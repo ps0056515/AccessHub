@@ -1,0 +1,101 @@
+.page { max-width: 1280px; margin: 0 auto; padding: 0 24px 64px; }
+
+.pageHeader { padding: 48px 0 32px; }
+.pageTitle { font-family: var(--serif); font-size: 2.4rem; font-weight: 400; letter-spacing: -0.02em; margin-bottom: 10px; }
+.pageSub { font-size: 15px; color: var(--text-muted); margin-bottom: 20px; }
+
+.filters { display: flex; gap: 8px; flex-wrap: wrap; }
+
+.filterBtn {
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-full);
+  padding: 6px 16px;
+  font-size: 13px;
+  color: var(--text-muted);
+  transition: all var(--transition);
+}
+
+.filterBtn:hover { background: var(--bg-secondary); color: var(--text); }
+.filterActive { background: var(--text); color: var(--bg); border-color: var(--text); }
+
+.eventGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 48px;
+}
+
+.eventCard {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 20px 24px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  transition: box-shadow var(--transition), transform var(--transition);
+}
+
+.eventCard:hover { box-shadow: var(--shadow-sm); transform: translateX(2px); }
+
+.dateBadge {
+  flex-shrink: 0;
+  width: 52px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 6px;
+  text-align: center;
+}
+
+.dateMonth { display: block; font-size: 9px; text-transform: uppercase; letter-spacing: 0.07em; color: var(--text-faint); }
+.dateDay { display: block; font-family: var(--serif); font-size: 22px; color: var(--text); line-height: 1.1; }
+
+.eventBody { flex: 1; min-width: 0; }
+
+.eventTitle { font-size: 15px; font-weight: 500; color: var(--text); margin-bottom: 4px; }
+.eventMeta { font-size: 13px; color: var(--text-faint); }
+
+.rsvpBtn {
+  flex-shrink: 0;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  padding: 8px 18px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text);
+  transition: all var(--transition);
+}
+
+.rsvpBtn:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+.hostBanner {
+  background: linear-gradient(135deg, #1a1916 0%, #2a2720 100%);
+  border-radius: var(--radius-lg);
+  padding: 48px;
+}
+
+.hostTitle { font-family: var(--serif); font-size: 1.8rem; font-weight: 400; color: #faf9f7; margin-bottom: 10px; }
+.hostSub { font-size: 15px; color: rgba(250,249,247,0.65); margin-bottom: 24px; max-width: 480px; }
+
+.hostBtn {
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 12px 24px;
+  font-size: 14px;
+  font-weight: 500;
+  transition: opacity var(--transition);
+}
+
+.hostBtn:hover { opacity: 0.85; }
+
+@media (max-width: 600px) {
+  .page { padding: 0 16px 48px; }
+  .eventCard { flex-direction: column; align-items: flex-start; gap: 14px; }
+  .rsvpBtn { width: 100%; text-align: center; }
+  .hostBanner { padding: 28px 20px; }
+}

@@ -1,0 +1,112 @@
+.footer {
+  background: var(--text);
+  color: rgba(250,249,247,0.7);
+  margin-top: auto;
+}
+
+.inner {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+.top {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr;
+  gap: 40px;
+  padding: 48px 0 40px;
+  border-bottom: 1px solid rgba(250,249,247,0.1);
+}
+
+.brand {}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.logoMark {
+  width: 30px; height: 30px;
+  border-radius: 8px;
+  background: var(--accent);
+  color: #fff;
+  font-family: var(--serif);
+  font-size: 17px;
+  display: flex; align-items: center; justify-content: center;
+}
+
+.logoText {
+  font-family: var(--serif);
+  font-size: 18px;
+  color: #faf9f7;
+  letter-spacing: -0.02em;
+}
+
+.brandDesc {
+  font-size: 13px;
+  line-height: 1.65;
+  color: rgba(250,249,247,0.55);
+  max-width: 280px;
+  margin-bottom: 18px;
+}
+
+.socials { display: flex; gap: 10px; flex-wrap: wrap; }
+
+.social {
+  font-size: 12px;
+  color: rgba(250,249,247,0.5);
+  padding: 4px 10px;
+  border: 1px solid rgba(250,249,247,0.15);
+  border-radius: var(--radius-full);
+  transition: all var(--transition);
+}
+
+.social:hover { color: #faf9f7; border-color: rgba(250,249,247,0.4); }
+
+.col {}
+.colHeading {
+  font-size: 11px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: rgba(250,249,247,0.85);
+  margin-bottom: 14px;
+}
+
+.colLinks { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+
+.colLink {
+  font-size: 13px;
+  color: rgba(250,249,247,0.5);
+  transition: color var(--transition);
+  display: block;
+}
+
+.colLink:hover { color: #faf9f7; }
+
+.bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 0;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.copy { font-size: 12px; color: rgba(250,249,247,0.35); }
+
+.bottomLinks { display: flex; gap: 16px; }
+.bottomLink { font-size: 12px; color: rgba(250,249,247,0.35); transition: color var(--transition); }
+.bottomLink:hover { color: rgba(250,249,247,0.7); }
+
+@media (max-width: 900px) {
+  .top { grid-template-columns: 1fr 1fr; }
+  .brand { grid-column: 1 / -1; }
+}
+
+@media (max-width: 600px) {
+  .top { grid-template-columns: 1fr 1fr; gap: 24px; padding: 32px 0 28px; }
+  .inner { padding: 0 16px; }
+}
