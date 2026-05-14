@@ -18,10 +18,10 @@ export default function Navbar({ activePage, setActivePage }) {
         <button
           className={styles.logo}
           onClick={() => setActivePage('portal')}
-          aria-label="AccessHub home"
+          aria-label="Allcanaccess home"
         >
           <span className={styles.logoMark} aria-hidden="true">A</span>
-          <span className={styles.logoText}>AccessHub</span>
+          <span className={styles.logoText}>Allcanaccess</span>
           <span className={styles.logoBadge}>Beta</span>
         </button>
 

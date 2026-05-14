@@ -17,7 +17,7 @@ export default function Resources() {
       <header className={styles.pageHeader}>
         <h1 className={styles.pageTitle}>Community resources</h1>
         <p className={styles.pageSub}>
-          Guides, templates, checklists and references curated by the AccessHub community.
+          Guides, templates, checklists and references curated by the Allcanaccess community.
         </p>
       </header>
 

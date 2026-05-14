@@ -4,7 +4,7 @@ export default function Footer() {
   const cols = [
     { heading: 'Community', links: ['Discussions', 'Resources', 'Tools', 'Events', 'NVDA Guide'] },
     { heading: 'Standards', links: ['WCAG 2.2', 'ARIA Patterns', 'Section 508', 'EN 301 549', 'EAA 2025'] },
-    { heading: 'Organisation', links: ['About AccessHub', 'Newsletter', 'Blog', 'Contribute', 'Contact'] },
+    { heading: 'Organisation', links: ['About Allcanaccess', 'Newsletter', 'Blog', 'Contribute', 'Contact'] },
   ];
 
   return (
@@ -14,7 +14,7 @@ export default function Footer() {
           <div className={styles.brand}>
             <div className={styles.logo}>
               <span className={styles.logoMark} aria-hidden="true">A</span>
-              <span className={styles.logoText}>AccessHub</span>
+              <span className={styles.logoText}>Allcanaccess</span>
             </div>
             <p className={styles.brandDesc}>
               A community for accessibility practitioners, designers, developers, and advocates building a more inclusive web.
@@ -37,7 +37,7 @@ export default function Footer() {
           ))}
         </div>
         <div className={styles.bottom}>
-          <p className={styles.copy}>© 2025 AccessHub · Built for the accessibility community · Not affiliated with IAAP or WebAIM</p>
+          <p className={styles.copy}>© 2025 Allcanaccess · Built for the accessibility community · Not affiliated with IAAP or WebAIM</p>
           <div className={styles.bottomLinks}>
             <a href="#" className={styles.bottomLink}>Privacy</a>
             <a href="#" className={styles.bottomLink}>Terms</a>

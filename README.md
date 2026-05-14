@@ -1,4 +1,4 @@
-# AccessHub — Accessibility Community Portal
+# Allcanaccess — Accessibility Community Portal
 
 A full React application for an accessibility practitioner community portal.
 
@@ -37,7 +37,7 @@ vercel
 ## Deploy to GitHub Pages
 ```bash
 npm install --save-dev gh-pages
-# Add to package.json: "homepage": "https://yourusername.github.io/accesshub"
+# Add to package.json: "homepage": "https://yourusername.github.io/allcanaccess"
 # Add scripts: "predeploy": "npm run build", "deploy": "gh-pages -d build"
 npm run deploy
 ```

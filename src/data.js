@@ -114,7 +114,7 @@ export const EVENTS = [
   { month: 'MAY', day: '15', title: 'EAA compliance Q&A live session', type: 'Online · 60 min · Free' },
   { month: 'JUN', day: '3',  title: 'CSUN 2025 recap & highlights', type: 'Online · 2h · Members only' },
   { month: 'JUN', day: '18', title: 'Mobile accessibility deep-dive', type: 'Online · 90 min · Free' },
-  { month: 'JUL', day: '9',  title: 'Annual AccessHub community meetup', type: 'In-person · London · Members' },
+  { month: 'JUL', day: '9',  title: 'Annual Allcanaccess community meetup', type: 'In-person · London · Members' },
 ];
 
 export const MEMBERS = [

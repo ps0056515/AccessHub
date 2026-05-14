@@ -5,7 +5,7 @@ const ALL_EVENTS = [
   ...EVENTS,
   { month: 'JUL', day: '22', title: 'Designing for cognitive accessibility', type: 'Online · 75 min · Free' },
   { month: 'AUG', day: '5',  title: 'PDF accessibility deep-dive workshop', type: 'Online · 90 min · Free' },
-  { month: 'AUG', day: '19', title: 'AccessHub annual survey results reveal', type: 'Online · 60 min · Free' },
+  { month: 'AUG', day: '19', title: 'Allcanaccess annual survey results reveal', type: 'Online · 60 min · Free' },
   { month: 'SEP', day: '11', title: 'Inclusive UX patterns for mobile', type: 'Online · 90 min · Members only' },
 ];
 
@@ -52,7 +52,7 @@ export default function Events() {
         <div className={styles.hostBannerContent}>
           <h2 className={styles.hostTitle}>Host an event</h2>
           <p className={styles.hostSub}>
-            Running a workshop, webinar, or local meetup? Reach thousands of practitioners through AccessHub.
+            Running a workshop, webinar, or local meetup? Reach thousands of practitioners through Allcanaccess.
           </p>
           <button className={styles.hostBtn}>Submit your event →</button>
         </div>
