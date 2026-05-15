@@ -28,7 +28,7 @@ export default function Navbar({ activePage, setActivePage, goToPortal, onSearch
           aria-label={`${SITE_NAME} home`}
         >
           <img src={logoUrl()} alt="" className={styles.logoImg} width={128} height={40} />
-          <span className="sr-only">{SITE_NAME}</span>
+          <span className={`sr-only ${styles.logoName}`}>{SITE_NAME}</span>
           <span className={styles.logoBadge}>Beta</span>
         </button>
 
