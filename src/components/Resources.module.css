@@ -15,10 +15,12 @@
 
 .toolbar {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 16px;
   margin-bottom: 28px;
   flex-wrap: wrap;
+  position: relative;
+  z-index: 1;
 }
 
 .searchWrap { flex: 1; min-width: 200px; max-width: 340px; }
@@ -37,9 +39,27 @@
 .searchInput:focus { outline: none; border-color: var(--accent); }
 .searchInput::placeholder { color: var(--text-faint); }
 
-.catNav { display: flex; gap: 6px; flex-wrap: wrap; }
+.catFieldset {
+  border: none;
+  padding: 0;
+  margin: 0;
+  flex: 1 1 220px;
+  min-width: 0;
+}
 
-.catBtn {
+.catNav {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.catLabel {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
   background: transparent;
   border: 1px solid var(--border);
   border-radius: var(--radius-full);
@@ -47,14 +67,41 @@
   font-size: 13px;
   color: var(--text-muted);
   transition: all var(--transition);
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
 }
 
-.catBtn:hover { background: var(--bg-secondary); color: var(--text); }
+.catLabel:hover {
+  background: var(--bg-secondary);
+  color: var(--text);
+}
 
-.catActive {
+.catLabel:focus-within {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.catInput {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+  margin: 0;
+}
+
+.catText {
+  pointer-events: none;
+}
+
+.catLabel.catActive {
   background: var(--text);
   color: var(--bg);
   border-color: var(--text);
+}
+
+.catLabel.catActive:hover {
+  opacity: 0.9;
+  color: var(--bg);
 }
 
 .grid {
@@ -94,10 +141,17 @@
 .cardTitle { font-size: 14px; font-weight: 500; color: var(--text); margin-bottom: 5px; line-height: 1.4; }
 .cardDesc { font-size: 12px; color: var(--text-muted); line-height: 1.55; }
 
-.cardActions { display: flex; align-items: center; gap: 8px; }
+.cardActions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  position: relative;
+  z-index: 1;
+}
 
 .cardBtn {
   flex: 1;
+  min-width: 0;
   background: var(--bg-secondary);
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
@@ -106,11 +160,19 @@
   color: var(--text);
   font-weight: 500;
   transition: background var(--transition);
+  text-decoration: none;
+  text-align: center;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .cardBtn:hover { background: var(--bg-tertiary); }
 
 .cardSave {
+  flex-shrink: 0;
+  position: relative;
+  z-index: 2;
   background: none;
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
@@ -125,6 +187,57 @@
 
 .cardSave:hover { color: var(--accent); border-color: var(--accent); }
 
+.cardSaveOn {
+  color: var(--accent);
+  border-color: var(--accent);
+  background: var(--accent-bg);
+}
+
+.cardCat {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-faint);
+  margin-bottom: 6px;
+}
+
+.certBanner {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+  padding: 24px 28px;
+  margin-bottom: 28px;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+  background: linear-gradient(160deg, #f7f5f0 0%, #edf4f0 100%);
+}
+
+.certHeading {
+  font-family: var(--serif);
+  font-size: 1.35rem;
+  font-weight: 400;
+  margin-bottom: 8px;
+}
+
+.certDesc { font-size: 14px; color: var(--text-muted); max-width: 560px; }
+
+.certCta {
+  background: var(--text);
+  color: var(--bg);
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 10px 18px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  align-self: center;
+}
+
+.certCta:hover { opacity: 0.88; }
+
 .empty {
   text-align: center;
   padding: 48px;
@@ -137,11 +250,13 @@
   align-items: center;
   justify-content: space-between;
   gap: 20px;
-  background: linear-gradient(135deg, #f0f9f4 0%, #e6f4ee 100%);
-  border: 1px solid rgba(26,107,74,0.15);
+  background: linear-gradient(135deg, #f0f5ff 0%, #e8f2ff 100%);
+  border: 1px solid rgba(var(--accent-rgb), 0.18);
   border-radius: var(--radius-lg);
   padding: 28px 32px;
   flex-wrap: wrap;
+  position: relative;
+  z-index: 1;
 }
 
 .bannerTitle {
@@ -167,6 +282,62 @@
 }
 
 .bannerBtn:hover { opacity: 0.85; }
+
+.formLabel {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-bottom: 14px;
+}
+
+.formInput,
+.formTextarea {
+  font: inherit;
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg-card);
+  color: var(--text);
+}
+
+.formTextarea { resize: vertical; min-height: 72px; }
+
+.formMsg {
+  font-size: 13px;
+  color: var(--accent-text);
+  background: var(--accent-bg);
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+}
+
+.submitFooter {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  margin-top: 8px;
+  padding-top: 4px;
+}
+
+.submitCancel {
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 8px 16px;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.submitOk {
+  background: var(--text);
+  color: var(--bg);
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 8px 18px;
+  cursor: pointer;
+  font-size: 13px;
+}
 
 @media (max-width: 600px) {
   .page { padding: 0 16px 48px; }

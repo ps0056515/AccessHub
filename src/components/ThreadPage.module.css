@@ -1,0 +1,230 @@
+.page {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 24px 24px 80px;
+}
+
+.breadcrumb {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-bottom: 12px;
+}
+
+.crumbBtn {
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  font-size: 13px;
+  color: var(--accent);
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.crumbBtn:hover { color: var(--accent-text); }
+
+.crumbSep { margin: 0 8px; color: var(--text-faint); }
+.crumbCurrent { color: var(--text-muted); }
+
+.back {
+  background: none;
+  border: none;
+  padding: 0 0 20px;
+  font-size: 14px;
+  color: var(--accent);
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.back:hover { text-decoration: underline; }
+
+.notFound { margin-bottom: 16px; color: var(--text-muted); }
+.backLink {
+  color: var(--accent);
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.rootPost {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--bg-card);
+  padding: 24px;
+  margin-bottom: 32px;
+}
+
+.rootTop {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+.voteCol {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.voteBtn {
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  width: 28px;
+  height: 22px;
+  font-size: 10px;
+  color: var(--text-faint);
+  cursor: pointer;
+}
+
+.votedUp { background: var(--accent-bg); border-color: var(--accent); color: var(--accent-text); }
+.votedDown { background: var(--red-bg); border-color: var(--red); color: var(--red-text); }
+.voteCount { font-size: 13px; font-weight: 500; color: var(--text-muted); }
+
+.avatar {
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 500;
+  flex-shrink: 0;
+}
+
+.rootBody { flex: 1; min-width: 0; }
+
+.meta {
+  font-size: 13px;
+  color: var(--text-faint);
+  margin-bottom: 8px;
+}
+
+.author { color: var(--text-muted); font-weight: 500; }
+.dot { color: var(--border-strong); margin: 0 4px; }
+
+.title {
+  font-family: var(--serif);
+  font-size: 1.65rem;
+  font-weight: 400;
+  line-height: 1.25;
+  margin-bottom: 12px;
+  color: var(--text);
+}
+
+.tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 16px; }
+
+.tag {
+  font-size: 11px;
+  padding: 2px 9px;
+  border-radius: var(--radius-full);
+  font-weight: 500;
+}
+
+.prose {
+  font-size: 15px;
+  line-height: 1.7;
+  color: var(--text-muted);
+  white-space: pre-wrap;
+}
+
+.repliesTitle {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--text-faint);
+  margin-bottom: 16px;
+}
+
+.replyList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.reply {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.replyBody { flex: 1; min-width: 0; }
+
+.replyMeta {
+  font-size: 12px;
+  color: var(--text-faint);
+  margin-bottom: 6px;
+}
+
+.replyText {
+  font-size: 14px;
+  line-height: 1.65;
+  color: var(--text-muted);
+  white-space: pre-wrap;
+}
+
+.noReplies {
+  font-size: 14px;
+  color: var(--text-faint);
+  margin-top: -8px;
+  margin-bottom: 8px;
+}
+
+.compose {
+  margin-top: 36px;
+  padding-top: 24px;
+  border-top: 1px solid var(--border);
+}
+
+.composeTitle {
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 12px;
+  color: var(--text);
+}
+
+.textarea {
+  width: 100%;
+  font: inherit;
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  margin-bottom: 12px;
+  resize: vertical;
+  min-height: 100px;
+}
+
+.textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.submit {
+  background: var(--text);
+  color: var(--bg);
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.submit:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.submit:hover:not(:disabled) { opacity: 0.88; }
+
+@media (max-width: 600px) {
+  .page { padding: 16px 16px 64px; }
+  .title { font-size: 1.35rem; }
+}

@@ -20,7 +20,8 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "test:e2e": "playwright test",
-    "verify": "npm run build && playwright test",
+    "verify": "npm run build",
+    "verify:e2e": "npm run build && playwright test",
     "serve:prod": "serve -s build -l 4173",
     "eject": "react-scripts eject"
   },

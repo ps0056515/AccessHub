@@ -1,0 +1,146 @@
+.page {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 28px 20px 48px;
+}
+
+.missing {
+  color: var(--text-muted);
+  margin-bottom: 16px;
+}
+
+.breadcrumb {
+  font-size: 13px;
+  margin-bottom: 28px;
+}
+
+.crumbBtn {
+  color: var(--accent);
+  font-weight: 500;
+  text-decoration: none;
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  cursor: pointer;
+}
+
+.crumbBtn:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.sep {
+  color: var(--text-faint);
+  margin: 0 8px;
+}
+
+.crumbCurrent {
+  color: var(--text-muted);
+}
+
+.header {
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+  margin-bottom: 32px;
+}
+
+.avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.headerText {
+  min-width: 0;
+  padding-top: 4px;
+}
+
+.name {
+  font-family: var(--serif);
+  font-size: clamp(1.6rem, 3vw, 2rem);
+  font-weight: 400;
+  line-height: 1.2;
+  margin: 0 0 6px;
+  color: var(--text);
+}
+
+.role {
+  font-size: 15px;
+  color: var(--text-muted);
+  margin: 0 0 8px;
+  text-transform: capitalize;
+}
+
+.hot {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--accent-text);
+  background: var(--accent-bg);
+  padding: 4px 10px;
+  border-radius: var(--radius-full);
+}
+
+.section {
+  margin-bottom: 24px;
+}
+
+.sectionTitle {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-faint);
+  margin: 0 0 12px;
+}
+
+.bio {
+  font-size: 15px;
+  line-height: 1.65;
+  color: var(--text);
+  margin: 0;
+}
+
+.urlHint {
+  font-size: 12px;
+  color: var(--text-faint);
+  margin-bottom: 24px;
+  word-break: break-all;
+}
+
+.mono {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.primaryBtn,
+.back {
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 11px 20px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.back {
+  display: inline-block;
+}
+
+.primaryBtn:hover,
+.back:hover {
+  opacity: 0.92;
+}

@@ -2,6 +2,8 @@
   background: var(--text);
   color: rgba(250,249,247,0.7);
   margin-top: auto;
+  position: relative;
+  z-index: 2;
 }
 
 .inner {
@@ -20,28 +22,29 @@
 
 .brand {}
 
-.logo {
-  display: flex;
-  align-items: center;
-  gap: 10px;
+.brandBtn {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  display: inline-block;
+  text-align: left;
   margin-bottom: 14px;
 }
 
-.logoMark {
-  width: 30px; height: 30px;
-  border-radius: 8px;
-  background: var(--accent);
-  color: #fff;
-  font-family: var(--serif);
-  font-size: 17px;
-  display: flex; align-items: center; justify-content: center;
+.logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
 }
 
-.logoText {
-  font-family: var(--serif);
-  font-size: 18px;
-  color: #faf9f7;
-  letter-spacing: -0.02em;
+.logoImg {
+  height: 40px;
+  width: auto;
+  max-width: min(180px, 55vw);
+  display: block;
+  object-fit: contain;
+  opacity: 0.98;
 }
 
 .brandDesc {
@@ -82,7 +85,23 @@
   color: rgba(250,249,247,0.5);
   transition: color var(--transition);
   display: block;
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+  text-align: left;
+  font-family: inherit;
+  width: 100%;
+  text-decoration: none;
 }
+
+a.colLink {
+  font: inherit;
+  width: 100%;
+}
+
+button.colLink { font: inherit; }
 
 .colLink:hover { color: #faf9f7; }
 
@@ -97,9 +116,24 @@
 
 .copy { font-size: 12px; color: rgba(250,249,247,0.35); }
 
-.bottomLinks { display: flex; gap: 16px; }
-.bottomLink { font-size: 12px; color: rgba(250,249,247,0.35); transition: color var(--transition); }
-.bottomLink:hover { color: rgba(250,249,247,0.7); }
+.bottomLinks { display: flex; gap: 16px; flex-wrap: wrap; align-items: center; }
+
+.bottomLink,
+.bottomLinkBtn {
+  font-size: 12px;
+  color: rgba(250,249,247,0.35);
+  transition: color var(--transition);
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  font-family: inherit;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.bottomLink:hover,
+.bottomLinkBtn:hover { color: rgba(250,249,247,0.7); }
 
 @media (max-width: 900px) {
   .top { grid-template-columns: 1fr 1fr; }

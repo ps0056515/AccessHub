@@ -103,6 +103,8 @@
 
 .certBtn {
   flex-shrink: 0;
+  position: relative;
+  z-index: 2;
   background: none;
   border: 1px solid var(--border-strong);
   border-radius: var(--radius-sm);
@@ -112,6 +114,11 @@
   align-self: center;
   transition: all var(--transition);
   white-space: nowrap;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
 }
 
 .certBtn:hover { background: var(--bg-secondary); color: var(--text); }

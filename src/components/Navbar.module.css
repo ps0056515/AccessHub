@@ -27,25 +27,12 @@
   flex-shrink: 0;
 }
 
-.logoMark {
-  width: 30px;
-  height: 30px;
-  border-radius: 8px;
-  background: var(--accent);
-  color: #fff;
-  font-family: var(--serif);
-  font-size: 17px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  line-height: 1;
-}
-
-.logoText {
-  font-family: var(--serif);
-  font-size: 18px;
-  color: var(--text);
-  letter-spacing: -0.02em;
+.logoImg {
+  display: block;
+  height: 40px;
+  width: auto;
+  max-width: min(200px, 38vw);
+  object-fit: contain;
 }
 
 .logoBadge {
@@ -106,8 +93,8 @@
 .searchBtn:hover { background: var(--bg-secondary); color: var(--text); }
 
 .joinBtn {
-  background: var(--text);
-  color: var(--bg);
+  background: var(--accent);
+  color: #fff;
   border: none;
   border-radius: var(--radius-sm);
   padding: 7px 16px;
@@ -116,7 +103,7 @@
   transition: opacity var(--transition);
 }
 
-.joinBtn:hover { opacity: 0.82; }
+.joinBtn:hover { opacity: 0.88; }
 
 .menuBtn {
   display: none;
@@ -165,8 +152,8 @@
 }
 
 .mobileJoin {
-  background: var(--text);
-  color: var(--bg);
+  background: var(--accent);
+  color: #fff;
   border: none;
   border-radius: var(--radius-sm);
   padding: 12px;
@@ -175,9 +162,22 @@
   margin-top: 8px;
 }
 
+.mobileJoin:hover { opacity: 0.9; }
+
 @media (max-width: 768px) {
   .nav { display: none; }
-  .joinBtn { display: none; }
+  /* Join must stay visible: hiding it blocked users who never open the hamburger menu. */
+  .joinBtn {
+    padding: 7px 10px;
+    font-size: 12px;
+  }
   .menuBtn { display: flex; }
   .mobileNav { display: flex; }
+}
+
+@media (max-width: 400px) {
+  .logoImg {
+    max-width: min(140px, 42vw);
+    height: 34px;
+  }
 }

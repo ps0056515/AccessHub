@@ -88,7 +88,15 @@ export default function Tools() {
                   </div>
                   <p className={styles.certMembers}>{c.members} in our community</p>
                 </div>
-                <button className={styles.certBtn}>Learn more →</button>
+                <a
+                  className={styles.certBtn}
+                  href={c.learnMoreUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={e => e.stopPropagation()}
+                >
+                  Learn more →
+                </a>
               </article>
             );
           })}

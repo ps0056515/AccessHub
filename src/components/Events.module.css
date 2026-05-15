@@ -4,9 +4,27 @@
 .pageTitle { font-family: var(--serif); font-size: 2.4rem; font-weight: 400; letter-spacing: -0.02em; margin-bottom: 10px; }
 .pageSub { font-size: 15px; color: var(--text-muted); margin-bottom: 20px; }
 
-.filters { display: flex; gap: 8px; flex-wrap: wrap; }
+.filterFieldset {
+  border: none;
+  padding: 0;
+  margin: 0;
+  position: relative;
+  z-index: 1;
+}
 
-.filterBtn {
+.filters {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.filterLabel {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
   background: transparent;
   border: 1px solid var(--border);
   border-radius: var(--radius-full);
@@ -14,16 +32,75 @@
   font-size: 13px;
   color: var(--text-muted);
   transition: all var(--transition);
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
 }
 
-.filterBtn:hover { background: var(--bg-secondary); color: var(--text); }
-.filterActive { background: var(--text); color: var(--bg); border-color: var(--text); }
+.filterLabel:hover {
+  background: var(--bg-secondary);
+  color: var(--text);
+}
+
+.filterLabel:focus-within {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.filterInput {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+  margin: 0;
+}
+
+.filterText {
+  pointer-events: none;
+}
+
+.filterSelected {
+  background: var(--text);
+  color: var(--bg);
+  border-color: var(--text);
+}
+
+.filterLabel.filterSelected:hover {
+  opacity: 0.92;
+  color: var(--bg);
+}
+
+.eventSection { margin-bottom: 40px; }
+
+.sectionLabel {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-faint);
+  margin-bottom: 14px;
+}
+
+.timingPill {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--accent-text);
+  background: var(--accent-bg);
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  margin-bottom: 6px;
+}
+
+.rsvpHint { font-size: 13px; margin-top: 12px; color: var(--text-muted); }
+
+.empty { font-size: 14px; color: var(--text-faint); padding: 12px 0 24px; }
 
 .eventGrid {
   display: flex;
   flex-direction: column;
   gap: 12px;
-  margin-bottom: 48px;
+  margin-bottom: 8px;
 }
 
 .eventCard {
@@ -92,6 +169,75 @@
 }
 
 .hostBtn:hover { opacity: 0.85; }
+
+.hostModalIntro {
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--text-muted);
+  margin-bottom: 16px;
+}
+
+.formLabel {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-bottom: 14px;
+}
+
+.formInput,
+.formTextarea {
+  font: inherit;
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg-card);
+  color: var(--text);
+}
+
+.formTextarea {
+  resize: vertical;
+  min-height: 88px;
+}
+
+.formMsg {
+  font-size: 13px;
+  color: var(--accent-text);
+  background: var(--accent-bg);
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  margin-bottom: 12px;
+}
+
+.submitFooter {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  margin-top: 8px;
+  flex-wrap: wrap;
+}
+
+.submitCancel {
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 8px 16px;
+  cursor: pointer;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.submitOk {
+  background: var(--text);
+  color: var(--bg);
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 8px 18px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+}
 
 @media (max-width: 600px) {
   .page { padding: 0 16px 48px; }

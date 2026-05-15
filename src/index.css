@@ -6,21 +6,26 @@
   --sans: 'DM Sans', system-ui, sans-serif;
   --mono: 'Fira Mono', 'Consolas', monospace;
 
-  --bg: #faf9f7;
+  /* Brand-aligned: navy + vibrant blue (matches public/allcanaccess.jpg) */
+  --brand-navy: #0c1929;
+  --brand-blue: #0b6cff;
+  --accent-rgb: 11, 108, 255;
+
+  --bg: #f4f7fb;
   --bg-card: #ffffff;
-  --bg-secondary: #f3f2ef;
-  --bg-tertiary: #ebe9e4;
+  --bg-secondary: #e8eef7;
+  --bg-tertiary: #dde6f0;
 
-  --text: #1a1916;
-  --text-muted: #6b6963;
-  --text-faint: #a09d97;
+  --text: #0c1929;
+  --text-muted: #3d4f66;
+  --text-faint: #6b7c92;
 
-  --border: rgba(26,25,22,0.10);
-  --border-strong: rgba(26,25,22,0.20);
+  --border: rgba(12, 25, 41, 0.1);
+  --border-strong: rgba(12, 25, 41, 0.18);
 
-  --accent: #1a6b4a;
-  --accent-bg: #e6f4ee;
-  --accent-text: #0d4a32;
+  --accent: #0b6cff;
+  --accent-bg: #e8f2ff;
+  --accent-text: #003d99;
 
   --blue: #1a4f8a;
   --blue-bg: #e8f0fb;

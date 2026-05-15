@@ -1,8 +1,14 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { logoUrl, SITE_NAME } from '../brand';
 import styles from './Navbar.module.css';
 
-export default function Navbar({ activePage, setActivePage }) {
+export default function Navbar({ activePage, setActivePage, goToPortal, onSearch }) {
   const [menuOpen, setMenuOpen] = useState(false);
+  const navigate = useNavigate();
+
+  const visitPortal =
+    typeof goToPortal === 'function' ? goToPortal : () => setActivePage('portal');
 
   const links = [
     { id: 'portal',    label: 'Community' },
@@ -16,12 +22,13 @@ export default function Navbar({ activePage, setActivePage }) {
     <header className={styles.header} role="banner">
       <div className={styles.inner}>
         <button
+          type="button"
           className={styles.logo}
-          onClick={() => setActivePage('portal')}
-          aria-label="Allcanaccess home"
+          onClick={() => visitPortal()}
+          aria-label={`${SITE_NAME} home`}
         >
-          <span className={styles.logoMark} aria-hidden="true">A</span>
-          <span className={styles.logoText}>Allcanaccess</span>
+          <img src={logoUrl()} alt="" className={styles.logoImg} width={128} height={40} />
+          <span className="sr-only">{SITE_NAME}</span>
           <span className={styles.logoBadge}>Beta</span>
         </button>
 
@@ -39,13 +46,22 @@ export default function Navbar({ activePage, setActivePage }) {
         </nav>
 
         <div className={styles.actions}>
-          <button className={styles.searchBtn} aria-label="Search">
+          <button
+            type="button"
+            className={styles.searchBtn}
+            aria-label="Search discussions"
+            onClick={() => onSearch?.()}
+          >
             <svg width="15" height="15" viewBox="0 0 15 15" fill="none" aria-hidden="true">
               <circle cx="6.5" cy="6.5" r="4.5" stroke="currentColor" strokeWidth="1.4"/>
               <path d="M10 10L13.5 13.5" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/>
             </svg>
           </button>
-          <button className={styles.joinBtn} onClick={() => setActivePage('portal')}>
+          <button
+            className={styles.joinBtn}
+            type="button"
+            onClick={() => navigate('/join')}
+          >
             Join community
           </button>
           <button
@@ -71,7 +87,14 @@ export default function Navbar({ activePage, setActivePage }) {
               {l.label}
             </button>
           ))}
-          <button className={styles.mobileJoin} onClick={() => { setActivePage('portal'); setMenuOpen(false); }}>
+          <button
+            type="button"
+            className={styles.mobileJoin}
+            onClick={() => {
+              navigate('/join');
+              setMenuOpen(false);
+            }}
+          >
             Join community
           </button>
         </nav>
