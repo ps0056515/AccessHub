@@ -10,6 +10,9 @@ import Footer from './components/Footer';
 import ThreadPage from './components/ThreadPage';
 import JoinCommunityPage from './components/JoinCommunityPage';
 import MemberProfilePage from './components/MemberProfilePage';
+import Privacy from './components/footer-pages/Privacy';
+import Terms from './components/footer-pages/Terms';
+import AccessibilityStatement from './components/footer-pages/AccessibilityStatement';
 import { POSTS } from './data';
 import { SITE_NAME } from './brand';
 
@@ -147,9 +150,9 @@ function AppShell() {
   const focusPortalDiscussionSearch = useCallback(() => {
     setActivePageState('portal');
     navigate('/');
-    queueMicrotask(() => {
+    setTimeout(() => {
       window.dispatchEvent(new CustomEvent('allcanaccess:focus-discussion-search'));
-    });
+    }, 100);
   }, [navigate]);
 
   const returnFromThread = useCallback(() => {
@@ -222,6 +225,9 @@ function AppShell() {
           />
           <Route path="/events" element={<Events setActivePage={setActivePage} />} />
           <Route path="/profile/:memberId" element={<MemberProfilePage goToPortal={goToPortal} />} />
+          <Route path="/privacy" element={<Privacy />} />
+          <Route path="/terms" element={<Terms />} />
+          <Route path="/accessibility" element={<AccessibilityStatement />} />
           <Route
             path="*"
             element={

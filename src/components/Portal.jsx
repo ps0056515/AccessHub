@@ -1,16 +1,22 @@
-import { useEffect, useRef, useState, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { STATS, ALL_EVENTS, MEMBERS, TAG_COLORS, COLOR_MAP } from '../data';
-import styles from './Portal.module.css';
+import { useEffect, useRef, useState, useMemo } from "react";
+import { useNavigate } from "react-router-dom";
+import { STATS, ALL_EVENTS, MEMBERS, TAG_COLORS, COLOR_MAP } from "../data";
+import styles from "./Portal.module.css";
 
-const TOPIC_FILTERS = ['WCAG 2.2', 'Screen readers', 'Legal'];
+const TOPIC_FILTERS = ["WCAG 2.2", "Screen readers", "Legal"];
 
 function postMatchesQuery(post, rawQuery) {
   const q = rawQuery.trim().toLowerCase();
   if (!q) return true;
-  const haystack = [post.title, post.excerpt, post.body, post.author, ...(post.tags || [])]
+  const haystack = [
+    post.title,
+    post.excerpt,
+    post.body,
+    post.author,
+    ...(post.tags || []),
+  ]
     .filter(Boolean)
-    .join(' ')
+    .join(" ")
     .toLowerCase();
   return haystack.includes(q);
 }
@@ -35,7 +41,7 @@ function Avatar({ initials, color, size = 36 }) {
 }
 
 function Tag({ label }) {
-  const c = TAG_COLORS[label] || { bg: '#f3f2ef', text: '#4a4840' };
+  const c = TAG_COLORS[label] || { bg: "#f3f2ef", text: "#4a4840" };
   return (
     <span className={styles.tag} style={{ background: c.bg, color: c.text }}>
       {label}
@@ -53,7 +59,7 @@ function PostCard({ post, onOpenThread }) {
       setVotes(post.votes);
       setVoted(null);
     } else {
-      setVotes(post.votes + (dir === 'up' ? 1 : -1));
+      setVotes(post.votes + (dir === "up" ? 1 : -1));
       setVoted(dir);
     }
   };
@@ -63,8 +69,8 @@ function PostCard({ post, onOpenThread }) {
       <div className={styles.voteCol}>
         <button
           type="button"
-          className={`${styles.voteBtn} ${voted === 'up' ? styles.votedUp : ''}`}
-          onClick={e => vote('up', e)}
+          className={`${styles.voteBtn} ${voted === "up" ? styles.votedUp : ""}`}
+          onClick={(e) => vote("up", e)}
           aria-label={`Upvote: ${post.title}`}
         >
           ▲
@@ -72,8 +78,8 @@ function PostCard({ post, onOpenThread }) {
         <span className={styles.voteCount}>{votes}</span>
         <button
           type="button"
-          className={`${styles.voteBtn} ${voted === 'down' ? styles.votedDown : ''}`}
-          onClick={e => vote('down', e)}
+          className={`${styles.voteBtn} ${voted === "down" ? styles.votedDown : ""}`}
+          onClick={(e) => vote("down", e)}
           aria-label={`Downvote: ${post.title}`}
         >
           ▼
@@ -97,7 +103,7 @@ function PostCard({ post, onOpenThread }) {
           <h3 className={styles.postTitle}>{post.title}</h3>
           <p className={styles.postExcerpt}>{post.excerpt}</p>
           <div className={styles.postTags}>
-            {post.tags.map(t => (
+            {post.tags.map((t) => (
               <Tag key={t} label={t} />
             ))}
           </div>
@@ -107,12 +113,17 @@ function PostCard({ post, onOpenThread }) {
   );
 }
 
-export default function Portal({ setActivePage, goToSection, posts, setPosts }) {
+export default function Portal({
+  setActivePage,
+  goToSection,
+  posts,
+  setPosts,
+}) {
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState('hot');
-  const [query, setQuery] = useState('');
+  const [activeTab, setActiveTab] = useState("hot");
+  const [query, setQuery] = useState("");
   const [topicFilter, setTopicFilter] = useState(null);
-  const [draftQuestion, setDraftQuestion] = useState('');
+  const [draftQuestion, setDraftQuestion] = useState("");
   const askBoxRef = useRef(null);
   const askTextareaRef = useRef(null);
   const searchInputRef = useRef(null);
@@ -120,28 +131,40 @@ export default function Portal({ setActivePage, goToSection, posts, setPosts }) 
   useEffect(() => {
     const onFocusSearch = () => {
       searchInputRef.current?.focus();
-      searchInputRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      searchInputRef.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+      });
     };
     const onFocusAsk = () => {
-      askBoxRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      askBoxRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
       askTextareaRef.current?.focus();
     };
-    window.addEventListener('allcanaccess:focus-discussion-search', onFocusSearch);
-    window.addEventListener('allcanaccess:focus-ask', onFocusAsk);
+    window.addEventListener(
+      "allcanaccess:focus-discussion-search",
+      onFocusSearch,
+    );
+    window.addEventListener("allcanaccess:focus-ask", onFocusAsk);
     return () => {
-      window.removeEventListener('allcanaccess:focus-discussion-search', onFocusSearch);
-      window.removeEventListener('allcanaccess:focus-ask', onFocusAsk);
+      window.removeEventListener(
+        "allcanaccess:focus-discussion-search",
+        onFocusSearch,
+      );
+      window.removeEventListener("allcanaccess:focus-ask", onFocusAsk);
     };
   }, []);
 
   const focusDiscussionBox = () => {
-    askBoxRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    askBoxRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
     askTextareaRef.current?.focus();
   };
 
   const goToCertificationsSection = () => {
-    sessionStorage.setItem('aa-nav', JSON.stringify({ scrollTo: 'certifications' }));
-    setActivePage?.('resources');
+    sessionStorage.setItem(
+      "aa-nav",
+      JSON.stringify({ scrollTo: "certifications" }),
+    );
+    setActivePage?.("resources");
   };
 
   const handlePostQuestion = () => {
@@ -154,37 +177,36 @@ export default function Portal({ setActivePage, goToSection, posts, setPosts }) 
     const newPost = {
       id: Date.now(),
       votes: 0,
-      initials: 'YU',
-      color: 'blue',
-      author: 'You',
-      role: 'Community member',
-      time: 'Just now',
+      initials: "YU",
+      color: "blue",
+      author: "You",
+      role: "Community member",
+      time: "Just now",
       replies: 0,
       title: trimmedQuestion,
       excerpt:
-        'Thanks for posting. Community members can now respond to your question.',
-      body:
-        'Your question is live. Others can reply once the thread is indexed. Edit details from your profile (coming soon).',
-      tags: ['WCAG 2.2'],
-      tagColors: ['blue'],
+        "Thanks for posting. Community members can now respond to your question.",
+      body: "Your question is live. Others can reply once the thread is indexed. Edit details from your profile (coming soon).",
+      tags: ["WCAG 2.2"],
+      tagColors: ["blue"],
     };
 
-    setPosts(prevPosts => [newPost, ...prevPosts]);
-    setDraftQuestion('');
-    setQuery('');
-    setActiveTab('new');
+    setPosts((prevPosts) => [newPost, ...prevPosts]);
+    setDraftQuestion("");
+    setQuery("");
+    setActiveTab("new");
     navigate(`/thread/${newPost.id}`);
   };
 
   const tabs = [
-    { id: 'hot', label: '🔥 Hot' },
-    { id: 'new', label: '✨ New' },
-    { id: 'top', label: '⬆ Top' },
-    { id: 'unanswered', label: '💬 Unanswered' },
+    { id: "hot", label: "🔥 Hot" },
+    { id: "new", label: "✨ New" },
+    { id: "top", label: "⬆ Top" },
+    { id: "unanswered", label: "💬 Unanswered" },
   ];
 
   const baseFiltered = useMemo(() => {
-    return posts.filter(p => {
+    return posts.filter((p) => {
       if (topicFilter && !p.tags.includes(topicFilter)) return false;
       return postMatchesQuery(p, query);
     });
@@ -192,39 +214,39 @@ export default function Portal({ setActivePage, goToSection, posts, setPosts }) 
 
   const tabFiltered = useMemo(() => {
     const list = [...baseFiltered];
-    if (activeTab === 'hot') {
+    if (activeTab === "hot") {
       return [...list].sort((a, b) => {
         const scoreA = a.votes + (a.id > 100 ? 0 : 2);
         const scoreB = b.votes + (b.id > 100 ? 0 : 2);
         return scoreB - scoreA;
       });
     }
-    if (activeTab === 'new') return list.sort((a, b) => b.id - a.id);
-    if (activeTab === 'top') return list.sort((a, b) => b.votes - a.votes);
-    if (activeTab === 'unanswered') return list.filter(p => p.replies === 0);
+    if (activeTab === "new") return list.sort((a, b) => b.id - a.id);
+    if (activeTab === "top") return list.sort((a, b) => b.votes - a.votes);
+    if (activeTab === "unanswered") return list.filter((p) => p.replies === 0);
     return list;
   }, [baseFiltered, activeTab]);
 
   const sidebarEvents = useMemo(() => {
     const upcoming = ALL_EVENTS.filter(
-      e => e.timing === 'upcoming' || e.timing === 'live'
+      (e) => e.timing === "upcoming" || e.timing === "live",
     );
     return upcoming.slice(0, 4);
   }, []);
 
-  const goToEvent = id => {
+  const goToEvent = (id) => {
     try {
-      sessionStorage.setItem('aa-nav', JSON.stringify({ focusEventId: id }));
+      sessionStorage.setItem("aa-nav", JSON.stringify({ focusEventId: id }));
     } catch {
       /* ignore */
     }
-    if (typeof goToSection === 'function') goToSection('events');
-    else setActivePage?.('events');
+    if (typeof goToSection === "function") goToSection("events");
+    else setActivePage?.("events");
   };
 
   const goToAllEvents = () => {
-    if (typeof goToSection === 'function') goToSection('events');
-    else setActivePage?.('events');
+    if (typeof goToSection === "function") goToSection("events");
+    else setActivePage?.("events");
   };
 
   return (
@@ -241,20 +263,32 @@ export default function Portal({ setActivePage, goToSection, posts, setPosts }) 
             practitioners connect
           </h1>
           <p className={`${styles.heroSub} fade-up fade-up-1`}>
-            Crowd-sourced discussions, vetted guides, tooling, and events — built with practitioners who ship inclusive
-            products in the real world.
+            Crowd-sourced discussions, vetted guides, tooling, and events —
+            built with practitioners who ship inclusive products in the real
+            world.
           </p>
-          <ul className={`${styles.heroChips} fade-up fade-up-1`} aria-label="Popular topics">
+          <ul
+            className={`${styles.heroChips} fade-up fade-up-1`}
+            aria-label="Popular topics"
+          >
             <li>WCAG 2.2 implementations</li>
             <li>Screen reader testing</li>
             <li>Legal &amp; procurement</li>
             <li>Design systems</li>
           </ul>
           <div className={`${styles.heroActions} fade-up fade-up-2`}>
-            <button type="button" className={styles.heroCta} onClick={focusDiscussionBox}>
+            <button
+              type="button"
+              className={styles.heroCta}
+              onClick={focusDiscussionBox}
+            >
               Start a discussion
             </button>
-            <button type="button" className={styles.heroSecondary} onClick={goToCertificationsSection}>
+            <button
+              type="button"
+              className={styles.heroSecondary}
+              onClick={goToCertificationsSection}
+            >
               Explore certifications
             </button>
           </div>
@@ -281,40 +315,6 @@ export default function Portal({ setActivePage, goToSection, posts, setPosts }) 
 
       <div className={styles.mainGrid}>
         <main className={styles.feed}>
-          <div className={styles.searchRow}>
-            <label htmlFor="search" className="sr-only">
-              Search discussions
-            </label>
-            <div className={styles.searchWrap}>
-              <svg className={styles.searchIcon} width="15" height="15" viewBox="0 0 15 15" fill="none" aria-hidden="true">
-                <circle cx="6.5" cy="6.5" r="4.5" stroke="currentColor" strokeWidth="1.4" />
-                <path d="M10 10L13.5 13.5" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
-              </svg>
-              <input
-                ref={searchInputRef}
-                id="search"
-                className={styles.searchInput}
-                type="search"
-                placeholder="Search discussions by title or text…"
-                value={query}
-                onChange={e => setQuery(e.target.value)}
-              />
-            </div>
-            <div className={styles.filterPills} role="toolbar" aria-label="Filter discussions by topic">
-              {TOPIC_FILTERS.map(f => (
-                <button
-                  key={f}
-                  type="button"
-                  aria-pressed={topicFilter === f}
-                  className={`${styles.filterPill} ${topicFilter === f ? styles.filterPillActive : ''}`}
-                  onClick={() => setTopicFilter(prev => (prev === f ? null : f))}
-                >
-                  {f}
-                </button>
-              ))}
-            </div>
-          </div>
-
           <div className={styles.askBox} ref={askBoxRef}>
             <p className={styles.askLabel}>Ask the community</p>
             <textarea
@@ -324,26 +324,91 @@ export default function Portal({ setActivePage, goToSection, posts, setPosts }) 
               rows={3}
               aria-label="Write your question"
               value={draftQuestion}
-              onChange={e => setDraftQuestion(e.target.value)}
+              onChange={(e) => setDraftQuestion(e.target.value)}
             />
             <div className={styles.askFooter}>
-              <button type="button" className={styles.askTopic}>
+              {/** TODO: Enable the button for choose topic */}
+              {/* <button type="button" className={styles.askTopic}>
                 Choose topic
-              </button>
-              <button type="button" className={styles.askPost} onClick={handlePostQuestion}>
+              </button> */}
+              <button
+                type="button"
+                className={styles.askPost}
+                onClick={handlePostQuestion}
+              >
                 Post question →
               </button>
             </div>
           </div>
-
-          <div className={styles.tabBar} role="tablist" aria-label="Discussion filter">
-            {tabs.map(t => (
+          <div className={styles.searchRow}>
+            <label htmlFor="search" className="sr-only">
+              Search discussions
+            </label>
+            <div className={styles.searchWrap}>
+              <svg
+                className={styles.searchIcon}
+                width="15"
+                height="15"
+                viewBox="0 0 15 15"
+                fill="none"
+                aria-hidden="true"
+              >
+                <circle
+                  cx="6.5"
+                  cy="6.5"
+                  r="4.5"
+                  stroke="currentColor"
+                  strokeWidth="1.4"
+                />
+                <path
+                  d="M10 10L13.5 13.5"
+                  stroke="currentColor"
+                  strokeWidth="1.4"
+                  strokeLinecap="round"
+                />
+              </svg>
+              <input
+                ref={searchInputRef}
+                id="search"
+                className={styles.searchInput}
+                type="search"
+                placeholder="Search discussions by title or text…"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+              />
+            </div>
+            <div
+              className={styles.filterPills}
+              role="toolbar"
+              aria-label="Filter discussions by topic"
+            >
+              {TOPIC_FILTERS.map((f) => (
+                <button
+                  key={f}
+                  type="button"
+                  aria-pressed={topicFilter === f}
+                  className={`${styles.filterPill} ${topicFilter === f ? styles.filterPillActive : ""}`}
+                  onClick={() =>
+                    setTopicFilter((prev) => (prev === f ? null : f))
+                  }
+                >
+                  {f}
+                </button>
+              ))}
+            </div>
+          </div>
+          <div
+            className={styles.tabBar}
+            role="tablist"
+            aria-label="Discussion filter"
+          >
+            {tabs.map((t) => (
               <button
                 key={t.id}
                 type="button"
                 role="tab"
                 aria-selected={activeTab === t.id}
-                className={`${styles.tabBtn} ${activeTab === t.id ? styles.tabActive : ''}`}
+                className={`${styles.tabBtn} ${activeTab === t.id ? styles.tabActive : ""}`}
                 onClick={() => setActiveTab(t.id)}
               >
                 {t.label}
@@ -358,25 +423,36 @@ export default function Portal({ setActivePage, goToSection, posts, setPosts }) 
                   ? `No discussions match “${query.trim()}”. Try another word or clear the search.`
                   : topicFilter
                     ? `No discussions in “${topicFilter}” with the current tab. Try another topic or tab.`
-                    : 'No discussions match your filters.'}
+                    : "No discussions match your filters."}
               </p>
             ) : (
-              tabFiltered.map(p => (
-                <PostCard key={p.id} post={p} onOpenThread={post => navigate(`/thread/${post.id}`)} />
+              tabFiltered.map((p) => (
+                <PostCard
+                  key={p.id}
+                  post={p}
+                  onOpenThread={(post) => navigate(`/thread/${post.id}`)}
+                />
               ))
             )}
           </div>
         </main>
 
         <aside className={styles.sidebar} aria-label="Community sidebar">
-          <section className={styles.sideSection} aria-labelledby="events-heading">
+          <section
+            className={styles.sideSection}
+            aria-labelledby="events-heading"
+          >
             <h2 id="events-heading" className={styles.sideTitle}>
               Upcoming events
             </h2>
             <ul className={styles.eventList}>
-              {sidebarEvents.map(e => (
+              {sidebarEvents.map((e) => (
                 <li key={e.id} className={styles.eventItem}>
-                  <button type="button" className={styles.eventRowBtn} onClick={() => goToEvent(e.id)}>
+                  <button
+                    type="button"
+                    className={styles.eventRowBtn}
+                    onClick={() => goToEvent(e.id)}
+                  >
                     <div className={styles.eventDate}>
                       <span className={styles.eventMonth}>{e.month}</span>
                       <span className={styles.eventDay}>{e.day}</span>
@@ -389,17 +465,24 @@ export default function Portal({ setActivePage, goToSection, posts, setPosts }) 
                 </li>
               ))}
             </ul>
-            <button type="button" className={styles.sideLink} onClick={goToAllEvents}>
+            <button
+              type="button"
+              className={styles.sideLink}
+              onClick={goToAllEvents}
+            >
               View all events →
             </button>
           </section>
 
-          <section className={styles.sideSection} aria-labelledby="contributors-heading">
+          <section
+            className={styles.sideSection}
+            aria-labelledby="contributors-heading"
+          >
             <h2 id="contributors-heading" className={styles.sideTitle}>
               Top contributors
             </h2>
             <ul className={styles.memberList}>
-              {MEMBERS.map(m => (
+              {MEMBERS.map((m) => (
                 <li key={m.id} className={styles.memberItem}>
                   <button
                     type="button"
@@ -413,7 +496,10 @@ export default function Portal({ setActivePage, goToSection, posts, setPosts }) 
                       <span className={styles.memberRole}>{m.role}</span>
                     </div>
                     {m.hot ? (
-                      <span className={styles.hotBadge} aria-label="Hot contributor">
+                      <span
+                        className={styles.hotBadge}
+                        aria-label="Hot contributor"
+                      >
                         🔥
                       </span>
                     ) : null}
@@ -423,11 +509,16 @@ export default function Portal({ setActivePage, goToSection, posts, setPosts }) 
             </ul>
           </section>
 
-          <section className={styles.sideSection} aria-labelledby="checker-heading">
+          <section
+            className={styles.sideSection}
+            aria-labelledby="checker-heading"
+          >
             <h2 id="checker-heading" className={styles.sideTitle}>
               Quick WAVE scan
             </h2>
-            <p className={styles.checkerDesc}>Paste any URL for an instant accessibility scan</p>
+            <p className={styles.checkerDesc}>
+              Paste any URL for an instant accessibility scan
+            </p>
             <label htmlFor="wave-url" className="sr-only">
               Website URL
             </label>
@@ -441,9 +532,13 @@ export default function Portal({ setActivePage, goToSection, posts, setPosts }) 
               type="button"
               className={styles.checkerBtn}
               onClick={() => {
-                const el = document.getElementById('wave-url');
+                const el = document.getElementById("wave-url");
                 const url = el?.value?.trim();
-                if (url) window.open(`https://wave.webaim.org/report#/${encodeURIComponent(url)}`, '_blank');
+                if (url)
+                  window.open(
+                    `https://wave.webaim.org/report#/${encodeURIComponent(url)}`,
+                    "_blank",
+                  );
               }}
             >
               Run scan →
@@ -451,7 +546,6 @@ export default function Portal({ setActivePage, goToSection, posts, setPosts }) 
           </section>
         </aside>
       </div>
-
     </div>
   );
 }

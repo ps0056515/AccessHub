@@ -39,9 +39,9 @@
 }
 
 .logoImg {
-  height: 40px;
+  height: 60px;
   width: auto;
-  max-width: min(180px, 55vw);
+  max-width: min(200px, 55vw);
   display: block;
   object-fit: contain;
   opacity: 0.98;
