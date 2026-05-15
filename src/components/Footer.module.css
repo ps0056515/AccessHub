@@ -114,14 +114,14 @@ button.colLink { font: inherit; }
   gap: 12px;
 }
 
-.copy { font-size: 12px; color: rgba(250,249,247,0.35); }
+.copy { font-size: 12px; color: rgba(250,249,247,0.72); }
 
 .bottomLinks { display: flex; gap: 16px; flex-wrap: wrap; align-items: center; }
 
 .bottomLink,
 .bottomLinkBtn {
   font-size: 12px;
-  color: rgba(250,249,247,0.35);
+  color: rgba(250,249,247,0.72);
   transition: color var(--transition);
   background: none;
   border: none;

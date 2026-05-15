@@ -179,7 +179,7 @@ function AppShell() {
           position: 'absolute',
           top: '-100%',
           left: 16,
-          background: '#0b6cff',
+          background: '#074a9e',
           color: '#fff',
           padding: '10px 18px',
           borderRadius: 6,

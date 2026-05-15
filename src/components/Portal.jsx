@@ -300,12 +300,11 @@ export default function Portal({ setActivePage, goToSection, posts, setPosts }) 
                 onChange={e => setQuery(e.target.value)}
               />
             </div>
-            <div className={styles.filterPills} role="list" aria-label="Filter by topic">
+            <div className={styles.filterPills} role="toolbar" aria-label="Filter discussions by topic">
               {TOPIC_FILTERS.map(f => (
                 <button
                   key={f}
                   type="button"
-                  role="listitem"
                   aria-pressed={topicFilter === f}
                   className={`${styles.filterPill} ${topicFilter === f ? styles.filterPillActive : ''}`}
                   onClick={() => setTopicFilter(prev => (prev === f ? null : f))}

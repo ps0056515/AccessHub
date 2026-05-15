@@ -8,8 +8,9 @@
 
   /* Brand-aligned: navy + vibrant blue (matches public/allcanaccess.jpg) */
   --brand-navy: #0c1929;
-  --brand-blue: #0b6cff;
-  --accent-rgb: 11, 108, 255;
+  /* Darker than legacy #0b6cff so link/text-on-page meets WCAG AA on --bg */
+  --brand-blue: #074a9e;
+  --accent-rgb: 7, 74, 158;
 
   --bg: #f4f7fb;
   --bg-card: #ffffff;
@@ -18,12 +19,12 @@
 
   --text: #0c1929;
   --text-muted: #3d4f66;
-  --text-faint: #6b7c92;
+  --text-faint: #2d3f52;
 
   --border: rgba(12, 25, 41, 0.1);
   --border-strong: rgba(12, 25, 41, 0.18);
 
-  --accent: #0b6cff;
+  --accent: #074a9e;
   --accent-bg: #e8f2ff;
   --accent-text: #003d99;
 
@@ -109,3 +110,15 @@ kbd {
 .fade-up-2 { animation-delay: 0.12s; }
 .fade-up-3 { animation-delay: 0.20s; }
 .fade-up-4 { animation-delay: 0.28s; }
+
+@media (prefers-reduced-motion: reduce) {
+  .fade-up,
+  .fade-up-1,
+  .fade-up-2,
+  .fade-up-3,
+  .fade-up-4 {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+}
