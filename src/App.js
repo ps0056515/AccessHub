@@ -84,23 +84,15 @@ function AppShell() {
   const setActivePage = useCallback(
     page => {
       setActivePageState(page);
-      if (isThreadRoute) {
-        navigate(page === 'events' ? '/events' : '/');
-        return;
-      }
-      if (location.pathname === '/join' || isProfileRoute) {
-        navigate(page === 'events' ? '/events' : '/');
-        return;
-      }
       if (page === 'events') {
-        navigate('/events');
+        if (location.pathname !== '/events') navigate('/events');
         return;
       }
-      if (location.pathname === '/events' && page !== 'events') {
+      if (location.pathname !== '/') {
         navigate('/');
       }
     },
-    [navigate, isThreadRoute, location.pathname, isProfileRoute]
+    [navigate, location.pathname]
   );
 
   useLayoutEffect(() => {
