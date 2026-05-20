@@ -1,22 +1,29 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { logoUrl, SITE_NAME } from '../brand';
+import { useAuth } from '../context/AuthContext';
 import styles from './Navbar.module.css';
 
 export default function Navbar({ activePage, setActivePage, goToPortal, onSearch }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const navigate = useNavigate();
+  const { user, logout } = useAuth();
 
   const visitPortal =
     typeof goToPortal === 'function' ? goToPortal : () => setActivePage('portal');
 
   const links = [
-    { id: 'portal',    label: 'Community' },
+    { id: 'portal', label: 'Community' },
     { id: 'resources', label: 'Resources' },
-    { id: 'tools',     label: 'Tools' },
-    { id: 'events',    label: 'Events' },
-    { id: 'guide',     label: 'NVDA Guide' },
+    { id: 'tools', label: 'Tools' },
+    { id: 'events', label: 'Events' },
+    { id: 'guide', label: 'NVDA Guide' },
   ];
+
+  const handleLogout = async () => {
+    await logout();
+    navigate('/login', { replace: true });
+  };
 
   return (
     <header className={styles.header} role="banner">
@@ -33,7 +40,7 @@ export default function Navbar({ activePage, setActivePage, goToPortal, onSearch
         </button>
 
         <nav className={styles.nav} aria-label="Main navigation">
-          {links.map(l => (
+          {links.map((l) => (
             <button
               key={l.id}
               className={`${styles.navLink} ${activePage === l.id ? styles.active : ''}`}
@@ -53,22 +60,31 @@ export default function Navbar({ activePage, setActivePage, goToPortal, onSearch
             onClick={() => onSearch?.()}
           >
             <svg width="15" height="15" viewBox="0 0 15 15" fill="none" aria-hidden="true">
-              <circle cx="6.5" cy="6.5" r="4.5" stroke="currentColor" strokeWidth="1.4"/>
-              <path d="M10 10L13.5 13.5" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/>
+              <circle cx="6.5" cy="6.5" r="4.5" stroke="currentColor" strokeWidth="1.4" />
+              <path
+                d="M10 10L13.5 13.5"
+                stroke="currentColor"
+                strokeWidth="1.4"
+                strokeLinecap="round"
+              />
             </svg>
           </button>
-          <button
-            className={styles.joinBtn}
-            type="button"
-            onClick={() => navigate('/join')}
-          >
-            Join community
+
+          {user && (
+            <span className={styles.userLabel} title={user.email}>
+              {user.displayName}
+            </span>
+          )}
+
+          <button type="button" className={styles.signOutBtn} onClick={() => void handleLogout()}>
+            Sign out
           </button>
+
           <button
             className={styles.menuBtn}
             aria-label={menuOpen ? 'Close menu' : 'Open menu'}
             aria-expanded={menuOpen}
-            onClick={() => setMenuOpen(o => !o)}
+            onClick={() => setMenuOpen((o) => !o)}
           >
             <span className={`${styles.bar} ${menuOpen ? styles.barOpen1 : ''}`} />
             <span className={`${styles.bar} ${menuOpen ? styles.barOpen2 : ''}`} />
@@ -78,24 +94,28 @@ export default function Navbar({ activePage, setActivePage, goToPortal, onSearch
 
       {menuOpen && (
         <nav className={styles.mobileNav} aria-label="Mobile navigation">
-          {links.map(l => (
+          {links.map((l) => (
             <button
               key={l.id}
               className={`${styles.mobileLink} ${activePage === l.id ? styles.mobileActive : ''}`}
-              onClick={() => { setActivePage(l.id); setMenuOpen(false); }}
+              onClick={() => {
+                setActivePage(l.id);
+                setMenuOpen(false);
+              }}
             >
               {l.label}
             </button>
           ))}
+          {user && <p className={styles.mobileUser}>{user.displayName}</p>}
           <button
             type="button"
             className={styles.mobileJoin}
             onClick={() => {
-              navigate('/join');
+              void handleLogout();
               setMenuOpen(false);
             }}
           >
-            Join community
+            Sign out
           </button>
         </nav>
       )}

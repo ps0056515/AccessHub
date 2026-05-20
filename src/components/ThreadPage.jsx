@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
+import { initialsFromName } from '../lib/userDisplay';
 import {
   getCommentsForPost,
   TAG_COLORS,
@@ -56,6 +58,7 @@ function Avatar({ initials, color, size = 40 }) {
 export default function ThreadPage({ posts, setPosts, returnToCommunity }) {
   const { postId } = useParams();
   const navigate = useNavigate();
+  const { user } = useAuth();
   const id = useMemo(() => {
     const n = Number(postId);
     return Number.isFinite(n) ? n : null;
@@ -98,10 +101,11 @@ export default function ThreadPage({ posts, setPosts, returnToCommunity }) {
     const text = commentBody.trim();
     if (!text || id == null) return;
 
+    const authorName = user?.displayName || user?.email || 'You';
     const entry = {
       id: `u-${Date.now()}`,
-      author: 'You',
-      initials: 'YU',
+      author: authorName,
+      initials: initialsFromName(authorName),
       color: 'blue',
       time: 'Just now',
       body: text,

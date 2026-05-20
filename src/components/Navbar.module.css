@@ -92,6 +92,46 @@
 
 .searchBtn:hover { background: var(--bg-secondary); color: var(--text); }
 
+.signInBtn {
+  background: none;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  padding: 7px 14px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text);
+  transition: background var(--transition);
+}
+
+.signInBtn:hover {
+  background: var(--bg-secondary);
+}
+
+.signOutBtn {
+  background: none;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  padding: 7px 14px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+.signOutBtn:hover {
+  background: var(--bg-secondary);
+  color: var(--text);
+}
+
+.userLabel {
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
 .joinBtn {
   background: var(--accent);
   color: #fff;
@@ -104,6 +144,13 @@
 }
 
 .joinBtn:hover { opacity: 0.88; }
+
+.mobileUser {
+  padding: 10px 12px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-muted);
+}
 
 .menuBtn {
   display: none;

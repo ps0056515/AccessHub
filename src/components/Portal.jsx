@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
+import { initialsFromName } from '../lib/userDisplay';
 import { STATS, ALL_EVENTS, MEMBERS, TAG_COLORS, COLOR_MAP } from '../data';
 import styles from './Portal.module.css';
 
@@ -109,6 +111,7 @@ function PostCard({ post, onOpenThread }) {
 
 export default function Portal({ setActivePage, goToSection, posts, setPosts }) {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [activeTab, setActiveTab] = useState('hot');
   const [query, setQuery] = useState('');
   const [topicFilter, setTopicFilter] = useState(null);
@@ -151,12 +154,13 @@ export default function Portal({ setActivePage, goToSection, posts, setPosts }) 
       return;
     }
 
+    const authorName = user?.displayName || user?.email || 'You';
     const newPost = {
       id: Date.now(),
       votes: 0,
-      initials: 'YU',
+      initials: initialsFromName(authorName),
       color: 'blue',
-      author: 'You',
+      author: authorName,
       role: 'Community member',
       time: 'Just now',
       replies: 0,

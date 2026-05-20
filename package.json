@@ -6,6 +6,15 @@
     "node": ">=18"
   },
   "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "express-rate-limit": "^7.5.0",
+    "helmet": "^8.0.0",
+    "jsonwebtoken": "^9.0.2",
+    "pg": "^8.13.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.20.0",
@@ -14,11 +23,20 @@
   "devDependencies": {
     "@axe-core/playwright": "^4.11.3",
     "@playwright/test": "^1.49.1",
-    "serve": "^14.2.4"
+    "concurrently": "^9.1.2",
+    "cross-env": "^7.0.3",
+    "serve": "^14.2.4",
+    "wait-on": "^8.0.1"
   },
+  "proxy": "http://localhost:4000",
   "scripts": {
     "start": "react-scripts start",
+    "server": "node --max-http-header-size=262144 server/index.js",
+    "db:migrate": "node server/db/migrate.js",
+    "dev": "concurrently -k \"npm run start\" \"wait-on tcp:3000 && cross-env NODE_ENV=development npm run server\"",
     "build": "react-scripts build",
+    "start:prod": "cross-env NODE_ENV=production CLIENT_ORIGIN=http://localhost:4000 node --max-http-header-size=262144 server/index.js",
+    "build:prod": "npm run build && npm run start:prod",
     "test": "react-scripts test",
     "test:e2e": "playwright test",
     "test:a11y": "playwright test e2e/a11y.spec.js",
