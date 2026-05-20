@@ -8,7 +8,7 @@ export default function GoogleSignInSection({
   text = 'signin_with',
   disabled = false,
 }) {
-  const { clientId, loading } = useGoogleClientId();
+  const { clientId, loading, apiUnreachable } = useGoogleClientId();
 
   if (loading) {
     return (
@@ -22,8 +22,18 @@ export default function GoogleSignInSection({
     return (
       <div className={styles.googleWrap}>
         <p className={styles.googleStatus}>
-          Google sign-in is not configured. Add <code>GOOGLE_CLIENT_ID</code> to your <code>.env</code>{' '}
-          file and restart the server.
+          {apiUnreachable ? (
+            <>
+              Cannot reach the API at <code>/api/auth/config</code>. Start the backend with{' '}
+              <code>npm run server</code> or <code>npm run dev</code>, then refresh.
+            </>
+          ) : (
+            <>
+              Google sign-in is not configured on the server. Set <code>GOOGLE_CLIENT_ID</code> in{' '}
+              <code>.env</code> and restart the API. For dev you can also set{' '}
+              <code>REACT_APP_GOOGLE_CLIENT_ID</code> (same value) and restart <code>npm start</code>.
+            </>
+          )}
         </p>
       </div>
     );

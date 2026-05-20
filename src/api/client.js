@@ -38,7 +38,12 @@ export async function api(path, options = {}) {
   }
 
   if (!res.ok) {
-    const err = new Error(data?.error || `Request failed (${res.status})`);
+    let message = data?.error || `Request failed (${res.status})`;
+    if (typeof message === 'string' && message.toLowerCase().includes('proxy')) {
+      message =
+        'Cannot reach the API. Run npm run server (port 3001) or npm run dev, then try again.';
+    }
+    const err = new Error(message);
     err.status = res.status;
     throw err;
   }

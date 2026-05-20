@@ -14,15 +14,36 @@ A full React application for an accessibility practitioner community portal.
 ## Getting Started
 
 ```bash
-# Install dependencies
 npm install
+cp .env.example .env   # set DATABASE_URL, JWT_SECRET, Google OAuth
 
-# Start dev server (localhost:3000)
-npm start
+# PostgreSQL: create DB, then apply migrations
+npm run db:migrate
 
-# Build for production
-npm run build
+# Optional: copy users from old SQLite file
+npm run db:import-sqlite
+
+# API (3001) + React (3010)
+npm run dev
 ```
+
+- Web: http://localhost:3010  
+- API: http://localhost:3001  
+
+```bash
+# API only
+npm run server
+
+# Static production build on 3010
+npm run build && npm run serve:prod
+```
+
+### Database scripts
+
+| Command | Description |
+|---------|-------------|
+| `npm run db:migrate` | Apply SQL migrations to PostgreSQL (`DATABASE_URL`) |
+| `npm run db:import-sqlite` | Import users from `DATABASE_PATH` SQLite file |
 
 ## Deploy to Netlify (free)
 1. Run `npm run build`
