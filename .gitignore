@@ -146,6 +146,9 @@ vite.config.ts.timestamp-*
 # Production build
 /build
 
+# SQLite database
+/data/
+
 # Playwright
 /playwright-report/
 /test-results/

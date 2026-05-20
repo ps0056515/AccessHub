@@ -10,6 +10,13 @@ import Footer from './components/Footer';
 import ThreadPage from './components/ThreadPage';
 import JoinCommunityPage from './components/JoinCommunityPage';
 import MemberProfilePage from './components/MemberProfilePage';
+import SignInPage from './components/SignInPage';
+import SignUpPage from './components/SignUpPage';
+import CompleteProfilePage from './components/CompleteProfilePage';
+import AdminDashboard from './components/AdminDashboard';
+import RequireAuth from './components/RequireAuth';
+import RequireAdmin from './components/RequireAdmin';
+import { AuthProvider } from './context/AuthContext';
 import { POSTS } from './data';
 import { SITE_NAME } from './brand';
 
@@ -112,6 +119,22 @@ function AppShell() {
       document.title = `Join · ${SITE_NAME}`;
       return;
     }
+    if (location.pathname === '/sign-in') {
+      document.title = `Sign in · ${SITE_NAME}`;
+      return;
+    }
+    if (location.pathname === '/sign-up') {
+      document.title = `Sign up · ${SITE_NAME}`;
+      return;
+    }
+    if (location.pathname === '/admin') {
+      document.title = `Admin · ${SITE_NAME}`;
+      return;
+    }
+    if (location.pathname === '/complete-profile') {
+      document.title = `Complete profile · ${SITE_NAME}`;
+      return;
+    }
     if (isProfileRoute) {
       document.title = `Member profile · ${SITE_NAME}`;
       return;
@@ -165,6 +188,8 @@ function AppShell() {
   const navActive =
     location.pathname === '/join'
       ? 'join'
+      : location.pathname === '/sign-in' || location.pathname === '/sign-up'
+        ? 'join'
       : location.pathname === '/events'
         ? 'events'
         : isThreadRoute || isProfileRoute
@@ -218,7 +243,29 @@ function AppShell() {
           />
           <Route
             path="/join"
-            element={<JoinCommunityPage goToPortal={goToPortal} goToSection={goToSection} />}
+            element={
+              <RequireAuth>
+                <JoinCommunityPage goToPortal={goToPortal} goToSection={goToSection} />
+              </RequireAuth>
+            }
+          />
+          <Route path="/sign-in" element={<SignInPage goToPortal={goToPortal} />} />
+          <Route path="/sign-up" element={<SignUpPage goToPortal={goToPortal} />} />
+          <Route
+            path="/complete-profile"
+            element={
+              <RequireAuth>
+                <CompleteProfilePage goToPortal={goToPortal} />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/admin"
+            element={
+              <RequireAdmin>
+                <AdminDashboard goToPortal={goToPortal} />
+              </RequireAdmin>
+            }
           />
           <Route path="/events" element={<Events setActivePage={setActivePage} />} />
           <Route path="/profile/:memberId" element={<MemberProfilePage goToPortal={goToPortal} />} />
@@ -247,7 +294,9 @@ function AppShell() {
 export default function App() {
   return (
     <BrowserRouter>
-      <AppShell />
+      <AuthProvider>
+        <AppShell />
+      </AuthProvider>
     </BrowserRouter>
   );
 }

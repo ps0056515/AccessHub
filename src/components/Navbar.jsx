@@ -1,14 +1,24 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { logoUrl, SITE_NAME } from '../brand';
+import { useAuth } from '../context/AuthContext';
 import styles from './Navbar.module.css';
 
 export default function Navbar({ activePage, setActivePage, goToPortal, onSearch }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const navigate = useNavigate();
+  const { user, signOut, loading: authLoading, isAdmin } = useAuth();
 
   const visitPortal =
     typeof goToPortal === 'function' ? goToPortal : () => setActivePage('portal');
+
+  const goToJoin = () => {
+    if (user) {
+      navigate('/join');
+      return;
+    }
+    navigate('/sign-in', { state: { from: '/join' } });
+  };
 
   const links = [
     { id: 'portal',    label: 'Community' },
@@ -57,10 +67,51 @@ export default function Navbar({ activePage, setActivePage, goToPortal, onSearch
               <path d="M10 10L13.5 13.5" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/>
             </svg>
           </button>
+          {!authLoading && !user && (
+            <>
+              <button
+                className={styles.signInBtn}
+                type="button"
+                onClick={() => navigate('/sign-in')}
+              >
+                Sign in
+              </button>
+              <button
+                className={styles.joinBtn}
+                type="button"
+                onClick={() => navigate('/sign-up')}
+              >
+                Sign up
+              </button>
+            </>
+          )}
+          {!authLoading && user && (
+            <>
+              {isAdmin && (
+                <button
+                  className={styles.adminBtn}
+                  type="button"
+                  onClick={() => navigate('/admin')}
+                >
+                  Admin
+                </button>
+              )}
+              <span className={styles.userLabel} title={user.email}>
+                {user.displayName}
+              </span>
+              <button
+                className={styles.signOutBtn}
+                type="button"
+                onClick={() => signOut()}
+              >
+                Sign out
+              </button>
+            </>
+          )}
           <button
-            className={styles.joinBtn}
+            className={styles.communityBtn}
             type="button"
-            onClick={() => navigate('/join')}
+            onClick={goToJoin}
           >
             Join community
           </button>
@@ -87,11 +138,62 @@ export default function Navbar({ activePage, setActivePage, goToPortal, onSearch
               {l.label}
             </button>
           ))}
+          {!authLoading && !user && (
+            <>
+              <button
+                type="button"
+                className={styles.mobileLink}
+                onClick={() => {
+                  navigate('/sign-in');
+                  setMenuOpen(false);
+                }}
+              >
+                Sign in
+              </button>
+              <button
+                type="button"
+                className={styles.mobileJoin}
+                onClick={() => {
+                  navigate('/sign-up');
+                  setMenuOpen(false);
+                }}
+              >
+                Sign up
+              </button>
+            </>
+          )}
+          {!authLoading && user && (
+            <>
+              {isAdmin && (
+                <button
+                  type="button"
+                  className={styles.mobileLink}
+                  onClick={() => {
+                    navigate('/admin');
+                    setMenuOpen(false);
+                  }}
+                >
+                  Admin dashboard
+                </button>
+              )}
+              <span className={styles.mobileUser}>{user.displayName}</span>
+              <button
+                type="button"
+                className={styles.mobileLink}
+                onClick={() => {
+                  signOut();
+                  setMenuOpen(false);
+                }}
+              >
+                Sign out
+              </button>
+            </>
+          )}
           <button
             type="button"
-            className={styles.mobileJoin}
+            className={styles.mobileJoinGhost}
             onClick={() => {
-              navigate('/join');
+              goToJoin();
               setMenuOpen(false);
             }}
           >

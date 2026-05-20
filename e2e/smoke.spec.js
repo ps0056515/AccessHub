@@ -18,21 +18,14 @@ test.describe('production smoke', () => {
     await expect(page.getByText(/curated by the All Can Access community/i)).toBeVisible();
   });
 
-  test('Join community then home restores portal hero', async ({ page }) => {
+  test('Join community prompts sign in when logged out', async ({ page }) => {
     await page.goto('/');
-    await page
-      .getByRole('navigation', { name: 'Main navigation' })
-      .getByRole('button', { name: 'Resources' })
-      .click();
-    await page.evaluate(() => window.scrollTo(0, 400));
     await page.getByRole('button', { name: 'Join community' }).first().click();
-    await expect(page).toHaveURL(/\/join$/);
-    await expect(
-      page.getByRole('heading', { level: 1, name: /Join the accessibility community/i })
-    ).toBeVisible();
+    await expect(page).toHaveURL(/\/sign-in$/);
+    await expect(page.getByRole('heading', { level: 1, name: 'Sign in' })).toBeVisible();
+    await expect(page.getByText(/sign in to join the community/i)).toBeVisible();
     await page.getByRole('button', { name: /All Can Access home/i }).click();
-    await expect(page).not.toHaveURL(/\/join$/);
-    expect(await page.evaluate(() => window.scrollY)).toBeLessThan(8);
+    await expect(page).not.toHaveURL(/\/sign-in$/);
     await expect(
       page.getByRole('heading', { level: 1, name: /Where.*accessibility/i })
     ).toBeVisible();

@@ -92,6 +92,19 @@
 
 .searchBtn:hover { background: var(--bg-secondary); color: var(--text); }
 
+.signInBtn {
+  background: none;
+  color: var(--accent-text);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  padding: 7px 14px;
+  font-size: 13px;
+  font-weight: 500;
+  transition: background var(--transition);
+}
+
+.signInBtn:hover { background: var(--bg-secondary); }
+
 .joinBtn {
   background: var(--accent);
   color: #fff;
@@ -104,6 +117,55 @@
 }
 
 .joinBtn:hover { opacity: 0.88; }
+
+.communityBtn {
+  background: none;
+  color: var(--accent-text);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  padding: 7px 14px;
+  font-size: 13px;
+  font-weight: 500;
+  transition: background var(--transition);
+}
+
+.communityBtn:hover { background: var(--bg-secondary); }
+
+.userLabel {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text);
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.signOutBtn {
+  background: none;
+  color: var(--text-muted);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  padding: 7px 12px;
+  font-size: 13px;
+  font-weight: 500;
+  transition: background var(--transition);
+}
+
+.signOutBtn:hover { background: var(--bg-secondary); color: var(--text); }
+
+.adminBtn {
+  background: var(--purple-bg);
+  color: var(--purple-text);
+  border: 1px solid rgba(90, 61, 184, 0.2);
+  border-radius: var(--radius-sm);
+  padding: 7px 12px;
+  font-size: 13px;
+  font-weight: 500;
+  transition: background var(--transition);
+}
+
+.adminBtn:hover { background: #e4dff8; }
 
 .menuBtn {
   display: none;
@@ -151,6 +213,13 @@
   background: var(--bg-secondary);
 }
 
+.mobileUser {
+  padding: 10px 12px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text);
+}
+
 .mobileJoin {
   background: var(--accent);
   color: #fff;
@@ -164,9 +233,26 @@
 
 .mobileJoin:hover { opacity: 0.9; }
 
+.mobileJoinGhost {
+  background: none;
+  color: var(--accent-text);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  padding: 12px;
+  font-size: 15px;
+  font-weight: 500;
+  margin-top: 8px;
+}
+
+.mobileJoinGhost:hover { background: var(--bg-secondary); }
+
 @media (max-width: 768px) {
   .nav { display: none; }
-  /* Join must stay visible: hiding it blocked users who never open the hamburger menu. */
+  .signInBtn { display: none; }
+  .userLabel { display: none; }
+  .signOutBtn { display: none; }
+  .adminBtn { display: none; }
+  .communityBtn { display: none; }
   .joinBtn {
     padding: 7px 10px;
     font-size: 12px;
