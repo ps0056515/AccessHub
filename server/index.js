@@ -5,7 +5,7 @@ const authRoutes = require('./routes/auth');
 const adminRoutes = require('./routes/admin');
 const { query, closePool } = require('./db');
 
-const PORT = Number(process.env.API_PORT || process.env.PORT) || 3001;
+const PORT = Number(process.env.API_PORT || process.env.PORT) || 3015;
 const app = express();
 
 app.use(cors({ origin: true, credentials: true }));

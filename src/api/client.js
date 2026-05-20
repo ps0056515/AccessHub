@@ -41,7 +41,7 @@ export async function api(path, options = {}) {
     let message = data?.error || `Request failed (${res.status})`;
     if (typeof message === 'string' && message.toLowerCase().includes('proxy')) {
       message =
-        'Cannot reach the API. Run npm run server (port 3001) or npm run dev, then try again.';
+        'Cannot reach the API. Run npm run server (port 3015) or npm run dev, then try again.';
     }
     const err = new Error(message);
     err.status = res.status;

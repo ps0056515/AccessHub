@@ -27,9 +27,10 @@
     "serve": "^14.2.4"
   },
   "scripts": {
-    "start": "cross-env PORT=3010 HOST=0.0.0.0 DANGEROUSLY_DISABLE_HOST_CHECK=true react-scripts start",
-    "server": "cross-env API_PORT=3001 node server/index.js",
-    "dev": "concurrently -n api,web -c blue,green \"cross-env API_PORT=3001 npm run server\" \"npm start\"",
+    "start": "node scripts/start-dev.js",
+    "start:deploy": "node scripts/start-deploy.js",
+    "server": "cross-env API_PORT=3015 node server/index.js",
+    "dev": "concurrently -n api,web -c blue,green \"cross-env API_PORT=3015 npm run server\" \"npm start\"",
     "db:migrate": "node server/db/migrate.js",
     "db:import-sqlite": "node server/db/import-sqlite.js",
     "build": "react-scripts build",
