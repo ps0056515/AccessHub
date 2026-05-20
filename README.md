@@ -23,12 +23,12 @@ npm run db:migrate
 # Optional: copy users from old SQLite file
 npm run db:import-sqlite
 
-# API (3001) + React (3010)
+# API (3015) + React (3010)
 npm run dev
 ```
 
 - Web: http://localhost:3010  
-- API: http://localhost:3001  
+- API: http://localhost:3015  
 
 ```bash
 # API only
@@ -37,6 +37,17 @@ npm run server
 # Static production build on 3010
 npm run build && npm run serve:prod
 ```
+
+### Jenkins / server deploy
+
+Do **not** run bare `react-scripts start` in CI (causes `allowedHosts` errors if `HOST` is empty).
+
+| Command | Use |
+|---------|-----|
+| `npm start` | Dev server on port 3010 (uses `scripts/start-dev.js`) |
+| `npm run start:deploy` | Production: `npm run build` + API + static on 3010 |
+
+Remove any Jenkins env var `HOST=` (empty). If you must use dev mode on the server, run `npm start` after `git pull`, not `react-scripts start` directly.
 
 ### Database scripts
 
