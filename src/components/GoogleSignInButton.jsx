@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import styles from './AuthPage.module.css';
 
 const SCRIPT_ID = 'google-gsi-client';
@@ -30,12 +30,6 @@ function loadGoogleScript() {
   });
 }
 
-function measureButtonWidth(el) {
-  if (!el) return 320;
-  const width = Math.floor(el.getBoundingClientRect().width);
-  return Math.min(Math.max(width, 200), 400);
-}
-
 export default function GoogleSignInButton({
   clientId,
   onSuccess,
@@ -47,37 +41,28 @@ export default function GoogleSignInButton({
   const btnRef = useRef(null);
   const onSuccessRef = useRef(onSuccess);
   const onErrorRef = useRef(onError);
-  const [ready, setReady] = useState(false);
-  const [buttonWidth, setButtonWidth] = useState(0);
+  const [status, setStatus] = useState('loading');
 
   onSuccessRef.current = onSuccess;
   onErrorRef.current = onError;
 
-  useLayoutEffect(() => {
-    const el = wrapRef.current;
-    if (!el) return undefined;
-
-    const updateWidth = () => setButtonWidth(measureButtonWidth(el));
-    updateWidth();
-
-    const observer = new ResizeObserver(updateWidth);
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, [clientId]);
-
-  useLayoutEffect(() => {
-    setReady(false);
-  }, [clientId, text, buttonWidth]);
-
   useEffect(() => {
-    if (!clientId || disabled || buttonWidth < 200) return undefined;
+    if (!clientId || disabled) return undefined;
 
     let cancelled = false;
 
     async function init() {
+      setStatus('loading');
       try {
         await loadGoogleScript();
-        if (cancelled || !btnRef.current || !window.google?.accounts?.id) return;
+        if (cancelled || !btnRef.current || !wrapRef.current || !window.google?.accounts?.id) {
+          return;
+        }
+
+        const width = Math.min(
+          Math.max(Math.floor(wrapRef.current.getBoundingClientRect().width), 240),
+          400
+        );
 
         window.google.accounts.id.initialize({
           client_id: clientId,
@@ -98,13 +83,16 @@ export default function GoogleSignInButton({
           theme: 'outline',
           size: 'large',
           text,
-          width: buttonWidth,
+          width,
           shape: 'rectangular',
         });
 
-        if (!cancelled) setReady(true);
+        if (!cancelled) setStatus('ready');
       } catch (err) {
-        onErrorRef.current?.(err);
+        if (!cancelled) {
+          setStatus('error');
+          onErrorRef.current?.(err);
+        }
       }
     }
 
@@ -112,18 +100,22 @@ export default function GoogleSignInButton({
     return () => {
       cancelled = true;
     };
-  }, [clientId, text, disabled, buttonWidth]);
+  }, [clientId, text, disabled]);
 
   if (!clientId) return null;
 
   return (
-    <div ref={wrapRef} className={styles.googleWrap} aria-hidden={disabled}>
-      {!ready && (
-        <div className={styles.googlePlaceholder} aria-hidden="true">
+    <div ref={wrapRef} className={styles.googleWrap}>
+      {status === 'loading' && (
+        <p className={styles.googleLoading} aria-live="polite">
           Loading Google sign-in…
-        </div>
+        </p>
       )}
-      <div ref={btnRef} className={`${styles.googleBtn} ${ready ? styles.googleBtnReady : ''}`} />
+      <div
+        ref={btnRef}
+        className={styles.googleBtn}
+        style={{ display: status === 'ready' ? 'flex' : 'none' }}
+      />
     </div>
   );
 }

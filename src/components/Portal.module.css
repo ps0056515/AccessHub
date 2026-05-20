@@ -105,13 +105,34 @@
   max-width: 520px;
 }
 
-.heroChips li {
+.heroChips li { display: flex; }
+
+.heroChipBtn {
   font-size: 12px;
   padding: 6px 12px;
   border-radius: var(--radius-full);
   border: 1px solid var(--border-strong);
   color: var(--text-muted);
   background: rgba(255,255,255,0.45);
+  cursor: pointer;
+  transition: background var(--transition), border-color var(--transition), color var(--transition);
+}
+
+.heroChipBtn:hover {
+  background: rgba(255,255,255,0.85);
+  border-color: var(--accent);
+  color: var(--text);
+}
+
+.heroChipBtn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.heroChipBtnActive {
+  background: var(--accent-bg);
+  border-color: var(--accent);
+  color: var(--accent-text);
 }
 
 .heroDecor {
@@ -465,10 +486,27 @@
 }
 
 .empty {
-  padding: 48px 24px;
+  padding: 32px 16px;
   text-align: center;
-  color: var(--text-faint);
+  color: var(--text-muted);
+  font-size: 15px;
+}
+
+.askError {
+  color: var(--red-text);
+  font-size: 13px;
+  margin-top: 8px;
+}
+
+.retryBtn {
+  margin-top: 12px;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 8px 16px;
   font-size: 14px;
+  font-weight: 500;
 }
 
 /* ── Sidebar (stack above feed in case of accidental overlap) ── */

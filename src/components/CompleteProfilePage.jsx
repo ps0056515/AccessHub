@@ -57,6 +57,7 @@ export default function CompleteProfilePage({ goToPortal }) {
               type="text"
               autoComplete="country-name"
               required
+              placeholder="e.g. United States"
               value={country}
               onChange={e => setCountry(e.target.value)}
               disabled={submitting}
@@ -73,6 +74,7 @@ export default function CompleteProfilePage({ goToPortal }) {
               type="text"
               autoComplete="address-level2"
               required
+              placeholder="e.g. Chicago"
               value={city}
               onChange={e => setCity(e.target.value)}
               disabled={submitting}
