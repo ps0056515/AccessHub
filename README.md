@@ -46,15 +46,15 @@ npm run db:migrate
 npm run dev
 ```
 
-- React: http://localhost:3000  
+- React: http://localhost:3010  
 - API: http://localhost:4000  
 
 CRA proxies `/api/*` to the API in development.
 
 ### 5. Auth UI
 
-- **Create account:** http://localhost:3000/register  
-- **Sign in:** http://localhost:3000/login  
+- **Create account:** http://localhost:3010/register  
+- **Sign in:** http://localhost:3010/login  
 
 Posting questions and comments requires sign-in.
 
@@ -94,10 +94,15 @@ AccessHub/
 
 ```bash
 npm run build
-NODE_ENV=production JWT_SECRET=... DATABASE_URL=... CLIENT_ORIGIN=https://your-domain.com npm run start:prod
+NODE_ENV=production PORT=3010 JWT_SECRET=... DATABASE_URL=... CLIENT_ORIGIN=https://your-domain.com npm run start:prod
 ```
 
-The API serves the React `build/` folder and handles auth.
+The API serves the React `build/` folder on **port 3010** (default) and handles auth.
+
+### Jenkins / CI
+
+- **Dev server only:** `npm start` → http://0.0.0.0:3010 (do not set `HOST=` to an empty value in Jenkins).
+- **Full app (UI + API):** `npm run build && npm run start:prod` → http://localhost:3010
 
 ## Scripts
 
