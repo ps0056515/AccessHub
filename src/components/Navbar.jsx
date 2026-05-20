@@ -17,15 +17,15 @@ export default function Navbar({ activePage, setActivePage, goToPortal, onSearch
       navigate('/join');
       return;
     }
-    navigate('/sign-in', { state: { from: '/join' } });
+    navigate('/sign-up', { state: { from: '/join' } });
   };
 
   const links = [
-    { id: 'portal',    label: 'Community' },
+    { id: 'portal', label: 'Community' },
     { id: 'resources', label: 'Resources' },
-    { id: 'tools',     label: 'Tools' },
-    { id: 'events',    label: 'Events' },
-    { id: 'guide',     label: 'NVDA Guide' },
+    { id: 'tools', label: 'Tools' },
+    { id: 'events', label: 'Events' },
+    { id: 'guide', label: 'NVDA Guide' },
   ];
 
   return (
@@ -63,27 +63,18 @@ export default function Navbar({ activePage, setActivePage, goToPortal, onSearch
             onClick={() => onSearch?.()}
           >
             <svg width="15" height="15" viewBox="0 0 15 15" fill="none" aria-hidden="true">
-              <circle cx="6.5" cy="6.5" r="4.5" stroke="currentColor" strokeWidth="1.4"/>
-              <path d="M10 10L13.5 13.5" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/>
+              <circle cx="6.5" cy="6.5" r="4.5" stroke="currentColor" strokeWidth="1.4" />
+              <path d="M10 10L13.5 13.5" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
             </svg>
           </button>
           {!authLoading && !user && (
-            <>
-              <button
-                className={styles.signInBtn}
-                type="button"
-                onClick={() => navigate('/sign-in')}
-              >
-                Sign in
-              </button>
-              <button
-                className={styles.joinBtn}
-                type="button"
-                onClick={() => navigate('/sign-up')}
-              >
-                Sign up
-              </button>
-            </>
+            <button
+              className={styles.signInBtn}
+              type="button"
+              onClick={() => navigate('/sign-in')}
+            >
+              Sign in
+            </button>
           )}
           {!authLoading && user && (
             <>
@@ -99,17 +90,13 @@ export default function Navbar({ activePage, setActivePage, goToPortal, onSearch
               <span className={styles.userLabel} title={user.email}>
                 {user.displayName}
               </span>
-              <button
-                className={styles.signOutBtn}
-                type="button"
-                onClick={() => signOut()}
-              >
+              <button className={styles.signOutBtn} type="button" onClick={() => signOut()}>
                 Sign out
               </button>
             </>
           )}
           <button
-            className={styles.communityBtn}
+            className={user ? styles.communityBtn : styles.joinBtn}
             type="button"
             onClick={goToJoin}
           >
@@ -133,34 +120,25 @@ export default function Navbar({ activePage, setActivePage, goToPortal, onSearch
             <button
               key={l.id}
               className={`${styles.mobileLink} ${activePage === l.id ? styles.mobileActive : ''}`}
-              onClick={() => { setActivePage(l.id); setMenuOpen(false); }}
+              onClick={() => {
+                setActivePage(l.id);
+                setMenuOpen(false);
+              }}
             >
               {l.label}
             </button>
           ))}
           {!authLoading && !user && (
-            <>
-              <button
-                type="button"
-                className={styles.mobileLink}
-                onClick={() => {
-                  navigate('/sign-in');
-                  setMenuOpen(false);
-                }}
-              >
-                Sign in
-              </button>
-              <button
-                type="button"
-                className={styles.mobileJoin}
-                onClick={() => {
-                  navigate('/sign-up');
-                  setMenuOpen(false);
-                }}
-              >
-                Sign up
-              </button>
-            </>
+            <button
+              type="button"
+              className={styles.mobileLink}
+              onClick={() => {
+                navigate('/sign-in');
+                setMenuOpen(false);
+              }}
+            >
+              Sign in
+            </button>
           )}
           {!authLoading && user && (
             <>
@@ -191,7 +169,7 @@ export default function Navbar({ activePage, setActivePage, goToPortal, onSearch
           )}
           <button
             type="button"
-            className={styles.mobileJoinGhost}
+            className={user ? styles.mobileJoinGhost : styles.mobileJoin}
             onClick={() => {
               goToJoin();
               setMenuOpen(false);

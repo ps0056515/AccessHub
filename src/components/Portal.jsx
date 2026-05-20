@@ -1,9 +1,18 @@
 import { useEffect, useRef, useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { STATS, ALL_EVENTS, MEMBERS, TAG_COLORS, COLOR_MAP } from '../data';
+import { postsApi } from '../api/client';
+import { useAuth } from '../context/AuthContext';
 import styles from './Portal.module.css';
 
 const TOPIC_FILTERS = ['WCAG 2.2', 'Screen readers', 'Legal'];
+
+const HERO_TOPICS = [
+  { label: 'WCAG 2.2 implementations', tag: 'WCAG 2.2' },
+  { label: 'Screen reader testing', tag: 'Screen readers' },
+  { label: 'Legal & procurement', tag: 'Legal' },
+  { label: 'Design systems', query: 'design system' },
+];
 
 function postMatchesQuery(post, rawQuery) {
   const q = rawQuery.trim().toLowerCase();
@@ -107,12 +116,23 @@ function PostCard({ post, onOpenThread }) {
   );
 }
 
-export default function Portal({ setActivePage, goToSection, posts, setPosts }) {
+export default function Portal({
+  setActivePage,
+  goToSection,
+  posts,
+  setPosts,
+  postsLoading,
+  postsError,
+  onRetryPosts,
+}) {
   const navigate = useNavigate();
+  const { isAuthenticated } = useAuth();
   const [activeTab, setActiveTab] = useState('hot');
   const [query, setQuery] = useState('');
   const [topicFilter, setTopicFilter] = useState(null);
   const [draftQuestion, setDraftQuestion] = useState('');
+  const [postError, setPostError] = useState('');
+  const [posting, setPosting] = useState(false);
   const askBoxRef = useRef(null);
   const askTextareaRef = useRef(null);
   const searchInputRef = useRef(null);
@@ -139,41 +159,67 @@ export default function Portal({ setActivePage, goToSection, posts, setPosts }) 
     askTextareaRef.current?.focus();
   };
 
+  const applyHeroTopic = topic => {
+    const isActive =
+      (topic.tag && topicFilter === topic.tag) ||
+      (topic.query && query.trim().toLowerCase() === topic.query.toLowerCase());
+
+    if (isActive) {
+      setTopicFilter(null);
+      setQuery('');
+      return;
+    }
+
+    if (topic.tag) {
+      setTopicFilter(topic.tag);
+      setQuery('');
+    } else {
+      setTopicFilter(null);
+      setQuery(topic.query || topic.label);
+    }
+    setActiveTab('hot');
+    searchInputRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    searchInputRef.current?.focus();
+  };
+
   const goToCertificationsSection = () => {
     sessionStorage.setItem('aa-nav', JSON.stringify({ scrollTo: 'certifications' }));
     setActivePage?.('resources');
   };
 
-  const handlePostQuestion = () => {
+  const handlePostQuestion = async () => {
     const trimmedQuestion = draftQuestion.trim();
     if (!trimmedQuestion) {
       askTextareaRef.current?.focus();
       return;
     }
 
-    const newPost = {
-      id: Date.now(),
-      votes: 0,
-      initials: 'YU',
-      color: 'blue',
-      author: 'You',
-      role: 'Community member',
-      time: 'Just now',
-      replies: 0,
-      title: trimmedQuestion,
-      excerpt:
-        'Thanks for posting. Community members can now respond to your question.',
-      body:
-        'Your question is live. Others can reply once the thread is indexed. Edit details from your profile (coming soon).',
-      tags: ['WCAG 2.2'],
-      tagColors: ['blue'],
-    };
+    if (!isAuthenticated) {
+      navigate('/sign-in', { state: { from: '/' } });
+      return;
+    }
 
-    setPosts(prevPosts => [newPost, ...prevPosts]);
-    setDraftQuestion('');
-    setQuery('');
-    setActiveTab('new');
-    navigate(`/thread/${newPost.id}`);
+    setPostError('');
+    setPosting(true);
+    try {
+      const title =
+        trimmedQuestion.length > 120 ? `${trimmedQuestion.slice(0, 117).trim()}…` : trimmedQuestion;
+      const { post: newPost } = await postsApi.create({
+        title,
+        body: trimmedQuestion,
+        tags: ['WCAG 2.2'],
+      });
+
+      setPosts(prevPosts => [newPost, ...prevPosts]);
+      setDraftQuestion('');
+      setQuery('');
+      setActiveTab('new');
+      navigate(`/thread/${newPost.id}`);
+    } catch (err) {
+      setPostError(err.message || 'Could not post your question.');
+    } finally {
+      setPosting(false);
+    }
   };
 
   const tabs = [
@@ -245,10 +291,23 @@ export default function Portal({ setActivePage, goToSection, posts, setPosts }) 
             products in the real world.
           </p>
           <ul className={`${styles.heroChips} fade-up fade-up-1`} aria-label="Popular topics">
-            <li>WCAG 2.2 implementations</li>
-            <li>Screen reader testing</li>
-            <li>Legal &amp; procurement</li>
-            <li>Design systems</li>
+            {HERO_TOPICS.map(topic => {
+              const isActive =
+                (topic.tag && topicFilter === topic.tag) ||
+                (topic.query && query.trim().toLowerCase() === topic.query.toLowerCase());
+              return (
+                <li key={topic.label}>
+                  <button
+                    type="button"
+                    className={`${styles.heroChipBtn} ${isActive ? styles.heroChipBtnActive : ''}`}
+                    aria-pressed={isActive}
+                    onClick={() => applyHeroTopic(topic)}
+                  >
+                    {topic.label}
+                  </button>
+                </li>
+              );
+            })}
           </ul>
           <div className={`${styles.heroActions} fade-up fade-up-2`}>
             <button type="button" className={styles.heroCta} onClick={focusDiscussionBox}>
@@ -325,13 +384,24 @@ export default function Portal({ setActivePage, goToSection, posts, setPosts }) 
               aria-label="Write your question"
               value={draftQuestion}
               onChange={e => setDraftQuestion(e.target.value)}
+              disabled={posting}
             />
+            {postError && (
+              <p className={styles.askError} role="alert">
+                {postError}
+              </p>
+            )}
             <div className={styles.askFooter}>
               <button type="button" className={styles.askTopic}>
                 Choose topic
               </button>
-              <button type="button" className={styles.askPost} onClick={handlePostQuestion}>
-                Post question →
+              <button
+                type="button"
+                className={styles.askPost}
+                onClick={handlePostQuestion}
+                disabled={posting}
+              >
+                {posting ? 'Posting…' : 'Post question →'}
               </button>
             </div>
           </div>
@@ -352,7 +422,16 @@ export default function Portal({ setActivePage, goToSection, posts, setPosts }) 
           </div>
 
           <div role="tabpanel" aria-label={`${activeTab} discussions`}>
-            {tabFiltered.length === 0 ? (
+            {postsLoading ? (
+              <p className={styles.empty}>Loading discussions…</p>
+            ) : postsError ? (
+              <div className={styles.empty}>
+                <p>{postsError}</p>
+                <button type="button" className={styles.retryBtn} onClick={onRetryPosts}>
+                  Try again
+                </button>
+              </div>
+            ) : tabFiltered.length === 0 ? (
               <p className={styles.empty}>
                 {query.trim()
                   ? `No discussions match “${query.trim()}”. Try another word or clear the search.`

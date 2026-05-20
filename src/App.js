@@ -1,4 +1,4 @@
-import { useState, useLayoutEffect, useCallback } from 'react';
+import { useState, useLayoutEffect, useCallback, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Portal from './components/Portal';
@@ -17,7 +17,7 @@ import AdminDashboard from './components/AdminDashboard';
 import RequireAuth from './components/RequireAuth';
 import RequireAdmin from './components/RequireAdmin';
 import { AuthProvider } from './context/AuthContext';
-import { POSTS } from './data';
+import { postsApi } from './api/client';
 import { SITE_NAME } from './brand';
 
 const PAGE_TITLES = {
@@ -39,37 +39,43 @@ function scrollWindowTopInstant() {
   root.style.scrollBehavior = prev;
 }
 
-function loadPosts() {
-  try {
-    const raw = sessionStorage.getItem('aa-discussion-posts');
-    if (raw) {
-      const parsed = JSON.parse(raw);
-      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
-    }
-  } catch {
-    /* ignore */
-  }
-  return POSTS.map(p => ({ ...p }));
-}
-
-const PAGES = {
-  portal: Portal,
-  resources: Resources,
-  tools: Tools,
-  events: Events,
-  guide: NVDAGuide,
-};
-
-const SECTION_IDS = ['portal', 'resources', 'tools', 'events', 'guide'];
-
 function AppShell() {
   const navigate = useNavigate();
   const location = useLocation();
   const [activePage, setActivePageState] = useState('portal');
-  const [posts, setPosts] = useState(loadPosts);
+  const [posts, setPosts] = useState([]);
+  const [postsLoading, setPostsLoading] = useState(true);
+  const [postsError, setPostsError] = useState('');
+
+  const loadPosts = useCallback(async () => {
+    setPostsLoading(true);
+    setPostsError('');
+    try {
+      const { posts: data } = await postsApi.list();
+      setPosts(data);
+    } catch (err) {
+      setPostsError(err.message || 'Could not load discussions.');
+    } finally {
+      setPostsLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    loadPosts();
+  }, [loadPosts]);
 
   const isThreadRoute = location.pathname.startsWith('/thread/');
   const isProfileRoute = location.pathname.startsWith('/profile/');
+
+  const PAGES = {
+    portal: Portal,
+    resources: Resources,
+    tools: Tools,
+    events: Events,
+    guide: NVDAGuide,
+  };
+
+  const SECTION_IDS = ['portal', 'resources', 'tools', 'events', 'guide'];
 
   useLayoutEffect(() => {
     if (isThreadRoute) return;
@@ -77,25 +83,26 @@ function AppShell() {
     requestAnimationFrame(scrollWindowTopInstant);
   }, [activePage, isThreadRoute, location.pathname]);
 
-  useLayoutEffect(() => {
-    try {
-      sessionStorage.setItem('aa-discussion-posts', JSON.stringify(posts));
-    } catch {
-      /* ignore */
-    }
-  }, [posts]);
+  const refreshPosts = loadPosts;
 
   const setActivePage = useCallback(
     page => {
       setActivePageState(page);
-      if (isThreadRoute) {
+
+      const onDedicatedRoute =
+        isThreadRoute ||
+        isProfileRoute ||
+        location.pathname === '/join' ||
+        location.pathname === '/sign-in' ||
+        location.pathname === '/sign-up' ||
+        location.pathname === '/complete-profile' ||
+        location.pathname === '/admin';
+
+      if (onDedicatedRoute) {
         navigate(page === 'events' ? '/events' : '/');
         return;
       }
-      if (location.pathname === '/join' || isProfileRoute) {
-        navigate(page === 'events' ? '/events' : '/');
-        return;
-      }
+
       if (page === 'events') {
         navigate('/events');
         return;
@@ -124,7 +131,7 @@ function AppShell() {
       return;
     }
     if (location.pathname === '/sign-up') {
-      document.title = `Sign up · ${SITE_NAME}`;
+      document.title = `Join community · ${SITE_NAME}`;
       return;
     }
     if (location.pathname === '/admin') {
@@ -237,6 +244,7 @@ function AppShell() {
               <ThreadPage
                 posts={posts}
                 setPosts={setPosts}
+                refreshPosts={refreshPosts}
                 returnToCommunity={returnFromThread}
               />
             }
@@ -278,6 +286,9 @@ function AppShell() {
                   goToSection={goToSection}
                   posts={posts}
                   setPosts={setPosts}
+                  postsLoading={postsLoading}
+                  postsError={postsError}
+                  onRetryPosts={loadPosts}
                 />
               ) : (
                 <Page setActivePage={setActivePage} />

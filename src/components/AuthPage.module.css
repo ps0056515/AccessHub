@@ -1,5 +1,5 @@
 .page {
-  max-width: 440px;
+  max-width: 480px;
   margin: 0 auto;
   padding: 48px 20px 64px;
 }
@@ -10,7 +10,6 @@
   border-radius: var(--radius-lg);
   padding: 32px 28px;
   box-shadow: var(--shadow-sm);
-  overflow: hidden;
 }
 
 .kicker {
@@ -47,18 +46,7 @@
   display: flex;
   flex-direction: column;
   gap: 6px;
-}
-
-.fieldRow {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-}
-
-@media (max-width: 480px) {
-  .fieldRow {
-    grid-template-columns: 1fr;
-  }
+  min-width: 0;
 }
 
 .label {
@@ -68,6 +56,7 @@
 }
 
 .input {
+  width: 100%;
   border: 1px solid var(--border-strong);
   border-radius: var(--radius-sm);
   padding: 10px 12px;
@@ -131,6 +120,8 @@
   font-family: inherit;
   font-size: inherit;
   cursor: pointer;
+  position: relative;
+  z-index: 1;
 }
 
 .back {
@@ -154,11 +145,9 @@
 }
 
 .googleWrap {
-  position: relative;
   width: 100%;
   min-height: 44px;
   margin-bottom: 8px;
-  overflow: hidden;
 }
 
 .googleBtn {
@@ -166,20 +155,16 @@
   min-height: 44px;
   display: flex;
   justify-content: center;
-  opacity: 0;
-}
-
-.googleBtnReady {
-  opacity: 1;
+  align-items: center;
 }
 
 .googleBtn iframe {
-  max-width: 100%;
+  pointer-events: auto;
 }
 
-.googlePlaceholder {
-  position: absolute;
-  inset: 0;
+.googleLoading {
+  width: 100%;
+  min-height: 44px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -187,8 +172,7 @@
   color: var(--text-faint);
   border: 1px dashed var(--border-strong);
   border-radius: var(--radius-sm);
-  box-sizing: border-box;
-  background: var(--bg-card);
+  margin: 0;
 }
 
 .googleStatus {

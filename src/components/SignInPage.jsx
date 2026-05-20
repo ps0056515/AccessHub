@@ -113,7 +113,7 @@ export default function SignInPage({ goToPortal }) {
         <p className={styles.footer}>
           Don&apos;t have an account?{' '}
           <Link className={styles.link} to="/sign-up" state={location.state}>
-            Sign up
+            Join community
           </Link>
         </p>
       </div>

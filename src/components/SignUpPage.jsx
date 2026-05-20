@@ -10,7 +10,6 @@ export default function SignUpPage({ goToPortal }) {
   const navigate = useNavigate();
   const location = useLocation();
   const from = location.state?.from || '/';
-  const joiningCommunity = from === '/join';
   const redirectAfterAuth = useAuthRedirect(goToPortal);
   const { signUp, signInWithGoogle } = useAuth();
   const [displayName, setDisplayName] = useState('');
@@ -55,12 +54,11 @@ export default function SignUpPage({ goToPortal }) {
       </button>
 
       <div className={styles.card}>
-        <p className={styles.kicker}>Account</p>
-        <h1 className={styles.title}>Sign up</h1>
+        <p className={styles.kicker}>Community</p>
+        <h1 className={styles.title}>Join community</h1>
         <p className={styles.lead}>
-          {joiningCommunity
-            ? 'Create a free account to join the community and take part in discussions.'
-            : 'Create a free account to join discussions and connect with the community.'}
+          Create your free account to take part in discussions and connect with accessibility
+          practitioners.
         </p>
 
         {error && (
@@ -110,37 +108,38 @@ export default function SignUpPage({ goToPortal }) {
             />
           </div>
 
-          <div className={styles.fieldRow}>
-            <div className={styles.field}>
-              <label className={styles.label} htmlFor="signup-country">
-                Country
-              </label>
-              <input
-                id="signup-country"
-                className={styles.input}
-                type="text"
-                autoComplete="country-name"
-                required
-                value={country}
-                onChange={e => setCountry(e.target.value)}
-                disabled={submitting}
-              />
-            </div>
-            <div className={styles.field}>
-              <label className={styles.label} htmlFor="signup-city">
-                City
-              </label>
-              <input
-                id="signup-city"
-                className={styles.input}
-                type="text"
-                autoComplete="address-level2"
-                required
-                value={city}
-                onChange={e => setCity(e.target.value)}
-                disabled={submitting}
-              />
-            </div>
+          <div className={styles.field}>
+            <label className={styles.label} htmlFor="signup-country">
+              Country
+            </label>
+            <input
+              id="signup-country"
+              className={styles.input}
+              type="text"
+              autoComplete="country-name"
+              required
+              placeholder="e.g. United States"
+              value={country}
+              onChange={e => setCountry(e.target.value)}
+              disabled={submitting}
+            />
+          </div>
+
+          <div className={styles.field}>
+            <label className={styles.label} htmlFor="signup-city">
+              City
+            </label>
+            <input
+              id="signup-city"
+              className={styles.input}
+              type="text"
+              autoComplete="address-level2"
+              required
+              placeholder="e.g. Chicago"
+              value={city}
+              onChange={e => setCity(e.target.value)}
+              disabled={submitting}
+            />
           </div>
 
           <div className={styles.field}>
@@ -164,7 +163,7 @@ export default function SignUpPage({ goToPortal }) {
           </div>
 
           <button type="submit" className={styles.submit} disabled={submitting}>
-            {submitting ? 'Creating account…' : 'Create account'}
+            {submitting ? 'Joining…' : 'Join community'}
           </button>
         </form>
 

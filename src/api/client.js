@@ -65,3 +65,11 @@ export const adminApi = {
   stats: () => api('/api/admin/stats'),
   users: () => api('/api/admin/users'),
 };
+
+export const postsApi = {
+  list: () => api('/api/posts'),
+  get: id => api(`/api/posts/${id}`),
+  create: body => api('/api/posts', { method: 'POST', body: JSON.stringify(body) }),
+  addComment: (id, body) =>
+    api(`/api/posts/${id}/comments`, { method: 'POST', body: JSON.stringify(body) }),
+};

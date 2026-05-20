@@ -18,14 +18,13 @@ test.describe('production smoke', () => {
     await expect(page.getByText(/curated by the All Can Access community/i)).toBeVisible();
   });
 
-  test('Join community prompts sign in when logged out', async ({ page }) => {
+  test('Join community opens registration when logged out', async ({ page }) => {
     await page.goto('/');
     await page.getByRole('button', { name: 'Join community' }).first().click();
-    await expect(page).toHaveURL(/\/sign-in$/);
-    await expect(page.getByRole('heading', { level: 1, name: 'Sign in' })).toBeVisible();
-    await expect(page.getByText(/sign in to join the community/i)).toBeVisible();
+    await expect(page).toHaveURL(/\/sign-up$/);
+    await expect(page.getByRole('heading', { level: 1, name: 'Join community' })).toBeVisible();
     await page.getByRole('button', { name: /All Can Access home/i }).click();
-    await expect(page).not.toHaveURL(/\/sign-in$/);
+    await expect(page).not.toHaveURL(/\/sign-up$/);
     await expect(
       page.getByRole('heading', { level: 1, name: /Where.*accessibility/i })
     ).toBeVisible();

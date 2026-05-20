@@ -1,29 +1,10 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import {
-  getCommentsForPost,
-  TAG_COLORS,
-  COLOR_MAP,
-} from '../data';
+import { TAG_COLORS, COLOR_MAP } from '../data';
+import { postsApi } from '../api/client';
+import { useAuth } from '../context/AuthContext';
 import styles from './ThreadPage.module.css';
 import { SITE_NAME } from '../brand';
-
-const EXTRA_COMMENTS_KEY = 'aa-user-thread-comments';
-
-function readExtraComments() {
-  try {
-    const raw = sessionStorage.getItem(EXTRA_COMMENTS_KEY);
-    if (!raw) return {};
-    const o = JSON.parse(raw);
-    return typeof o === 'object' && o !== null ? o : {};
-  } catch {
-    return {};
-  }
-}
-
-function writeExtraComments(byPost) {
-  sessionStorage.setItem(EXTRA_COMMENTS_KEY, JSON.stringify(byPost));
-}
 
 function Tag({ label }) {
   const c = TAG_COLORS[label] || { bg: '#f3f2ef', text: '#4a4840' };
@@ -53,29 +34,65 @@ function Avatar({ initials, color, size = 40 }) {
   );
 }
 
-export default function ThreadPage({ posts, setPosts, returnToCommunity }) {
+export default function ThreadPage({ posts, setPosts, refreshPosts, returnToCommunity }) {
   const { postId } = useParams();
   const navigate = useNavigate();
+  const { isAuthenticated } = useAuth();
   const id = useMemo(() => {
     const n = Number(postId);
     return Number.isFinite(n) ? n : null;
   }, [postId]);
 
-  const post = useMemo(
+  const cachedPost = useMemo(
     () => (id == null ? null : posts.find(p => p.id === id)),
     [posts, id]
   );
 
-  const [votes, setVotes] = useState(post?.votes ?? 0);
+  const [post, setPost] = useState(cachedPost);
+  const [comments, setComments] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState('');
+  const [votes, setVotes] = useState(cachedPost?.votes ?? 0);
   const [voted, setVoted] = useState(null);
-  const [extraByPost, setExtraByPost] = useState(readExtraComments);
-
   const [commentBody, setCommentBody] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+  const [commentError, setCommentError] = useState('');
 
   useEffect(() => {
-    setVotes(post?.votes ?? 0);
-    setVoted(null);
-  }, [post?.id, post?.votes]);
+    if (id == null) {
+      setLoading(false);
+      return undefined;
+    }
+
+    let cancelled = false;
+
+    async function loadThread() {
+      setLoading(true);
+      setLoadError('');
+      try {
+        const { post: data, comments: threadComments } = await postsApi.get(id);
+        if (!cancelled) {
+          setPost(data);
+          setComments(threadComments);
+          setVotes(data.votes);
+          setPosts(prev => {
+            const exists = prev.some(p => p.id === data.id);
+            if (exists) return prev.map(p => (p.id === data.id ? data : p));
+            return [data, ...prev];
+          });
+        }
+      } catch (err) {
+        if (!cancelled) setLoadError(err.message || 'Could not load discussion.');
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    }
+
+    loadThread();
+    return () => {
+      cancelled = true;
+    };
+  }, [id, setPosts]);
 
   useEffect(() => {
     if (!post) return;
@@ -85,47 +102,48 @@ export default function ThreadPage({ posts, setPosts, returnToCommunity }) {
     };
   }, [post]);
 
-  const baseComments = useMemo(() => (id == null ? [] : getCommentsForPost(id)), [id]);
-
-  const mergedComments = useMemo(() => {
-    if (id == null) return [];
-    const extra = extraByPost[id] || [];
-    return [...baseComments, ...extra];
-  }, [id, baseComments, extraByPost]);
-
-  const addComment = e => {
+  const addComment = async e => {
     e.preventDefault();
     const text = commentBody.trim();
     if (!text || id == null) return;
 
-    const entry = {
-      id: `u-${Date.now()}`,
-      author: 'You',
-      initials: 'YU',
-      color: 'blue',
-      time: 'Just now',
-      body: text,
-    };
+    if (!isAuthenticated) {
+      navigate('/sign-in', { state: { from: `/thread/${id}` } });
+      return;
+    }
 
-    setExtraByPost(prev => {
-      const next = { ...prev, [id]: [...(prev[id] || []), entry] };
-      writeExtraComments(next);
-      return next;
-    });
-
-    setPosts(prev =>
-      prev.map(p =>
-        p.id === id ? { ...p, replies: (p.replies || 0) + 1 } : p
-      )
-    );
-
-    setCommentBody('');
+    setCommentError('');
+    setSubmitting(true);
+    try {
+      const { comment } = await postsApi.addComment(id, { body: text });
+      setComments(prev => [...prev, comment]);
+      setPost(prev => {
+        if (!prev) return prev;
+        const updated = { ...prev, replies: (prev.replies || 0) + 1 };
+        setPosts(list => list.map(p => (p.id === updated.id ? updated : p)));
+        return updated;
+      });
+      setCommentBody('');
+      refreshPosts?.();
+    } catch (err) {
+      setCommentError(err.message || 'Could not post reply.');
+    } finally {
+      setSubmitting(false);
+    }
   };
+
+  if (loading) {
+    return (
+      <div className={styles.page}>
+        <p className={styles.notFound}>Loading discussion…</p>
+      </div>
+    );
+  }
 
   if (id == null || !post) {
     return (
       <div className={styles.page}>
-        <p className={styles.notFound}>Discussion not found.</p>
+        <p className={styles.notFound}>{loadError || 'Discussion not found.'}</p>
         <button type="button" className={styles.backLink} onClick={returnToCommunity}>
           ← Back to community
         </button>
@@ -204,10 +222,10 @@ export default function ThreadPage({ posts, setPosts, returnToCommunity }) {
 
       <section className={styles.replies} aria-labelledby="replies-heading">
         <h2 id="replies-heading" className={styles.repliesTitle}>
-          Replies ({mergedComments.length})
+          Replies ({comments.length})
         </h2>
         <ol className={styles.replyList}>
-          {mergedComments.map(c => (
+          {comments.map(c => (
             <li key={c.id} className={styles.reply}>
               <Avatar initials={c.initials} color={c.color} size={36} />
               <div className={styles.replyBody}>
@@ -221,7 +239,7 @@ export default function ThreadPage({ posts, setPosts, returnToCommunity }) {
             </li>
           ))}
         </ol>
-        {mergedComments.length === 0 ? (
+        {comments.length === 0 ? (
           <p className={styles.noReplies}>No replies yet — be the first.</p>
         ) : null}
       </section>
@@ -230,6 +248,11 @@ export default function ThreadPage({ posts, setPosts, returnToCommunity }) {
         <h2 id="reply-label" className={styles.composeTitle}>
           Add a reply
         </h2>
+        {commentError && (
+          <p className={styles.commentError} role="alert">
+            {commentError}
+          </p>
+        )}
         <form onSubmit={addComment}>
           <label htmlFor="reply-text" className="sr-only">
             Your reply
@@ -241,9 +264,10 @@ export default function ThreadPage({ posts, setPosts, returnToCommunity }) {
             value={commentBody}
             onChange={e => setCommentBody(e.target.value)}
             placeholder="Share context, examples, or questions…"
+            disabled={submitting}
           />
-          <button type="submit" className={styles.submit} disabled={!commentBody.trim()}>
-            Post reply
+          <button type="submit" className={styles.submit} disabled={!commentBody.trim() || submitting}>
+            {submitting ? 'Posting…' : 'Post reply'}
           </button>
         </form>
       </section>
