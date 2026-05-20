@@ -90,9 +90,14 @@ export default function SignInPage({ goToPortal }) {
           </div>
 
           <div className={styles.field}>
-            <label className={styles.label} htmlFor="signin-password">
-              Password
-            </label>
+            <div className={styles.labelRow}>
+              <label className={styles.label} htmlFor="signin-password">
+                Password
+              </label>
+              <Link className={styles.linkInline} to="/forgot-password">
+                Forgot password?
+              </Link>
+            </div>
             <input
               id="signin-password"
               className={styles.input}

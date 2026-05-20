@@ -12,6 +12,8 @@ import JoinCommunityPage from './components/JoinCommunityPage';
 import MemberProfilePage from './components/MemberProfilePage';
 import SignInPage from './components/SignInPage';
 import SignUpPage from './components/SignUpPage';
+import ForgotPasswordPage from './components/ForgotPasswordPage';
+import ResetPasswordPage from './components/ResetPasswordPage';
 import CompleteProfilePage from './components/CompleteProfilePage';
 import AdminDashboard from './components/AdminDashboard';
 import RequireAuth from './components/RequireAuth';
@@ -95,6 +97,8 @@ function AppShell() {
         location.pathname === '/join' ||
         location.pathname === '/sign-in' ||
         location.pathname === '/sign-up' ||
+        location.pathname === '/forgot-password' ||
+        location.pathname === '/reset-password' ||
         location.pathname === '/complete-profile' ||
         location.pathname === '/admin';
 
@@ -132,6 +136,14 @@ function AppShell() {
     }
     if (location.pathname === '/sign-up') {
       document.title = `Join community · ${SITE_NAME}`;
+      return;
+    }
+    if (location.pathname === '/forgot-password') {
+      document.title = `Forgot password · ${SITE_NAME}`;
+      return;
+    }
+    if (location.pathname === '/reset-password') {
+      document.title = `Reset password · ${SITE_NAME}`;
       return;
     }
     if (location.pathname === '/admin') {
@@ -195,7 +207,10 @@ function AppShell() {
   const navActive =
     location.pathname === '/join'
       ? 'join'
-      : location.pathname === '/sign-in' || location.pathname === '/sign-up'
+      : location.pathname === '/sign-in' ||
+          location.pathname === '/sign-up' ||
+          location.pathname === '/forgot-password' ||
+          location.pathname === '/reset-password'
         ? 'join'
       : location.pathname === '/events'
         ? 'events'
@@ -259,6 +274,8 @@ function AppShell() {
           />
           <Route path="/sign-in" element={<SignInPage goToPortal={goToPortal} />} />
           <Route path="/sign-up" element={<SignUpPage goToPortal={goToPortal} />} />
+          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+          <Route path="/reset-password" element={<ResetPasswordPage />} />
           <Route
             path="/complete-profile"
             element={

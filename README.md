@@ -55,6 +55,15 @@ Remove any Jenkins env var `HOST=` (empty). If you must use dev mode on the serv
 | `npm run db:seed` | Seed sample discussion threads (skipped if posts exist) |
 | `npm run db:migrate-from-sqlite` | One-time: migrate `./data/accesshub.db` into PostgreSQL |
 
+### Forgot password
+
+1. Run `npm run db:migrate` (migration `002_password_reset.sql`).
+2. Set `APP_URL` in `.env` to your site origin (e.g. `http://localhost:3010`).
+3. **Dev:** leave SMTP unset — the API logs the reset link to the console when someone requests a reset.
+4. **Production:** configure `SMTP_HOST`, `SMTP_USER`, `SMTP_PASS`, and `EMAIL_FROM` to send mail.
+
+Routes: `POST /api/auth/forgot-password`, `POST /api/auth/reset-password`. UI: `/forgot-password`, `/reset-password?token=…`.
+
 ## Deploy to Netlify (free)
 1. Run `npm run build`
 2. Drag the `build/` folder to [netlify.com/drop](https://netlify.com/drop)

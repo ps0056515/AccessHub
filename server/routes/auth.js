@@ -8,8 +8,12 @@ const {
   publicUser,
 } = require('../auth');
 const { verifyGoogleToken } = require('../google');
+const { generateResetToken, hashResetToken, resetExpiresAt } = require('../passwordReset');
+const { sendPasswordResetEmail, buildResetUrl } = require('../email');
 
 const router = express.Router();
+const GENERIC_RESET_MESSAGE =
+  'If an account exists for that email, we sent password reset instructions.';
 const USER_RETURNING =
   'id, email, password_hash, display_name, google_id, country, city, created_at';
 const USER_SELECT = `SELECT ${USER_RETURNING} FROM users`;
@@ -243,6 +247,110 @@ router.get('/me', authMiddleware, async (req, res, next) => {
       user: profile,
       needsLocation: !profile.country || !profile.city,
     });
+  } catch (err) {
+    next(err);
+  }
+});
+
+router.post('/forgot-password', async (req, res, next) => {
+  const { email } = req.body || {};
+  if (!email?.trim() || !EMAIL_RE.test(email.trim())) {
+    res.status(400).json({ error: 'Enter a valid email address.' });
+    return;
+  }
+
+  const normalizedEmail = email.trim().toLowerCase();
+
+  try {
+    const { rows } = await query(`${USER_SELECT} WHERE LOWER(email) = $1`, [normalizedEmail]);
+    const user = rows[0];
+
+    if (user?.password_hash) {
+      const token = generateResetToken();
+      const tokenHash = hashResetToken(token);
+      const expiresAt = resetExpiresAt();
+
+      await query(
+        `UPDATE users
+         SET password_reset_token_hash = $1, password_reset_expires_at = $2
+         WHERE id = $3`,
+        [tokenHash, expiresAt.toISOString(), user.id],
+      );
+
+      const resetUrl = buildResetUrl(token);
+      try {
+        await sendPasswordResetEmail({
+          to: user.email,
+          resetUrl,
+          displayName: user.display_name,
+        });
+      } catch (mailErr) {
+        console.error('Password reset email failed:', mailErr);
+        await query(
+          `UPDATE users
+           SET password_reset_token_hash = NULL, password_reset_expires_at = NULL
+           WHERE id = $1`,
+          [user.id],
+        );
+        res.status(503).json({
+          error:
+            'Could not send the reset email. Check SMTP settings or try again later.',
+        });
+        return;
+      }
+    }
+
+    res.json({ message: GENERIC_RESET_MESSAGE });
+  } catch (err) {
+    if (err.code === '42703') {
+      res.status(503).json({
+        error: 'Password reset is not set up. Run npm run db:migrate and restart the API server.',
+      });
+      return;
+    }
+    next(err);
+  }
+});
+
+router.post('/reset-password', async (req, res, next) => {
+  const { token, password } = req.body || {};
+  if (!token?.trim()) {
+    res.status(400).json({ error: 'Reset link is invalid or expired.' });
+    return;
+  }
+  if (!password || password.length < 8) {
+    res.status(400).json({ error: 'Password must be at least 8 characters.' });
+    return;
+  }
+
+  const tokenHash = hashResetToken(token.trim());
+
+  try {
+    const { rows } = await query(
+      `${USER_SELECT}
+       WHERE password_reset_token_hash = $1
+         AND password_reset_expires_at IS NOT NULL
+         AND password_reset_expires_at > NOW()`,
+      [tokenHash],
+    );
+    const user = rows[0];
+
+    if (!user) {
+      res.status(400).json({ error: 'Reset link is invalid or expired.' });
+      return;
+    }
+
+    const passwordHash = await hashPassword(password);
+    await query(
+      `UPDATE users
+       SET password_hash = $1,
+           password_reset_token_hash = NULL,
+           password_reset_expires_at = NULL
+       WHERE id = $2`,
+      [passwordHash, user.id],
+    );
+
+    res.json({ message: 'Your password has been updated. You can sign in with your new password.' });
   } catch (err) {
     next(err);
   }

@@ -59,6 +59,10 @@ export const authApi = {
   updateProfile: body => api('/api/auth/profile', { method: 'PATCH', body: JSON.stringify(body) }),
   me: () => api('/api/auth/me'),
   signOut: () => api('/api/auth/signout', { method: 'POST' }),
+  forgotPassword: body =>
+    api('/api/auth/forgot-password', { method: 'POST', body: JSON.stringify(body) }),
+  resetPassword: body =>
+    api('/api/auth/reset-password', { method: 'POST', body: JSON.stringify(body) }),
 };
 
 export const adminApi = {
