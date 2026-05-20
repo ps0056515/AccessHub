@@ -19,9 +19,7 @@ cp .env.example .env   # set DATABASE_URL, JWT_SECRET, Google OAuth
 
 # PostgreSQL: create DB, then apply migrations
 npm run db:migrate
-
-# Optional: copy users from old SQLite file
-npm run db:import-sqlite
+npm run db:seed
 
 # API (3015) + React (3010)
 npm run dev
@@ -54,7 +52,8 @@ Remove any Jenkins env var `HOST=` (empty). If you must use dev mode on the serv
 | Command | Description |
 |---------|-------------|
 | `npm run db:migrate` | Apply SQL migrations to PostgreSQL (`DATABASE_URL`) |
-| `npm run db:import-sqlite` | Import users from `DATABASE_PATH` SQLite file |
+| `npm run db:seed` | Seed sample discussion threads (skipped if posts exist) |
+| `npm run db:migrate-from-sqlite` | One-time: migrate `./data/accesshub.db` into PostgreSQL |
 
 ## Deploy to Netlify (free)
 1. Run `npm run build`
