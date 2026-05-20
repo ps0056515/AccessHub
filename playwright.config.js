@@ -8,13 +8,13 @@ module.exports = defineConfig({
   workers: process.env.CI ? 1 : undefined,
   reporter: process.env.CI ? 'github' : 'html',
   use: {
-    baseURL: 'http://127.0.0.1:4173',
+    baseURL: 'http://127.0.0.1:3010',
     trace: 'on-first-retry',
   },
   projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'] } }],
   webServer: {
-    command: 'npx serve -s build -l 4173',
-    url: 'http://127.0.0.1:4173',
+    command: 'npx serve -s build -l 3010',
+    url: 'http://127.0.0.1:3010',
     reuseExistingServer: !process.env.CI,
     timeout: 120000,
   },

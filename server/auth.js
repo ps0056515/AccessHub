@@ -1,6 +1,6 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const { getDb } = require('./db');
+const { query } = require('./db');
 
 const JWT_SECRET = process.env.JWT_SECRET || 'dev-only-change-in-production';
 const TOKEN_TTL = process.env.JWT_TTL || '7d';
@@ -8,7 +8,7 @@ const TOKEN_TTL = process.env.JWT_TTL || '7d';
 function getAdminEmails() {
   return (process.env.ADMIN_EMAILS || '')
     .split(',')
-    .map(e => e.trim().toLowerCase())
+    .map((e) => e.trim().toLowerCase())
     .filter(Boolean);
 }
 
@@ -51,19 +51,21 @@ function authMiddleware(req, res, next) {
   }
 }
 
-function adminMiddleware(req, res, next) {
-  const db = getDb();
-  const user = db
-    .prepare('SELECT id, email FROM users WHERE id = ?')
-    .get(req.userId);
+async function adminMiddleware(req, res, next) {
+  try {
+    const { rows } = await query('SELECT id, email FROM users WHERE id = $1', [req.userId]);
+    const user = rows[0];
 
-  if (!user || !isAdminEmail(user.email)) {
-    res.status(403).json({ error: 'Admin access required.' });
-    return;
+    if (!user || !isAdminEmail(user.email)) {
+      res.status(403).json({ error: 'Admin access required.' });
+      return;
+    }
+
+    req.adminUser = user;
+    next();
+  } catch (err) {
+    next(err);
   }
-
-  req.adminUser = user;
-  next();
 }
 
 function publicUser(row) {
