@@ -95,13 +95,15 @@ export default function Navbar({ activePage, setActivePage, goToPortal, onSearch
               </button>
             </>
           )}
-          <button
-            className={user ? styles.communityBtn : styles.joinBtn}
-            type="button"
-            onClick={goToJoin}
-          >
-            Join community
-          </button>
+          {!authLoading && !user && (
+            <button
+              className={styles.joinBtn}
+              type="button"
+              onClick={goToJoin}
+            >
+              Join community
+            </button>
+          )}
           <button
             className={styles.menuBtn}
             aria-label={menuOpen ? 'Close menu' : 'Open menu'}
@@ -167,16 +169,18 @@ export default function Navbar({ activePage, setActivePage, goToPortal, onSearch
               </button>
             </>
           )}
-          <button
-            type="button"
-            className={user ? styles.mobileJoinGhost : styles.mobileJoin}
-            onClick={() => {
-              goToJoin();
-              setMenuOpen(false);
-            }}
-          >
-            Join community
-          </button>
+          {!authLoading && !user && (
+            <button
+              type="button"
+              className={styles.mobileJoin}
+              onClick={() => {
+                goToJoin();
+                setMenuOpen(false);
+              }}
+            >
+              Join community
+            </button>
+          )}
         </nav>
       )}
     </header>
