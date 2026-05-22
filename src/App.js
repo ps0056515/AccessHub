@@ -27,7 +27,6 @@ import News from './components/footer-pages/News';
 import Contact from './components/footer-pages/Contact';
 import Contribute from './components/footer-pages/Contribute';
 import En301549 from './components/footer-pages/En301549';
-import { POSTS } from './data';
 import { SITE_NAME } from './brand';
 
 const FOOTER_PAGE_TITLES = {
@@ -38,6 +37,14 @@ const FOOTER_PAGE_TITLES = {
   '/privacy': `Privacy · ${SITE_NAME}`,
   '/terms': `Terms · ${SITE_NAME}`,
   '/accessibility': `Accessibility statement · ${SITE_NAME}`,
+};
+
+const SECTION_PATHS = {
+  portal: '/',
+  resources: '/resources',
+  tools: '/tools',
+  events: '/events',
+  guide: '/guide',
 };
 
 const PAGE_TITLES = {
@@ -87,15 +94,11 @@ function AppShell() {
   const isThreadRoute = location.pathname.startsWith('/thread/');
   const isProfileRoute = location.pathname.startsWith('/profile/');
 
-  const PAGES = {
-    portal: Portal,
-    resources: Resources,
-    tools: Tools,
-    events: Events,
-    guide: NVDAGuide,
-  };
-
   const SECTION_IDS = ['portal', 'resources', 'tools', 'events', 'guide'];
+
+  const sectionFromPath = SECTION_IDS.find(
+    (id) => id !== 'portal' && location.pathname === SECTION_PATHS[id],
+  );
 
   useLayoutEffect(() => {
     if (isThreadRoute) return;
@@ -107,42 +110,25 @@ function AppShell() {
 
   const setActivePage = useCallback(
     page => {
+      if (!SECTION_PATHS[page]) return;
       setActivePageState(page);
-
-      const onDedicatedRoute =
-        isThreadRoute ||
-        isProfileRoute ||
-        location.pathname === '/join' ||
-        location.pathname === '/sign-in' ||
-        location.pathname === '/sign-up' ||
-        location.pathname === '/forgot-password' ||
-        location.pathname === '/reset-password' ||
-        location.pathname === '/complete-profile' ||
-        location.pathname === '/admin';
-
-      if (page === 'events') {
-        if (location.pathname !== '/events') navigate('/events');
-        return;
-      }
-      if (location.pathname !== '/') {
-        navigate('/');
+      const target = SECTION_PATHS[page];
+      if (location.pathname !== target) {
+        navigate(target);
       }
     },
-    [navigate, location.pathname]
+    [navigate, location.pathname],
   );
 
   useLayoutEffect(() => {
-    const section = SECTION_IDS.find(
-      (id) => id !== 'portal' && location.pathname === `/${id}`,
-    );
-    if (section) {
-      setActivePageState(section);
+    if (sectionFromPath) {
+      setActivePageState(sectionFromPath);
       return;
     }
     if (location.pathname === '/') {
       setActivePageState('portal');
     }
-  }, [location.pathname]);
+  }, [location.pathname, sectionFromPath]);
 
   useLayoutEffect(() => {
     if (isThreadRoute) return;
@@ -178,8 +164,8 @@ function AppShell() {
       document.title = `Member profile · ${SITE_NAME}`;
       return;
     }
-    if (location.pathname === '/events') {
-      document.title = PAGE_TITLES.events;
+    if (sectionFromPath) {
+      document.title = PAGE_TITLES[sectionFromPath];
       return;
     }
     if (FOOTER_PAGE_TITLES[location.pathname]) {
@@ -187,7 +173,7 @@ function AppShell() {
       return;
     }
     document.title = PAGE_TITLES[activePage] || PAGE_TITLES.portal;
-  }, [isThreadRoute, isProfileRoute, location.pathname, activePage]);
+  }, [isThreadRoute, isProfileRoute, location.pathname, activePage, sectionFromPath]);
 
   const goToPortal = useCallback(() => {
     setActivePageState('portal');
@@ -227,7 +213,6 @@ function AppShell() {
     });
   }, [navigate]);
 
-  const Page = PAGES[activePage] || Portal;
   const navActive =
     location.pathname === '/join'
       ? 'join'
@@ -236,11 +221,8 @@ function AppShell() {
           location.pathname === '/forgot-password' ||
           location.pathname === '/reset-password'
         ? 'join'
-      : location.pathname === '/events'
-        ? 'events'
-        : isThreadRoute || isProfileRoute
-          ? 'portal'
-          : activePage;
+        : sectionFromPath ||
+          (isThreadRoute || isProfileRoute ? 'portal' : location.pathname === '/' ? 'portal' : activePage);
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
@@ -295,6 +277,17 @@ function AppShell() {
               />
             }
           />
+          <Route path="/events" element={<Events setActivePage={setActivePage} />} />
+          <Route path="/resources" element={<Resources setActivePage={setActivePage} />} />
+          <Route path="/tools" element={<Tools setActivePage={setActivePage} />} />
+          <Route path="/guide" element={<NVDAGuide setActivePage={setActivePage} />} />
+          <Route path="/privacy" element={<Privacy />} />
+          <Route path="/terms" element={<Terms />} />
+          <Route path="/accessibility" element={<AccessibilityStatement />} />
+          <Route path="/news" element={<News />} />
+          <Route path="/contact" element={<Contact />} />
+          <Route path="/contribute" element={<Contribute />} />
+          <Route path="/en-301-549" element={<En301549 />} />
           <Route element={<RequireAuth />}>
             <Route
               path="/thread/:postId"
@@ -323,36 +316,7 @@ function AppShell() {
                 </RequireAdmin>
               }
             />
-            <Route path="/events" element={<Events setActivePage={setActivePage} />} />
-            <Route path="/resources" element={<Resources setActivePage={setActivePage} />} />
-            <Route path="/tools" element={<Tools setActivePage={setActivePage} />} />
-            <Route path="/guide" element={<NVDAGuide setActivePage={setActivePage} />} />
             <Route path="/profile/:memberId" element={<MemberProfilePage goToPortal={goToPortal} />} />
-            <Route path="/privacy" element={<Privacy />} />
-            <Route path="/terms" element={<Terms />} />
-            <Route path="/accessibility" element={<AccessibilityStatement />} />
-            <Route path="/news" element={<News />} />
-            <Route path="/contact" element={<Contact />} />
-            <Route path="/contribute" element={<Contribute />} />
-            <Route path="/en-301-549" element={<En301549 />} />
-            <Route
-              path="*"
-              element={
-                activePage === 'portal' ? (
-                  <Portal
-                    setActivePage={setActivePage}
-                    goToSection={goToSection}
-                    posts={posts}
-                    setPosts={setPosts}
-                    postsLoading={postsLoading}
-                    postsError={postsError}
-                    onRetryPosts={loadPosts}
-                  />
-                ) : (
-                  <Page setActivePage={setActivePage} />
-                )
-              }
-            />
           </Route>
         </Routes>
       </main>
