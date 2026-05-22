@@ -11,6 +11,7 @@ export default function SignInPage({ goToPortal }) {
   const location = useLocation();
   const from = location.state?.from || '/';
   const joiningCommunity = from === '/join';
+  const redirectedFromProtected = from !== '/' && from !== '/join';
   const redirectAfterAuth = useAuthRedirect(goToPortal);
   const { signIn, signInWithGoogle } = useAuth();
   const [email, setEmail] = useState('');
@@ -47,17 +48,15 @@ export default function SignInPage({ goToPortal }) {
 
   return (
     <div className={styles.page}>
-      <button type="button" className={styles.back} onClick={() => navigate('/')}>
-        ← Back to community home
-      </button>
-
       <div className={styles.card}>
         <p className={styles.kicker}>Account</p>
         <h1 className={styles.title}>Sign in</h1>
         <p className={styles.lead}>
           {joiningCommunity
             ? 'Sign in to join the community and take part in discussions.'
-            : 'Welcome back. Sign in to participate in discussions and save your profile.'}
+            : redirectedFromProtected
+              ? 'Sign in to continue to the page you requested.'
+              : 'Welcome back. Sign in to participate in discussions and save your profile.'}
         </p>
 
         {error && (

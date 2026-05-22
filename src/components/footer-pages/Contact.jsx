@@ -11,7 +11,7 @@ export default function Contact() {
       </p>
       <p style={{ marginTop: '1.5rem' }}>
         Email:{' '}
-        <a href="mailto:pradeep.srinivasan@gmail.com">pradeep.srinivasan@gmail.com</a>
+        <a href="mailto:sudheer.b@fireflink.com">sudheer.b@fireflink.com</a>
       </p>
       <p style={{ marginTop: '1rem' }}>
         Prefer to post publicly? Start a discussion on the{' '}
