@@ -143,6 +143,12 @@ router.post('/:id/vote', async (req, res, next) => {
       if (current === voteValue) {
         await query('DELETE FROM post_votes WHERE post_id = $1 AND voter_key = $2', [id, key]);
         delta = -voteValue;
+      } else if (current === -1 && voteValue === 1) {
+        await query('DELETE FROM post_votes WHERE post_id = $1 AND voter_key = $2', [id, key]);
+        delta = 1;
+      } else if (current === 1 && voteValue === -1) {
+        await query('DELETE FROM post_votes WHERE post_id = $1 AND voter_key = $2', [id, key]);
+        delta = -1;
       } else {
         await query(
           'UPDATE post_votes SET direction = $1 WHERE post_id = $2 AND voter_key = $3',

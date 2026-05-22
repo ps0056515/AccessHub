@@ -1,13 +1,17 @@
 function voteDelta(currentVote, nextDirection) {
-  const nextValue = nextDirection === 'up' ? 1 : -1;
   if (currentVote === nextDirection) {
-    return { delta: -nextValue, userVote: null };
+    return { delta: nextDirection === 'up' ? -1 : 1, userVote: null };
   }
-  if (currentVote === null) {
-    return { delta: nextValue, userVote: nextDirection };
+
+  if (currentVote === 'down' && nextDirection === 'up') {
+    return { delta: 1, userVote: null };
   }
-  const currentValue = currentVote === 'up' ? 1 : -1;
-  return { delta: nextValue - currentValue, userVote: nextDirection };
+
+  if (currentVote === 'up' && nextDirection === 'down') {
+    return { delta: -1, userVote: null };
+  }
+
+  return { delta: nextDirection === 'up' ? 1 : -1, userVote: nextDirection };
 }
 
 export { voteDelta };

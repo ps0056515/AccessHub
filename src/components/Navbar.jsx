@@ -90,7 +90,14 @@ export default function Navbar({ activePage, setActivePage, goToPortal, onSearch
               <span className={styles.userLabel} title={user.email}>
                 {user.displayName}
               </span>
-              <button className={styles.signOutBtn} type="button" onClick={() => signOut()}>
+              <button
+                className={styles.signOutBtn}
+                type="button"
+                onClick={async () => {
+                  await signOut();
+                  navigate('/sign-in', { replace: true });
+                }}
+              >
                 Sign out
               </button>
             </>
@@ -160,8 +167,9 @@ export default function Navbar({ activePage, setActivePage, goToPortal, onSearch
               <button
                 type="button"
                 className={styles.mobileLink}
-                onClick={() => {
-                  signOut();
+                onClick={async () => {
+                  await signOut();
+                  navigate('/sign-in', { replace: true });
                   setMenuOpen(false);
                 }}
               >

@@ -277,75 +277,83 @@ function AppShell() {
       />
       <main id="main-content" style={{ flex: 1 }}>
         <Routes>
-          <Route
-            path="/thread/:postId"
-            element={
-              <ThreadPage
-                posts={posts}
-                setPosts={setPosts}
-                refreshPosts={refreshPosts}
-                returnToCommunity={returnFromThread}
-              />
-            }
-          />
-          <Route
-            path="/join"
-            element={
-              <RequireAuth>
-                <JoinCommunityPage goToPortal={goToPortal} goToSection={goToSection} />
-              </RequireAuth>
-            }
-          />
           <Route path="/sign-in" element={<SignInPage goToPortal={goToPortal} />} />
           <Route path="/sign-up" element={<SignUpPage goToPortal={goToPortal} />} />
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />
           <Route path="/reset-password" element={<ResetPasswordPage />} />
           <Route
-            path="/complete-profile"
+            path="/"
             element={
-              <RequireAuth>
-                <CompleteProfilePage goToPortal={goToPortal} />
-              </RequireAuth>
+              <Portal
+                setActivePage={setActivePage}
+                goToSection={goToSection}
+                posts={posts}
+                setPosts={setPosts}
+                postsLoading={postsLoading}
+                postsError={postsError}
+                onRetryPosts={loadPosts}
+              />
             }
           />
-          <Route
-            path="/admin"
-            element={
-              <RequireAdmin>
-                <AdminDashboard goToPortal={goToPortal} />
-              </RequireAdmin>
-            }
-          />
-          <Route path="/events" element={<Events setActivePage={setActivePage} />} />
-          <Route path="/resources" element={<Resources setActivePage={setActivePage} />} />
-          <Route path="/tools" element={<Tools setActivePage={setActivePage} />} />
-          <Route path="/guide" element={<NVDAGuide setActivePage={setActivePage} />} />
-          <Route path="/profile/:memberId" element={<MemberProfilePage goToPortal={goToPortal} />} />
-          <Route path="/privacy" element={<Privacy />} />
-          <Route path="/terms" element={<Terms />} />
-          <Route path="/accessibility" element={<AccessibilityStatement />} />
-          <Route path="/news" element={<News />} />
-          <Route path="/contact" element={<Contact />} />
-          <Route path="/contribute" element={<Contribute />} />
-          <Route path="/en-301-549" element={<En301549 />} />
-          <Route
-            path="*"
-            element={
-              activePage === 'portal' ? (
-                <Portal
-                  setActivePage={setActivePage}
-                  goToSection={goToSection}
+          <Route element={<RequireAuth />}>
+            <Route
+              path="/thread/:postId"
+              element={
+                <ThreadPage
                   posts={posts}
                   setPosts={setPosts}
-                  postsLoading={postsLoading}
-                  postsError={postsError}
-                  onRetryPosts={loadPosts}
+                  refreshPosts={refreshPosts}
+                  returnToCommunity={returnFromThread}
                 />
-              ) : (
-                <Page setActivePage={setActivePage} />
-              )
-            }
-          />
+              }
+            />
+            <Route
+              path="/join"
+              element={<JoinCommunityPage goToPortal={goToPortal} goToSection={goToSection} />}
+            />
+            <Route
+              path="/complete-profile"
+              element={<CompleteProfilePage goToPortal={goToPortal} />}
+            />
+            <Route
+              path="/admin"
+              element={
+                <RequireAdmin>
+                  <AdminDashboard goToPortal={goToPortal} />
+                </RequireAdmin>
+              }
+            />
+            <Route path="/events" element={<Events setActivePage={setActivePage} />} />
+            <Route path="/resources" element={<Resources setActivePage={setActivePage} />} />
+            <Route path="/tools" element={<Tools setActivePage={setActivePage} />} />
+            <Route path="/guide" element={<NVDAGuide setActivePage={setActivePage} />} />
+            <Route path="/profile/:memberId" element={<MemberProfilePage goToPortal={goToPortal} />} />
+            <Route path="/privacy" element={<Privacy />} />
+            <Route path="/terms" element={<Terms />} />
+            <Route path="/accessibility" element={<AccessibilityStatement />} />
+            <Route path="/news" element={<News />} />
+            <Route path="/contact" element={<Contact />} />
+            <Route path="/contribute" element={<Contribute />} />
+            <Route path="/en-301-549" element={<En301549 />} />
+            <Route
+              path="*"
+              element={
+                activePage === 'portal' ? (
+                  <Portal
+                    setActivePage={setActivePage}
+                    goToSection={goToSection}
+                    posts={posts}
+                    setPosts={setPosts}
+                    postsLoading={postsLoading}
+                    postsError={postsError}
+                    onRetryPosts={loadPosts}
+                  />
+                ) : (
+                  <Page setActivePage={setActivePage} />
+                )
+              }
+            />
+          </Route>
         </Routes>
       </main>
       <Footer goToSection={goToSection} goToPortal={goToPortal} />

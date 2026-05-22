@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
-import { SITE_NAME, footerLogoUrl } from "../brand";
+import { SITE_NAME } from "../brand";
+import FooterLogo from "./FooterLogo";
 import styles from "./Footer.module.css";
 
 const COMMUNITY_NAV = [
@@ -27,7 +28,7 @@ const ORG_LINKS = [
   {
     label: "Newsletter",
     type: "external",
-    href: "https://www.w3.org/WAI/subscribe/",
+    href: "https://www.w3.org/WAI/news/subscribe/",
   },
   { label: "Blog", type: "external", href: "https://www.w3.org/WAI/news/" },
   { label: "Contribute", type: "route", to: "/contribute" },
@@ -75,14 +76,7 @@ export default function Footer({ goToSection, goToPortal }) {
               onClick={() => goToPage("portal")}
             >
               <span className={styles.logo}>
-                <img
-                  src={footerLogoUrl()}
-                  alt=""
-                  className={styles.logoImg}
-                  width={200}
-                  height={60}
-                />
-                <span className="sr-only">{SITE_NAME}</span>
+                <FooterLogo className={styles.logoImg} width={200} height={60} />
               </span>
             </button>
             <p className={styles.brandDesc}>
