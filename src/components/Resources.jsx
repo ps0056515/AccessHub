@@ -1,12 +1,12 @@
-import { useLayoutEffect, useMemo, useState } from 'react';
-import { RESOURCES, COLOR_MAP } from '../data';
-import Modal from './Modal';
-import styles from './Resources.module.css';
+import { useLayoutEffect, useMemo, useState } from "react";
+import { RESOURCES, COLOR_MAP } from "../data";
+import Modal from "./Modal";
+import styles from "./Resources.module.css";
 
-const CATEGORIES = ['All', 'Standards', 'Testing', 'Design', 'Legal', 'Tools'];
+const CATEGORIES = ["All", "Standards", "Testing", "Design", "Legal", "Tools"];
 
-const SAVED_KEY = 'allcanaccess-saved-resources';
-const SUBMISSIONS_KEY = 'allcanaccess-resource-submissions';
+const SAVED_KEY = "allcanaccess-saved-resources";
+const SUBMISSIONS_KEY = "allcanaccess-resource-submissions";
 
 function loadSaved() {
   try {
@@ -19,25 +19,25 @@ function loadSaved() {
 }
 
 export default function Resources({ setActivePage }) {
-  const [activeCategory, setActiveCategory] = useState('All');
-  const [query, setQuery] = useState('');
+  const [activeCategory, setActiveCategory] = useState("All");
+  const [query, setQuery] = useState("");
   const [saved, setSaved] = useState(loadSaved);
   const [submitOpen, setSubmitOpen] = useState(false);
-  const [submitTitle, setSubmitTitle] = useState('');
-  const [submitUrl, setSubmitUrl] = useState('');
-  const [submitNote, setSubmitNote] = useState('');
+  const [submitTitle, setSubmitTitle] = useState("");
+  const [submitUrl, setSubmitUrl] = useState("");
+  const [submitNote, setSubmitNote] = useState("");
   const [submitMsg, setSubmitMsg] = useState(null);
 
   useLayoutEffect(() => {
-    const raw = sessionStorage.getItem('aa-nav');
+    const raw = sessionStorage.getItem("aa-nav");
     if (!raw) return;
     try {
       const { scrollTo, focusEventId } = JSON.parse(raw);
-      if (scrollTo === 'certifications') {
+      if (scrollTo === "certifications") {
         requestAnimationFrame(() => {
-          document.getElementById('resource-certifications')?.scrollIntoView({
-            behavior: 'smooth',
-            block: 'start',
+          document.getElementById("resource-certifications")?.scrollIntoView({
+            behavior: "smooth",
+            block: "start",
           });
         });
       }
@@ -47,21 +47,24 @@ export default function Resources({ setActivePage }) {
     } catch {
       /* ignore */
     } finally {
-      sessionStorage.removeItem('aa-nav');
+      sessionStorage.removeItem("aa-nav");
     }
   }, []);
 
   const filtered = useMemo(() => {
-    return RESOURCES.filter(r => {
-      if (activeCategory !== 'All' && r.category !== activeCategory) return false;
+    return RESOURCES.filter((r) => {
+      if (activeCategory !== "All" && r.category !== activeCategory)
+        return false;
       if (!query) return true;
       const q = query.toLowerCase();
-      return r.title.toLowerCase().includes(q) || r.desc.toLowerCase().includes(q);
+      return (
+        r.title.toLowerCase().includes(q) || r.desc.toLowerCase().includes(q)
+      );
     });
   }, [activeCategory, query]);
 
-  const toggleSave = slug => {
-    setSaved(prev => {
+  const toggleSave = (slug) => {
+    setSaved((prev) => {
       const next = new Set(prev);
       if (next.has(slug)) next.delete(slug);
       else next.add(slug);
@@ -74,27 +77,34 @@ export default function Resources({ setActivePage }) {
     });
   };
 
-  const handleSubmit = e => {
+  const handleSubmit = (e) => {
     e.preventDefault();
     const title = submitTitle.trim();
     const url = submitUrl.trim();
     if (!title || !url) {
-      setSubmitMsg('Please add at least a title and link.');
+      setSubmitMsg("Please add at least a title and link.");
       return;
     }
     try {
       const prev = sessionStorage.getItem(SUBMISSIONS_KEY);
       const list = prev ? JSON.parse(prev) : [];
-      const entry = { title, url, note: submitNote.trim(), at: new Date().toISOString() };
+      const entry = {
+        title,
+        url,
+        note: submitNote.trim(),
+        at: new Date().toISOString(),
+      };
       const next = Array.isArray(list) ? [...list, entry] : [entry];
       sessionStorage.setItem(SUBMISSIONS_KEY, JSON.stringify(next));
     } catch {
       /* still show thanks; storage may be unavailable */
     }
-    setSubmitMsg('Thanks — we saved your suggestion locally for this demo. You can submit another anytime.');
-    setSubmitTitle('');
-    setSubmitUrl('');
-    setSubmitNote('');
+    setSubmitMsg(
+      "Thanks — we saved your suggestion locally for this demo. You can submit another anytime.",
+    );
+    setSubmitTitle("");
+    setSubmitUrl("");
+    setSubmitNote("");
   };
 
   return (
@@ -102,23 +112,29 @@ export default function Resources({ setActivePage }) {
       <header className={styles.pageHeader}>
         <h1 className={styles.pageTitle}>Community resources</h1>
         <p className={styles.pageSub}>
-          Guides, templates, checklists and references curated by the All Can Access community.
+          Guides, templates, checklists and references curated by the
+          AllCanAccess community.
         </p>
       </header>
 
-      <section id="resource-certifications" className={styles.certBanner} aria-labelledby="cert-heading">
+      <section
+        id="resource-certifications"
+        className={styles.certBanner}
+        aria-labelledby="cert-heading"
+      >
         <div>
           <h2 id="cert-heading" className={styles.certHeading}>
             Certifications &amp; learning paths
           </h2>
           <p className={styles.certDesc}>
-            IAAP credentials, WAS, and structured training tracks — pair these with the checklist resources below.
+            IAAP credentials, WAS, and structured training tracks — pair these
+            with the checklist resources below.
           </p>
         </div>
         <button
           type="button"
           className={styles.certCta}
-          onClick={() => setActivePage?.('tools')}
+          onClick={() => setActivePage?.("tools")}
         >
           Open tools &amp; certifications →
         </button>
@@ -135,16 +151,16 @@ export default function Resources({ setActivePage }) {
             type="search"
             placeholder="Search resources…"
             value={query}
-            onChange={e => setQuery(e.target.value)}
+            onChange={(e) => setQuery(e.target.value)}
           />
         </div>
         <fieldset className={styles.catFieldset}>
           <legend className="sr-only">Filter resources by category</legend>
           <div className={styles.catNav}>
-            {CATEGORIES.map(c => (
+            {CATEGORIES.map((c) => (
               <label
                 key={c}
-                className={`${styles.catLabel} ${activeCategory === c ? styles.catActive : ''}`}
+                className={`${styles.catLabel} ${activeCategory === c ? styles.catActive : ""}`}
               >
                 <input
                   type="radio"
@@ -171,7 +187,10 @@ export default function Resources({ setActivePage }) {
               className={`${styles.card} fade-up`}
               style={{ animationDelay: `${i * 0.05}s` }}
             >
-              <div className={styles.cardIcon} style={{ background: c.bg, color: c.text }}>
+              <div
+                className={styles.cardIcon}
+                style={{ background: c.bg, color: c.text }}
+              >
                 <span role="img" aria-hidden="true" style={{ fontSize: 20 }}>
                   {r.icon}
                 </span>
@@ -182,27 +201,42 @@ export default function Resources({ setActivePage }) {
                 <p className={styles.cardDesc}>{r.desc}</p>
               </div>
               <div className={styles.cardActions}>
-                <a className={styles.cardBtn} href={r.viewUrl} target="_blank" rel="noopener noreferrer">
+                <a
+                  className={styles.cardBtn}
+                  href={r.viewUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
                   View →
                 </a>
                 <button
                   type="button"
-                  className={`${styles.cardSave} ${isSaved ? styles.cardSaveOn : ''}`}
-                  aria-label={isSaved ? `Remove from saved: ${r.title}` : `Save for later: ${r.title}`}
-                  title={isSaved ? 'Remove from saved' : 'Save for later'}
+                  className={`${styles.cardSave} ${isSaved ? styles.cardSaveOn : ""}`}
+                  aria-label={
+                    isSaved
+                      ? `Remove from saved: ${r.title}`
+                      : `Save for later: ${r.title}`
+                  }
+                  title={isSaved ? "Remove from saved" : "Save for later"}
                   aria-pressed={isSaved}
-                  onClick={e => {
+                  onClick={(e) => {
                     e.preventDefault();
                     e.stopPropagation();
                     toggleSave(r.slug);
                   }}
                 >
-                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+                  <svg
+                    width="14"
+                    height="14"
+                    viewBox="0 0 14 14"
+                    fill="none"
+                    aria-hidden="true"
+                  >
                     <path
                       d="M2 1h10v12l-5-3-5 3V1z"
                       stroke="currentColor"
                       strokeWidth="1.2"
-                      fill={isSaved ? 'currentColor' : 'none'}
+                      fill={isSaved ? "currentColor" : "none"}
                     />
                   </svg>
                 </button>
@@ -223,9 +257,15 @@ export default function Resources({ setActivePage }) {
       <div className={styles.submitBanner}>
         <div>
           <h2 className={styles.bannerTitle}>Have a resource to share?</h2>
-          <p className={styles.bannerSub}>Submit it for community review and help practitioners worldwide.</p>
+          <p className={styles.bannerSub}>
+            Submit it for community review and help practitioners worldwide.
+          </p>
         </div>
-        <button type="button" className={styles.bannerBtn} onClick={() => setSubmitOpen(true)}>
+        <button
+          type="button"
+          className={styles.bannerBtn}
+          onClick={() => setSubmitOpen(true)}
+        >
           Submit a resource →
         </button>
       </div>
@@ -246,7 +286,7 @@ export default function Resources({ setActivePage }) {
                 name="resource-title"
                 autoComplete="off"
                 value={submitTitle}
-                onChange={e => setSubmitTitle(e.target.value)}
+                onChange={(e) => setSubmitTitle(e.target.value)}
               />
             </label>
             <label className={styles.formLabel}>
@@ -258,7 +298,7 @@ export default function Resources({ setActivePage }) {
                 inputMode="url"
                 placeholder="https://"
                 value={submitUrl}
-                onChange={e => setSubmitUrl(e.target.value)}
+                onChange={(e) => setSubmitUrl(e.target.value)}
               />
             </label>
             <label className={styles.formLabel}>
@@ -268,7 +308,7 @@ export default function Resources({ setActivePage }) {
                 name="resource-notes"
                 rows={3}
                 value={submitNote}
-                onChange={e => setSubmitNote(e.target.value)}
+                onChange={(e) => setSubmitNote(e.target.value)}
               />
             </label>
             {submitMsg ? (
