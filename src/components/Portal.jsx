@@ -349,14 +349,6 @@ export default function Portal({
                 </li>
               );
             })}
-          <ul
-            className={`${styles.heroChips} fade-up fade-up-1`}
-            aria-label="Popular topics"
-          >
-            <li>WCAG 2.2 implementations</li>
-            <li>Screen reader testing</li>
-            <li>Legal &amp; procurement</li>
-            <li>Design systems</li>
           </ul>
           <div className={`${styles.heroActions} fade-up fade-up-2`}>
             <button
