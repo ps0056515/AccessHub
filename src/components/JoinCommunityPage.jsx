@@ -59,12 +59,12 @@ export default function JoinCommunityPage({ goToPortal, goToSection }) {
           >
             IAAP
           </a>
-          , All Can Access gives you several ways to learn and take part — starting here or through
+          , AllCanAccess gives you several ways to learn and take part — starting here or through
           established hubs.
         </p>
         <div className={styles.heroActions}>
           <button type="button" className={styles.btnPrimary} onClick={enterDiscussions}>
-            Start on All Can Access — open discussions
+            Start on AllCanAccess — open discussions
           </button>
           <a className={styles.btnSecondary} href="#participate-here">
             Jump to ways to participate
@@ -88,7 +88,7 @@ export default function JoinCommunityPage({ goToPortal, goToSection }) {
 
       <section className={styles.section} id="participate-here" aria-labelledby="here-heading">
         <h2 id="here-heading" className={styles.h2}>
-          Ways to participate on All Can Access
+          Ways to participate on AllCanAccess
         </h2>
         <p className={styles.sectionIntro}>
           This mirrors the split you see elsewhere: an open discussion space (like Reddit), curated

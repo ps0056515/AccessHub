@@ -20,6 +20,10 @@ import RequireAuth from './components/RequireAuth';
 import RequireAdmin from './components/RequireAdmin';
 import { AuthProvider } from './context/AuthContext';
 import { postsApi } from './api/client';
+import Privacy from './components/footer-pages/Privacy';
+import Terms from './components/footer-pages/Terms';
+import AccessibilityStatement from './components/footer-pages/AccessibilityStatement';
+import { POSTS } from './data';
 import { SITE_NAME } from './brand';
 
 const PAGE_TITLES = {
@@ -102,20 +106,15 @@ function AppShell() {
         location.pathname === '/complete-profile' ||
         location.pathname === '/admin';
 
-      if (onDedicatedRoute) {
-        navigate(page === 'events' ? '/events' : '/');
-        return;
-      }
-
       if (page === 'events') {
-        navigate('/events');
+        if (location.pathname !== '/events') navigate('/events');
         return;
       }
-      if (location.pathname === '/events' && page !== 'events') {
+      if (location.pathname !== '/') {
         navigate('/');
       }
     },
-    [navigate, isThreadRoute, location.pathname, isProfileRoute]
+    [navigate, location.pathname]
   );
 
   useLayoutEffect(() => {
@@ -189,9 +188,9 @@ function AppShell() {
   const focusPortalDiscussionSearch = useCallback(() => {
     setActivePageState('portal');
     navigate('/');
-    queueMicrotask(() => {
+    setTimeout(() => {
       window.dispatchEvent(new CustomEvent('allcanaccess:focus-discussion-search'));
-    });
+    }, 100);
   }, [navigate]);
 
   const returnFromThread = useCallback(() => {
@@ -294,6 +293,9 @@ function AppShell() {
           />
           <Route path="/events" element={<Events setActivePage={setActivePage} />} />
           <Route path="/profile/:memberId" element={<MemberProfilePage goToPortal={goToPortal} />} />
+          <Route path="/privacy" element={<Privacy />} />
+          <Route path="/terms" element={<Terms />} />
+          <Route path="/accessibility" element={<AccessibilityStatement />} />
           <Route
             path="*"
             element={

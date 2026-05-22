@@ -193,7 +193,7 @@ export default function Events() {
         <div className={styles.hostBannerContent}>
           <h2 className={styles.hostTitle}>Host an event</h2>
           <p className={styles.hostSub}>
-            Running a workshop, webinar, or local meetup? Reach thousands of practitioners through All Can Access.
+            Running a workshop, webinar, or local meetup? Reach thousands of practitioners through AllCanAccess.
           </p>
           <button type="button" className={styles.hostBtn} onClick={() => setHostOpen(true)}>
             Submit your event →
