@@ -87,6 +87,14 @@
 .votedDown { background: var(--red-bg); border-color: var(--red); color: var(--red-text); }
 .voteCount { font-size: 13px; font-weight: 500; color: var(--text-muted); }
 
+.voteError {
+  font-size: 12px;
+  color: var(--red);
+  margin-top: 6px;
+  max-width: 120px;
+  line-height: 1.4;
+}
+
 .avatar {
   border-radius: 50%;
   display: flex;

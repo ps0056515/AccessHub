@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { TAG_COLORS, COLOR_MAP } from '../data';
-import { postsApi } from '../api/client';
+import { postsApi, getVoterKey, getStoredVote, setStoredVote } from '../api/client';
+import { voteDelta } from '../utils/voteDelta';
 import { useAuth } from '../context/AuthContext';
 import styles from './ThreadPage.module.css';
 import { SITE_NAME } from '../brand';
@@ -53,7 +54,9 @@ export default function ThreadPage({ posts, setPosts, refreshPosts, returnToComm
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState('');
   const [votes, setVotes] = useState(cachedPost?.votes ?? 0);
-  const [voted, setVoted] = useState(null);
+  const [voted, setVoted] = useState(() => (id != null ? getStoredVote(id) : null));
+  const [voting, setVoting] = useState(false);
+  const [voteError, setVoteError] = useState('');
   const [commentBody, setCommentBody] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [commentError, setCommentError] = useState('');
@@ -75,6 +78,7 @@ export default function ThreadPage({ posts, setPosts, refreshPosts, returnToComm
           setPost(data);
           setComments(threadComments);
           setVotes(data.votes);
+          setVoted(getStoredVote(id));
           setPosts(prev => {
             const exists = prev.some(p => p.id === data.id);
             if (exists) return prev.map(p => (p.id === data.id ? data : p));
@@ -151,13 +155,34 @@ export default function ThreadPage({ posts, setPosts, refreshPosts, returnToComm
     );
   }
 
-  const vote = dir => {
-    if (voted === dir) {
-      setVotes(post.votes);
-      setVoted(null);
-    } else {
-      setVotes(post.votes + (dir === 'up' ? 1 : -1));
-      setVoted(dir);
+  const vote = async (dir) => {
+    if (voting || id == null) return;
+
+    const prevVotes = votes;
+    const prevVoted = voted;
+    const { delta, userVote: nextVoted } = voteDelta(voted, dir);
+
+    setVoteError('');
+    setVotes(prevVotes + delta);
+    setVoted(nextVoted);
+    setVoting(true);
+
+    try {
+      const { votes: newVotes, userVote } = await postsApi.vote(id, {
+        direction: dir,
+        voterKey: getVoterKey(),
+      });
+      setVotes(newVotes);
+      setVoted(userVote);
+      setStoredVote(id, userVote);
+      setPost((prev) => (prev ? { ...prev, votes: newVotes } : prev));
+      setPosts((list) => list.map((p) => (p.id === id ? { ...p, votes: newVotes } : p)));
+    } catch (err) {
+      setVotes(prevVotes);
+      setVoted(prevVoted);
+      setVoteError(err.message || 'Could not save your vote.');
+    } finally {
+      setVoting(false);
     }
   };
 
@@ -185,18 +210,29 @@ export default function ThreadPage({ posts, setPosts, refreshPosts, returnToComm
               className={`${styles.voteBtn} ${voted === 'up' ? styles.votedUp : ''}`}
               onClick={() => vote('up')}
               aria-label="Upvote"
+              aria-pressed={voted === 'up'}
+              disabled={voting}
             >
               ▲
             </button>
-            <span className={styles.voteCount}>{votes}</span>
+            <span className={styles.voteCount} aria-live="polite" aria-atomic="true">
+              {votes}
+            </span>
             <button
               type="button"
               className={`${styles.voteBtn} ${voted === 'down' ? styles.votedDown : ''}`}
               onClick={() => vote('down')}
               aria-label="Downvote"
+              aria-pressed={voted === 'down'}
+              disabled={voting}
             >
               ▼
             </button>
+            {voteError ? (
+              <p className={styles.voteError} role="alert">
+                {voteError}
+              </p>
+            ) : null}
           </div>
           <Avatar initials={post.initials} color={post.color} size={44} />
           <div className={styles.rootBody}>

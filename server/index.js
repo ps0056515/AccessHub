@@ -4,6 +4,7 @@ const cors = require('cors');
 const authRoutes = require('./routes/auth');
 const adminRoutes = require('./routes/admin');
 const postsRoutes = require('./routes/posts');
+const newsRoutes = require('./routes/news');
 const { query, closePool } = require('./db');
 
 const PORT = Number(process.env.API_PORT || process.env.PORT) || 3015;
@@ -24,6 +25,7 @@ app.get('/api/health', async (_req, res) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/posts', postsRoutes);
+app.use('/api/news', newsRoutes);
 
 app.use((err, _req, res, _next) => {
   console.error(err);
