@@ -14,10 +14,7 @@ const STANDARDS_LINKS = [
   { label: "WCAG 2.2", href: "https://www.w3.org/TR/WCAG22/" },
   { label: "ARIA Patterns", href: "https://www.w3.org/WAI/ARIA/apg/" },
   { label: "Section 508", href: "https://www.section508.gov/" },
-  {
-    label: "EN 301 549",
-    href: "https://www.etsi.org/deliver/etsi_en/301500_301599/301549/",
-  },
+  { label: "EN 301 549", to: "/en-301-549" },
   {
     label: "EAA 2025",
     href: "https://digital-strategy.ec.europa.eu/en/policies/web-accessibility",
@@ -26,26 +23,37 @@ const STANDARDS_LINKS = [
 
 const ORG_LINKS = [
   { label: `About ${SITE_NAME}`, type: "app" },
+  { label: "News", type: "route", to: "/news" },
   {
     label: "Newsletter",
     type: "external",
     href: "https://www.w3.org/WAI/subscribe/",
   },
   { label: "Blog", type: "external", href: "https://www.w3.org/WAI/news/" },
-  { label: "Contribute", type: "contribute" },
-  {
-    label: "Contact",
-    type: "external",
-    href: "https://www.w3.org/WAI/about/contacting-orgs/",
-  },
+  { label: "Contribute", type: "route", to: "/contribute" },
+  { label: "Contact", type: "route", to: "/contact" },
 ];
 
 const SOCIAL_LINKS = [
   { label: "LinkedIn", href: "https://www.linkedin.com/company/w3c/" },
   { label: "X", href: "https://x.com/w3c/" },
   { label: "GitHub", href: "https://github.com/w3c/wai" },
-  { label: "RSS", href: "https://www.w3.org/blog/news/feed/" },
+  { label: "RSS", to: "/news" },
 ];
+
+function scrollToTop() {
+  window.scrollTo(0, 0);
+  document.documentElement.scrollTop = 0;
+  document.body.scrollTop = 0;
+}
+
+function FooterRouteLink({ to, className, children }) {
+  return (
+    <Link to={to} className={className} onClick={scrollToTop}>
+      {children}
+    </Link>
+  );
+}
 
 export default function Footer({ goToSection, goToPortal }) {
   const goToPage = (page) => {
@@ -54,13 +62,6 @@ export default function Footer({ goToSection, goToPortal }) {
       return;
     }
     if (typeof goToSection === "function") goToSection(page);
-  };
-
-  const contribute = () => {
-    if (typeof goToPortal === "function") goToPortal();
-    queueMicrotask(() =>
-      window.dispatchEvent(new CustomEvent("allcanaccess:focus-ask")),
-    );
   };
 
   return (
@@ -89,17 +90,23 @@ export default function Footer({ goToSection, goToPortal }) {
               developers, and advocates building a more inclusive web.
             </p>
             <div className={styles.socials} aria-label="Social links">
-              {SOCIAL_LINKS.map((s) => (
-                <a
-                  key={s.label}
-                  href={s.href}
-                  className={styles.social}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  {s.label}
-                </a>
-              ))}
+              {SOCIAL_LINKS.map((s) =>
+                s.to ? (
+                  <FooterRouteLink key={s.label} to={s.to} className={styles.social}>
+                    {s.label}
+                  </FooterRouteLink>
+                ) : (
+                  <a
+                    key={s.label}
+                    href={s.href}
+                    className={styles.social}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {s.label}
+                  </a>
+                ),
+              )}
             </div>
           </div>
 
@@ -125,14 +132,20 @@ export default function Footer({ goToSection, goToPortal }) {
             <ul className={styles.colLinks}>
               {STANDARDS_LINKS.map((l) => (
                 <li key={l.label}>
-                  <a
-                    href={l.href}
-                    className={styles.colLink}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    {l.label}
-                  </a>
+                  {l.to ? (
+                    <FooterRouteLink to={l.to} className={styles.colLink}>
+                      {l.label}
+                    </FooterRouteLink>
+                  ) : (
+                    <a
+                      href={l.href}
+                      className={styles.colLink}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      {l.label}
+                    </a>
+                  )}
                 </li>
               ))}
             </ul>
@@ -143,14 +156,10 @@ export default function Footer({ goToSection, goToPortal }) {
             <ul className={styles.colLinks}>
               {ORG_LINKS.map((item) => (
                 <li key={item.label}>
-                  {item.type === "contribute" ? (
-                    <button
-                      type="button"
-                      className={styles.colLink}
-                      onClick={contribute}
-                    >
+                  {item.type === "route" ? (
+                    <FooterRouteLink to={item.to} className={styles.colLink}>
                       {item.label}
-                    </button>
+                    </FooterRouteLink>
                   ) : item.type === "external" ? (
                     <a
                       href={item.href}
@@ -180,15 +189,15 @@ export default function Footer({ goToSection, goToPortal }) {
             affiliated with IAAP or WebAIM
           </p>
           <div className={styles.bottomLinks}>
-            <Link className={styles.bottomLink} to="/privacy">
+            <FooterRouteLink className={styles.bottomLink} to="/privacy">
               Privacy
-            </Link>
-            <Link className={styles.bottomLink} to="/terms">
+            </FooterRouteLink>
+            <FooterRouteLink className={styles.bottomLink} to="/terms">
               Terms
-            </Link>
-            <Link className={styles.bottomLink} to="/accessibility">
+            </FooterRouteLink>
+            <FooterRouteLink className={styles.bottomLink} to="/accessibility">
               Accessibility statement
-            </Link>
+            </FooterRouteLink>
           </div>
         </div>
       </div>

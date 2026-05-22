@@ -19,31 +19,42 @@
   align-items: center;
 }
 
+/* Filter pills — all states ≥ 4.5:1 text contrast (WCAG AA) */
 .filterLabel {
   position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  background: transparent;
-  border: 1px solid var(--border);
+  background: #ffffff;
+  border: 1px solid #b8c4d4;
   border-radius: var(--radius-full);
   padding: 6px 16px;
   font-size: 13px;
-  color: var(--text-muted);
-  transition: all var(--transition);
+  font-weight: 500;
+  color: #0c1929;
+  transition: background var(--transition), color var(--transition), border-color var(--transition), box-shadow var(--transition);
   user-select: none;
   -webkit-tap-highlight-color: transparent;
 }
 
 .filterLabel:hover {
-  background: var(--bg-secondary);
-  color: var(--text);
+  background: #e8eef7;
+  color: #0c1929;
+  border-color: #8fa0b8;
+}
+
+.filterLabel:active {
+  background: #dde6f0;
+  color: #0c1929;
+  border-color: #8fa0b8;
 }
 
 .filterLabel:focus-within {
-  outline: 2px solid var(--accent);
+  outline: 2px solid #074a9e;
   outline-offset: 2px;
+  box-shadow: 0 0 0 3px rgba(7, 74, 158, 0.25);
+  color: #0c1929;
 }
 
 .filterInput {
@@ -59,14 +70,26 @@
 }
 
 .filterSelected {
-  background: var(--text);
-  color: var(--bg);
-  border-color: var(--text);
+  background: #0c1929;
+  color: #ffffff;
+  border-color: #0c1929;
 }
 
 .filterLabel.filterSelected:hover {
-  opacity: 0.92;
-  color: var(--bg);
+  background: #1a2d42;
+  color: #ffffff;
+  border-color: #1a2d42;
+}
+
+.filterLabel.filterSelected:active {
+  background: #243347;
+  color: #ffffff;
+  border-color: #243347;
+}
+
+.filterLabel.filterSelected:focus-within {
+  color: #ffffff;
+  background: #0c1929;
 }
 
 .eventSection { margin-bottom: 40px; }
@@ -175,6 +198,29 @@
   line-height: 1.6;
   color: var(--text-muted);
   margin-bottom: 16px;
+}
+
+.formRequiredNote {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-bottom: 14px;
+}
+
+.formLabelText {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 2px;
+  flex-wrap: wrap;
+}
+
+.requiredMark {
+  color: var(--red);
+  font-weight: 600;
+}
+
+.optionalMark {
+  color: var(--text-muted);
+  font-weight: 400;
 }
 
 .formLabel {

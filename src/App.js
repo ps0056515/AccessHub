@@ -23,8 +23,22 @@ import { postsApi } from './api/client';
 import Privacy from './components/footer-pages/Privacy';
 import Terms from './components/footer-pages/Terms';
 import AccessibilityStatement from './components/footer-pages/AccessibilityStatement';
+import News from './components/footer-pages/News';
+import Contact from './components/footer-pages/Contact';
+import Contribute from './components/footer-pages/Contribute';
+import En301549 from './components/footer-pages/En301549';
 import { POSTS } from './data';
 import { SITE_NAME } from './brand';
+
+const FOOTER_PAGE_TITLES = {
+  '/news': `News · ${SITE_NAME}`,
+  '/contact': `Contact · ${SITE_NAME}`,
+  '/contribute': `Contribute · ${SITE_NAME}`,
+  '/en-301-549': `EN 301 549 · ${SITE_NAME}`,
+  '/privacy': `Privacy · ${SITE_NAME}`,
+  '/terms': `Terms · ${SITE_NAME}`,
+  '/accessibility': `Accessibility statement · ${SITE_NAME}`,
+};
 
 const PAGE_TITLES = {
   portal: `Community · ${SITE_NAME}`,
@@ -118,8 +132,15 @@ function AppShell() {
   );
 
   useLayoutEffect(() => {
-    if (location.pathname === '/events') {
-      setActivePageState('events');
+    const section = SECTION_IDS.find(
+      (id) => id !== 'portal' && location.pathname === `/${id}`,
+    );
+    if (section) {
+      setActivePageState(section);
+      return;
+    }
+    if (location.pathname === '/') {
+      setActivePageState('portal');
     }
   }, [location.pathname]);
 
@@ -159,6 +180,10 @@ function AppShell() {
     }
     if (location.pathname === '/events') {
       document.title = PAGE_TITLES.events;
+      return;
+    }
+    if (FOOTER_PAGE_TITLES[location.pathname]) {
+      document.title = FOOTER_PAGE_TITLES[location.pathname];
       return;
     }
     document.title = PAGE_TITLES[activePage] || PAGE_TITLES.portal;
@@ -292,10 +317,17 @@ function AppShell() {
             }
           />
           <Route path="/events" element={<Events setActivePage={setActivePage} />} />
+          <Route path="/resources" element={<Resources setActivePage={setActivePage} />} />
+          <Route path="/tools" element={<Tools setActivePage={setActivePage} />} />
+          <Route path="/guide" element={<NVDAGuide setActivePage={setActivePage} />} />
           <Route path="/profile/:memberId" element={<MemberProfilePage goToPortal={goToPortal} />} />
           <Route path="/privacy" element={<Privacy />} />
           <Route path="/terms" element={<Terms />} />
           <Route path="/accessibility" element={<AccessibilityStatement />} />
+          <Route path="/news" element={<News />} />
+          <Route path="/contact" element={<Contact />} />
+          <Route path="/contribute" element={<Contribute />} />
+          <Route path="/en-301-549" element={<En301549 />} />
           <Route
             path="*"
             element={

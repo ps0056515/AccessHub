@@ -1,17 +1,29 @@
 import { useEffect, useRef, useState, useMemo } from 'react';
+import { flushSync } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import { STATS, ALL_EVENTS, MEMBERS, TAG_COLORS, COLOR_MAP } from '../data';
-import { postsApi } from '../api/client';
+import { postsApi, getVoterKey, getStoredVote, setStoredVote } from '../api/client';
+import { voteDelta } from '../utils/voteDelta';
 import { useAuth } from '../context/AuthContext';
 import styles from './Portal.module.css';
 
 const TOPIC_FILTERS = ["WCAG 2.2", "Screen readers", "Legal"];
 
+const ASK_TOPICS = [
+  "WCAG 2.2",
+  "Screen readers",
+  "Legal",
+  "ARIA",
+  "Color contrast",
+  "Design systems",
+  "Strategy",
+];
+
 const HERO_TOPICS = [
-  { label: 'WCAG 2.2 implementations', tag: 'WCAG 2.2' },
-  { label: 'Screen reader testing', tag: 'Screen readers' },
-  { label: 'Legal & procurement', tag: 'Legal' },
-  { label: 'Design systems', query: 'design system' },
+  { label: "WCAG 2.2 implementations", searchText: "WCAG 2.2 implementations" },
+  { label: "Screen reader testing", searchText: "Screen reader testing" },
+  { label: "Legal & procurement", searchText: "Legal & procurement" },
+  { label: "Design systems", searchText: "Design systems" },
 ];
 
 function postMatchesQuery(post, rawQuery) {
@@ -27,7 +39,12 @@ function postMatchesQuery(post, rawQuery) {
     .filter(Boolean)
     .join(" ")
     .toLowerCase();
-  return haystack.includes(q);
+
+  if (haystack.includes(q)) return true;
+
+  const tokens = q.split(/\s+/).filter((word) => word.length >= 3);
+  if (tokens.length === 0) return haystack.includes(q);
+  return tokens.every((word) => haystack.includes(word));
 }
 
 function Avatar({ initials, color, size = 36 }) {
@@ -58,18 +75,44 @@ function Tag({ label }) {
   );
 }
 
-function PostCard({ post, onOpenThread }) {
+function PostCard({ post, onOpenThread, onVotesChange }) {
   const [votes, setVotes] = useState(post.votes);
-  const [voted, setVoted] = useState(null);
+  const [voted, setVoted] = useState(() => getStoredVote(post.id));
+  const [voting, setVoting] = useState(false);
+  const [voteError, setVoteError] = useState('');
 
-  const vote = (dir, e) => {
+  useEffect(() => {
+    setVotes(post.votes);
+  }, [post.votes]);
+
+  const vote = async (dir, e) => {
     e.stopPropagation();
-    if (voted === dir) {
-      setVotes(post.votes);
-      setVoted(null);
-    } else {
-      setVotes(post.votes + (dir === "up" ? 1 : -1));
-      setVoted(dir);
+    if (voting) return;
+
+    const prevVotes = votes;
+    const prevVoted = voted;
+    const { delta, userVote: nextVoted } = voteDelta(voted, dir);
+
+    setVoteError('');
+    setVotes(prevVotes + delta);
+    setVoted(nextVoted);
+    setVoting(true);
+
+    try {
+      const { votes: newVotes, userVote } = await postsApi.vote(post.id, {
+        direction: dir,
+        voterKey: getVoterKey(),
+      });
+      setVotes(newVotes);
+      setVoted(userVote);
+      setStoredVote(post.id, userVote);
+      onVotesChange?.(post.id, newVotes);
+    } catch (err) {
+      setVotes(prevVotes);
+      setVoted(prevVoted);
+      setVoteError(err.message || 'Could not save your vote.');
+    } finally {
+      setVoting(false);
     }
   };
 
@@ -81,18 +124,29 @@ function PostCard({ post, onOpenThread }) {
           className={`${styles.voteBtn} ${voted === "up" ? styles.votedUp : ""}`}
           onClick={(e) => vote("up", e)}
           aria-label={`Upvote: ${post.title}`}
+          aria-pressed={voted === "up"}
+          disabled={voting}
         >
           ▲
         </button>
-        <span className={styles.voteCount}>{votes}</span>
+        <span className={styles.voteCount} aria-live="polite" aria-atomic="true">
+          {votes}
+        </span>
         <button
           type="button"
           className={`${styles.voteBtn} ${voted === "down" ? styles.votedDown : ""}`}
           onClick={(e) => vote("down", e)}
           aria-label={`Downvote: ${post.title}`}
+          aria-pressed={voted === "down"}
+          disabled={voting}
         >
           ▼
         </button>
+        {voteError ? (
+          <span className="sr-only" role="alert">
+            {voteError}
+          </span>
+        ) : null}
       </div>
       <Avatar initials={post.initials} color={post.color} />
       <button
@@ -137,6 +191,7 @@ export default function Portal({
   const [query, setQuery] = useState('');
   const [topicFilter, setTopicFilter] = useState(null);
   const [draftQuestion, setDraftQuestion] = useState('');
+  const [draftTags, setDraftTags] = useState(['WCAG 2.2']);
   const [postError, setPostError] = useState('');
   const [posting, setPosting] = useState(false);
   const askBoxRef = useRef(null);
@@ -169,15 +224,52 @@ export default function Portal({
     };
   }, []);
 
+  useEffect(() => {
+    try {
+      const raw = sessionStorage.getItem('aa-nav');
+      if (!raw) return;
+      const nav = JSON.parse(raw);
+      if (nav.focusAsk) {
+        sessionStorage.removeItem('aa-nav');
+        askBoxRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        askTextareaRef.current?.focus();
+      }
+    } catch {
+      /* ignore */
+    }
+  }, []);
+
   const focusDiscussionBox = () => {
     askBoxRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
     askTextareaRef.current?.focus();
   };
 
-  const applyHeroTopic = topic => {
-    const isActive =
-      (topic.tag && topicFilter === topic.tag) ||
-      (topic.query && query.trim().toLowerCase() === topic.query.toLowerCase());
+  const applyHeroTopic = (topic) => {
+    const searchText = topic.searchText || topic.label;
+    const isActive = query.trim().toLowerCase() === searchText.toLowerCase();
+
+    if (isActive) {
+      flushSync(() => {
+        setTopicFilter(null);
+        setQuery('');
+      });
+      return;
+    }
+
+    flushSync(() => {
+      setQuery(searchText);
+      setTopicFilter(null);
+      setActiveTab('hot');
+    });
+
+    requestAnimationFrame(() => {
+      searchInputRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      searchInputRef.current?.focus({ preventScroll: true });
+    });
+  };
+
+  const applyFilterPill = (filter) => {
+    const isActive = topicFilter === filter && query.trim() === filter;
 
     if (isActive) {
       setTopicFilter(null);
@@ -185,16 +277,14 @@ export default function Portal({
       return;
     }
 
-    if (topic.tag) {
-      setTopicFilter(topic.tag);
-      setQuery('');
-    } else {
-      setTopicFilter(null);
-      setQuery(topic.query || topic.label);
-    }
+    setTopicFilter(filter);
+    setQuery(filter);
     setActiveTab('hot');
-    searchInputRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
     searchInputRef.current?.focus();
+  };
+
+  const handleVotesChange = (postId, newVotes) => {
+    setPosts((prev) => prev.map((p) => (p.id === postId ? { ...p, votes: newVotes } : p)));
   };
 
   const goToCertificationsSection = () => {
@@ -225,11 +315,12 @@ export default function Portal({
       const { post: newPost } = await postsApi.create({
         title,
         body: trimmedQuestion,
-        tags: ['WCAG 2.2'],
+        tags: draftTags,
       });
 
       setPosts(prevPosts => [newPost, ...prevPosts]);
       setDraftQuestion('');
+      setDraftTags(['WCAG 2.2']);
       setQuery('');
       setActiveTab('new');
       navigate(`/thread/${newPost.id}`);
@@ -238,28 +329,6 @@ export default function Portal({
     } finally {
       setPosting(false);
     }
-    const newPost = {
-      id: Date.now(),
-      votes: 0,
-      initials: "YU",
-      color: "blue",
-      author: "You",
-      role: "Community member",
-      time: "Just now",
-      replies: 0,
-      title: trimmedQuestion,
-      excerpt:
-        "Thanks for posting. Community members can now respond to your question.",
-      body: "Your question is live. Others can reply once the thread is indexed. Edit details from your profile (coming soon).",
-      tags: ["WCAG 2.2"],
-      tagColors: ["blue"],
-    };
-
-    setPosts((prevPosts) => [newPost, ...prevPosts]);
-    setDraftQuestion("");
-    setQuery("");
-    setActiveTab("new");
-    navigate(`/thread/${newPost.id}`);
   };
 
   const tabs = [
@@ -333,9 +402,8 @@ export default function Portal({
           </p>
           <ul className={`${styles.heroChips} fade-up fade-up-1`} aria-label="Popular topics">
             {HERO_TOPICS.map(topic => {
-              const isActive =
-                (topic.tag && topicFilter === topic.tag) ||
-                (topic.query && query.trim().toLowerCase() === topic.query.toLowerCase());
+              const searchText = topic.searchText || topic.label;
+              const isActive = query.trim().toLowerCase() === searchText.toLowerCase();
               return (
                 <li key={topic.label}>
                   <button
@@ -406,11 +474,22 @@ export default function Portal({
               </p>
             )}
             <div className={styles.askFooter}>
-              {/** TODO: Enable the button for choose topic */}
-              {/* <button type="button" className={styles.askTopic}>
-                Choose topic
-              </button>
-              </button> */}
+              <label className={styles.topicPicker} htmlFor="ask-topic">
+                <span className={styles.topicPickerLabel}>Choose topic</span>
+                <select
+                  id="ask-topic"
+                  className={styles.topicSelect}
+                  value={draftTags[0] || ASK_TOPICS[0]}
+                  onChange={(e) => setDraftTags([e.target.value])}
+                  disabled={posting}
+                >
+                  {ASK_TOPICS.map((topic) => (
+                    <option key={topic} value={topic}>
+                      {topic}
+                    </option>
+                  ))}
+                </select>
+              </label>
               <button
                 type="button"
                 className={styles.askPost}
@@ -418,8 +497,6 @@ export default function Portal({
                 disabled={posting}
               >
                 {posting ? 'Posting…' : 'Post question →'}
-              >
-                Post question →
               </button>
             </div>
           </div>
@@ -471,9 +548,7 @@ export default function Portal({
                   type="button"
                   aria-pressed={topicFilter === f}
                   className={`${styles.filterPill} ${topicFilter === f ? styles.filterPillActive : ""}`}
-                  onClick={() =>
-                    setTopicFilter((prev) => (prev === f ? null : f))
-                  }
+                  onClick={() => applyFilterPill(f)}
                 >
                   {f}
                 </button>
@@ -523,6 +598,7 @@ export default function Portal({
                   key={p.id}
                   post={p}
                   onOpenThread={(post) => navigate(`/thread/${post.id}`)}
+                  onVotesChange={handleVotesChange}
                 />
               ))
             )}

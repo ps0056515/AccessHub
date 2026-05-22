@@ -103,6 +103,74 @@ router.post('/', authMiddleware, async (req, res, next) => {
   }
 });
 
+router.post('/:id/vote', async (req, res, next) => {
+  const id = Number(req.params.id);
+  const { direction, voterKey } = req.body || {};
+
+  if (!Number.isFinite(id)) {
+    res.status(400).json({ error: 'Invalid post id.' });
+    return;
+  }
+  if (!voterKey?.trim()) {
+    res.status(400).json({ error: 'Voter key is required.' });
+    return;
+  }
+  if (direction !== 'up' && direction !== 'down') {
+    res.status(400).json({ error: 'Direction must be "up" or "down".' });
+    return;
+  }
+
+  const voteValue = direction === 'up' ? 1 : -1;
+  const key = voterKey.trim();
+
+  try {
+    const { rows: posts } = await query('SELECT id, votes FROM posts WHERE id = $1', [id]);
+    if (posts.length === 0) {
+      res.status(404).json({ error: 'Discussion not found.' });
+      return;
+    }
+
+    const { rows: existing } = await query(
+      'SELECT direction FROM post_votes WHERE post_id = $1 AND voter_key = $2',
+      [id, key],
+    );
+
+    let userVote = null;
+    let delta = 0;
+
+    if (existing.length > 0) {
+      const current = existing[0].direction;
+      if (current === voteValue) {
+        await query('DELETE FROM post_votes WHERE post_id = $1 AND voter_key = $2', [id, key]);
+        delta = -voteValue;
+      } else {
+        await query(
+          'UPDATE post_votes SET direction = $1 WHERE post_id = $2 AND voter_key = $3',
+          [voteValue, id, key],
+        );
+        delta = voteValue - current;
+        userVote = direction;
+      }
+    } else {
+      await query(
+        'INSERT INTO post_votes (post_id, voter_key, direction) VALUES ($1, $2, $3)',
+        [id, key, voteValue],
+      );
+      delta = voteValue;
+      userVote = direction;
+    }
+
+    const { rows: totals } = await query(
+      'UPDATE posts SET votes = votes + $1 WHERE id = $2 RETURNING votes',
+      [delta, id],
+    );
+
+    res.json({ votes: totals[0].votes, userVote });
+  } catch (err) {
+    next(err);
+  }
+});
+
 router.post('/:id/comments', authMiddleware, async (req, res, next) => {
   const id = Number(req.params.id);
   const { body } = req.body || {};

@@ -216,20 +216,37 @@ export default function Events() {
             Tell us about your session. We’ll review community fit, timing, and accessibility needs before it goes
             live — same flow whether you’re on a preview build or production.
           </p>
-          <form onSubmit={handleHostSubmit} noValidate>
-            <label className={styles.formLabel}>
-              Event title
+          <form onSubmit={handleHostSubmit} noValidate aria-describedby="host-required-note">
+            <p id="host-required-note" className={styles.formRequiredNote}>
+              Required fields are marked with an asterisk (
+              <span className={styles.requiredMark} aria-hidden="true">
+                *
+              </span>
+              ).
+            </p>
+            <label className={styles.formLabel} htmlFor="host-title">
+              <span className={styles.formLabelText}>
+                Event title
+                <span className={styles.requiredMark} aria-hidden="true">
+                  *
+                </span>
+                <span className="sr-only"> (required)</span>
+              </span>
               <input
+                id="host-title"
                 className={styles.formInput}
                 name="host-title"
                 autoComplete="off"
+                required
+                aria-required="true"
                 value={hostTitle}
                 onChange={e => setHostTitle(e.target.value)}
               />
             </label>
-            <label className={styles.formLabel}>
-              Format
+            <label className={styles.formLabel} htmlFor="host-format">
+              <span className={styles.formLabelText}>Format</span>
               <select
+                id="host-format"
                 className={styles.formInput}
                 name="host-format"
                 value={hostFormat}
@@ -241,9 +258,13 @@ export default function Events() {
                 <option value="hybrid">Hybrid</option>
               </select>
             </label>
-            <label className={styles.formLabel}>
-              Proposed date or window
+            <label className={styles.formLabel} htmlFor="host-date">
+              <span className={styles.formLabelText}>
+                Proposed date or window
+                <span className={styles.optionalMark}> (optional)</span>
+              </span>
               <input
+                id="host-date"
                 className={styles.formInput}
                 name="host-date"
                 placeholder="e.g. July 2026, or 15 Sept afternoon"
@@ -251,21 +272,34 @@ export default function Events() {
                 onChange={e => setHostDate(e.target.value)}
               />
             </label>
-            <label className={styles.formLabel}>
-              Contact email
+            <label className={styles.formLabel} htmlFor="host-email">
+              <span className={styles.formLabelText}>
+                Contact email
+                <span className={styles.requiredMark} aria-hidden="true">
+                  *
+                </span>
+                <span className="sr-only"> (required)</span>
+              </span>
               <input
+                id="host-email"
                 className={styles.formInput}
                 name="host-email"
                 type="email"
                 autoComplete="email"
                 inputMode="email"
+                required
+                aria-required="true"
                 value={hostEmail}
                 onChange={e => setHostEmail(e.target.value)}
               />
             </label>
-            <label className={styles.formLabel}>
-              Details (audience, length, accessibility plans)
+            <label className={styles.formLabel} htmlFor="host-details">
+              <span className={styles.formLabelText}>
+                Details (audience, length, accessibility plans)
+                <span className={styles.optionalMark}> (optional)</span>
+              </span>
               <textarea
+                id="host-details"
                 className={styles.formTextarea}
                 name="host-details"
                 rows={4}
