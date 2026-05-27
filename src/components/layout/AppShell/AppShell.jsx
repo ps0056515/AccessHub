@@ -17,7 +17,6 @@ import SignUpPage from 'pages/auth/SignUpPage';
 import ForgotPasswordPage from 'pages/auth/ForgotPasswordPage';
 import ResetPasswordPage from 'pages/auth/ResetPasswordPage';
 import CompleteProfilePage from 'pages/auth/CompleteProfilePage';
-import AdminDashboard from 'pages/admin/AdminDashboard';
 // Footer pages
 import Privacy from 'pages/footer-pages/Privacy';
 import Terms from 'pages/footer-pages/Terms';
@@ -308,14 +307,7 @@ export default function AppShell() {
               path="/complete-profile"
               element={<CompleteProfilePage goToPortal={goToPortal} />}
             />
-            <Route
-              path="/admin"
-              element={
-                <RequireAdmin>
-                  <AdminDashboard goToPortal={goToPortal} />
-                </RequireAdmin>
-              }
-            />
+
             <Route path="/profile/:memberId" element={<MemberProfilePage goToPortal={goToPortal} />} />
           </Route>
         </Routes>

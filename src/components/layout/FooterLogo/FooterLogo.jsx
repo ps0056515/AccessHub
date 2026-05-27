@@ -1,19 +1,15 @@
-import { useState } from 'react';
-import { SITE_NAME, footerLogoUrl, logoUrl } from 'brand';
+import { useConfig } from 'context/ConfigContext';
 
 export default function FooterLogo({ className, width = 200, height = 60 }) {
-  const [src, setSrc] = useState(footerLogoUrl());
+  const { siteName, footerLogoUrl } = useConfig();
 
   return (
     <img
-      src={src}
-      alt={`${SITE_NAME} logo`}
+      src={footerLogoUrl || '/allcanaccess_footer.png'}
+      alt={`${siteName} logo`}
       className={className}
       width={width}
       height={height}
-      onError={() => {
-        if (src !== logoUrl()) setSrc(logoUrl());
-      }}
     />
   );
 }

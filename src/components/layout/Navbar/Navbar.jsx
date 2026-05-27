@@ -1,13 +1,23 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { logoUrl, SITE_NAME } from 'brand';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from 'context/AuthContext';
+import { useConfig } from 'context/ConfigContext';
 import styles from './Navbar.module.css';
+
+const SECTION_PATHS = {
+  portal: '/',
+  resources: '/resources',
+  tools: '/tools',
+  events: '/events',
+  guide: '/guide',
+};
 
 export default function Navbar({ activePage, setActivePage, goToPortal, onSearch }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
   const { user, signOut, loading: authLoading, isAdmin } = useAuth();
+  const { siteName, navbarLogoUrl, navigation } = useConfig();
 
   const visitPortal =
     typeof goToPortal === 'function' ? goToPortal : () => setActivePage('portal');
@@ -20,13 +30,40 @@ export default function Navbar({ activePage, setActivePage, goToPortal, onSearch
     navigate('/sign-up', { state: { from: '/join' } });
   };
 
-  const links = [
-    { id: 'portal', label: 'Community' },
-    { id: 'resources', label: 'Resources' },
-    { id: 'tools', label: 'Tools' },
-    { id: 'events', label: 'Events' },
-    { id: 'guide', label: 'NVDA Guide' },
-  ];
+  const getPageIdFromUrl = (url) => {
+    if (url === '/') return 'portal';
+    if (url === '/resources') return 'resources';
+    if (url === '/tools') return 'tools';
+    if (url === '/events') return 'events';
+    if (url === '/guide') return 'guide';
+    return '';
+  };
+
+  const links = (navigation.navbar || []).map((l, index) => ({
+    id: getPageIdFromUrl(l.url) || `nav-item-${index}`,
+    label: l.label,
+    url: l.url,
+    isExternal: l.isExternal
+  }));
+
+  const handleLinkClick = (l) => {
+    const pageId = getPageIdFromUrl(l.url);
+    if (pageId) {
+      setActivePage(pageId);
+    } else {
+      if (l.isExternal) {
+        window.open(l.url, '_blank', 'noopener,noreferrer');
+      } else {
+        navigate(l.url);
+      }
+    }
+  };
+
+  const isLinkActive = (l) => {
+    const pageId = getPageIdFromUrl(l.url);
+    if (pageId) return activePage === pageId;
+    return location.pathname === l.url;
+  };
 
   return (
     <header className={styles.header} role="banner">
@@ -35,10 +72,10 @@ export default function Navbar({ activePage, setActivePage, goToPortal, onSearch
           type="button"
           className={styles.logo}
           onClick={() => visitPortal()}
-          aria-label={`${SITE_NAME} home`}
+          aria-label={`${siteName} home`}
         >
-          <img src={logoUrl()} alt="" className={styles.logoImg} width={128} height={40} />
-          <span className={`sr-only ${styles.logoName}`}>{SITE_NAME}</span>
+          <img src={navbarLogoUrl} alt="" className={styles.logoImg} width={128} height={40} />
+          <span className={`sr-only ${styles.logoName}`}>{siteName}</span>
           <span className={styles.logoBadge}>Beta</span>
         </button>
 
@@ -46,9 +83,9 @@ export default function Navbar({ activePage, setActivePage, goToPortal, onSearch
           {links.map(l => (
             <button
               key={l.id}
-              className={`${styles.navLink} ${activePage === l.id ? styles.active : ''}`}
-              onClick={() => setActivePage(l.id)}
-              aria-current={activePage === l.id ? 'page' : undefined}
+              className={`${styles.navLink} ${isLinkActive(l) ? styles.active : ''}`}
+              onClick={() => handleLinkClick(l)}
+              aria-current={isLinkActive(l) ? 'page' : undefined}
             >
               {l.label}
             </button>
@@ -128,9 +165,9 @@ export default function Navbar({ activePage, setActivePage, goToPortal, onSearch
           {links.map(l => (
             <button
               key={l.id}
-              className={`${styles.mobileLink} ${activePage === l.id ? styles.mobileActive : ''}`}
+              className={`${styles.mobileLink} ${isLinkActive(l) ? styles.mobileActive : ''}`}
               onClick={() => {
-                setActivePage(l.id);
+                handleLinkClick(l);
                 setMenuOpen(false);
               }}
             >

@@ -1,0 +1,176 @@
+.toolsHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.addToolBtn {
+  background: var(--accent, #074a9e);
+  color: #ffffff;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.addToolBtn:hover {
+  background: #063d82;
+}
+
+.tableContainer {
+  overflow-x: auto;
+}
+
+.sortButtons {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.sortBtn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 11px;
+  color: var(--text-muted);
+  padding: 2px;
+}
+
+.sortBtn:disabled {
+  cursor: not-allowed;
+  opacity: 0.4;
+}
+
+.toolIconCell {
+  font-size: 20px;
+  text-align: center;
+}
+
+.badgePill {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 9999px;
+  text-transform: uppercase;
+}
+
+.actionBtnGroup {
+  display: flex;
+  gap: 8px;
+}
+
+.editBtn {
+  background: transparent;
+  border: 1px solid var(--border-strong, #cbd5e1);
+  color: var(--text);
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.editBtn:hover {
+  background: var(--bg-secondary, #f8fafc);
+}
+
+.deleteBtn {
+  background: transparent;
+  border: 1px solid #fecaca;
+  color: #ef4444;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.deleteBtn:hover {
+  background: #fef2f2;
+}
+
+
+
+.formFields {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.formLabel {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.formInput, .formSelect {
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: 1px solid var(--border, #cbd5e1);
+  background: var(--bg-card, #ffffff);
+  color: var(--text);
+  font-size: 14px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.formInput:focus, .formSelect:focus {
+  outline: 2px solid var(--accent, #074a9e);
+  outline-offset: -1px;
+}
+
+
+.cancelBtn {
+  background: transparent;
+  border: 1px solid var(--border, #cbd5e1);
+  color: var(--text-muted);
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.cancelBtn:hover {
+  background: var(--bg-secondary, #f8fafc);
+}
+
+.saveBtn {
+  background: var(--accent, #074a9e);
+  color: #ffffff;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.saveBtn:hover {
+  background: #063d82;
+}
+
+.saveBtn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.visuallyHidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
+}

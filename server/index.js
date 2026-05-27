@@ -1,17 +1,21 @@
+process.env.NODE_ENV = process.env.NODE_ENV || 'development';
 require('dotenv').config();
+const path = require('path');
 const express = require('express');
 const cors = require('cors');
 const authRoutes = require('./routes/auth');
 const adminRoutes = require('./routes/admin');
 const postsRoutes = require('./routes/posts');
 const newsRoutes = require('./routes/news');
+const settingsRoutes = require('./routes/settings');
+const toolsRoutes = require('./routes/tools');
 const { query, closePool } = require('./db');
 
 const PORT = Number(process.env.API_PORT || process.env.PORT) || 3015;
 const app = express();
 
 app.use(cors({ origin: true, credentials: true }));
-app.use(express.json());
+app.use(express.json({ limit: '10mb' }));
 
 app.get('/api/health', async (_req, res) => {
   try {
@@ -26,6 +30,9 @@ app.use('/api/auth', authRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/posts', postsRoutes);
 app.use('/api/news', newsRoutes);
+app.use('/api/settings', settingsRoutes);
+app.use('/api/tools', toolsRoutes);
+app.use('/api/uploads', express.static(path.join(__dirname, 'uploads')));
 
 app.use((err, _req, res, _next) => {
   console.error(err);

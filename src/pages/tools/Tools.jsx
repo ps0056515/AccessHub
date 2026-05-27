@@ -1,4 +1,6 @@
-import { TOOLS, CERTS, COLOR_MAP } from 'data';
+import { useState, useEffect } from 'react';
+import { CERTS, COLOR_MAP } from 'data';
+import { toolsApi } from 'api/client';
 import styles from './Tools.module.css';
 
 function BadgePill({ label, color }) {
@@ -11,6 +13,29 @@ function BadgePill({ label, color }) {
 }
 
 export default function Tools() {
+  const [toolsList, setToolsList] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let cancelled = false;
+    async function fetchTools() {
+      try {
+        const data = await toolsApi.list();
+        if (!cancelled && Array.isArray(data)) {
+          setToolsList(data);
+        }
+      } catch (err) {
+        console.error('Failed to load tools:', err);
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    }
+    fetchTools();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   return (
     <div className={styles.page}>
       <header className={styles.pageHeader}>
@@ -29,28 +54,32 @@ export default function Tools() {
           Vetted by the community — from quick browser checks to deep CI/CD integration.
         </p>
         <div className={styles.toolGrid}>
-          {TOOLS.map((t, i) => (
-            <a
-              key={i}
-              href={t.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className={`${styles.toolCard} fade-up`}
-              style={{ animationDelay: `${i * 0.04}s` }}
-              aria-label={`${t.name} — ${t.type} — ${t.price}${t.badge ? ` — ${t.badge}` : ''}`}
-            >
-              <div className={styles.toolTop}>
-                <div className={styles.toolIcon}>{t.icon}</div>
-                {t.badge && <BadgePill label={t.badge} color={t.badgeColor} />}
-              </div>
-              <h3 className={styles.toolName}>{t.name}</h3>
-              <p className={styles.toolType}>{t.type}</p>
-              <div className={styles.toolFooter}>
-                <span className={styles.toolPrice}>{t.price}</span>
-                <span className={styles.toolArrow} aria-hidden="true">↗</span>
-              </div>
-            </a>
-          ))}
+          {loading ? (
+            <p style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '40px', color: 'var(--text-muted)' }}>Loading tools...</p>
+          ) : (
+            toolsList.map((t, i) => (
+              <a
+                key={t.id || i}
+                href={t.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={`${styles.toolCard} fade-up`}
+                style={{ animationDelay: `${i * 0.04}s` }}
+                aria-label={`${t.name} — ${t.type} — ${t.price}${t.badge ? ` — ${t.badge}` : ''}`}
+              >
+                <div className={styles.toolTop}>
+                  <div className={styles.toolIcon}>{t.icon}</div>
+                  {t.badge && <BadgePill label={t.badge} color={t.badge_color || t.badgeColor} />}
+                </div>
+                <h3 className={styles.toolName}>{t.name}</h3>
+                <p className={styles.toolType}>{t.type}</p>
+                <div className={styles.toolFooter}>
+                  <span className={styles.toolPrice}>{t.price}</span>
+                  <span className={styles.toolArrow} aria-hidden="true">↗</span>
+                </div>
+              </a>
+            ))
+          )}
         </div>
       </section>
 
