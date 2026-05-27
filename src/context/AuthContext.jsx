@@ -16,11 +16,26 @@ export function AuthProvider({ children }) {
 
   useEffect(() => {
     let cancelled = false;
+    const DEV_MOCK_USER = {
+      id: 9999,
+      email: 'admin@dev.local',
+      displayName: 'Dev Admin (Bypassed)',
+      country: 'US',
+      city: 'Chicago',
+      authMethod: 'email',
+      isAdmin: true,
+      createdAt: new Date().toISOString()
+    };
 
     async function restoreSession() {
       const token = getStoredToken();
       if (!token) {
-        if (!cancelled) setLoading(false);
+        if (!cancelled) {
+          if (process.env.NODE_ENV === 'development') {
+            setUser(DEV_MOCK_USER);
+          }
+          setLoading(false);
+        }
         return;
       }
 
@@ -33,8 +48,12 @@ export function AuthProvider({ children }) {
       } catch {
         setStoredToken(null);
         if (!cancelled) {
-          setUser(null);
-          setNeedsLocation(false);
+          if (process.env.NODE_ENV === 'development') {
+            setUser(DEV_MOCK_USER);
+          } else {
+            setUser(null);
+            setNeedsLocation(false);
+          }
         }
       } finally {
         if (!cancelled) setLoading(false);

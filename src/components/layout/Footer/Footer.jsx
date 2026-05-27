@@ -1,46 +1,7 @@
 import { Link } from 'react-router-dom';
-import { SITE_NAME } from "brand";
+import { useConfig } from 'context/ConfigContext';
 import FooterLogo from 'components/layout/FooterLogo/FooterLogo';
 import styles from "./Footer.module.css";
-
-const COMMUNITY_NAV = [
-  { label: "Discussions", page: "portal" },
-  { label: "Resources", page: "resources" },
-  { label: "Tools", page: "tools" },
-  { label: "Events", page: "events" },
-  { label: "NVDA Guide", page: "guide" },
-];
-
-const STANDARDS_LINKS = [
-  { label: "WCAG 2.2", href: "https://www.w3.org/TR/WCAG22/" },
-  { label: "ARIA Patterns", href: "https://www.w3.org/WAI/ARIA/apg/" },
-  { label: "Section 508", href: "https://www.section508.gov/" },
-  { label: "EN 301 549", to: "/en-301-549" },
-  {
-    label: "EAA 2025",
-    href: "https://digital-strategy.ec.europa.eu/en/policies/web-accessibility",
-  },
-];
-
-const ORG_LINKS = [
-  { label: `About ${SITE_NAME}`, type: "app" },
-  { label: "News", type: "route", to: "/news" },
-  {
-    label: "Newsletter",
-    type: "external",
-    href: "https://www.w3.org/WAI/news/subscribe/",
-  },
-  { label: "Blog", type: "external", href: "https://www.w3.org/WAI/news/" },
-  { label: "Contribute", type: "route", to: "/contribute" },
-  { label: "Contact", type: "route", to: "/contact" },
-];
-
-const SOCIAL_LINKS = [
-  { label: "LinkedIn", href: "https://www.linkedin.com/company/w3c/" },
-  { label: "X", href: "https://x.com/w3c/" },
-  { label: "GitHub", href: "https://github.com/w3c/wai" },
-  { label: "RSS", to: "/news" },
-];
 
 function scrollToTop() {
   window.scrollTo(0, 0);
@@ -57,12 +18,68 @@ function FooterRouteLink({ to, className, children }) {
 }
 
 export default function Footer({ goToSection, goToPortal }) {
-  const goToPage = (page) => {
+  const { siteName, navigation, footerColumns } = useConfig();
+
+  const socialLinks = navigation.footer_socials || [];
+
+  const getPageIdFromUrl = (url) => {
+    if (url === '/') return 'portal';
+    if (url === '/resources') return 'resources';
+    if (url === '/tools') return 'tools';
+    if (url === '/events') return 'events';
+    if (url === '/guide') return 'guide';
+    return '';
+  };
+
+  const goToPage = (url) => {
+    const page = getPageIdFromUrl(url);
     if (page === "portal") {
       if (typeof goToPortal === "function") goToPortal();
       return;
     }
-    if (typeof goToSection === "function") goToSection(page);
+    if (page && typeof goToSection === "function") {
+      goToSection(page);
+    }
+  };
+
+  const renderLink = (l) => {
+    if (l.isExternal) {
+      return (
+        <a
+          href={l.url}
+          className={styles.colLink}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          {l.label}
+        </a>
+      );
+    }
+
+    const page = getPageIdFromUrl(l.url);
+    if (page) {
+      return (
+        <button
+          type="button"
+          className={styles.colLink}
+          onClick={() => {
+            if (page === 'portal') {
+              if (typeof goToPortal === 'function') goToPortal();
+            } else if (typeof goToSection === 'function') {
+              goToSection(page);
+            }
+          }}
+        >
+          {l.label}
+        </button>
+      );
+    }
+
+    return (
+      <FooterRouteLink to={l.url} className={styles.colLink}>
+        {l.label}
+      </FooterRouteLink>
+    );
   };
 
   return (
@@ -73,113 +90,56 @@ export default function Footer({ goToSection, goToPortal }) {
             <button
               type="button"
               className={styles.brandBtn}
-              onClick={() => goToPage("portal")}
+              onClick={() => goToPage("/")}
             >
               <span className={styles.logo}>
                 <FooterLogo className={styles.logoImg} width={200} height={60} />
               </span>
             </button>
             <p className={styles.brandDesc}>
-              A community for accessibility practitioners, designers,
-              developers, and advocates building a more inclusive web.
+               A community for accessibility practitioners, designers,
+               developers, and advocates building a more inclusive web.
             </p>
             <div className={styles.socials} aria-label="Social links">
-              {SOCIAL_LINKS.map((s) =>
-                s.to ? (
-                  <FooterRouteLink key={s.label} to={s.to} className={styles.social}>
-                    {s.label}
-                  </FooterRouteLink>
-                ) : (
+              {socialLinks.map((s) =>
+                s.isExternal ? (
                   <a
                     key={s.label}
-                    href={s.href}
+                    href={s.url}
                     className={styles.social}
                     target="_blank"
                     rel="noopener noreferrer"
                   >
                     {s.label}
                   </a>
+                ) : (
+                  <FooterRouteLink key={s.label} to={s.url} className={styles.social}>
+                    {s.label}
+                  </FooterRouteLink>
                 ),
               )}
             </div>
           </div>
 
-          <nav className={styles.col} aria-label="Community">
-            <p className={styles.colHeading}>Community</p>
-            <ul className={styles.colLinks}>
-              {COMMUNITY_NAV.map(({ label, page }) => (
-                <li key={label}>
-                  <button
-                    type="button"
-                    className={styles.colLink}
-                    onClick={() => goToPage(page)}
-                  >
-                    {label}
-                  </button>
-                </li>
-              ))}
-            </ul>
-          </nav>
-
-          <nav className={styles.col} aria-label="Standards">
-            <p className={styles.colHeading}>Standards</p>
-            <ul className={styles.colLinks}>
-              {STANDARDS_LINKS.map((l) => (
-                <li key={l.label}>
-                  {l.to ? (
-                    <FooterRouteLink to={l.to} className={styles.colLink}>
-                      {l.label}
-                    </FooterRouteLink>
-                  ) : (
-                    <a
-                      href={l.href}
-                      className={styles.colLink}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      {l.label}
-                    </a>
-                  )}
-                </li>
-              ))}
-            </ul>
-          </nav>
-
-          <nav className={styles.col} aria-label="Organisation">
-            <p className={styles.colHeading}>Organisation</p>
-            <ul className={styles.colLinks}>
-              {ORG_LINKS.map((item) => (
-                <li key={item.label}>
-                  {item.type === "route" ? (
-                    <FooterRouteLink to={item.to} className={styles.colLink}>
-                      {item.label}
-                    </FooterRouteLink>
-                  ) : item.type === "external" ? (
-                    <a
-                      href={item.href}
-                      className={styles.colLink}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      {item.label}
-                    </a>
-                  ) : (
-                    <button
-                      type="button"
-                      className={styles.colLink}
-                      onClick={() => goToPortal?.()}
-                    >
-                      {item.label}
-                    </button>
-                  )}
-                </li>
-              ))}
-            </ul>
-          </nav>
+          {footerColumns.map((col) => {
+            const colLinks = navigation[`footer_${col.key_name}`] || [];
+            return (
+              <nav key={col.key_name} className={styles.col} aria-label={col.title}>
+                <p className={styles.colHeading}>{col.title}</p>
+                <ul className={styles.colLinks}>
+                  {colLinks.map((l) => (
+                    <li key={l.label}>
+                      {renderLink(l)}
+                    </li>
+                  ))}
+                </ul>
+              </nav>
+            );
+          })}
         </div>
         <div className={styles.bottom}>
           <p className={styles.copy}>
-            © 2026 {SITE_NAME} · Built for the accessibility community · Not
+            © 2026 {siteName} · Built for the accessibility community · Not
             affiliated with IAAP or WebAIM
           </p>
           <div className={styles.bottomLinks}>

@@ -1,174 +1,155 @@
-import { useEffect, useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { adminApi } from 'api/client';
+import { useAuth } from 'context/AuthContext';
+import { SITE_NAME } from 'brand';
 import styles from './AdminDashboard.module.css';
 
-function StatCard({ label, value, hint }) {
-  return (
-    <article className={styles.statCard}>
-      <p className={styles.statLabel}>{label}</p>
-      <p className={styles.statValue}>{value}</p>
-      {hint && <p className={styles.statHint}>{hint}</p>}
-    </article>
-  );
-}
-
-function formatDate(iso) {
-  if (!iso) return '—';
-  const normalized = iso.includes('T') ? iso : `${iso.replace(' ', 'T')}Z`;
-  const d = new Date(normalized);
-  if (Number.isNaN(d.getTime())) return iso;
-  return d.toLocaleDateString(undefined, {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-  });
-}
+// Sub-page Views
+import OverviewView from './views/OverviewView/OverviewView';
+import ResourcesView from './views/ResourcesView/ResourcesView';
+import ToolsView from './views/ToolsView/ToolsView';
+import EventsView from './views/EventsView/EventsView';
+import DiscussionsView from './views/DiscussionsView/DiscussionsView';
+import SettingsView from './views/SettingsView/SettingsView';
 
 export default function AdminDashboard({ goToPortal }) {
   const navigate = useNavigate();
-  const [stats, setStats] = useState(null);
-  const [users, setUsers] = useState([]);
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(true);
+  const { user, signOut } = useAuth();
+  const [activeTab, setActiveTab] = useState('overview');
+  const [toasts, setToasts] = useState([]);
 
   useEffect(() => {
-    let cancelled = false;
-
-    async function load() {
-      setLoading(true);
-      setError('');
-      try {
-        const [statsData, usersData] = await Promise.all([adminApi.stats(), adminApi.users()]);
-        if (!cancelled) {
-          setStats(statsData);
-          setUsers(usersData.users || []);
-        }
-      } catch (err) {
-        if (!cancelled) setError(err.message || 'Could not load admin data.');
-      } finally {
-        if (!cancelled) setLoading(false);
-      }
-    }
-
-    load();
-    return () => {
-      cancelled = true;
-    };
+    document.title = `Admin · ${SITE_NAME}`;
   }, []);
 
+  const addToast = (message, type = 'success') => {
+    const id = Date.now();
+    setToasts((prev) => [...prev, { id, message, type }]);
+    setTimeout(() => {
+      setToasts((prev) => prev.filter((t) => t.id !== id));
+    }, 4000);
+  };
+
+  const tabs = [
+    { id: 'overview', label: 'Overview', icon: '📊' },
+    { id: 'resources', label: 'Resources', icon: '📚' },
+    { id: 'tools', label: 'Tools', icon: '🛠️' },
+    { id: 'events', label: 'Events', icon: '📅' },
+    { id: 'discussions', label: 'Discussions', icon: '💬' },
+    { id: 'settings', label: 'Settings', icon: '⚙️' },
+  ];
+
+  const handleSignOut = async () => {
+    await signOut();
+    navigate('/sign-in', { replace: true });
+  };
+
   return (
-    <div className={styles.page}>
-      <header className={styles.header}>
-        <div>
-          <p className={styles.kicker}>Admin</p>
-          <h1 className={styles.title}>Community dashboard</h1>
-          <p className={styles.lead}>Overview of members, locations, and sign-up activity.</p>
-        </div>
-        <button type="button" className={styles.backBtn} onClick={() => goToPortal?.() || navigate('/')}>
-          ← Back to site
-        </button>
-      </header>
+    <div className={styles.cmsContainer}>
+      <a href="#cms-main-content" className={styles.skipLink}>
+        Skip to main content
+      </a>
 
-      {error && (
-        <div className={styles.error} role="alert">
-          {error}
-        </div>
-      )}
-
-      {loading && <p className={styles.loading}>Loading dashboard…</p>}
-
-      {!loading && stats && (
-        <>
-          <section className={styles.statsGrid} aria-label="Summary statistics">
-            <StatCard label="Total members" value={stats.totalUsers} />
-            <StatCard label="New this week" value={stats.recentSignups} />
-            <StatCard label="Google sign-ins" value={stats.googleUsers} />
-            <StatCard label="Email sign-ups" value={stats.emailUsers} />
-            <StatCard label="With location" value={stats.withLocation} hint={`${stats.countriesCount} countries`} />
-          </section>
-
-          <div className={styles.panels}>
-            <section className={styles.panel} aria-labelledby="country-heading">
-              <h2 id="country-heading" className={styles.panelTitle}>
-                Members by country
-              </h2>
-              <table className={styles.table}>
-                <thead>
-                  <tr>
-                    <th scope="col">Country</th>
-                    <th scope="col">Members</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {stats.byCountry.map(row => (
-                    <tr key={row.country}>
-                      <td>{row.country}</td>
-                      <td>{row.count}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </section>
-
-            <section className={styles.panel} aria-labelledby="city-heading">
-              <h2 id="city-heading" className={styles.panelTitle}>
-                Members by city
-              </h2>
-              <table className={styles.table}>
-                <thead>
-                  <tr>
-                    <th scope="col">City</th>
-                    <th scope="col">Country</th>
-                    <th scope="col">Members</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {stats.byCity.map(row => (
-                    <tr key={`${row.city}-${row.country}`}>
-                      <td>{row.city}</td>
-                      <td>{row.country}</td>
-                      <td>{row.count}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </section>
+      {/* Sidebar Navigation */}
+      <aside className={styles.sidebar} aria-label="CMS Management Menu">
+        <div className={styles.sidebarBrand}>
+          <span className={styles.brandEmoji} aria-hidden="true">🛡️</span>
+          <div>
+            <h2 className={styles.brandTitle}>AccessHub</h2>
+            <span className={styles.brandRole}>Admin Portal</span>
           </div>
+        </div>
 
-          <section className={styles.panel} aria-labelledby="users-heading">
-            <h2 id="users-heading" className={styles.panelTitle}>
-              All members
-            </h2>
-            <div className={styles.tableWrap}>
-              <table className={styles.table}>
-                <thead>
-                  <tr>
-                    <th scope="col">Name</th>
-                    <th scope="col">Email</th>
-                    <th scope="col">City</th>
-                    <th scope="col">Country</th>
-                    <th scope="col">Sign-in</th>
-                    <th scope="col">Joined</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {users.map(u => (
-                    <tr key={u.id}>
-                      <td>{u.displayName}</td>
-                      <td>{u.email}</td>
-                      <td>{u.city || '—'}</td>
-                      <td>{u.country || '—'}</td>
-                      <td>{u.authMethod === 'google' ? 'Google' : 'Email'}</td>
-                      <td>{formatDate(u.createdAt)}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+        <nav className={styles.sidebarNav} aria-label="CMS Navigation Tabs">
+          <ul className={styles.tabList}>
+            {tabs.map(t => (
+              <li key={t.id}>
+                <button
+                  type="button"
+                  className={`${styles.tabItem} ${activeTab === t.id ? styles.tabItemActive : ''}`}
+                  onClick={() => setActiveTab(t.id)}
+                  aria-current={activeTab === t.id ? 'page' : undefined}
+                >
+                  <span className={styles.tabIcon} aria-hidden="true">{t.icon}</span>
+                  <span className={styles.tabLabel}>{t.label}</span>
+                </button>
+              </li>
+            ))}
+          </ul>
+        </nav>
+
+        {/* Sidebar Profile Card */}
+        {user && (
+          <div className={styles.profileCard}>
+            <div className={styles.profileAvatar} aria-hidden="true">
+              {user.displayName?.slice(0, 2).toUpperCase() || 'AD'}
             </div>
-          </section>
-        </>
-      )}
+            <div className={styles.profileInfo}>
+              <p className={styles.profileName}>{user.displayName}</p>
+              <p className={styles.profileEmail} title={user.email}>{user.email}</p>
+            </div>
+            <button
+              type="button"
+              className={styles.logoutBtn}
+              onClick={handleSignOut}
+              aria-label="Sign out of Admin Panel"
+              title="Sign out"
+            >
+              🚪
+            </button>
+          </div>
+        )}
+      </aside>
+
+      {/* Main CMS Display Frame */}
+      <div className={styles.mainFrame}>
+        <header className={styles.frameHeader}>
+          <span className={styles.pathIndicator}>CMS / {activeTab}</span>
+          <button
+            type="button"
+            className={styles.backBtn}
+            onClick={() => goToPortal?.() || navigate('/')}
+            aria-label="Return to the main community portal"
+          >
+            ← Exit to site
+          </button>
+        </header>
+
+        <main className={styles.frameContent} id="cms-main-content">
+          {activeTab === 'overview' && <OverviewView showToast={addToast} />}
+          {activeTab === 'resources' && <ResourcesView showToast={addToast} />}
+          {activeTab === 'tools' && <ToolsView showToast={addToast} />}
+          {activeTab === 'events' && <EventsView showToast={addToast} />}
+          {activeTab === 'discussions' && <DiscussionsView showToast={addToast} />}
+          {activeTab === 'settings' && <SettingsView showToast={addToast} />}
+        </main>
+      </div>
+
+      {/* Dynamic Toast Container */}
+      <div className={styles.toastContainer} aria-live="polite">
+        {toasts.map((toast) => (
+          <div
+            key={toast.id}
+            className={`${styles.toast} ${
+              toast.type === 'error' ? styles.toastError : styles.toastSuccess
+            }`}
+            role="alert"
+          >
+            <span className={styles.toastIcon} aria-hidden="true">
+              {toast.type === 'error' ? '❌' : '✔'}
+            </span>
+            <div className={styles.toastContent}>{toast.message}</div>
+            <button
+              type="button"
+              className={styles.toastCloseBtn}
+              onClick={() => setToasts((prev) => prev.filter((t) => t.id !== toast.id))}
+              aria-label="Close notification"
+            >
+              ✕
+            </button>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }

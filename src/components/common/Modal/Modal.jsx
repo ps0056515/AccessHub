@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import styles from './Modal.module.css';
 
-export default function Modal({ title, children, onClose, footer }) {
+export default function Modal({ title, children, onClose, footer, width, height }) {
   useEffect(() => {
     const onKey = e => {
       if (e.key === 'Escape') onClose?.();
@@ -16,6 +16,16 @@ export default function Modal({ title, children, onClose, footer }) {
     };
   }, [onClose]);
 
+  const dialogStyle = {};
+  if (width) {
+    dialogStyle.width = width;
+    dialogStyle.maxWidth = '100%';
+  }
+  if (height) {
+    dialogStyle.height = height;
+    dialogStyle.maxHeight = '90vh';
+  }
+
   return createPortal(
     <div
       className={styles.backdrop}
@@ -25,6 +35,7 @@ export default function Modal({ title, children, onClose, footer }) {
     >
       <div
         className={styles.dialog}
+        style={dialogStyle}
         role="dialog"
         aria-modal="true"
         aria-labelledby="modal-title"

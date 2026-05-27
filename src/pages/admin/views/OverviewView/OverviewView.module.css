@@ -1,0 +1,9 @@
+.errorContainer {
+  text-align: center;
+  padding: 48px;
+  color: var(--text-muted);
+}
+
+.retryBtn {
+  margin-top: 12px;
+}

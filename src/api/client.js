@@ -104,6 +104,16 @@ export const adminApi = {
   users: () => api('/api/admin/users'),
 };
 
+export const settingsApi = {
+  get: () => api('/api/settings'),
+  update: body => api('/api/settings', { method: 'PUT', body: JSON.stringify(body) }),
+  uploadLogo: body => api('/api/settings/upload-logo', { method: 'POST', body: JSON.stringify(body) }),
+  updateNavigation: body => api('/api/settings/navigation', { method: 'PUT', body: JSON.stringify(body) }),
+  createFooterColumn: body => api('/api/settings/footer-columns', { method: 'POST', body: JSON.stringify(body) }),
+  updateFooterColumns: body => api('/api/settings/footer-columns', { method: 'PUT', body: JSON.stringify(body) }),
+  deleteFooterColumn: key => api(`/api/settings/footer-columns/${key}`, { method: 'DELETE' }),
+};
+
 export const postsApi = {
   list: () => api('/api/posts'),
   get: id => api(`/api/posts/${id}`),
@@ -112,6 +122,14 @@ export const postsApi = {
     api(`/api/posts/${id}/comments`, { method: 'POST', body: JSON.stringify(body) }),
   vote: (id, body) =>
     api(`/api/posts/${id}/vote`, { method: 'POST', body: JSON.stringify(body) }),
+};
+
+export const toolsApi = {
+  list: () => api('/api/tools'),
+  create: body => api('/api/tools/admin', { method: 'POST', body: JSON.stringify(body) }),
+  update: (id, body) => api(`/api/tools/admin/${id}`, { method: 'PUT', body: JSON.stringify(body) }),
+  delete: id => api(`/api/tools/admin/${id}`, { method: 'DELETE' }),
+  reorder: body => api('/api/tools/admin/reorder', { method: 'PUT', body: JSON.stringify(body) }),
 };
 
 export const newsApi = {
