@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState, useMemo } from 'react';
 import { flushSync } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
-import { STATS, ALL_EVENTS, MEMBERS, TAG_COLORS, COLOR_MAP } from 'data';
-import { postsApi, getVoterKey, getStoredVote, setStoredVote } from 'api/client';
+import { STATS, MEMBERS, TAG_COLORS, COLOR_MAP } from 'data';
+import { postsApi, eventsApi, getVoterKey, getStoredVote, setStoredVote } from 'api/client';
 import { voteDelta } from 'utils/voteDelta';
 import { useAuth } from 'context/AuthContext';
 import styles from './Portal.module.css';
@@ -17,7 +17,34 @@ const ASK_TOPICS = [
   "Color contrast",
   "Design systems",
   "Strategy",
+  "Career advice",
+  "Mobile",
+  "PDFs",
+  "Other",
 ];
+
+const MONTH_ABBRS = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+
+function getEventTiming(eventDateStr) {
+  if (!eventDateStr) return 'upcoming';
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const d = new Date(String(eventDateStr).slice(0, 10) + 'T00:00:00');
+  const diff = d - today;
+  if (diff < 0) return 'past';
+  if (diff === 0) return 'live';
+  return 'upcoming';
+}
+
+function fmtMonth(dateStr) {
+  if (!dateStr) return '';
+  return MONTH_ABBRS[new Date(String(dateStr).slice(0, 10) + 'T00:00:00Z').getUTCMonth()] ?? '';
+}
+
+function fmtDay(dateStr) {
+  if (!dateStr) return '';
+  return String(new Date(String(dateStr).slice(0, 10) + 'T00:00:00Z').getUTCDate());
+}
 
 const HERO_TOPICS = [
   { label: "WCAG 2.2 implementations", searchText: "WCAG 2.2 implementations" },
@@ -360,11 +387,21 @@ export default function Portal({
     return list;
   }, [baseFiltered, activeTab]);
 
-  const sidebarEvents = useMemo(() => {
-    const upcoming = ALL_EVENTS.filter(
-      (e) => e.timing === "upcoming" || e.timing === "live",
-    );
-    return upcoming.slice(0, 4);
+  const [sidebarEvents, setSidebarEvents] = useState(() => []);
+
+  useEffect(() => {
+    eventsApi.list()
+      .then(data => {
+        if (Array.isArray(data)) {
+          setSidebarEvents(
+            data.filter(e => {
+              const timing = getEventTiming(e.event_date);
+              return timing === 'upcoming' || timing === 'live';
+            }).slice(0, 4)
+          );
+        }
+      })
+      .catch(() => {});
   }, []);
 
   const goToEvent = (id) => {
@@ -622,8 +659,8 @@ export default function Portal({
                     onClick={() => goToEvent(e.id)}
                   >
                     <div className={styles.eventDate}>
-                      <span className={styles.eventMonth}>{e.month}</span>
-                      <span className={styles.eventDay}>{e.day}</span>
+                      <span className={styles.eventMonth}>{fmtMonth(e.event_date)}</span>
+                      <span className={styles.eventDay}>{fmtDay(e.event_date)}</span>
                     </div>
                     <div className={styles.eventRowText}>
                       <p className={styles.eventTitle}>{e.title}</p>

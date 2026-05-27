@@ -364,6 +364,9 @@
   color: var(--text-faint, #64748b);
   border-bottom: 2px solid var(--border, #e2e8f0);
   background: var(--bg-secondary, #f8fafc);
+  position: sticky;
+  top: 0;
+  z-index: 1;
 }
 
 .table td {

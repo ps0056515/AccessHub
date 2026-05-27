@@ -9,6 +9,8 @@ const postsRoutes = require('./routes/posts');
 const newsRoutes = require('./routes/news');
 const settingsRoutes = require('./routes/settings');
 const toolsRoutes = require('./routes/tools');
+const eventsRoutes = require('./routes/events');
+const resourcesRoutes = require('./routes/resources');
 const { query, closePool } = require('./db');
 
 const PORT = Number(process.env.API_PORT || process.env.PORT) || 3015;
@@ -32,6 +34,8 @@ app.use('/api/posts', postsRoutes);
 app.use('/api/news', newsRoutes);
 app.use('/api/settings', settingsRoutes);
 app.use('/api/tools', toolsRoutes);
+app.use('/api/events', eventsRoutes);
+app.use('/api/resources', resourcesRoutes);
 app.use('/api/uploads', express.static(path.join(__dirname, 'uploads')));
 
 app.use((err, _req, res, _next) => {

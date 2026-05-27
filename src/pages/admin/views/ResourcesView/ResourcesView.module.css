@@ -1,24 +1,204 @@
-.underConstruction {
-  padding: 40px 24px;
-  text-align: center;
-  color: var(--text-muted);
+/* ─── Layout ──────────────────────────────────────────────────────────────── */
+.eventsHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
 }
 
-.constructionIcon {
-  font-size: 48px;
-  margin-bottom: 16px;
-}
-
-.constructionTitle {
-  font-size: 15px;
+.addEventBtn {
+  background: var(--accent, #074a9e);
+  color: #ffffff;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 14px;
   font-weight: 500;
-  color: var(--text);
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.addEventBtn:hover { background: #063d82; }
+
+/* ─── Tabs ────────────────────────────────────────────────────────────────── */
+.tabs {
+  display: flex;
+  gap: 4px;
+  border-bottom: 2px solid var(--border, #e2e8f0);
+  margin-bottom: 20px;
 }
 
-.constructionDesc {
+.tab {
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+  padding: 8px 16px;
   font-size: 13px;
-  margin-top: 6px;
-  max-width: 400px;
-  margin-left: auto;
-  margin-right: auto;
+  font-weight: 500;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s;
 }
+.tab:hover { color: var(--text); }
+.tabActive {
+  color: var(--accent, #074a9e);
+  border-bottom-color: var(--accent, #074a9e);
+}
+
+/* ─── Table ───────────────────────────────────────────────────────────────── */
+.tableContainer {
+  overflow-x: auto;
+  overflow-y: auto;
+  max-height: 420px;
+  border: 1px solid var(--border, #e2e8f0);
+  border-radius: 8px;
+}
+
+.dateBadge {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  background: var(--accent-subtle, #eff6ff);
+  color: var(--accent, #074a9e);
+  border-radius: 6px;
+  padding: 4px 8px;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1.2;
+  min-width: 40px;
+}
+.dateDay { font-size: 15px; }
+
+.timingPill {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 9999px;
+  text-transform: uppercase;
+}
+.timingUpcoming { background: #eff6ff; color: #1d4ed8; }
+.timingLive     { background: #fef3c7; color: #b45309; }
+.timingPast     { background: #f1f5f9; color: #64748b; }
+
+.rsvpCount {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text);
+  background: var(--bg-secondary, #f8fafc);
+  border: 1px solid var(--border, #e2e8f0);
+  border-radius: 9999px;
+  padding: 2px 8px;
+}
+
+/* Sort controls */
+.sortButtons { display: flex; flex-direction: column; gap: 2px; }
+.sortBtn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 11px;
+  color: var(--text-muted);
+  padding: 2px;
+}
+.sortBtn:disabled { cursor: not-allowed; opacity: 0.4; }
+
+/* Action buttons */
+.actionBtnGroup { display: flex; gap: 8px; }
+.editBtn {
+  background: transparent;
+  border: 1px solid var(--border-strong, #cbd5e1);
+  color: var(--text);
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  cursor: pointer;
+}
+.editBtn:hover { background: var(--bg-secondary, #f8fafc); }
+.approveBtn {
+  background: transparent;
+  border: 1px solid #bbf7d0;
+  color: #16a34a;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  cursor: pointer;
+}
+.approveBtn:hover { background: #f0fdf4; }
+.deleteBtn {
+  background: transparent;
+  border: 1px solid #fecaca;
+  color: #ef4444;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  cursor: pointer;
+}
+.deleteBtn:hover { background: #fef2f2; }
+
+/* ─── Modal form ──────────────────────────────────────────────────────────── */
+.formFields {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 4px;
+}
+.formRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.formGroup { display: flex; flex-direction: column; gap: 6px; }
+.formLabel { font-size: 13px; font-weight: 600; color: var(--text); }
+
+.formInput, .formSelect {
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: 1px solid var(--border, #cbd5e1);
+  background: var(--bg-card, #ffffff);
+  color: var(--text);
+  font-size: 14px;
+  width: 100%;
+  box-sizing: border-box;
+}
+.formInput:focus, .formSelect:focus {
+  outline: 2px solid var(--accent, #074a9e);
+  outline-offset: -1px;
+}
+
+.cancelBtn {
+  background: transparent;
+  border: 1px solid var(--border, #cbd5e1);
+  color: var(--text-muted);
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
+}
+.cancelBtn:hover { background: var(--bg-secondary, #f8fafc); }
+
+.saveBtn {
+  background: var(--accent, #074a9e);
+  color: #ffffff;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+}
+.saveBtn:hover { background: #063d82; }
+.saveBtn:disabled { opacity: 0.7; cursor: not-allowed; }
+
+/* Status badge for proposals */
+.statusBadge {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 9999px;
+  text-transform: capitalize;
+}
+.statusPending  { background: #fef9c3; color: #854d0e; }
+.statusApproved { background: #dcfce7; color: #15803d; }
+.statusRejected { background: #fee2e2; color: #b91c1c; }

@@ -1,21 +1,56 @@
-import { useLayoutEffect, useMemo, useState } from 'react';
-import { ALL_EVENTS } from 'data';
+import { useLayoutEffect, useMemo, useState, useEffect } from 'react';
+import { eventsApi } from 'api/client';
+import { useAuth } from 'context/AuthContext';
 import Modal from 'components/common/Modal/Modal';
 import styles from './Events.module.css';
 
 const TYPES = ['All', 'Free', 'Members only', 'In-person'];
 
 const HOST_SUBMIT_KEY = 'allcanaccess-host-submissions';
+const MONTH_ABBRS = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
 
-function timingLabel(t) {
-  if (t.timing === 'past') return 'Past';
-  if (t.timing === 'live') return 'Live now';
+function getEventTiming(eventDateStr) {
+  if (!eventDateStr) return 'upcoming';
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const d = new Date(String(eventDateStr).slice(0, 10) + 'T00:00:00');
+  const diff = d - today;
+  if (diff < 0) return 'past';
+  if (diff === 0) return 'live';
+  return 'upcoming';
+}
+
+function fmtMonth(dateStr) {
+  if (!dateStr) return '';
+  return MONTH_ABBRS[new Date(String(dateStr).slice(0, 10) + 'T00:00:00Z').getUTCMonth()] ?? '';
+}
+
+function fmtDay(dateStr) {
+  if (!dateStr) return '';
+  return String(new Date(String(dateStr).slice(0, 10) + 'T00:00:00Z').getUTCDate());
+}
+
+function fmtTime(dateStr) {
+  if (!dateStr) return '';
+  const d = new Date(dateStr);
+  return d.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', timeZoneName: 'short' });
+}
+
+function timingLabel(timing) {
+  if (timing === 'past') return 'Past';
+  if (timing === 'live') return 'Live now';
   return 'Upcoming';
 }
 
 export default function Events() {
+  const { user } = useAuth();
+  const [eventsList, setEventsList] = useState([]);
+  const [eventsLoading, setEventsLoading] = useState(true);
   const [filter, setFilter] = useState('All');
   const [rsvpEvent, setRsvpEvent] = useState(null);
+  const [rsvpEmail, setRsvpEmail] = useState('');
+  const [rsvpMsg, setRsvpMsg] = useState(null);
+  const [rsvpSubmitting, setRsvpSubmitting] = useState(false);
   const [hostOpen, setHostOpen] = useState(false);
   const [hostTitle, setHostTitle] = useState('');
   const [hostFormat, setHostFormat] = useState('webinar');
@@ -23,6 +58,13 @@ export default function Events() {
   const [hostEmail, setHostEmail] = useState('');
   const [hostDetails, setHostDetails] = useState('');
   const [hostMsg, setHostMsg] = useState(null);
+
+  useEffect(() => {
+    eventsApi.list()
+      .then(data => { if (Array.isArray(data)) setEventsList(data); })
+      .catch(() => {})
+      .finally(() => setEventsLoading(false));
+  }, []); 
 
   useLayoutEffect(() => {
     const raw = sessionStorage.getItem('aa-nav');
@@ -45,19 +87,19 @@ export default function Events() {
   }, []);
 
   const filtered = useMemo(() => {
-    return ALL_EVENTS.filter(e => {
+    return eventsList.filter(e => {
       if (filter === 'All') return true;
       if (filter === 'In-person') return e.band === 'In-person';
       if (filter === 'Free') return e.band === 'Free';
       if (filter === 'Members only') return e.band === 'Members only';
       return true;
     });
-  }, [filter]);
+  }, [filter, eventsList]);
 
   const grouped = useMemo(() => {
-    const past = filtered.filter(e => e.timing === 'past');
-    const live = filtered.filter(e => e.timing === 'live');
-    const upcoming = filtered.filter(e => e.timing === 'upcoming');
+    const past = filtered.filter(e => getEventTiming(e.event_date) === 'past');
+    const live = filtered.filter(e => getEventTiming(e.event_date) === 'live');
+    const upcoming = filtered.filter(e => getEventTiming(e.event_date) === 'upcoming');
     return { past, live, upcoming };
   }, [filtered]);
 
@@ -66,7 +108,35 @@ export default function Events() {
     setHostMsg(null);
   };
 
-  const handleHostSubmit = e => {
+  const closeRsvp = () => {
+    setRsvpEvent(null);
+    setRsvpEmail('');
+    setRsvpMsg(null);
+    setRsvpSubmitting(false);
+  };
+
+  const handleRsvpSubmit = async (e) => {
+    e.preventDefault();
+    const email = user ? user.email : rsvpEmail.trim();
+    if (!email) {
+      setRsvpMsg('Please enter your email address.');
+      return;
+    }
+    setRsvpSubmitting(true);
+    try {
+      await eventsApi.rsvp(rsvpEvent.id, {
+        email,
+        displayName: user?.displayName || null,
+      });
+      setRsvpMsg("✨ You're on the list! Check your email for a calendar invite.");
+    } catch (err) {
+      setRsvpMsg(err.message || 'Something went wrong. Please try again.');
+    } finally {
+      setRsvpSubmitting(false);
+    }
+  };
+
+  const handleHostSubmit = async e => {
     e.preventDefault();
     const title = hostTitle.trim();
     const email = hostEmail.trim();
@@ -75,29 +145,22 @@ export default function Events() {
       return;
     }
     try {
-      const prev = sessionStorage.getItem(HOST_SUBMIT_KEY);
-      const list = prev ? JSON.parse(prev) : [];
-      const entry = {
+      await eventsApi.submitProposal({
         title,
         format: hostFormat,
-        proposedDate: hostDate.trim(),
+        proposedDate: hostDate.trim() || null,
         email,
-        details: hostDetails.trim(),
-        submittedAt: new Date().toISOString(),
-      };
-      const next = Array.isArray(list) ? [...list, entry] : [entry];
-      sessionStorage.setItem(HOST_SUBMIT_KEY, JSON.stringify(next));
-    } catch {
-      /* ignore */
+        details: hostDetails.trim() || null,
+      });
+      setHostMsg('Thanks — your proposal has been submitted! Our team will review it and get back to you.');
+      setHostTitle('');
+      setHostFormat('webinar');
+      setHostDate('');
+      setHostEmail('');
+      setHostDetails('');
+    } catch (err) {
+      setHostMsg(err.message || 'Failed to submit proposal. Please try again.');
     }
-    setHostMsg(
-      'Thanks — your proposal was saved in this browser for the demo. With a backend we would email you a confirmation and review timeline.'
-    );
-    setHostTitle('');
-    setHostFormat('webinar');
-    setHostDate('');
-    setHostEmail('');
-    setHostDetails('');
   };
 
   return (
@@ -107,6 +170,7 @@ export default function Events() {
         <p className={styles.pageSub}>
           Live sessions, workshops, and meetups run by and for the accessibility community.
         </p>
+        {eventsLoading && <p className={styles.empty} aria-live="polite">Loading events…</p>}
         <fieldset className={styles.filterFieldset}>
           <legend className="sr-only">Filter events by type</legend>
           <div className={styles.filters}>
@@ -142,7 +206,7 @@ export default function Events() {
                 ev={e}
                 i={i}
                 onRsvp={() => setRsvpEvent(e)}
-                timing={timingLabel(e)}
+                timing={timingLabel(getEventTiming(e.event_date))}
               />
             ))}
           </div>
@@ -160,7 +224,7 @@ export default function Events() {
               ev={e}
               i={i}
               onRsvp={() => setRsvpEvent(e)}
-              timing={timingLabel(e)}
+              timing={timingLabel(getEventTiming(e.event_date))}
             />
           ))}
         </div>
@@ -180,7 +244,7 @@ export default function Events() {
               ev={e}
               i={i}
               onRsvp={() => setRsvpEvent(e)}
-              timing={timingLabel(e)}
+              timing={timingLabel(getEventTiming(e.event_date))}
             />
           ))}
         </div>
@@ -202,11 +266,38 @@ export default function Events() {
       </div>
 
       {rsvpEvent ? (
-        <Modal title={`RSVP: ${rsvpEvent.title}`} onClose={() => setRsvpEvent(null)}>
-          <p>{rsvpEvent.type}</p>
-          <p className={styles.rsvpHint} role="status" aria-live="polite">
-            You’re on the list for this session (demo). We’d email a calendar invite with a real backend.
-          </p>
+        <Modal title={`RSVP: ${rsvpEvent.title}`} onClose={closeRsvp}>
+          <p style={{ marginBottom: 12 }}>{rsvpEvent.type}</p>
+          {rsvpMsg ? (
+            <p className={styles.rsvpHint} role="status" aria-live="polite">{rsvpMsg}</p>
+          ) : (
+            <form onSubmit={handleRsvpSubmit}>
+              {user ? (
+                <p style={{ fontSize: 14, marginBottom: 12 }}>
+                  Registering as <strong>{user.displayName}</strong> ({user.email})
+                </p>
+              ) : (
+                <label style={{ display: 'flex', flexDirection: 'column', gap: 6, marginBottom: 12 }}>
+                  <span style={{ fontSize: 13, fontWeight: 600 }}>Your email address *</span>
+                  <input
+                    type="email"
+                    className={styles.formInput}
+                    value={rsvpEmail}
+                    onChange={e => setRsvpEmail(e.target.value)}
+                    placeholder="you@example.com"
+                    required
+                    aria-required="true"
+                  />
+                </label>
+              )}
+              <div className={styles.submitFooter}>
+                <button type="button" className={styles.submitCancel} onClick={closeRsvp}>Cancel</button>
+                <button type="submit" className={styles.submitOk} disabled={rsvpSubmitting}>
+                  {rsvpSubmitting ? 'Registering…' : 'Confirm RSVP'}
+                </button>
+              </div>
+            </form>
+          )}
         </Modal>
       ) : null}
 
@@ -335,11 +426,11 @@ function EventCard({ ev, i, onRsvp, timing }) {
       style={{ animationDelay: `${i * 0.05}s` }}
     >
       <div className={styles.dateBadge}>
-        <span className={styles.dateMonth}>{ev.month}</span>
-        <span className={styles.dateDay}>{ev.day}</span>
+        <span className={styles.dateMonth}>{fmtMonth(ev.event_date)}</span>
+        <span className={styles.dateDay}>{fmtDay(ev.event_date)}</span>
       </div>
       <div className={styles.eventBody}>
-        <p className={styles.timingPill}>{timing}</p>
+        <p className={styles.timingPill}>{timing} • {fmtTime(ev.event_date)}</p>
         <h2 className={styles.eventTitle}>{ev.title}</h2>
         <p className={styles.eventMeta}>{ev.type}</p>
       </div>

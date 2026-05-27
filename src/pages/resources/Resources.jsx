@@ -1,5 +1,6 @@
-import { useLayoutEffect, useMemo, useState } from "react";
-import { RESOURCES, COLOR_MAP } from "data";
+import { useLayoutEffect, useMemo, useState, useEffect } from "react";
+import { COLOR_MAP } from "data";
+import { resourcesApi } from "api/client";
 import Modal from "components/common/Modal/Modal";
 import styles from "./Resources.module.css";
 
@@ -27,6 +28,20 @@ export default function Resources({ setActivePage }) {
   const [submitUrl, setSubmitUrl] = useState("");
   const [submitNote, setSubmitNote] = useState("");
   const [submitMsg, setSubmitMsg] = useState(null);
+  const [submitSubmitting, setSubmitSubmitting] = useState(false);
+
+  const [resources, setResources] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    resourcesApi
+      .list()
+      .then((data) => {
+        if (Array.isArray(data)) setResources(data);
+      })
+      .catch((err) => console.error(err))
+      .finally(() => setLoading(false));
+  }, []);
 
   useLayoutEffect(() => {
     const raw = sessionStorage.getItem("aa-nav");
@@ -52,7 +67,7 @@ export default function Resources({ setActivePage }) {
   }, []);
 
   const filtered = useMemo(() => {
-    return RESOURCES.filter((r) => {
+    return resources.filter((r) => {
       if (activeCategory !== "All" && r.category !== activeCategory)
         return false;
       if (!query) return true;
@@ -61,7 +76,7 @@ export default function Resources({ setActivePage }) {
         r.title.toLowerCase().includes(q) || r.desc.toLowerCase().includes(q)
       );
     });
-  }, [activeCategory, query]);
+  }, [activeCategory, query, resources]);
 
   const toggleSave = (slug) => {
     setSaved((prev) => {
@@ -77,7 +92,7 @@ export default function Resources({ setActivePage }) {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const title = submitTitle.trim();
     const url = submitUrl.trim();
@@ -85,23 +100,33 @@ export default function Resources({ setActivePage }) {
       setSubmitMsg("Please add at least a title and link.");
       return;
     }
+
+    setSubmitSubmitting(true);
+    setSubmitMsg(null);
     try {
-      const prev = sessionStorage.getItem(SUBMISSIONS_KEY);
-      const list = prev ? JSON.parse(prev) : [];
-      const entry = {
+      await resourcesApi.submitProposal({
         title,
         url,
         note: submitNote.trim(),
-        at: new Date().toISOString(),
-      };
-      const next = Array.isArray(list) ? [...list, entry] : [entry];
-      sessionStorage.setItem(SUBMISSIONS_KEY, JSON.stringify(next));
-    } catch {
-      /* still show thanks; storage may be unavailable */
+      });
+      setSubmitMsg(
+        "Thanks — your suggestion has been submitted for review. You can submit another anytime.",
+      );
+      setSubmitTitle("");
+      setSubmitUrl("");
+      setSubmitNote("");
+    } catch (err) {
+      setSubmitMsg(
+        err.message || "Failed to submit resource. Please try again.",
+      );
+    } finally {
+      setSubmitSubmitting(false);
     }
-    setSubmitMsg(
-      "Thanks — we saved your suggestion locally for this demo. You can submit another anytime.",
-    );
+  };
+
+  const closeSubmit = () => {
+    setSubmitOpen(false);
+    setSubmitMsg(null);
     setSubmitTitle("");
     setSubmitUrl("");
     setSubmitNote("");
@@ -185,7 +210,8 @@ export default function Resources({ setActivePage }) {
             <article
               key={r.slug}
               className={`${styles.card} fade-up`}
-              style={{ animationDelay: `${i * 0.05}s` }}
+              style={{ animationDelay: `${i * 0.05}s`, cursor: 'pointer' }}
+              onClick={() => window.open(r.view_url, '_blank')}
             >
               <div
                 className={styles.cardIcon}
@@ -203,9 +229,10 @@ export default function Resources({ setActivePage }) {
               <div className={styles.cardActions}>
                 <a
                   className={styles.cardBtn}
-                  href={r.viewUrl}
+                  href={r.view_url}
                   target="_blank"
                   rel="noopener noreferrer"
+                  onClick={(e) => e.stopPropagation()}
                 >
                   View →
                 </a>
@@ -246,7 +273,9 @@ export default function Resources({ setActivePage }) {
         })}
       </div>
 
-      {filtered.length === 0 ? (
+      {loading && resources.length === 0 ? (
+        <p className={styles.loading}>Loading resources...</p>
+      ) : filtered.length === 0 ? (
         <p className={styles.empty}>
           {query.trim()
             ? `No resources found for “${query.trim()}” in this category.`
@@ -271,13 +300,7 @@ export default function Resources({ setActivePage }) {
       </div>
 
       {submitOpen ? (
-        <Modal
-          title="Suggest a resource"
-          onClose={() => {
-            setSubmitOpen(false);
-            setSubmitMsg(null);
-          }}
-        >
+        <Modal title="Suggest a resource" onClose={closeSubmit}>
           <form id="resource-submit-form" onSubmit={handleSubmit} noValidate>
             <label className={styles.formLabel}>
               Title
@@ -320,15 +343,16 @@ export default function Resources({ setActivePage }) {
               <button
                 type="button"
                 className={styles.submitCancel}
-                onClick={() => {
-                  setSubmitOpen(false);
-                  setSubmitMsg(null);
-                }}
+                onClick={closeSubmit}
               >
                 Cancel
               </button>
-              <button type="submit" className={styles.submitOk}>
-                Send
+              <button
+                type="submit"
+                className={styles.submitOk}
+                disabled={submitSubmitting}
+              >
+                {submitSubmitting ? "Submitting..." : "Submit resource"}
               </button>
             </div>
           </form>

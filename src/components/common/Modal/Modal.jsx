@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import styles from './Modal.module.css';
 
-export default function Modal({ title, children, onClose, footer, width, height }) {
+export default function Modal({ title, children, onClose, footer, width= "50%", height }) {
   useEffect(() => {
     const onKey = e => {
       if (e.key === 'Escape') onClose?.();
