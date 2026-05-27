@@ -81,8 +81,101 @@ function buildResetUrl(token) {
   return `${getAppOrigin()}/reset-password?token=${encodeURIComponent(token)}`;
 }
 
+// ─── iCalendar helpers ────────────────────────────────────────────────────────
+
+/** Parse duration in minutes from a type string like 'Online · 90 min · Free'. */
+function parseDurationMins(typeStr) {
+  const m = (typeStr || '').match(/(\d+)\s*(?:min|h)/i);
+  if (!m) return 60;
+  const n = parseInt(m[1], 10);
+  if (/h\b/i.test(typeStr.slice(typeStr.search(/\d+\s*h/i)))) return n * 60;
+  return n;
+}
+
+/** Format a Date to iCal DTSTART/DTEND string (YYYYMMDDTHHMMSSZ). */
+function toIcalDate(date) {
+  return date.toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '');
+}
+
+/** Format event_date (ISO date string) for email body. */
+function formatEventDateLabel(isoDate) {
+  if (!isoDate) return '';
+  const d = new Date(isoDate);
+  return d.toLocaleString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', timeZone: 'UTC', timeZoneName: 'short' });
+}
+
+/** Build a minimal RFC-5545 compliant iCalendar string for an event. */
+function buildIcal({ event, uid, origin }) {
+  // event_date is now a full timestamp
+  const start = new Date(event.event_date);
+  const durationMins = parseDurationMins(event.type);
+  const end = new Date(start.getTime() + durationMins * 60 * 1000);
+  const now = toIcalDate(new Date());
+  const eventsUrl = `${origin}/events`;
+
+  return [
+    'BEGIN:VCALENDAR',
+    'VERSION:2.0',
+    'PRODID:-//AllCanAccess//Events//EN',
+    'CALSCALE:GREGORIAN',
+    'METHOD:REQUEST',
+    'BEGIN:VEVENT',
+    `UID:${uid}`,
+    `DTSTAMP:${now}`,
+    `DTSTART:${toIcalDate(start)}`,
+    `DTEND:${toIcalDate(end)}`,
+    `SUMMARY:${event.title}`,
+    `DESCRIPTION:${event.type}\\n\\nView event: ${eventsUrl}`,
+    `URL:${eventsUrl}`,
+    'STATUS:CONFIRMED',
+    'END:VEVENT',
+    'END:VCALENDAR',
+  ].join('\r\n');
+}
+
+async function sendEventRsvpEmail({ event, email, displayName }) {
+  const from = process.env.EMAIL_FROM || 'AllCanAccess <noreply@allcanaccess.local>';
+  const origin = getAppOrigin();
+  const uid = `event-${event.id}-${Date.now()}@allcanaccess`;
+  const icalContent = buildIcal({ event, uid, origin });
+
+  const name = displayName || 'there';
+  const dateLabel = formatEventDateLabel(event.event_date);
+  const subject = `📅 RSVP confirmed: ${event.title}`;
+  const text = `Hi ${name},\n\nYou're registered for "${event.title}"${dateLabel ? ` (${dateLabel})` : ''}.\n\nA calendar invite is attached — add it to your calendar to save the date.\n\nView events: ${origin}/events\n\n— AllCanAccess`;
+  const html = `<p>Hi ${escapeHtml(name)},</p>
+<p>You're registered for <strong>${escapeHtml(event.title)}</strong>${dateLabel ? ` (${escapeHtml(dateLabel)})` : ''}.</p>
+<p>A calendar invite is attached — add it to your calendar to save the date.</p>
+<p><a href="${escapeAttr(origin + '/events')}">View all events →</a></p>
+<p>— AllCanAccess</p>`;
+
+  const transport = getTransporter();
+  if (!transport) {
+    console.log('\n[rsvp-email] SMTP not configured — calendar invite for:', email);
+    console.log('Subject:', subject);
+    console.log('iCal content:\n', icalContent);
+    return { delivered: false, mode: 'console' };
+  }
+
+  await transport.sendMail({
+    from,
+    to: email,
+    subject,
+    text,
+    html,
+    icalEvent: {
+      method: 'REQUEST',
+      content: icalContent,
+    },
+  });
+  return { delivered: true, mode: 'smtp' };
+}
+
+
 module.exports = {
   sendPasswordResetEmail,
+  sendEventRsvpEmail,
   buildResetUrl,
   getAppOrigin,
 };
+

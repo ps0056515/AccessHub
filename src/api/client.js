@@ -132,6 +132,37 @@ export const toolsApi = {
   reorder: body => api('/api/tools/admin/reorder', { method: 'PUT', body: JSON.stringify(body) }),
 };
 
+export const eventsApi = {
+  list: () => api('/api/events'),
+  rsvp: (eventId, body) => api(`/api/events/${eventId}/rsvp`, { method: 'POST', body: JSON.stringify(body) }),
+  submitProposal: body => api('/api/events/proposals', { method: 'POST', body: JSON.stringify(body) }),
+  // Admin endpoints
+  listProposals: () => api('/api/events/admin/proposals'),
+  approveProposal: (id, body) => api(`/api/events/admin/proposals/${id}/approve`, { method: 'POST', body: JSON.stringify(body) }),
+  deleteProposal: id => api(`/api/events/admin/proposals/${id}`, { method: 'DELETE' }),
+  create: body => api('/api/events/admin', { method: 'POST', body: JSON.stringify(body) }),
+  update: (id, body) => api(`/api/events/admin/${id}`, { method: 'PUT', body: JSON.stringify(body) }),
+  delete: id => api(`/api/events/admin/${id}`, { method: 'DELETE' }),
+  reorder: body => api('/api/events/admin/reorder', { method: 'PUT', body: JSON.stringify(body) }),
+};
+
 export const newsApi = {
   feed: () => api('/api/news/feed'),
+};
+
+
+export const resourcesApi = {
+  // Public
+  list: () => api('/api/resources'),
+  submitProposal: (body) => api('/api/resources/proposals', { method: 'POST', body: JSON.stringify(body) }),
+
+  // Admin
+  listProposals: () => api('/api/resources/admin/proposals'),
+  approveProposal: (id, body) => api(`/api/resources/admin/proposals/${id}/approve`, { method: 'POST', body: JSON.stringify(body) }),
+  rejectProposal: (id) => api(`/api/resources/admin/proposals/${id}`, { method: 'DELETE' }),
+  deleteProposal: (id) => api(`/api/resources/admin/proposals/${id}/force`, { method: 'DELETE' }),
+  reorder: (body) => api('/api/resources/admin/reorder', { method: 'PUT', body: JSON.stringify(body) }),
+  create: (body) => api('/api/resources/admin', { method: 'POST', body: JSON.stringify(body) }),
+  update: (id, body) => api(`/api/resources/admin/${id}`, { method: 'PUT', body: JSON.stringify(body) }),
+  delete: (id) => api(`/api/resources/admin/${id}`, { method: 'DELETE' }),
 };

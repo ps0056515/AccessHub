@@ -12,6 +12,15 @@ import EventsView from './views/EventsView/EventsView';
 import DiscussionsView from './views/DiscussionsView/DiscussionsView';
 import SettingsView from './views/SettingsView/SettingsView';
 
+const VIEWS = {
+  overview: OverviewView,
+  resources: ResourcesView,
+  tools: ToolsView,
+  events: EventsView,
+  discussions: DiscussionsView,
+  settings: SettingsView,
+};
+
 export default function AdminDashboard({ goToPortal }) {
   const navigate = useNavigate();
   const { user, signOut } = useAuth();
