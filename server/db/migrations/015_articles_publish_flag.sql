@@ -1,0 +1,2 @@
+ALTER TABLE articles DROP COLUMN IF EXISTS cover_image;
+ALTER TABLE articles ADD COLUMN IF NOT EXISTS is_published BOOLEAN DEFAULT false;

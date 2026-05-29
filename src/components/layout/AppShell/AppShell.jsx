@@ -12,6 +12,8 @@ import NVDAGuide from "pages/nvda-guide/NVDAGuide";
 import ThreadPage from "pages/thread/ThreadPage";
 import JoinCommunityPage from "pages/join/JoinCommunityPage";
 import MemberProfilePage from "pages/profile/MemberProfilePage";
+import ArticlesList from "pages/articles/ArticlesList";
+import ArticleDetail from "pages/articles/ArticleDetail";
 import SignInPage from "pages/auth/SignInPage";
 import SignUpPage from "pages/auth/SignUpPage";
 import ForgotPasswordPage from "pages/auth/ForgotPasswordPage";
@@ -45,7 +47,8 @@ const SECTION_PATHS = {
   resources: "/resources",
   tools: "/tools",
   events: "/events",
-  guide: "/guide",
+  guide: "/screen-readers",
+  articles: "/articles",
 };
 
 const PAGE_TITLES = {
@@ -53,7 +56,8 @@ const PAGE_TITLES = {
   resources: `Resources · ${SITE_NAME}`,
   tools: `Tools · ${SITE_NAME}`,
   events: `Events · ${SITE_NAME}`,
-  guide: `NVDA Guide · ${SITE_NAME}`,
+  guide: `Screen Readers · ${SITE_NAME}`,
+  articles: `Articles · ${SITE_NAME}`,
 };
 
 /** `html { scroll-behavior: smooth }` can animate `scrollTo`; route changes must jump instantly. */
@@ -95,7 +99,7 @@ export default function AppShell() {
   const isThreadRoute = location.pathname.startsWith("/thread/");
   const isProfileRoute = location.pathname.startsWith("/profile/");
 
-  const SECTION_IDS = ["portal", "resources", "tools", "events", "guide"];
+  const SECTION_IDS = ["portal", "resources", "tools", "events", "guide", "articles"];
 
   const sectionFromPath = SECTION_IDS.find(
     (id) => id !== "portal" && location.pathname === SECTION_PATHS[id],
@@ -311,7 +315,7 @@ export default function AppShell() {
             element={<Tools setActivePage={setActivePage} />}
           />
           <Route
-            path="/guide"
+            path="/screen-readers"
             element={<NVDAGuide setActivePage={setActivePage} />}
           />
           <Route path="/privacy" element={<Privacy />} />
@@ -320,6 +324,11 @@ export default function AppShell() {
           <Route path="/news" element={<News />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/contribute" element={<Contribute />} />
+          <Route
+            path="/articles"
+            element={<ArticlesList setActivePage={setActivePage} />}
+          />
+          <Route path="/articles/:id" element={<ArticleDetail />} />
           <Route path="/en-301-549" element={<En301549 />} />
           <Route path="/about-us" element={<AboutUs />} />
           <Route element={<RequireAuth />}>

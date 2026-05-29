@@ -27,7 +27,7 @@ export default function Footer({ goToSection, goToPortal }) {
     if (url === '/resources') return 'resources';
     if (url === '/tools') return 'tools';
     if (url === '/events') return 'events';
-    if (url === '/guide') return 'guide';
+    if (url === '/screen-readers') return 'screen-readers';
     return '';
   };
 

@@ -10,6 +10,7 @@ import ResourcesView from './views/ResourcesView/ResourcesView';
 import ToolsView from './views/ToolsView/ToolsView';
 import EventsView from './views/EventsView/EventsView';
 import DiscussionsView from './views/DiscussionsView/DiscussionsView';
+import ArticlesView from './views/ArticlesView/ArticlesView';
 import SettingsView from './views/SettingsView/SettingsView';
 
 const VIEWS = {
@@ -18,6 +19,7 @@ const VIEWS = {
   tools: ToolsView,
   events: EventsView,
   discussions: DiscussionsView,
+  articles: ArticlesView,
   settings: SettingsView,
 };
 
@@ -45,6 +47,7 @@ export default function AdminDashboard({ goToPortal }) {
     { id: 'tools', label: 'Tools', icon: '🛠️' },
     { id: 'events', label: 'Events', icon: '📅' },
     { id: 'discussions', label: 'Discussions', icon: '💬' },
+    { id: 'articles', label: 'Articles', icon: '📝' },
     { id: 'settings', label: 'Settings', icon: '⚙️' },
   ];
 
@@ -130,6 +133,7 @@ export default function AdminDashboard({ goToPortal }) {
           {activeTab === 'tools' && <ToolsView showToast={addToast} />}
           {activeTab === 'events' && <EventsView showToast={addToast} />}
           {activeTab === 'discussions' && <DiscussionsView showToast={addToast} />}
+          {activeTab === 'articles' && <ArticlesView showToast={addToast} />}
           {activeTab === 'settings' && <SettingsView showToast={addToast} />}
         </main>
       </div>
