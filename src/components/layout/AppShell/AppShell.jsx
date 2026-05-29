@@ -1,49 +1,51 @@
-import { useState, useLayoutEffect, useCallback, useEffect } from 'react';
-import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
-import Navbar from 'components/layout/Navbar/Navbar';
-import Footer from 'components/layout/Footer/Footer';
-import RequireAuth from 'components/auth/RequireAuth';
-import RequireAdmin from 'components/auth/RequireAdmin';
-import Portal from 'pages/portal/Portal';
-import Resources from 'pages/resources/Resources';
-import Tools from 'pages/tools/Tools';
-import Events from 'pages/events/Events';
-import NVDAGuide from 'pages/nvda-guide/NVDAGuide';
-import ThreadPage from 'pages/thread/ThreadPage';
-import JoinCommunityPage from 'pages/join/JoinCommunityPage';
-import MemberProfilePage from 'pages/profile/MemberProfilePage';
-import SignInPage from 'pages/auth/SignInPage';
-import SignUpPage from 'pages/auth/SignUpPage';
-import ForgotPasswordPage from 'pages/auth/ForgotPasswordPage';
-import ResetPasswordPage from 'pages/auth/ResetPasswordPage';
-import CompleteProfilePage from 'pages/auth/CompleteProfilePage';
+import { useState, useLayoutEffect, useCallback, useEffect } from "react";
+import { Routes, Route, useNavigate, useLocation } from "react-router-dom";
+import Navbar from "components/layout/Navbar/Navbar";
+import Footer from "components/layout/Footer/Footer";
+import RequireAuth from "components/auth/RequireAuth";
+import RequireAdmin from "components/auth/RequireAdmin";
+import Portal from "pages/portal/Portal";
+import Resources from "pages/resources/Resources";
+import Tools from "pages/tools/Tools";
+import Events from "pages/events/Events";
+import NVDAGuide from "pages/nvda-guide/NVDAGuide";
+import ThreadPage from "pages/thread/ThreadPage";
+import JoinCommunityPage from "pages/join/JoinCommunityPage";
+import MemberProfilePage from "pages/profile/MemberProfilePage";
+import SignInPage from "pages/auth/SignInPage";
+import SignUpPage from "pages/auth/SignUpPage";
+import ForgotPasswordPage from "pages/auth/ForgotPasswordPage";
+import ResetPasswordPage from "pages/auth/ResetPasswordPage";
+import CompleteProfilePage from "pages/auth/CompleteProfilePage";
 // Footer pages
-import Privacy from 'pages/footer-pages/Privacy';
-import Terms from 'pages/footer-pages/Terms';
-import AccessibilityStatement from 'pages/footer-pages/AccessibilityStatement';
-import News from 'pages/footer-pages/News';
-import Contact from 'pages/footer-pages/Contact';
-import Contribute from 'pages/footer-pages/Contribute';
-import En301549 from 'pages/footer-pages/En301549';
-import { SITE_NAME } from 'brand';
-import { postsApi } from 'api/client';
+import Privacy from "pages/footer-pages/Privacy";
+import Terms from "pages/footer-pages/Terms";
+import AccessibilityStatement from "pages/footer-pages/AccessibilityStatement";
+import News from "pages/footer-pages/News";
+import Contact from "pages/footer-pages/Contact";
+import Contribute from "pages/footer-pages/Contribute";
+import En301549 from "pages/footer-pages/En301549";
+import AboutUs from "pages/footer-pages/AboutUs";
+import { SITE_NAME } from "brand";
+import { postsApi } from "api/client";
 
 const FOOTER_PAGE_TITLES = {
-  '/news': `News · ${SITE_NAME}`,
-  '/contact': `Contact · ${SITE_NAME}`,
-  '/contribute': `Contribute · ${SITE_NAME}`,
-  '/en-301-549': `EN 301 549 · ${SITE_NAME}`,
-  '/privacy': `Privacy · ${SITE_NAME}`,
-  '/terms': `Terms · ${SITE_NAME}`,
-  '/accessibility': `Accessibility statement · ${SITE_NAME}`,
+  "/news": `News · ${SITE_NAME}`,
+  "/contact": `Contact · ${SITE_NAME}`,
+  "/contribute": `Contribute · ${SITE_NAME}`,
+  "/en-301-549": `EN 301 549 · ${SITE_NAME}`,
+  "/privacy": `Privacy · ${SITE_NAME}`,
+  "/terms": `Terms · ${SITE_NAME}`,
+  "/accessibility": `Accessibility statement · ${SITE_NAME}`,
+  "/about-us": `About Us · ${SITE_NAME}`,
 };
 
 const SECTION_PATHS = {
-  portal: '/',
-  resources: '/resources',
-  tools: '/tools',
-  events: '/events',
-  guide: '/guide',
+  portal: "/",
+  resources: "/resources",
+  tools: "/tools",
+  events: "/events",
+  guide: "/guide",
 };
 
 const PAGE_TITLES = {
@@ -58,7 +60,7 @@ const PAGE_TITLES = {
 function scrollWindowTopInstant() {
   const root = document.documentElement;
   const prev = root.style.scrollBehavior;
-  root.style.scrollBehavior = 'auto';
+  root.style.scrollBehavior = "auto";
   window.scrollTo(0, 0);
   root.scrollTop = 0;
   document.body.scrollTop = 0;
@@ -68,19 +70,19 @@ function scrollWindowTopInstant() {
 export default function AppShell() {
   const navigate = useNavigate();
   const location = useLocation();
-  const [activePage, setActivePageState] = useState('portal');
+  const [activePage, setActivePageState] = useState("portal");
   const [posts, setPosts] = useState([]);
   const [postsLoading, setPostsLoading] = useState(true);
-  const [postsError, setPostsError] = useState('');
+  const [postsError, setPostsError] = useState("");
 
   const loadPosts = useCallback(async () => {
     setPostsLoading(true);
-    setPostsError('');
+    setPostsError("");
     try {
       const { posts: data } = await postsApi.list();
       setPosts(data);
     } catch (err) {
-      setPostsError(err.message || 'Could not load discussions.');
+      setPostsError(err.message || "Could not load discussions.");
     } finally {
       setPostsLoading(false);
     }
@@ -90,13 +92,13 @@ export default function AppShell() {
     loadPosts();
   }, [loadPosts]);
 
-  const isThreadRoute = location.pathname.startsWith('/thread/');
-  const isProfileRoute = location.pathname.startsWith('/profile/');
+  const isThreadRoute = location.pathname.startsWith("/thread/");
+  const isProfileRoute = location.pathname.startsWith("/profile/");
 
-  const SECTION_IDS = ['portal', 'resources', 'tools', 'events', 'guide'];
+  const SECTION_IDS = ["portal", "resources", "tools", "events", "guide"];
 
   const sectionFromPath = SECTION_IDS.find(
-    (id) => id !== 'portal' && location.pathname === SECTION_PATHS[id],
+    (id) => id !== "portal" && location.pathname === SECTION_PATHS[id],
   );
 
   useLayoutEffect(() => {
@@ -108,7 +110,7 @@ export default function AppShell() {
   const refreshPosts = loadPosts;
 
   const setActivePage = useCallback(
-    page => {
+    (page) => {
       if (!SECTION_PATHS[page]) return;
       setActivePageState(page);
       const target = SECTION_PATHS[page];
@@ -124,38 +126,38 @@ export default function AppShell() {
       setActivePageState(sectionFromPath);
       return;
     }
-    if (location.pathname === '/') {
-      setActivePageState('portal');
+    if (location.pathname === "/") {
+      setActivePageState("portal");
     }
   }, [location.pathname, sectionFromPath]);
 
   useLayoutEffect(() => {
     if (isThreadRoute) return;
-    if (location.pathname === '/join') {
+    if (location.pathname === "/join") {
       document.title = `Join · ${SITE_NAME}`;
       return;
     }
-    if (location.pathname === '/sign-in') {
+    if (location.pathname === "/sign-in") {
       document.title = `Sign in · ${SITE_NAME}`;
       return;
     }
-    if (location.pathname === '/sign-up') {
+    if (location.pathname === "/sign-up") {
       document.title = `Join community · ${SITE_NAME}`;
       return;
     }
-    if (location.pathname === '/forgot-password') {
+    if (location.pathname === "/forgot-password") {
       document.title = `Forgot password · ${SITE_NAME}`;
       return;
     }
-    if (location.pathname === '/reset-password') {
+    if (location.pathname === "/reset-password") {
       document.title = `Reset password · ${SITE_NAME}`;
       return;
     }
-    if (location.pathname === '/admin') {
+    if (location.pathname === "/admin") {
       document.title = `Admin · ${SITE_NAME}`;
       return;
     }
-    if (location.pathname === '/complete-profile') {
+    if (location.pathname === "/complete-profile") {
       document.title = `Complete profile · ${SITE_NAME}`;
       return;
     }
@@ -172,11 +174,17 @@ export default function AppShell() {
       return;
     }
     document.title = PAGE_TITLES[activePage] || PAGE_TITLES.portal;
-  }, [isThreadRoute, isProfileRoute, location.pathname, activePage, sectionFromPath]);
+  }, [
+    isThreadRoute,
+    isProfileRoute,
+    location.pathname,
+    activePage,
+    sectionFromPath,
+  ]);
 
   const goToPortal = useCallback(() => {
-    setActivePageState('portal');
-    navigate('/');
+    setActivePageState("portal");
+    navigate("/");
     queueMicrotask(() => {
       scrollWindowTopInstant();
       requestAnimationFrame(scrollWindowTopInstant);
@@ -184,7 +192,7 @@ export default function AppShell() {
   }, [navigate]);
 
   const goToSection = useCallback(
-    page => {
+    (page) => {
       if (!SECTION_IDS.includes(page)) return;
       setActivePage(page);
       queueMicrotask(() => {
@@ -192,20 +200,22 @@ export default function AppShell() {
         requestAnimationFrame(scrollWindowTopInstant);
       });
     },
-    [setActivePage]
+    [setActivePage],
   );
 
   const focusPortalDiscussionSearch = useCallback(() => {
-    setActivePageState('portal');
-    navigate('/');
+    setActivePageState("portal");
+    navigate("/");
     setTimeout(() => {
-      window.dispatchEvent(new CustomEvent('allcanaccess:focus-discussion-search'));
+      window.dispatchEvent(
+        new CustomEvent("allcanaccess:focus-discussion-search"),
+      );
     }, 100);
   }, [navigate]);
 
   const returnFromThread = useCallback(() => {
-    setActivePageState('portal');
-    navigate('/');
+    setActivePageState("portal");
+    navigate("/");
     queueMicrotask(() => {
       scrollWindowTopInstant();
       requestAnimationFrame(scrollWindowTopInstant);
@@ -213,39 +223,45 @@ export default function AppShell() {
   }, [navigate]);
 
   const navActive =
-    location.pathname === '/join'
-      ? 'join'
-      : location.pathname === '/sign-in' ||
-          location.pathname === '/sign-up' ||
-          location.pathname === '/forgot-password' ||
-          location.pathname === '/reset-password'
-        ? 'join'
+    location.pathname === "/join"
+      ? "join"
+      : location.pathname === "/sign-in" ||
+          location.pathname === "/sign-up" ||
+          location.pathname === "/forgot-password" ||
+          location.pathname === "/reset-password"
+        ? "join"
         : sectionFromPath ||
-          (isThreadRoute || isProfileRoute ? 'portal' : location.pathname === '/' ? 'portal' : activePage);
+          (isThreadRoute || isProfileRoute
+            ? "portal"
+            : location.pathname === "/"
+              ? "portal"
+              : activePage);
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+    <div
+      style={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}
+    >
       <a
         href="#main-content"
         style={{
-          position: 'absolute',
-          top: '-100%',
+          position: "absolute",
+          top: "-100%",
           left: 16,
-          background: '#074a9e',
-          color: '#fff',
-          padding: '10px 18px',
+          background: "#074a9e",
+          color: "#fff",
+          padding: "10px 18px",
           borderRadius: 6,
           fontSize: 14,
           fontWeight: 500,
           zIndex: 9999,
-          textDecoration: 'none',
-          transition: 'top 0.1s',
+          textDecoration: "none",
+          transition: "top 0.1s",
         }}
-        onFocus={e => {
-          e.target.style.top = '16px';
+        onFocus={(e) => {
+          e.target.style.top = "16px";
         }}
-        onBlur={e => {
-          e.target.style.top = '-100%';
+        onBlur={(e) => {
+          e.target.style.top = "-100%";
         }}
       >
         Skip to main content
@@ -258,8 +274,14 @@ export default function AppShell() {
       />
       <main id="main-content" style={{ flex: 1 }}>
         <Routes>
-          <Route path="/sign-in" element={<SignInPage goToPortal={goToPortal} />} />
-          <Route path="/sign-up" element={<SignUpPage goToPortal={goToPortal} />} />
+          <Route
+            path="/sign-in"
+            element={<SignInPage goToPortal={goToPortal} />}
+          />
+          <Route
+            path="/sign-up"
+            element={<SignUpPage goToPortal={goToPortal} />}
+          />
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />
           <Route path="/reset-password" element={<ResetPasswordPage />} />
           <Route
@@ -276,10 +298,22 @@ export default function AppShell() {
               />
             }
           />
-          <Route path="/events" element={<Events setActivePage={setActivePage} />} />
-          <Route path="/resources" element={<Resources setActivePage={setActivePage} />} />
-          <Route path="/tools" element={<Tools setActivePage={setActivePage} />} />
-          <Route path="/guide" element={<NVDAGuide setActivePage={setActivePage} />} />
+          <Route
+            path="/events"
+            element={<Events setActivePage={setActivePage} />}
+          />
+          <Route
+            path="/resources"
+            element={<Resources setActivePage={setActivePage} />}
+          />
+          <Route
+            path="/tools"
+            element={<Tools setActivePage={setActivePage} />}
+          />
+          <Route
+            path="/guide"
+            element={<NVDAGuide setActivePage={setActivePage} />}
+          />
           <Route path="/privacy" element={<Privacy />} />
           <Route path="/terms" element={<Terms />} />
           <Route path="/accessibility" element={<AccessibilityStatement />} />
@@ -287,6 +321,7 @@ export default function AppShell() {
           <Route path="/contact" element={<Contact />} />
           <Route path="/contribute" element={<Contribute />} />
           <Route path="/en-301-549" element={<En301549 />} />
+          <Route path="/about-us" element={<AboutUs />} />
           <Route element={<RequireAuth />}>
             <Route
               path="/thread/:postId"
@@ -301,14 +336,22 @@ export default function AppShell() {
             />
             <Route
               path="/join"
-              element={<JoinCommunityPage goToPortal={goToPortal} goToSection={goToSection} />}
+              element={
+                <JoinCommunityPage
+                  goToPortal={goToPortal}
+                  goToSection={goToSection}
+                />
+              }
             />
             <Route
               path="/complete-profile"
               element={<CompleteProfilePage goToPortal={goToPortal} />}
             />
 
-            <Route path="/profile/:memberId" element={<MemberProfilePage goToPortal={goToPortal} />} />
+            <Route
+              path="/profile/:memberId"
+              element={<MemberProfilePage goToPortal={goToPortal} />}
+            />
           </Route>
         </Routes>
       </main>

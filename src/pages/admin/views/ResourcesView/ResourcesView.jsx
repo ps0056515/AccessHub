@@ -341,6 +341,7 @@ export default function ResourcesView({ showToast }) {
       <ResourceModal
         isOpen={isModalOpen || !!approvingProposal}
         resource={approvingProposal || editingResource}
+        existingResources={resourcesList}
         onClose={handleModalClose}
         onSave={approvingProposal ? handleApproveProposal : loadResources}
         showToast={showToast}

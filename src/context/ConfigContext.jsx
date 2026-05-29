@@ -15,6 +15,27 @@ export function ConfigProvider({ children }) {
     footer_socials: []
   });
   const [footerColumns, setFooterColumns] = useState([]);
+  
+  // Portal Hero config
+  const [portalConfig, setPortalConfig] = useState({
+    bgUrl: '',
+    badge: 'Live community · weekly office hours',
+    heading: 'Where accessibility\npractitioners connect',
+    subheading: 'Crowd-sourced discussions, vetted guides, tooling, and events — built with practitioners who ship inclusive products in the real world.',
+    tags: [
+      { label: "WCAG 2.2 implementations", searchText: "WCAG 2.2 implementations" },
+      { label: "Screen reader testing", searchText: "Screen reader testing" },
+      { label: "Legal & procurement", searchText: "Legal & procurement" },
+      { label: "Design systems", searchText: "Design systems" },
+    ],
+    stats: [
+      { num: "3.2k", label: "Active members" },
+      { num: "15k+", label: "Questions answered" },
+      { num: "80+", label: "Vetted tools" },
+      { num: "12", label: "Upcoming events" },
+    ]
+  });
+
   const [loading, setLoading] = useState(true);
 
   const refreshConfig = useCallback(async () => {
@@ -26,6 +47,15 @@ export function ConfigProvider({ children }) {
         if (data.footer_logo_url) setFooterLogoUrl(data.footer_logo_url);
         if (data.navigation) setNavigation(data.navigation);
         if (data.footer_columns) setFooterColumns(data.footer_columns);
+        
+        setPortalConfig(prev => ({
+          bgUrl: data.portal_hero_bg_url ?? prev.bgUrl,
+          badge: data.portal_hero_badge || prev.badge,
+          heading: data.portal_hero_heading || prev.heading,
+          subheading: data.portal_hero_subheading || prev.subheading,
+          tags: data.portal_hero_tags || prev.tags,
+          stats: data.portal_stats || prev.stats,
+        }));
       }
     } catch (err) {
       console.error('Failed to load system settings:', err);
@@ -44,6 +74,7 @@ export function ConfigProvider({ children }) {
     footerLogoUrl,
     navigation,
     footerColumns,
+    portalConfig,
     loading,
     refreshConfig
   };

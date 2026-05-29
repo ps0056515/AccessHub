@@ -3,7 +3,6 @@ import { resourcesApi } from 'api/client';
 import Modal from 'components/common/Modal/Modal';
 import styles from '../ResourcesView.module.css';
 
-const CATEGORIES = ["Standards", "Testing", "Design", "Legal", "Tools"];
 const COLORS = ['blue', 'purple', 'green', 'amber', 'red', 'pink', 'gray'];
 
 const DEFAULT_FORM = {
@@ -15,9 +14,14 @@ const DEFAULT_FORM = {
   category: 'Standards',
 };
 
-export default function ResourceModal({ isOpen, resource, onClose, onSave, showToast }) {
+export default function ResourceModal({ isOpen, resource, existingResources = [], onClose, onSave, showToast }) {
   const [formData, setFormData] = useState(DEFAULT_FORM);
   const [submitting, setSubmitting] = useState(false);
+
+  const dynamicCategories = existingResources
+    .map(r => r.category)
+    .filter((c, i, arr) => c && arr.indexOf(c) === i)
+    .sort();
 
   useEffect(() => {
     if (isOpen) {
@@ -161,16 +165,19 @@ export default function ResourceModal({ isOpen, resource, onClose, onSave, showT
 
           <div className={styles.formGroup}>
             <label htmlFor="res-category" className={styles.formLabel}>Category *</label>
-            <select
+            <input
+              list="category-options"
               id="res-category"
               name="category"
               value={formData.category}
               onChange={handleChange}
-              className={styles.formSelect}
+              className={styles.formInput}
+              autoComplete="off"
               required
-            >
-              {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
-            </select>
+            />
+            <datalist id="category-options">
+              {dynamicCategories.map(c => <option key={c} value={c} />)}
+            </datalist>
           </div>
 
         </div>
