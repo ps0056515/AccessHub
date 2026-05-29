@@ -146,6 +146,18 @@ export const eventsApi = {
   reorder: body => api('/api/events/admin/reorder', { method: 'PUT', body: JSON.stringify(body) }),
 };
 
+export const articlesApi = {
+  list: () => api('/api/articles'),
+  listAdmin: () => api('/api/articles/admin'),
+  get: id => api(`/api/articles/${id}`),
+  getAdmin: id => api(`/api/articles/admin/${id}`),
+  uploadCover: body => api('/api/articles/upload-cover', { method: 'POST', body: JSON.stringify(body) }),
+  create: body => api('/api/articles', { method: 'POST', body: JSON.stringify(body) }),
+  update: (id, body) => api(`/api/articles/${id}`, { method: 'PUT', body: JSON.stringify(body) }),
+  togglePublish: (id, is_published) => api(`/api/articles/${id}/publish`, { method: 'PATCH', body: JSON.stringify({ is_published }) }),
+  delete: id => api(`/api/articles/${id}`, { method: 'DELETE' }),
+};
+
 export const newsApi = {
   feed: () => api('/api/news/feed'),
 };

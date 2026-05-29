@@ -125,16 +125,16 @@ export default function JoinCommunityPage({ goToPortal, goToSection }) {
             </button>
           </li>
           <li className={styles.infoCard}>
-            <h3 className={styles.cardTitle}>Tools &amp; NVDA guide</h3>
+            <h3 className={styles.cardTitle}>Tools &amp; Screen Readers</h3>
             <p className={styles.cardBody}>
-              Practical checklists and NVDA help — aligned with hands-on learning paths.
+              Practical checklists and Screen Readers help — aligned with hands-on learning paths.
             </p>
             <div className={styles.cardBtnRow}>
               <button type="button" className={styles.cardBtnGhost} onClick={() => goToSection?.('tools')}>
                 Tools
               </button>
               <button type="button" className={styles.cardBtnGhost} onClick={() => goToSection?.('guide')}>
-                NVDA guide
+                Screen Readers
               </button>
             </div>
           </li>

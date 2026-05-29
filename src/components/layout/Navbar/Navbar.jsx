@@ -1,18 +1,23 @@
-import { useState } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
-import { useAuth } from 'context/AuthContext';
-import { useConfig } from 'context/ConfigContext';
-import styles from './Navbar.module.css';
+import { useState } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
+import { useAuth } from "context/AuthContext";
+import { useConfig } from "context/ConfigContext";
+import styles from "./Navbar.module.css";
 
 const SECTION_PATHS = {
-  portal: '/',
-  resources: '/resources',
-  tools: '/tools',
-  events: '/events',
-  guide: '/guide',
+  portal: "/",
+  resources: "/resources",
+  tools: "/tools",
+  events: "/events",
+  screenReaders: "/screen-readers",
 };
 
-export default function Navbar({ activePage, setActivePage, goToPortal, onSearch }) {
+export default function Navbar({
+  activePage,
+  setActivePage,
+  goToPortal,
+  onSearch,
+}) {
   const [menuOpen, setMenuOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
@@ -20,14 +25,16 @@ export default function Navbar({ activePage, setActivePage, goToPortal, onSearch
   const { siteName, navbarLogoUrl, navigation } = useConfig();
 
   const visitPortal =
-    typeof goToPortal === 'function' ? goToPortal : () => setActivePage('portal');
+    typeof goToPortal === "function"
+      ? goToPortal
+      : () => setActivePage("portal");
 
   const goToJoin = () => {
     if (user) {
-      navigate('/join');
+      navigate("/join");
       return;
     }
-    navigate('/sign-up', { state: { from: '/join' } });
+    navigate("/sign-up", { state: { from: "/join" } });
   };
 
   const getPageIdFromUrl = (url) => {
@@ -35,7 +42,8 @@ export default function Navbar({ activePage, setActivePage, goToPortal, onSearch
     if (url === '/resources') return 'resources';
     if (url === '/tools') return 'tools';
     if (url === '/events') return 'events';
-    if (url === '/guide') return 'guide';
+    if (url === '/screen-readers') return 'guide';
+    if (url === '/articles' || url.startsWith('/articles/')) return 'articles';
     return '';
   };
 
@@ -43,7 +51,7 @@ export default function Navbar({ activePage, setActivePage, goToPortal, onSearch
     id: getPageIdFromUrl(l.url) || `nav-item-${index}`,
     label: l.label,
     url: l.url,
-    isExternal: l.isExternal
+    isExternal: l.isExternal,
   }));
 
   const handleLinkClick = (l) => {
@@ -52,7 +60,7 @@ export default function Navbar({ activePage, setActivePage, goToPortal, onSearch
       setActivePage(pageId);
     } else {
       if (l.isExternal) {
-        window.open(l.url, '_blank', 'noopener,noreferrer');
+        window.open(l.url, "_blank", "noopener,noreferrer");
       } else {
         navigate(l.url);
       }
@@ -74,18 +82,24 @@ export default function Navbar({ activePage, setActivePage, goToPortal, onSearch
           onClick={() => visitPortal()}
           aria-label={`${siteName} home`}
         >
-          <img src={navbarLogoUrl} alt="" className={styles.logoImg} width={128} height={40} />
+          <img
+            src={navbarLogoUrl}
+            alt=""
+            className={styles.logoImg}
+            width={128}
+            height={40}
+          />
           <span className={`sr-only ${styles.logoName}`}>{siteName}</span>
           <span className={styles.logoBadge}>Beta</span>
         </button>
 
         <nav className={styles.nav} aria-label="Main navigation">
-          {links.map(l => (
+          {links.map((l) => (
             <button
               key={l.id}
-              className={`${styles.navLink} ${isLinkActive(l) ? styles.active : ''}`}
+              className={`${styles.navLink} ${isLinkActive(l) ? styles.active : ""}`}
               onClick={() => handleLinkClick(l)}
-              aria-current={isLinkActive(l) ? 'page' : undefined}
+              aria-current={isLinkActive(l) ? "page" : undefined}
             >
               {l.label}
             </button>
@@ -99,16 +113,33 @@ export default function Navbar({ activePage, setActivePage, goToPortal, onSearch
             aria-label="Search discussions"
             onClick={() => onSearch?.()}
           >
-            <svg width="15" height="15" viewBox="0 0 15 15" fill="none" aria-hidden="true">
-              <circle cx="6.5" cy="6.5" r="4.5" stroke="currentColor" strokeWidth="1.4" />
-              <path d="M10 10L13.5 13.5" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
+            <svg
+              width="15"
+              height="15"
+              viewBox="0 0 15 15"
+              fill="none"
+              aria-hidden="true"
+            >
+              <circle
+                cx="6.5"
+                cy="6.5"
+                r="4.5"
+                stroke="currentColor"
+                strokeWidth="1.4"
+              />
+              <path
+                d="M10 10L13.5 13.5"
+                stroke="currentColor"
+                strokeWidth="1.4"
+                strokeLinecap="round"
+              />
             </svg>
           </button>
           {!authLoading && !user && (
             <button
               className={styles.signInBtn}
               type="button"
-              onClick={() => navigate('/sign-in')}
+              onClick={() => navigate("/sign-in")}
             >
               Sign in
             </button>
@@ -119,7 +150,7 @@ export default function Navbar({ activePage, setActivePage, goToPortal, onSearch
                 <button
                   className={styles.adminBtn}
                   type="button"
-                  onClick={() => navigate('/admin')}
+                  onClick={() => navigate("/admin")}
                 >
                   Admin
                 </button>
@@ -132,7 +163,7 @@ export default function Navbar({ activePage, setActivePage, goToPortal, onSearch
                 type="button"
                 onClick={async () => {
                   await signOut();
-                  navigate('/sign-in', { replace: true });
+                  navigate("/sign-in", { replace: true });
                 }}
               >
                 Sign out
@@ -140,32 +171,32 @@ export default function Navbar({ activePage, setActivePage, goToPortal, onSearch
             </>
           )}
           {!authLoading && !user && (
-            <button
-              className={styles.joinBtn}
-              type="button"
-              onClick={goToJoin}
-            >
+            <button className={styles.joinBtn} type="button" onClick={goToJoin}>
               Join community
             </button>
           )}
           <button
             className={styles.menuBtn}
-            aria-label={menuOpen ? 'Close menu' : 'Open menu'}
+            aria-label={menuOpen ? "Close menu" : "Open menu"}
             aria-expanded={menuOpen}
-            onClick={() => setMenuOpen(o => !o)}
+            onClick={() => setMenuOpen((o) => !o)}
           >
-            <span className={`${styles.bar} ${menuOpen ? styles.barOpen1 : ''}`} />
-            <span className={`${styles.bar} ${menuOpen ? styles.barOpen2 : ''}`} />
+            <span
+              className={`${styles.bar} ${menuOpen ? styles.barOpen1 : ""}`}
+            />
+            <span
+              className={`${styles.bar} ${menuOpen ? styles.barOpen2 : ""}`}
+            />
           </button>
         </div>
       </div>
 
       {menuOpen && (
         <nav className={styles.mobileNav} aria-label="Mobile navigation">
-          {links.map(l => (
+          {links.map((l) => (
             <button
               key={l.id}
-              className={`${styles.mobileLink} ${isLinkActive(l) ? styles.mobileActive : ''}`}
+              className={`${styles.mobileLink} ${isLinkActive(l) ? styles.mobileActive : ""}`}
               onClick={() => {
                 handleLinkClick(l);
                 setMenuOpen(false);
@@ -179,7 +210,7 @@ export default function Navbar({ activePage, setActivePage, goToPortal, onSearch
               type="button"
               className={styles.mobileLink}
               onClick={() => {
-                navigate('/sign-in');
+                navigate("/sign-in");
                 setMenuOpen(false);
               }}
             >
@@ -193,7 +224,7 @@ export default function Navbar({ activePage, setActivePage, goToPortal, onSearch
                   type="button"
                   className={styles.mobileLink}
                   onClick={() => {
-                    navigate('/admin');
+                    navigate("/admin");
                     setMenuOpen(false);
                   }}
                 >
@@ -206,7 +237,7 @@ export default function Navbar({ activePage, setActivePage, goToPortal, onSearch
                 className={styles.mobileLink}
                 onClick={async () => {
                   await signOut();
-                  navigate('/sign-in', { replace: true });
+                  navigate("/sign-in", { replace: true });
                   setMenuOpen(false);
                 }}
               >
