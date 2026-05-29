@@ -1,10 +1,11 @@
 import { useEffect, useRef, useState, useMemo } from 'react';
 import { flushSync } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
-import { STATS, MEMBERS, TAG_COLORS, COLOR_MAP } from 'data';
+import { MEMBERS, TAG_COLORS, COLOR_MAP } from 'data';
 import { postsApi, eventsApi, getVoterKey, getStoredVote, setStoredVote } from 'api/client';
 import { voteDelta } from 'utils/voteDelta';
 import { useAuth } from 'context/AuthContext';
+import { useConfig } from 'context/ConfigContext';
 import styles from './Portal.module.css';
 
 const TOPIC_FILTERS = ["WCAG 2.2", "Screen readers", "Legal"];
@@ -214,6 +215,7 @@ export default function Portal({
 }) {
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
+  const { portalConfig } = useConfig();
   const [activeTab, setActiveTab] = useState('hot');
   const [query, setQuery] = useState('');
   const [topicFilter, setTopicFilter] = useState(null);
@@ -421,24 +423,25 @@ export default function Portal({
 
   return (
     <div className={styles.page}>
-      <section className={styles.hero} aria-labelledby="hero-heading">
-        <div className={styles.heroInner}>
+      <section 
+        className={styles.hero} 
+        aria-labelledby="hero-heading"
+        style={portalConfig.bgUrl ? { backgroundImage: `url(${portalConfig.bgUrl})`, backgroundSize: 'cover', backgroundPosition: 'center' } : undefined}
+      >
+        {portalConfig.bgUrl && <div style={{ position: 'absolute', inset: 0, background: 'rgba(255,255,255,0.7)' }} />}
+        <div className={styles.heroInner} style={{ position: 'relative', zIndex: 1 }}>
           <div className={styles.heroBadge}>
             <span className={styles.heroDot} aria-hidden="true" />
-            Live community · weekly office hours
+            {portalConfig.badge}
           </div>
-          <h1 id="hero-heading" className={`${styles.heroTitle} fade-up`}>
-            Where <em>accessibility</em>
-            <br />
-            practitioners connect
+          <h1 id="hero-heading" className={`${styles.heroTitle} fade-up`} style={{ whiteSpace: 'pre-line' }}>
+            {portalConfig.heading}
           </h1>
           <p className={`${styles.heroSub} fade-up fade-up-1`}>
-            Crowd-sourced discussions, vetted guides, tooling, and events —
-            built with practitioners who ship inclusive products in the real
-            world.
+            {portalConfig.subheading}
           </p>
           <ul className={`${styles.heroChips} fade-up fade-up-1`} aria-label="Popular topics">
-            {HERO_TOPICS.map(topic => {
+            {(portalConfig.tags || []).map(topic => {
               const searchText = topic.searchText || topic.label;
               const isActive = query.trim().toLowerCase() === searchText.toLowerCase();
               return (
@@ -480,7 +483,7 @@ export default function Portal({
       </section>
 
       <section className={styles.statsBar} aria-label="Community statistics">
-        {STATS.map((s, i) => (
+        {(portalConfig.stats || []).map((s, i) => (
           <div
             key={i}
             className={`${styles.statItem} fade-up`}

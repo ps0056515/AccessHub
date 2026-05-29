@@ -4,8 +4,6 @@ import { resourcesApi } from "api/client";
 import Modal from "components/common/Modal/Modal";
 import styles from "./Resources.module.css";
 
-const CATEGORIES = ["All", "Standards", "Testing", "Design", "Legal", "Tools"];
-
 const SAVED_KEY = "allcanaccess-saved-resources";
 const SUBMISSIONS_KEY = "allcanaccess-resource-submissions";
 
@@ -65,6 +63,14 @@ export default function Resources({ setActivePage }) {
       sessionStorage.removeItem("aa-nav");
     }
   }, []);
+
+  const dynamicCategories = useMemo(() => {
+    const unique = new Set();
+    resources.forEach(r => {
+      if (r.category) unique.add(r.category);
+    });
+    return ["All", ...Array.from(unique)];
+  }, [resources]);
 
   const filtered = useMemo(() => {
     return resources.filter((r) => {
@@ -180,9 +186,9 @@ export default function Resources({ setActivePage }) {
           />
         </div>
         <fieldset className={styles.catFieldset}>
-          <legend className="sr-only">Filter resources by category</legend>
+          <legend className="sr-only">Filter by category</legend>
           <div className={styles.catNav}>
-            {CATEGORIES.map((c) => (
+            {dynamicCategories.map((c) => (
               <label
                 key={c}
                 className={`${styles.catLabel} ${activeCategory === c ? styles.catActive : ""}`}

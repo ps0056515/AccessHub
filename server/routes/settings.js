@@ -56,6 +56,12 @@ router.get('/', async (req, res, next) => {
       site_name: settings.site_name || 'AllCanAccess',
       navbar_logo_url: settings.navbar_logo_url || '/allcanaccess.png',
       footer_logo_url: settings.footer_logo_url || '/allcanaccess_footer.png',
+      portal_hero_bg_url: settings.portal_hero_bg_url || '',
+      portal_hero_badge: settings.portal_hero_badge || '',
+      portal_hero_heading: settings.portal_hero_heading || '',
+      portal_hero_subheading: settings.portal_hero_subheading || '',
+      portal_hero_tags: settings.portal_hero_tags ? JSON.parse(settings.portal_hero_tags) : null,
+      portal_stats: settings.portal_stats ? JSON.parse(settings.portal_stats) : null,
       footer_columns: footerColumns,
       navigation
     });
@@ -64,19 +70,55 @@ router.get('/', async (req, res, next) => {
   }
 });
 
-// PUT /api/settings - Update general settings (site_name) (Admin only)
+// PUT /api/settings - Update general settings (site_name, portal hero configs) (Admin only)
 router.put('/', authMiddleware, adminMiddleware, async (req, res, next) => {
-  const { site_name } = req.body || {};
-  if (!site_name?.trim()) {
-    res.status(400).json({ error: 'Site name is required.' });
+  const { site_name, portal_hero_badge, portal_hero_heading, portal_hero_subheading, portal_hero_tags, portal_stats, portal_hero_bg_url } = req.body || {};
+  if (site_name && !site_name.trim()) {
+    res.status(400).json({ error: 'Site name cannot be empty if provided.' });
     return;
   }
 
   try {
-    await query(
-      "INSERT INTO system_settings (key, value, updated_at) VALUES ('site_name', $1, NOW()) ON CONFLICT (key) DO UPDATE SET value = $1, updated_at = NOW()",
-      [site_name.trim()]
-    );
+    const upsert = async (k, v) => {
+      if (v === undefined) return;
+
+      // If we are clearing a URL field (e.g., removing an image), delete the old physical file
+      if (v === '' && (k.endsWith('_logo_url') || k === 'portal_hero_bg_url')) {
+        const oldSettings = await query('SELECT value FROM system_settings WHERE key = $1', [k]);
+        if (oldSettings.rows.length > 0) {
+          const oldUrl = oldSettings.rows[0].value;
+          if (oldUrl && oldUrl.startsWith('/api/uploads/')) {
+            const oldFile = path.join(__dirname, '..', 'uploads', path.basename(oldUrl));
+            if (fs.existsSync(oldFile)) {
+              try {
+                fs.unlinkSync(oldFile);
+              } catch (e) {
+                console.error('Failed to delete old image file on clearing:', e);
+              }
+            }
+          }
+        }
+      }
+
+      await query(
+        "INSERT INTO system_settings (key, value, updated_at) VALUES ($1, $2, NOW()) ON CONFLICT (key) DO UPDATE SET value = $2, updated_at = NOW()",
+        [k, v]
+      );
+    };
+
+    if (site_name) await upsert('site_name', site_name.trim());
+    await upsert('portal_hero_badge', portal_hero_badge);
+    await upsert('portal_hero_heading', portal_hero_heading);
+    await upsert('portal_hero_subheading', portal_hero_subheading);
+    await upsert('portal_hero_bg_url', portal_hero_bg_url);
+    
+    if (portal_hero_tags !== undefined) {
+      await upsert('portal_hero_tags', JSON.stringify(portal_hero_tags));
+    }
+    if (portal_stats !== undefined) {
+      await upsert('portal_stats', JSON.stringify(portal_stats));
+    }
+
     res.json({ ok: true });
   } catch (err) {
     next(err);
@@ -90,8 +132,8 @@ router.post('/upload-logo', authMiddleware, adminMiddleware, async (req, res, ne
     res.status(400).json({ error: 'Data, filename, and setting key are required.' });
     return;
   }
-  if (key !== 'navbar_logo_url' && key !== 'footer_logo_url') {
-    res.status(400).json({ error: 'Invalid logo key.' });
+  if (key !== 'navbar_logo_url' && key !== 'footer_logo_url' && key !== 'portal_hero_bg_url') {
+    res.status(400).json({ error: 'Invalid file key.' });
     return;
   }
 

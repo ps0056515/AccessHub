@@ -5,9 +5,9 @@ import dashboardStyles from '../../AdminDashboard.module.css';
 import styles from './SettingsView.module.css';
 
 export default function SettingsView({ showToast }) {
-  const { siteName, navbarLogoUrl, footerLogoUrl, navigation, footerColumns, refreshConfig } = useConfig();
+  const { siteName, navbarLogoUrl, footerLogoUrl, navigation, footerColumns, portalConfig, refreshConfig } = useConfig();
 
-  // Tab state: 'branding', 'navbar', 'footer'
+  // Tab state: 'branding', 'navbar', 'footer', 'landing'
   const [activeSubTab, setActiveSubTab] = useState('branding');
 
   // Branding states
@@ -26,10 +26,26 @@ export default function SettingsView({ showToast }) {
   const [createLoading, setCreateLoading] = useState(false);
   const [savingColumns, setSavingColumns] = useState(false);
 
-  // Initialize inputs from context config
+  // Landing page config state
+  const [localPortalConfig, setLocalPortalConfig] = useState({
+    bgUrl: '',
+    badge: '',
+    heading: '',
+    subheading: '',
+    tags: [],
+    stats: []
+  });
+  const [portalSaving, setPortalSaving] = useState(false);
+
   useEffect(() => {
     setSiteNameInput(siteName);
   }, [siteName]);
+
+  useEffect(() => {
+    if (portalConfig) {
+      setLocalPortalConfig(JSON.parse(JSON.stringify(portalConfig)));
+    }
+  }, [portalConfig]);
 
   useEffect(() => {
     if (navigation?.navbar) {
@@ -102,7 +118,8 @@ export default function SettingsView({ showToast }) {
           key: key
         });
         await refreshConfig();
-        showToast?.(`${key === 'navbar_logo_url' ? 'Navbar' : 'Footer'} logo uploaded successfully!`, 'success');
+        const labelName = key === 'navbar_logo_url' ? 'Navbar logo' : key === 'footer_logo_url' ? 'Footer logo' : 'Hero background';
+        showToast?.(`${labelName} uploaded successfully!`, 'success');
       } catch (err) {
         showToast?.(err.message || 'Failed to upload logo.', 'error');
       } finally {
@@ -114,6 +131,41 @@ export default function SettingsView({ showToast }) {
       setLogoLoading(null);
     };
     reader.readAsDataURL(file);
+  };
+
+  const handleDeleteHeroBg = async () => {
+    setPortalSaving(true);
+    try {
+      await settingsApi.update({
+        portal_hero_bg_url: ''
+      });
+      await refreshConfig();
+      showToast?.('Hero background removed successfully!', 'success');
+    } catch (err) {
+      showToast?.(err.message || 'Failed to remove hero background.', 'error');
+    } finally {
+      setPortalSaving(false);
+    }
+  };
+
+  const handleSavePortalConfig = async (e) => {
+    if (e) e.preventDefault();
+    setPortalSaving(true);
+    try {
+      await settingsApi.update({
+        portal_hero_badge: localPortalConfig.badge,
+        portal_hero_heading: localPortalConfig.heading,
+        portal_hero_subheading: localPortalConfig.subheading,
+        portal_hero_tags: localPortalConfig.tags,
+        portal_stats: localPortalConfig.stats
+      });
+      await refreshConfig();
+      showToast?.('Landing page config updated successfully!', 'success');
+    } catch (err) {
+      showToast?.(err.message || 'Failed to update landing page config.', 'error');
+    } finally {
+      setPortalSaving(false);
+    }
   };
 
   // Link modification actions (Generic for Navbar/Footer)
@@ -304,6 +356,15 @@ export default function SettingsView({ showToast }) {
         >
           ⬇️ Footer Columns
         </button>
+        <button
+          type="button"
+          role="tab"
+          aria-selected={activeSubTab === 'landing'}
+          onClick={() => setActiveSubTab('landing')}
+          className={`${styles.tabBtn} ${activeSubTab === 'landing' ? styles.tabBtnActive : ''}`}
+        >
+          🏠 Landing Page
+        </button>
       </div>
 
       {/* Tab 1: Branding & Logos */}
@@ -360,6 +421,167 @@ export default function SettingsView({ showToast }) {
                 </label>
               </div>
             </div>
+          </section>
+        </div>
+      )}
+
+      {/* Tab: Landing Page */}
+      {activeSubTab === 'landing' && (
+        <div className={styles.tabContent}>
+          <section className={dashboardStyles.panel}>
+            <h2 className={dashboardStyles.panelTitle}>Hero Section Text</h2>
+            <form onSubmit={handleSavePortalConfig}>
+              <div className={styles.formGroup}>
+                <label className={styles.formLabel}>Badge Text</label>
+                <input
+                  type="text"
+                  value={localPortalConfig.badge}
+                  onChange={(e) => setLocalPortalConfig({...localPortalConfig, badge: e.target.value})}
+                  className={styles.textInput}
+                />
+              </div>
+              <div className={styles.formGroup}>
+                <label className={styles.formLabel}>Heading</label>
+                <textarea
+                  value={localPortalConfig.heading}
+                  onChange={(e) => setLocalPortalConfig({...localPortalConfig, heading: e.target.value})}
+                  className={styles.textInput}
+                  rows={2}
+                />
+              </div>
+              <div className={styles.formGroup}>
+                <label className={styles.formLabel}>Subheading</label>
+                <textarea
+                  value={localPortalConfig.subheading}
+                  onChange={(e) => setLocalPortalConfig({...localPortalConfig, subheading: e.target.value})}
+                  className={styles.textInput}
+                  rows={3}
+                />
+              </div>
+              <button
+                type="submit"
+                disabled={portalSaving}
+                className={`${dashboardStyles.backBtn} ${styles.saveBtn}`}
+              >
+                {portalSaving ? 'Saving...' : 'Save Text Content'}
+              </button>
+            </form>
+          </section>
+
+          <section className={dashboardStyles.panel}>
+            <h2 className={dashboardStyles.panelTitle}>Hero Background Image (Max 2MB file size)</h2>
+            <div className={styles.logoCard}>
+              <div className={styles.logoPreviewBox} style={{ height: '160px', background: '#e0e0e0', overflow: 'hidden' }}>
+                {localPortalConfig.bgUrl ? (
+                  <img src={localPortalConfig.bgUrl} alt="Hero Background Preview" className={styles.logoPreviewImg} style={{ objectFit: 'cover', width: '100%', height: '100%' }} />
+                ) : (
+                  <span style={{ color: '#666' }}>No custom background (using default theme color)</span>
+                )}
+              </div>
+              <div style={{ display: 'flex', gap: '12px' }}>
+                <label className={styles.uploadLabelBtn}>
+                  {logoLoading === 'portal_hero_bg_url' ? 'Uploading...' : 'Upload New Hero Background'}
+                  <input type="file" accept="image/*" onChange={(e) => handleLogoUpload(e, 'portal_hero_bg_url')} className={styles.visuallyHidden} />
+                </label>
+                {localPortalConfig.bgUrl && (
+                  <button type="button" onClick={handleDeleteHeroBg} disabled={portalSaving} className={styles.uploadLabelBtn} style={{ color: '#ef4444', background: '#fef2f2', border: '1px solid #fca5a5' }}>
+                    🗑 Remove
+                  </button>
+                )}
+              </div>
+            </div>
+          </section>
+
+          <section className={dashboardStyles.panel}>
+            <div className={styles.panelHeader}>
+              <h2 className={dashboardStyles.panelTitle} style={{ margin: 0 }}>Hero Search Tags</h2>
+              <button type="button" onClick={() => {
+                setLocalPortalConfig(p => ({ ...p, tags: [...p.tags, { label: 'New Tag', searchText: 'New Tag' }] }))
+              }} className={styles.addLinkBtn}>
+                ➕ Add Tag
+              </button>
+            </div>
+            <div className={styles.linksList}>
+              {localPortalConfig.tags.map((tag, i) => (
+                <div key={i} className={styles.linkRow}>
+                  <div className={styles.linkFields}>
+                    <input
+                      type="text"
+                      value={tag.label}
+                      onChange={(e) => {
+                        const newTags = [...localPortalConfig.tags];
+                        newTags[i].label = e.target.value;
+                        setLocalPortalConfig({ ...localPortalConfig, tags: newTags });
+                      }}
+                      className={styles.linkLabelInput}
+                      placeholder="Visible Label"
+                    />
+                    <input
+                      type="text"
+                      value={tag.searchText}
+                      onChange={(e) => {
+                        const newTags = [...localPortalConfig.tags];
+                        newTags[i].searchText = e.target.value;
+                        setLocalPortalConfig({ ...localPortalConfig, tags: newTags });
+                      }}
+                      className={styles.linkUrlInput}
+                      placeholder="Search Text (hidden query)"
+                    />
+                  </div>
+                  <button type="button" onClick={() => {
+                    const newTags = localPortalConfig.tags.filter((_, idx) => idx !== i);
+                    setLocalPortalConfig({ ...localPortalConfig, tags: newTags });
+                  }} className={styles.deleteLinkBtn}>🗑</button>
+                </div>
+              ))}
+            </div>
+            <button type="button" disabled={portalSaving} onClick={() => handleSavePortalConfig()} className={`${dashboardStyles.backBtn} ${styles.saveBtn}`}>Save Config</button>
+          </section>
+
+          <section className={dashboardStyles.panel}>
+            <div className={styles.panelHeader}>
+              <h2 className={dashboardStyles.panelTitle} style={{ margin: 0 }}>Statistics Strip</h2>
+              <button type="button" onClick={() => {
+                setLocalPortalConfig(p => ({ ...p, stats: [...p.stats, { num: '100', label: 'New Stat' }] }))
+              }} className={styles.addLinkBtn}>
+                ➕ Add Stat
+              </button>
+            </div>
+            <div className={styles.linksList}>
+              {localPortalConfig.stats.map((stat, i) => (
+                <div key={i} className={styles.linkRow}>
+                  <div className={styles.linkFields}>
+                    <input
+                      type="text"
+                      value={stat.num}
+                      onChange={(e) => {
+                        const newStats = [...localPortalConfig.stats];
+                        newStats[i].num = e.target.value;
+                        setLocalPortalConfig({ ...localPortalConfig, stats: newStats });
+                      }}
+                      className={styles.linkLabelInput}
+                      placeholder="Number (e.g. 10k+)"
+                    />
+                    <input
+                      type="text"
+                      value={stat.label}
+                      onChange={(e) => {
+                        const newStats = [...localPortalConfig.stats];
+                        newStats[i].label = e.target.value;
+                        setLocalPortalConfig({ ...localPortalConfig, stats: newStats });
+                      }}
+                      className={styles.linkUrlInput}
+                      placeholder="Label (e.g. Active Members)"
+                    />
+                  </div>
+                  <button type="button" onClick={() => {
+                    const newStats = localPortalConfig.stats.filter((_, idx) => idx !== i);
+                    setLocalPortalConfig({ ...localPortalConfig, stats: newStats });
+                  }} className={styles.deleteLinkBtn}>🗑</button>
+                </div>
+              ))}
+            </div>
+            <button type="button" disabled={portalSaving} onClick={() => handleSavePortalConfig()} className={`${dashboardStyles.backBtn} ${styles.saveBtn}`}>Save Config</button>
           </section>
         </div>
       )}
