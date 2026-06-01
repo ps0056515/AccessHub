@@ -1,24 +1,184 @@
-.underConstruction {
-  padding: 40px 24px;
-  text-align: center;
-  color: var(--text-muted);
+.formGroup {
+  margin-bottom: 24px;
 }
 
-.constructionIcon {
-  font-size: 48px;
-  margin-bottom: 16px;
-}
-
-.constructionTitle {
-  font-size: 15px;
-  font-weight: 500;
-  color: var(--text);
-}
-
-.constructionDesc {
+.label {
+  display: block;
   font-size: 13px;
-  margin-top: 6px;
-  max-width: 400px;
-  margin-left: auto;
-  margin-right: auto;
+  font-weight: 600;
+  color: var(--text, #0f172a);
+  margin-bottom: 6px;
 }
+
+.input, .textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--border-strong, #cbd5e1);
+  border-radius: var(--radius-sm, 6px);
+  font-family: inherit;
+  font-size: 14px;
+  background: var(--bg-card, #ffffff);
+  color: var(--text, #0f172a);
+  box-sizing: border-box;
+}
+
+.input:focus, .textarea:focus {
+  outline: none;
+  border-color: var(--accent-focus, #38bdf8);
+  box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.1);
+}
+
+.textarea {
+  resize: vertical;
+  min-height: 120px;
+}
+
+.helperText {
+  display: block;
+  font-size: 12px;
+  color: var(--text-muted, #64748b);
+  margin-top: 4px;
+}
+
+.saveBtn {
+  background: var(--accent, #074a9e);
+  color: #ffffff;
+  border: none;
+  padding: 10px 20px;
+  border-radius: var(--radius-sm, 6px);
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.saveBtn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modalContent {
+  background: white;
+  width: 90%;
+  max-width: 600px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.modalHeader {
+  padding: 16px 20px;
+  border-bottom: 1px solid #e2e8f0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modalTitle {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.closeBtn {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: #64748b;
+}
+
+.modalBody {
+  padding: 20px;
+  overflow-y: auto;
+}
+
+.modalFooter {
+  padding: 16px 20px;
+  border-top: 1px solid #e2e8f0;
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.btnPrimary {
+  background: var(--accent, #074a9e);
+  color: #ffffff;
+  border: none;
+  padding: 8px 16px;
+  border-radius: var(--radius-sm, 6px);
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.btnPrimary:hover {
+  background: #063d82;
+}
+
+.btnSecondary {
+  background: transparent;
+  color: var(--text-muted, #475569);
+  border: 1px solid var(--border-strong, #cbd5e1);
+  padding: 8px 16px;
+  border-radius: var(--radius-sm, 6px);
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.btnSecondary:hover {
+  background: var(--bg-secondary, #f8fafc);
+  color: var(--text, #0f172a);
+}
+
+.btnDanger {
+  background: transparent;
+  color: #ef4444;
+  border: 1px solid #fca5a5;
+  padding: 8px 16px;
+  border-radius: var(--radius-sm, 6px);
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.btnDanger:hover {
+  background: #fef2f2;
+}
+
+.tabs {
+  display: flex;
+  gap: 16px;
+  border-bottom: 1px solid var(--border, #e2e8f0);
+  margin-bottom: 24px;
+}
+
+.tab {
+  background: none;
+  border: none;
+  padding: 12px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-muted, #64748b);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: all 0.15s ease;
+}
+
+.tab:hover {
+  color: var(--text, #0f172a);
+}
+
+.activeTab {
+  color: var(--accent, #074a9e);
+  border-bottom-color: var(--accent, #074a9e);
+}
+

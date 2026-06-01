@@ -1,4 +1,4 @@
-.page { max-width: 1280px; margin: 0 auto; padding: 0 24px 64px; }
+.page { padding-bottom: 64px; }
 
 .pageHeader { padding: 48px 0 32px; }
 .pageTitle { font-family: var(--serif); font-size: 2.4rem; font-weight: 400; letter-spacing: -0.02em; margin-bottom: 10px; }

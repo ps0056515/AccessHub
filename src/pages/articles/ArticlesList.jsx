@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { articlesApi } from 'api/client';
 import { SITE_NAME } from 'brand';
+import Container from 'components/common/Container/Container';
 import styles from './Articles.module.css';
 
 export default function ArticlesList() {
@@ -27,7 +28,7 @@ export default function ArticlesList() {
   }, []);
 
   return (
-    <div className={styles.container}>
+    <Container className={styles.container}>
       <header className={styles.header}>
         <h1 className={styles.title}>Articles & News</h1>
         <p className={styles.subtitle}>Latest updates, guides, and stories from the community.</p>
@@ -59,6 +60,6 @@ export default function ArticlesList() {
       ) : (
         <p>No articles published yet. Check back soon!</p>
       )}
-    </div>
+    </Container>
   );
 }

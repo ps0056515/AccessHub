@@ -62,6 +62,9 @@ router.get('/', async (req, res, next) => {
       portal_hero_subheading: settings.portal_hero_subheading || '',
       portal_hero_tags: settings.portal_hero_tags ? JSON.parse(settings.portal_hero_tags) : null,
       portal_stats: settings.portal_stats ? JSON.parse(settings.portal_stats) : null,
+      portal_ask_placeholder: settings.portal_ask_placeholder || '',
+      portal_search_placeholder: settings.portal_search_placeholder || '',
+      portal_ask_topics: settings.portal_ask_topics ? JSON.parse(settings.portal_ask_topics) : null,
       footer_columns: footerColumns,
       navigation
     });
@@ -70,9 +73,21 @@ router.get('/', async (req, res, next) => {
   }
 });
 
-// PUT /api/settings - Update general settings (site_name, portal hero configs) (Admin only)
+// PUT /api/settings - Update general settings (site_name, portal hero configs, discussions config) (Admin only)
 router.put('/', authMiddleware, adminMiddleware, async (req, res, next) => {
-  const { site_name, portal_hero_badge, portal_hero_heading, portal_hero_subheading, portal_hero_tags, portal_stats, portal_hero_bg_url } = req.body || {};
+  const { 
+    site_name, 
+    portal_hero_badge, 
+    portal_hero_heading, 
+    portal_hero_subheading, 
+    portal_hero_tags, 
+    portal_stats, 
+    portal_hero_bg_url,
+    portal_ask_placeholder,
+    portal_search_placeholder,
+    portal_ask_topics
+  } = req.body || {};
+  
   if (site_name && !site_name.trim()) {
     res.status(400).json({ error: 'Site name cannot be empty if provided.' });
     return;
@@ -111,12 +126,17 @@ router.put('/', authMiddleware, adminMiddleware, async (req, res, next) => {
     await upsert('portal_hero_heading', portal_hero_heading);
     await upsert('portal_hero_subheading', portal_hero_subheading);
     await upsert('portal_hero_bg_url', portal_hero_bg_url);
+    await upsert('portal_ask_placeholder', portal_ask_placeholder);
+    await upsert('portal_search_placeholder', portal_search_placeholder);
     
     if (portal_hero_tags !== undefined) {
       await upsert('portal_hero_tags', JSON.stringify(portal_hero_tags));
     }
     if (portal_stats !== undefined) {
       await upsert('portal_stats', JSON.stringify(portal_stats));
+    }
+    if (portal_ask_topics !== undefined) {
+      await upsert('portal_ask_topics', JSON.stringify(portal_ask_topics));
     }
 
     res.json({ ok: true });
