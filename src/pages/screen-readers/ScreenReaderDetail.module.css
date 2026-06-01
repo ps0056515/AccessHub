@@ -1,5 +1,8 @@
 .page { max-width: 1280px; margin: 0 auto; padding: 0 24px 64px; }
 
+.backLink { display: inline-block; margin-bottom: 16px; color: var(--accent, #074a9e); font-weight: 600; text-decoration: none; }
+.backLink:hover { text-decoration: underline; }
+
 .pageHeader { padding: 48px 0 32px; }
 .pageTitle { font-family: var(--serif); font-size: 2.4rem; font-weight: 400; letter-spacing: -0.02em; margin-bottom: 10px; }
 .pageSub { font-size: 15px; color: var(--text-muted); max-width: 540px; }

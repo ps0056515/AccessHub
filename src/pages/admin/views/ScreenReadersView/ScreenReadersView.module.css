@@ -1,0 +1,116 @@
+.container {
+  padding: 20px 0;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.title {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--text, #0f172a);
+  margin: 0;
+}
+
+.addBtn {
+  background: var(--accent, #074a9e);
+  color: #fff;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.addBtn:hover {
+  background: #063d82;
+}
+
+.tableWrapper {
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.table th, .table td {
+  padding: 16px;
+  border-bottom: 1px solid var(--border, #e2e8f0);
+}
+
+.table th {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-faint, #64748b);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.table td {
+  font-size: 14px;
+  color: var(--text, #0f172a);
+}
+
+.titleCell {
+  font-weight: 600;
+}
+
+.actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.editBtn, .deleteBtn {
+  background: transparent;
+  border: 1px solid var(--border, #e2e8f0);
+  padding: 6px 12px;
+  border-radius: 4px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  color: var(--text-muted, #475569);
+}
+
+.editBtn:hover {
+  background: #f8fafc;
+  color: var(--accent, #074a9e);
+  border-color: var(--accent, #074a9e);
+}
+
+.deleteBtn:hover {
+  background: #fef2f2;
+  color: #ef4444;
+  border-color: #ef4444;
+}
+
+.statusBadge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 8px;
+  border-radius: 99px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.statusDraft {
+  background: #fef3c7;
+  color: #b45309;
+}
+
+.statusPublished {
+  background: #dcfce7;
+  color: #15803d;
+}

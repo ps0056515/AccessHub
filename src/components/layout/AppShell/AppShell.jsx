@@ -8,12 +8,15 @@ import Portal from "pages/portal/Portal";
 import Resources from "pages/resources/Resources";
 import Tools from "pages/tools/Tools";
 import Events from "pages/events/Events";
-import NVDAGuide from "pages/nvda-guide/NVDAGuide";
+import ScreenReadersList from "pages/screen-readers/ScreenReadersList";
+import ScreenReaderDetail from "pages/screen-readers/ScreenReaderDetail";
 import ThreadPage from "pages/thread/ThreadPage";
 import JoinCommunityPage from "pages/join/JoinCommunityPage";
 import MemberProfilePage from "pages/profile/MemberProfilePage";
 import ArticlesList from "pages/articles/ArticlesList";
 import ArticleDetail from "pages/articles/ArticleDetail";
+import BlogList from "pages/blog/BlogList";
+import BlogDetail from "pages/blog/BlogDetail";
 import SignInPage from "pages/auth/SignInPage";
 import SignUpPage from "pages/auth/SignUpPage";
 import ForgotPasswordPage from "pages/auth/ForgotPasswordPage";
@@ -316,7 +319,11 @@ export default function AppShell() {
           />
           <Route
             path="/screen-readers"
-            element={<NVDAGuide setActivePage={setActivePage} />}
+            element={<ScreenReadersList />}
+          />
+          <Route
+            path="/screen-readers/:id"
+            element={<ScreenReaderDetail />}
           />
           <Route path="/privacy" element={<Privacy />} />
           <Route path="/terms" element={<Terms />} />
@@ -329,6 +336,8 @@ export default function AppShell() {
             element={<ArticlesList setActivePage={setActivePage} />}
           />
           <Route path="/articles/:id" element={<ArticleDetail />} />
+          <Route path="/blog" element={<BlogList />} />
+          <Route path="/blog/:id" element={<BlogDetail />} />
           <Route path="/en-301-549" element={<En301549 />} />
           <Route path="/about-us" element={<AboutUs />} />
           <Route element={<RequireAuth />}>
