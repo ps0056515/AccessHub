@@ -122,6 +122,11 @@ export const postsApi = {
     api(`/api/posts/${id}/comments`, { method: 'POST', body: JSON.stringify(body) }),
   vote: (id, body) =>
     api(`/api/posts/${id}/vote`, { method: 'POST', body: JSON.stringify(body) }),
+  topContributors: () => api('/api/posts/top-contributors'),
+  // Admin methods
+  listAdmin: () => api('/api/posts/admin'),
+  updateAdmin: (id, body) => api(`/api/posts/admin/${id}`, { method: 'PUT', body: JSON.stringify(body) }),
+  deleteAdmin: id => api(`/api/posts/admin/${id}`, { method: 'DELETE' }),
 };
 
 export const toolsApi = {
@@ -139,7 +144,8 @@ export const eventsApi = {
   // Admin endpoints
   listProposals: () => api('/api/events/admin/proposals'),
   approveProposal: (id, body) => api(`/api/events/admin/proposals/${id}/approve`, { method: 'POST', body: JSON.stringify(body) }),
-  deleteProposal: id => api(`/api/events/admin/proposals/${id}`, { method: 'DELETE' }),
+  rejectProposal: id => api(`/api/events/admin/proposals/${id}`, { method: 'DELETE' }),
+  deleteProposal: id => api(`/api/events/admin/proposals/${id}/force`, { method: 'DELETE' }),
   create: body => api('/api/events/admin', { method: 'POST', body: JSON.stringify(body) }),
   update: (id, body) => api(`/api/events/admin/${id}`, { method: 'PUT', body: JSON.stringify(body) }),
   delete: id => api(`/api/events/admin/${id}`, { method: 'DELETE' }),

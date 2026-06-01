@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { blogpostsApi } from 'api/client';
 import { SITE_NAME } from 'brand';
+import Container from 'components/common/Container/Container';
 import styles from './Blog.module.css';
 
 export default function BlogpostsList() {
@@ -27,7 +28,7 @@ export default function BlogpostsList() {
   }, []);
 
   return (
-    <div className={styles.container}>
+    <Container className={styles.container}>
       <header className={styles.header}>
         <h1 className={styles.title}>Blogposts & News</h1>
         <p className={styles.subtitle}>Latest updates, guides, and stories from the community.</p>
@@ -59,6 +60,6 @@ export default function BlogpostsList() {
       ) : (
         <p>No blogposts published yet. Check back soon!</p>
       )}
-    </div>
+    </Container>
   );
 }

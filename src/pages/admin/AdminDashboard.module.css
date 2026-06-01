@@ -346,39 +346,7 @@
   letter-spacing: -0.01em;
 }
 
-/* ── Standard CMS Data Tables ── */
-.tableWrap {
-  overflow-x: auto;
-}
 
-.table {
-  width: 100%;
-  border-collapse: collapse;
-  text-align: left;
-  font-size: 13px;
-}
-
-.table th {
-  padding: 10px 12px;
-  font-weight: 600;
-  color: var(--text-faint, #64748b);
-  border-bottom: 2px solid var(--border, #e2e8f0);
-  background: var(--bg-secondary, #f8fafc);
-  position: sticky;
-  top: 0;
-  z-index: 1;
-}
-
-.table td {
-  padding: 12px;
-  color: var(--text-muted, #475569);
-  border-bottom: 1px solid var(--border, #e2e8f0);
-}
-
-.table tr:hover td {
-  background: rgba(var(--accent-rgb, 7, 74, 158), 0.02);
-  color: var(--text, #0f172a);
-}
 
 /* ── Responsive breakpoints ── */
 @media (max-width: 900px) {

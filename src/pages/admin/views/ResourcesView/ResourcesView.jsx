@@ -3,6 +3,7 @@ import { resourcesApi } from "api/client";
 import dashboardStyles from "../../AdminDashboard.module.css";
 import styles from "./ResourcesView.module.css";
 import ResourceModal from "./components/ResourceModal";
+import Table from "components/common/Table/Table";
 
 const TABS = ["Active Resources", "Proposed Resources"];
 
@@ -99,6 +100,150 @@ export default function ResourcesView({ showToast }) {
     setApprovingProposal(null);
   };
 
+  const activeResourceColumns = [
+    {
+      key: "icon",
+      label: "Icon",
+      render: (res) => <span style={{ fontSize: "1.25rem" }}>{res.icon}</span>,
+    },
+    {
+      key: "title",
+      label: "Title",
+      render: (res) => (
+        <>
+          <strong>{res.title}</strong>
+          <br />
+          <a
+            href={res.view_url}
+            target="_blank"
+            rel="noreferrer"
+            className={styles.metaLink}
+          >
+            {res.view_url}
+          </a>
+        </>
+      ),
+    },
+    { key: "category", label: "Category" },
+    {
+      key: "color",
+      label: "Color",
+      render: (res) => (
+        <span style={{ color: `var(--${res.color}-600)` }}>{res.color}</span>
+      ),
+    },
+    {
+      key: "actions",
+      label: "Actions",
+      render: (res) => (
+        <div className={styles.actionBtnGroup}>
+          <button
+            type="button"
+            className={styles.editBtn}
+            onClick={() => {
+              setEditingResource(res);
+              setIsModalOpen(true);
+            }}
+          >
+            Edit
+          </button>
+          <button
+            type="button"
+            className={styles.deleteBtn}
+            onClick={() => handleDeleteResource(res.id, res.title)}
+          >
+            Delete
+          </button>
+        </div>
+      ),
+    },
+  ];
+
+  const proposedResourceColumns = [
+    {
+      key: "date",
+      label: "Date",
+      render: (p) => new Date(p.created_at).toLocaleDateString(),
+    },
+    {
+      key: "title",
+      label: "Title & URL",
+      render: (p) => (
+        <>
+          <strong>{p.title}</strong>
+          <br />
+          <a
+            href={p.url}
+            target="_blank"
+            rel="noreferrer"
+            className={styles.metaLink}
+          >
+            {p.url}
+          </a>
+        </>
+      ),
+    },
+    {
+      key: "note",
+      label: "Submitter Note",
+      render: (p) => (
+        <span style={{ color: "var(--gray-600)" }}>{p.note || "—"}</span>
+      ),
+    },
+    {
+      key: "status",
+      label: "Status",
+      render: (p) => (
+        <span
+          className={`${styles.statusBadge} ${styles["status" + p.status]}`}
+        >
+          {p.status}
+        </span>
+      ),
+    },
+    {
+      key: "actions",
+      label: "Actions",
+      render: (p) =>
+        p.status === "pending" ? (
+          <div className={styles.actionBtnGroup}>
+            <button
+              type="button"
+              className={styles.approveBtn}
+              onClick={() => {
+                setApprovingProposal({
+                  ...p,
+                  _proposalId: p.id,
+                });
+              }}
+            >
+              Approve
+            </button>
+            <button
+              type="button"
+              className={styles.deleteBtn}
+              onClick={() => handleRejectProposal(p.id)}
+            >
+              Reject
+            </button>
+          </div>
+        ) : (
+          <div
+            className={styles.actionBtnGroup}
+            style={{ justifyContent: "space-between" }}
+          >
+            <button
+              type="button"
+              className={styles.deleteBtn}
+              onClick={() => handleDeleteProposal(p.id)}
+            >
+              Delete
+            </button>
+          </div>
+        ),
+    },
+  ];
+
   return (
     <>
       <header className={dashboardStyles.header}>
@@ -154,188 +299,31 @@ export default function ResourcesView({ showToast }) {
           ))}
         </nav>
 
-        {activeTab === "Active Resources" &&
-          (resourcesLoading && resourcesList.length === 0 ? (
+        {activeTab === "Active Resources" && (
+          resourcesLoading && resourcesList.length === 0 ? (
             <p className={dashboardStyles.loading}>Loading resources…</p>
           ) : (
-            <div className={styles.tableContainer}>
-              <table className={dashboardStyles.table}>
-                <thead>
-                  <tr>
-                    <th scope="col" style={{ width: 60 }}>
-                      Icon
-                    </th>
-                    <th scope="col">Title</th>
-                    <th scope="col">Category</th>
-                    <th scope="col">Color</th>
-                    <th scope="col" style={{ width: 130 }}>
-                      Actions
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {resourcesList.map((res) => (
-                    <tr key={res.id}>
-                      <td style={{ fontSize: "1.25rem" }}>{res.icon}</td>
-                      <td>
-                        <strong>{res.title}</strong>
-                        <br />
-                        <a
-                          href={res.view_url}
-                          target="_blank"
-                          rel="noreferrer"
-                          className={styles.metaLink}
-                        >
-                          {res.view_url}
-                        </a>
-                      </td>
-                      <td>{res.category}</td>
-                      <td>
-                        <span style={{ color: `var(--${res.color}-600)` }}>
-                          {res.color}
-                        </span>
-                      </td>
-                      <td>
-                        <div className={styles.actionBtnGroup}>
-                          <button
-                            type="button"
-                            className={styles.editBtn}
-                            onClick={() => {
-                              setEditingResource(res);
-                              setIsModalOpen(true);
-                            }}
-                          >
-                            Edit
-                          </button>
-                          <button
-                            type="button"
-                            className={styles.deleteBtn}
-                            onClick={() =>
-                              handleDeleteResource(res.id, res.title)
-                            }
-                          >
-                            Delete
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                  {resourcesList.length === 0 && (
-                    <tr>
-                      <td
-                        colSpan="5"
-                        style={{ textAlign: "center", padding: "2rem" }}
-                      >
-                        No active resources.
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
-            </div>
-          ))}
+            <Table
+              columns={activeResourceColumns}
+              data={resourcesList}
+              loading={resourcesLoading}
+              emptyMessage="No active resources."
+            />
+          )
+        )}
 
-        {activeTab === "Proposed Resources" &&
-          (proposalsLoading && proposals.length === 0 ? (
+        {activeTab === "Proposed Resources" && (
+          proposalsLoading && proposals.length === 0 ? (
             <p className={dashboardStyles.loading}>Loading proposals…</p>
           ) : (
-            <div className={styles.tableContainer}>
-              <table className={dashboardStyles.table}>
-                <thead>
-                  <tr>
-                    <th scope="col" style={{ width: 120 }}>
-                      Date
-                    </th>
-                    <th scope="col">Title & URL</th>
-                    <th scope="col">Submitter Note</th>
-                    <th scope="col" style={{ width: 100 }}>
-                      Status
-                    </th>
-                    <th scope="col" style={{ width: 150 }}>
-                      Actions
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {proposals.map((p) => (
-                    <tr key={p.id}>
-                      <td>{new Date(p.created_at).toLocaleDateString()}</td>
-                      <td>
-                        <strong>{p.title}</strong>
-                        <br />
-                        <a
-                          href={p.url}
-                          target="_blank"
-                          rel="noreferrer"
-                          className={styles.metaLink}
-                        >
-                          {p.url}
-                        </a>
-                      </td>
-                      <td style={{ color: "var(--gray-600)" }}>
-                        {p.note || "—"}
-                      </td>
-                      <td>
-                        <span
-                          className={`${styles.statusBadge} ${styles["status" + p.status]}`}
-                        >
-                          {p.status}
-                        </span>
-                      </td>
-                      <td>
-                        {p.status === "pending" ? (
-                          <div className={styles.actions}>
-                            <button
-                              type="button"
-                              className={dashboardStyles.btnApprove}
-                              onClick={() => {
-                                setApprovingProposal({
-                                  ...p,
-                                  _proposalId: p.id,
-                                });
-                              }}
-                            >
-                              Approve
-                            </button>
-                            <button
-                              type="button"
-                              className={dashboardStyles.btnReject}
-                              onClick={() => handleRejectProposal(p.id)}
-                            >
-                              Reject
-                            </button>
-                          </div>
-                        ) : (
-                          <div
-                            className={styles.actionBtnGroup}
-                            style={{ justifyContent: "space-between" }}
-                          >
-                            <button
-                              type="button"
-                              className={styles.deleteBtn}
-                              onClick={() => handleDeleteProposal(p.id)}
-                            >
-                              Delete
-                            </button>
-                          </div>
-                        )}
-                      </td>
-                    </tr>
-                  ))}
-                  {proposals.length === 0 && (
-                    <tr>
-                      <td
-                        colSpan="5"
-                        style={{ textAlign: "center", padding: "2rem" }}
-                      >
-                        No proposals yet.
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
-            </div>
-          ))}
+            <Table
+              columns={proposedResourceColumns}
+              data={proposals}
+              loading={proposalsLoading}
+              emptyMessage="No proposals yet."
+            />
+          )
+        )}
       </section>
 
       <ResourceModal

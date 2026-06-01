@@ -3,6 +3,7 @@ import ReactQuill, { Quill } from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import ImageResize from 'quill-image-resize-module-react';
 import { blogpostsApi } from 'api/client';
+import Table from 'components/common/Table/Table';
 import styles from './BlogpostsView.module.css';
 
 // Fix for React-Quill ImageResize module looking for window.Quill
@@ -178,6 +179,49 @@ export default function BlogpostsView({ showToast }) {
     }
   };
 
+  const columns = [
+    { key: 'title', label: 'Title', render: (row) => <span style={{ fontWeight: 500 }}>{row.title}</span> },
+    { key: 'author', label: 'Author' },
+    { key: 'status', label: 'Status', render: (blogpost) => (
+      <span style={{ 
+        padding: '4px 8px', 
+        borderRadius: '12px', 
+        fontSize: '12px', 
+        fontWeight: '600',
+        background: blogpost.is_published ? '#dcfce7' : '#f1f5f9',
+        color: blogpost.is_published ? '#166534' : '#64748b'
+      }}>
+        {blogpost.is_published ? 'Published' : 'Draft'}
+      </span>
+    )},
+    { key: 'date', label: 'Published Date', render: (blogpost) => new Date(blogpost.published_date).toLocaleDateString() },
+    { key: 'actions', label: 'Actions', render: (blogpost) => (
+      <div className={styles.actions}>
+        <button
+          type="button"
+          className={blogpost.is_published ? styles.btnSecondary : styles.btnSuccess}
+          onClick={() => togglePublish(blogpost)}
+        >
+          {blogpost.is_published ? 'Unpublish' : 'Publish'}
+        </button>
+        <button
+          type="button"
+          className={styles.btnSecondary}
+          onClick={() => openEditor(blogpost)}
+        >
+          Edit
+        </button>
+        <button
+          type="button"
+          className={styles.btnDanger}
+          onClick={() => handleDelete(blogpost.id, blogpost.title)}
+        >
+          Delete
+        </button>
+      </div>
+    )}
+  ];
+
   return (
     <div className={styles.container}>
       {!isEditing ? (
@@ -189,74 +233,12 @@ export default function BlogpostsView({ showToast }) {
             </button>
           </div>
 
-          <div className={styles.tableWrap}>
-            {loading ? (
-              <p className={styles.emptyState}>Loading blogposts...</p>
-            ) : blogposts.length > 0 ? (
-              <table className={styles.table}>
-                <thead>
-                  <tr>
-                    <th>Title</th>
-                    <th>Author</th>
-                    <th>Status</th>
-                    <th>Published Date</th>
-                    <th style={{ width: '140px' }}>Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {blogposts.map(blogpost => (
-                    <tr key={blogpost.id}>
-                      <td style={{ fontWeight: 500 }}>{blogpost.title}</td>
-                      <td>{blogpost.author}</td>
-                      <td>
-                        <span style={{ 
-                          padding: '4px 8px', 
-                          borderRadius: '12px', 
-                          fontSize: '12px', 
-                          fontWeight: '600',
-                          background: blogpost.is_published ? '#dcfce7' : '#f1f5f9',
-                          color: blogpost.is_published ? '#166534' : '#64748b'
-                        }}>
-                          {blogpost.is_published ? 'Published' : 'Draft'}
-                        </span>
-                      </td>
-                      <td>{new Date(blogpost.published_date).toLocaleDateString()}</td>
-                      <td>
-                        <div className={styles.actions}>
-                          <button
-                            type="button"
-                            className={styles.editBtn}
-                            onClick={() => togglePublish(blogpost)}
-                            title={blogpost.is_published ? 'Unpublish' : 'Publish'}
-                          >
-                            {blogpost.is_published ? '👁️‍🗨️' : '👁️'}
-                          </button>
-                          <button
-                            type="button"
-                            className={styles.editBtn}
-                            onClick={() => openEditor(blogpost)}
-                            title="Edit"
-                          >
-                            ✏️
-                          </button>
-                          <button
-                            type="button"
-                            className={styles.deleteBtn}
-                            onClick={() => handleDelete(blogpost.id, blogpost.title)}
-                            title="Delete"
-                          >
-                            🗑
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            ) : (
-              <p className={styles.emptyState}>No blogposts found. Click "Create New Blogpost" to start.</p>
-            )}
-          </div>
+          <Table 
+            columns={columns} 
+            data={blogposts} 
+            loading={loading} 
+            emptyMessage="No blogposts found." 
+          />
         </>
       ) : (
         <form onSubmit={handleSave} className={styles.form}>

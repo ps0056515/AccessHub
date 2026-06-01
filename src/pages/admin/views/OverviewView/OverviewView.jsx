@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { adminApi } from 'api/client';
 import dashboardStyles from '../../AdminDashboard.module.css';
 import styles from './OverviewView.module.css';
+import Table from 'components/common/Table/Table';
 
 function StatCard({ label, value, hint }) {
   return (
@@ -76,6 +77,26 @@ export default function OverviewView({ showToast }) {
   }
   if (!stats) return null;
 
+  const countryColumns = [
+    { key: 'country', label: 'Country' },
+    { key: 'count', label: 'Members' }
+  ];
+
+  const cityColumns = [
+    { key: 'city', label: 'City' },
+    { key: 'country', label: 'Country' },
+    { key: 'count', label: 'Members' }
+  ];
+
+  const userColumns = [
+    { key: 'displayName', label: 'Name' },
+    { key: 'email', label: 'Email' },
+    { key: 'city', label: 'City', render: (u) => u.city || '—' },
+    { key: 'country', label: 'Country', render: (u) => u.country || '—' },
+    { key: 'authMethod', label: 'Sign-in', render: (u) => u.authMethod === 'google' ? 'Google' : 'Email' },
+    { key: 'createdAt', label: 'Joined', render: (u) => formatDate(u.createdAt) }
+  ];
+
   return (
     <>
       <header className={dashboardStyles.header}>
@@ -99,46 +120,18 @@ export default function OverviewView({ showToast }) {
           <h2 id="country-heading" className={dashboardStyles.panelTitle}>
             Members by country
           </h2>
-          <table className={dashboardStyles.table}>
-            <thead>
-              <tr>
-                <th scope="col">Country</th>
-                <th scope="col">Members</th>
-              </tr>
-            </thead>
-            <tbody>
-              {stats.byCountry.map(row => (
-                <tr key={row.country}>
-                  <td>{row.country}</td>
-                  <td>{row.count}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          <Table columns={countryColumns} data={stats.byCountry} emptyMessage="No data available." />
         </section>
 
         <section className={dashboardStyles.panel} aria-labelledby="city-heading">
           <h2 id="city-heading" className={dashboardStyles.panelTitle}>
             Members by city
           </h2>
-          <table className={dashboardStyles.table}>
-            <thead>
-              <tr>
-                <th scope="col">City</th>
-                <th scope="col">Country</th>
-                <th scope="col">Members</th>
-              </tr>
-            </thead>
-            <tbody>
-              {stats.byCity.map(row => (
-                <tr key={`${row.city}-${row.country}`}>
-                  <td>{row.city}</td>
-                  <td>{row.country}</td>
-                  <td>{row.count}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          <Table 
+            columns={cityColumns} 
+            data={stats.byCity.map(r => ({ id: `${r.city}-${r.country}`, ...r }))} 
+            emptyMessage="No data available." 
+          />
         </section>
       </div>
 
@@ -146,32 +139,7 @@ export default function OverviewView({ showToast }) {
         <h2 id="users-heading" className={dashboardStyles.panelTitle}>
           All members
         </h2>
-        <div className={dashboardStyles.tableWrap}>
-          <table className={dashboardStyles.table}>
-            <thead>
-              <tr>
-                <th scope="col">Name</th>
-                <th scope="col">Email</th>
-                <th scope="col">City</th>
-                <th scope="col">Country</th>
-                <th scope="col">Sign-in</th>
-                <th scope="col">Joined</th>
-              </tr>
-            </thead>
-            <tbody>
-              {users.map(u => (
-                <tr key={u.id}>
-                  <td>{u.displayName}</td>
-                  <td>{u.email}</td>
-                  <td>{u.city || '—'}</td>
-                  <td>{u.country || '—'}</td>
-                  <td>{u.authMethod === 'google' ? 'Google' : 'Email'}</td>
-                  <td>{formatDate(u.createdAt)}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <Table columns={userColumns} data={users} emptyMessage="No members found." />
       </section>
     </>
   );

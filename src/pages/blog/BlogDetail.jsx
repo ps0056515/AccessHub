@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { blogpostsApi } from 'api/client';
 import { SITE_NAME } from 'brand';
+import Container from 'components/common/Container/Container';
 import styles from './Blog.module.css';
 
 export default function BlogpostDetail() {
@@ -31,12 +32,12 @@ export default function BlogpostDetail() {
     fetchBlogpost();
   }, [id, navigate]);
 
-  if (loading) return <div className={styles.detailContainer}>Loading blogpost...</div>;
-  if (error) return <div className={styles.detailContainer} style={{ color: 'red' }}>{error}</div>;
+  if (loading) return <Container className={styles.detailContainer}>Loading blogpost...</Container>;
+  if (error) return <Container className={styles.detailContainer} style={{ color: 'red' }}>{error}</Container>;
   if (!blogpost) return null;
 
   return (
-    <div className={styles.detailContainer}>
+    <Container className={styles.detailContainer} style={{ display: 'block' }}>
       <Link to="/blog" className={styles.backBtn}>
         ← Back to Blogposts
       </Link>
@@ -58,6 +59,6 @@ export default function BlogpostDetail() {
         className={styles.contentHtml} 
         dangerouslySetInnerHTML={{ __html: blogpost.content_html }} 
       />
-    </div>
+    </Container>
   );
 }

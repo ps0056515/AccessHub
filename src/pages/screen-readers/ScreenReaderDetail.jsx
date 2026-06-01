@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { screenReadersApi } from 'api/client';
+import Container from 'components/common/Container/Container';
 import styles from './ScreenReaderDetail.module.css';
 
 function Kbd({ children }) {
@@ -50,7 +51,7 @@ export default function ScreenReaderDetail() {
   const groups = [...new Set(checklist.map(c => c.group))];
 
   return (
-    <div className={styles.page}>
+    <Container className={styles.page}>
       <header className={styles.pageHeader}>
         <Link to="/screen-readers" className={styles.backLink}>← Back to screen readers</Link>
         <h1 className={styles.pageTitle}>{guide.title} testing guide</h1>
@@ -231,6 +232,6 @@ export default function ScreenReaderDetail() {
           )}
         </div>
       </div>
-    </div>
+    </Container>
   );
 }

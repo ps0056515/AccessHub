@@ -1,4 +1,4 @@
-.page { max-width: 1280px; margin: 0 auto; padding: 0 24px 64px; }
+.page { padding-bottom: 64px; }
 
 .backLink { display: inline-block; margin-bottom: 16px; color: var(--accent, #074a9e); font-weight: 600; text-decoration: none; }
 .backLink:hover { text-decoration: underline; }

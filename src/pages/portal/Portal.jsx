@@ -1,28 +1,17 @@
 import { useEffect, useRef, useState, useMemo } from 'react';
 import { flushSync } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
-import { MEMBERS, TAG_COLORS, COLOR_MAP } from 'data';
+import { TAG_COLORS, COLOR_MAP } from 'data';
 import { postsApi, eventsApi, getVoterKey, getStoredVote, setStoredVote } from 'api/client';
 import { voteDelta } from 'utils/voteDelta';
 import { useAuth } from 'context/AuthContext';
 import { useConfig } from 'context/ConfigContext';
+import Container from 'components/common/Container/Container';
 import styles from './Portal.module.css';
 
 const TOPIC_FILTERS = ["WCAG 2.2", "Screen readers", "Legal"];
 
-const ASK_TOPICS = [
-  "WCAG 2.2",
-  "Screen readers",
-  "Legal",
-  "ARIA",
-  "Color contrast",
-  "Design systems",
-  "Strategy",
-  "Career advice",
-  "Mobile",
-  "PDFs",
-  "Other",
-];
+
 
 const MONTH_ABBRS = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
 
@@ -226,6 +215,13 @@ export default function Portal({
   const askBoxRef = useRef(null);
   const askTextareaRef = useRef(null);
   const searchInputRef = useRef(null);
+  const [topContributors, setTopContributors] = useState([]);
+  
+  useEffect(() => {
+    postsApi.topContributors()
+      .then(res => setTopContributors(res.contributors || []))
+      .catch(console.error);
+  }, []);
 
   useEffect(() => {
     const onFocusSearch = () => {
@@ -429,7 +425,7 @@ export default function Portal({
         style={portalConfig.bgUrl ? { backgroundImage: `url(${portalConfig.bgUrl})`, backgroundSize: 'cover', backgroundPosition: 'center' } : undefined}
       >
         {portalConfig.bgUrl && <div style={{ position: 'absolute', inset: 0, background: 'rgba(255,255,255,0.7)' }} />}
-        <div className={styles.heroInner} style={{ position: 'relative', zIndex: 1 }}>
+        <Container className={styles.heroInner} style={{ position: 'relative', zIndex: 1 }}>
           <div className={styles.heroBadge}>
             <span className={styles.heroDot} aria-hidden="true" />
             {portalConfig.badge}
@@ -474,7 +470,7 @@ export default function Portal({
               Explore certifications
             </button>
           </div>
-        </div>
+        </Container>
         <div className={styles.heroDecor} aria-hidden="true">
           <div className={styles.decorCircle1} />
           <div className={styles.decorCircle2} />
@@ -482,7 +478,7 @@ export default function Portal({
         </div>
       </section>
 
-      <section className={styles.statsBar} aria-label="Community statistics">
+      <Container className={styles.statsBar} aria-label="Community statistics">
         {(portalConfig.stats || []).map((s, i) => (
           <div
             key={i}
@@ -493,16 +489,16 @@ export default function Portal({
             <span className={styles.statLabel}>{s.label}</span>
           </div>
         ))}
-      </section>
+      </Container>
 
-      <div className={styles.mainGrid}>
+      <Container className={styles.mainGrid}>
         <main className={styles.feed}>
           <div className={styles.askBox} ref={askBoxRef}>
             <p className={styles.askLabel}>Ask the community</p>
             <textarea
               className={styles.askTextarea}
               ref={askTextareaRef}
-              placeholder="What accessibility challenge are you working through?"
+              placeholder={portalConfig.askPlaceholder || "What accessibility challenge are you working through?"}
               rows={3}
               aria-label="Write your question"
               value={draftQuestion}
@@ -519,11 +515,11 @@ export default function Portal({
                 <select
                   id="ask-topic"
                   className={styles.topicSelect}
-                  value={draftTags[0] || ASK_TOPICS[0]}
+                  value={draftTags[0] || portalConfig.askTopics?.[0]}
                   onChange={(e) => setDraftTags([e.target.value])}
                   disabled={posting}
                 >
-                  {ASK_TOPICS.map((topic) => (
+                  {(portalConfig.askTopics || []).map((topic) => (
                     <option key={topic} value={topic}>
                       {topic}
                     </option>
@@ -572,7 +568,7 @@ export default function Portal({
                 id="search"
                 className={styles.searchInput}
                 type="search"
-                placeholder="Search discussions by title or text…"
+                placeholder={portalConfig.searchPlaceholder || "Search discussions by title or text…"}
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
               />
@@ -690,7 +686,7 @@ export default function Portal({
               Top contributors
             </h2>
             <ul className={styles.memberList}>
-              {MEMBERS.map((m) => (
+              {topContributors.map((m) => (
                 <li key={m.id} className={styles.memberItem}>
                   <button
                     type="button"
@@ -718,7 +714,7 @@ export default function Portal({
           </section>
 
           <section
-            className={styles.sideSection}
+            className={styles.quickChecker}
             aria-labelledby="checker-heading"
           >
             <h2 id="checker-heading" className={styles.sideTitle}>
@@ -753,7 +749,7 @@ export default function Portal({
             </button>
           </section>
         </aside>
-      </div>
+      </Container>
     </div>
   );
 }

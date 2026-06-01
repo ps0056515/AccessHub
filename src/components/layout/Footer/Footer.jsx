@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { useConfig } from 'context/ConfigContext';
 import FooterLogo from 'components/layout/FooterLogo/FooterLogo';
+import Container from 'components/common/Container/Container';
 import styles from "./Footer.module.css";
 
 function scrollToTop() {
@@ -84,7 +85,7 @@ export default function Footer({ goToSection, goToPortal }) {
 
   return (
     <footer className={styles.footer} role="contentinfo">
-      <div className={styles.inner}>
+      <Container className={styles.inner}>
         <div className={styles.top}>
           <div className={styles.brand}>
             <button
@@ -154,7 +155,7 @@ export default function Footer({ goToSection, goToPortal }) {
             </FooterRouteLink>
           </div>
         </div>
-      </div>
+      </Container>
     </footer>
   );
 }

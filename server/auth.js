@@ -15,9 +15,6 @@ function getAdminEmails() {
 function isAdminEmail(email) {
   if (!email) return false;
   const normalized = email.trim().toLowerCase();
-  if (process.env.NODE_ENV === 'development' && normalized === 'admin@dev.local') {
-    return true;
-  }
   return getAdminEmails().includes(normalized);
 }
 
@@ -37,35 +34,9 @@ function verifyToken(token) {
   return jwt.verify(token, JWT_SECRET);
 }
 
-let devUserId = null;
-async function getDevUserId() {
-  if (devUserId) return devUserId;
-  try {
-    const { rows } = await query("SELECT id FROM users WHERE email = 'admin@dev.local'");
-    if (rows.length > 0) {
-      devUserId = rows[0].id;
-      return devUserId;
-    }
-    const insertRes = await query(
-      "INSERT INTO users (email, password_hash, display_name, country, city) VALUES ('admin@dev.local', '', 'Dev Admin', 'US', 'Chicago') RETURNING id"
-    );
-    devUserId = insertRes.rows[0].id;
-    return devUserId;
-  } catch (err) {
-    console.error("Failed to query or create dev user:", err);
-    return null;
-  }
-}
+
 
 async function authMiddleware(req, res, next) {
-  if (process.env.NODE_ENV === 'development') {
-    const id = await getDevUserId();
-    if (id) {
-      req.userId = id;
-      return next();
-    }
-  }
-
   const header = req.headers.authorization || '';
   const token = header.startsWith('Bearer ') ? header.slice(7) : null;
 
@@ -84,13 +55,24 @@ async function authMiddleware(req, res, next) {
 }
 
 async function adminMiddleware(req, res, next) {
-  if (process.env.NODE_ENV === 'development') {
-    const id = await getDevUserId();
-    if (id) {
-      req.adminUser = { id, email: 'admin@dev.local', display_name: 'Dev Admin' };
-      return next();
+  if (!req.userId) {
+    const header = req.headers.authorization || '';
+    const token = header.startsWith('Bearer ') ? header.slice(7) : null;
+
+    if (!token) {
+      res.status(401).json({ error: 'Authentication required.' });
+      return;
+    }
+
+    try {
+      const payload = verifyToken(token);
+      req.userId = payload.sub;
+    } catch {
+      res.status(401).json({ error: 'Invalid or expired session.' });
+      return;
     }
   }
+
 
   try {
     const { rows } = await query('SELECT id, email FROM users WHERE id = $1', [req.userId]);

@@ -3,6 +3,7 @@ import { eventsApi } from "api/client";
 import EventModal from "./components/EventModal";
 import dashboardStyles from "../../AdminDashboard.module.css";
 import styles from "./EventsView.module.css";
+import Table from "components/common/Table/Table";
 
 const TABS = ["Active Events", "Proposed Events"];
 
@@ -129,11 +130,22 @@ export default function EventsView({ showToast }) {
   const handleRejectProposal = async (id, title) => {
     if (!window.confirm(`Reject proposal "${title}"?`)) return;
     try {
-      await eventsApi.deleteProposal(id);
+      await eventsApi.rejectProposal(id);
       showToast?.(`Proposal "${title}" rejected.`, "success");
       loadProposals();
     } catch (err) {
       showToast?.(err.message || "Failed to reject proposal.", "error");
+    }
+  };
+
+  const handleDeleteProposal = async (id, title) => {
+    if (!window.confirm(`Permanently delete proposal "${title}"?`)) return;
+    try {
+      await eventsApi.deleteProposal(id);
+      showToast?.(`Proposal "${title}" deleted.`, "success");
+      loadProposals();
+    } catch (err) {
+      showToast?.(err.message || "Failed to delete proposal.", "error");
     }
   };
 
@@ -177,6 +189,153 @@ export default function EventsView({ showToast }) {
     setEditingEvent(null);
     setApprovingProposal(null);
   };
+
+  const activeEventColumns = [
+    {
+      key: "date",
+      label: "Date",
+      render: (ev) => (
+        <span className={styles.dateBadge}>
+          <span>{fmtMonth(ev.event_date)}</span>
+          <span className={styles.dateDay}>{fmtDay(ev.event_date)}</span>
+        </span>
+      ),
+    },
+    {
+      key: "title",
+      label: "Title",
+      render: (ev) => <strong>{ev.title}</strong>,
+    },
+    { key: "type", label: "Type" },
+    { key: "band", label: "Band" },
+    {
+      key: "timing",
+      label: "Timing",
+      render: (ev) => (
+        <span
+          className={`${styles.timingPill} ${timingClass(getEventTiming(ev.event_date), styles)}`}
+        >
+          {getEventTiming(ev.event_date)}
+        </span>
+      ),
+    },
+    {
+      key: "rsvps",
+      label: "RSVPs",
+      render: (ev) => (
+        <span className={styles.rsvpCount}>{ev.rsvp_count ?? 0}</span>
+      ),
+    },
+    {
+      key: "actions",
+      label: "Actions",
+      render: (ev) => (
+        <div className={styles.actionBtnGroup}>
+          <button
+            type="button"
+            onClick={() => {
+              setEditingEvent(ev);
+              setIsModalOpen(true);
+            }}
+            className={styles.editBtn}
+          >
+            Edit
+          </button>
+          <button
+            type="button"
+            onClick={() => handleDeleteEvent(ev.id, ev.title)}
+            className={styles.deleteBtn}
+          >
+            Delete
+          </button>
+        </div>
+      ),
+    },
+  ];
+
+  const proposedEventColumns = [
+    {
+      key: "title",
+      label: "Title",
+      render: (p) => (
+        <>
+          <strong>{p.title}</strong>
+          {p.details && (
+            <>
+              <br />
+              <small style={{ color: "var(--text-muted)" }}>
+                {p.details.slice(0, 80)}
+                {p.details.length > 80 ? "…" : ""}
+              </small>
+            </>
+          )}
+        </>
+      ),
+    },
+    { key: "format", label: "Format" },
+    {
+      key: "proposed_date",
+      label: "Proposed Date",
+      render: (p) => p.proposed_date || "—",
+    },
+    {
+      key: "contact",
+      label: "Contact",
+      render: (p) => <a href={`mailto:${p.email}`}>{p.email}</a>,
+    },
+    {
+      key: "status",
+      label: "Status",
+      render: (p) => (
+        <span
+          className={`${styles.statusBadge} ${styles[`status${p.status.charAt(0).toUpperCase() + p.status.slice(1)}`]}`}
+        >
+          {p.status}
+        </span>
+      ),
+    },
+    {
+      key: "submitted",
+      label: "Submitted",
+      render: (p) => new Date(p.created_at).toLocaleDateString(),
+    },
+    {
+      key: "actions",
+      label: "Actions",
+      render: (p) =>
+        p.status === "pending" ? (
+          <div className={styles.actionBtnGroup}>
+            <button
+              type="button"
+              onClick={() => handleApproveProposal(p)}
+              className={styles.approveBtn}
+            >
+              Approve
+            </button>
+            <button
+              type="button"
+              onClick={() => handleRejectProposal(p.id, p.title)}
+              className={styles.deleteBtn}
+            >
+              Reject
+            </button>
+          </div>
+        ) : (
+          <div
+            className={styles.actionBtnGroup}
+            style={{ justifyContent: "flex-end" }}
+          >
+            <button
+              type="button"
+              className={styles.deleteBtn}
+              onClick={() => handleDeleteProposal(p.id, p.title)}
+            >
+              Delete
+            </button>
+          </div>
+        ),
+    },
+  ];
 
   return (
     <>
@@ -237,195 +396,23 @@ export default function EventsView({ showToast }) {
         </nav>
 
         {/* Active Events Tab */}
-        {activeTab === "Active Events" &&
-          (eventsLoading && eventsList.length === 0 ? (
-            <p className={dashboardStyles.loading}>Loading events…</p>
-          ) : (
-            <div className={styles.tableContainer}>
-              <table className={dashboardStyles.table}>
-                <thead>
-                  <tr>
-                    <th scope="col" style={{ width: 80 }}>
-                      Date
-                    </th>
-                    <th scope="col">Title</th>
-                    <th scope="col">Type</th>
-                    <th scope="col">Band</th>
-                    <th scope="col">Timing</th>
-                    <th scope="col" style={{ width: 80, textAlign: "center" }}>
-                      RSVPs
-                    </th>
-                    <th scope="col" style={{ width: 130 }}>
-                      Actions
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {eventsList.map((ev, index) => (
-                    <tr key={ev.id}>
-                      <td>
-                        <span className={styles.dateBadge}>
-                          <span>{fmtMonth(ev.event_date)}</span>
-                          <span className={styles.dateDay}>
-                            {fmtDay(ev.event_date)}
-                          </span>
-                        </span>
-                      </td>
-                      <td>
-                        <strong>{ev.title}</strong>
-                      </td>
-                      <td>{ev.type}</td>
-                      <td>{ev.band}</td>
-                      <td>
-                        <span
-                          className={`${styles.timingPill} ${timingClass(getEventTiming(ev.event_date), styles)}`}
-                        >
-                          {getEventTiming(ev.event_date)}
-                        </span>
-                      </td>
-                      <td style={{ textAlign: "center" }}>
-                        <span className={styles.rsvpCount}>
-                          {ev.rsvp_count ?? 0}
-                        </span>
-                      </td>
-                      <td>
-                        <div className={styles.actionBtnGroup}>
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setEditingEvent(ev);
-                              setIsModalOpen(true);
-                            }}
-                            className={styles.editBtn}
-                          >
-                            Edit
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => handleDeleteEvent(ev.id, ev.title)}
-                            className={styles.deleteBtn}
-                          >
-                            Delete
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                  {eventsList.length === 0 && (
-                    <tr>
-                      <td
-                        colSpan="8"
-                        style={{
-                          textAlign: "center",
-                          padding: 24,
-                          color: "var(--text-muted)",
-                        }}
-                      >
-                        No events yet. Click "📅 Add Event" to create one.
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
-            </div>
-          ))}
-
+        {activeTab === "Active Events" && (
+          <Table
+            columns={activeEventColumns}
+            data={eventsList}
+            loading={eventsLoading}
+            emptyMessage="No events yet. Click '📅 Add Event' to create one."
+          />
+        )}
         {/* Proposed Events Tab */}
-        {activeTab === "Proposed Events" &&
-          (proposalsLoading ? (
-            <p className={dashboardStyles.loading}>Loading proposals…</p>
-          ) : (
-            <div className={styles.tableContainer}>
-              <table className={dashboardStyles.table}>
-                <thead>
-                  <tr>
-                    <th scope="col">Title</th>
-                    <th scope="col">Format</th>
-                    <th scope="col">Proposed Date</th>
-                    <th scope="col">Contact</th>
-                    <th scope="col">Status</th>
-                    <th scope="col">Submitted</th>
-                    <th scope="col" style={{ width: 160 }}>
-                      Actions
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {proposals.map((p) => (
-                    <tr key={p.id}>
-                      <td>
-                        <strong>{p.title}</strong>
-                        {p.details && (
-                          <>
-                            <br />
-                            <small style={{ color: "var(--text-muted)" }}>
-                              {p.details.slice(0, 80)}
-                              {p.details.length > 80 ? "…" : ""}
-                            </small>
-                          </>
-                        )}
-                      </td>
-                      <td>{p.format}</td>
-                      <td>{p.proposed_date || "—"}</td>
-                      <td>
-                        <a href={`mailto:${p.email}`}>{p.email}</a>
-                      </td>
-                      <td>
-                        <span
-                          className={`${styles.statusBadge} ${styles[`status${p.status.charAt(0).toUpperCase() + p.status.slice(1)}`]}`}
-                        >
-                          {p.status}
-                        </span>
-                      </td>
-                      <td>{new Date(p.created_at).toLocaleDateString()}</td>
-                      <td>
-                        {p.status === "pending" ? (
-                          <div className={styles.actionBtnGroup}>
-                            <button
-                              type="button"
-                              onClick={() => handleApproveProposal(p)}
-                              className={styles.approveBtn}
-                            >
-                              Approve
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() =>
-                                handleRejectProposal(p.id, p.title)
-                              }
-                              className={styles.deleteBtn}
-                            >
-                              Reject
-                            </button>
-                          </div>
-                        ) : (
-                          <span
-                            style={{ color: "var(--text-muted)", fontSize: 12 }}
-                          >
-                            —
-                          </span>
-                        )}
-                      </td>
-                    </tr>
-                  ))}
-                  {proposals.length === 0 && (
-                    <tr>
-                      <td
-                        colSpan="7"
-                        style={{
-                          textAlign: "center",
-                          padding: 24,
-                          color: "var(--text-muted)",
-                        }}
-                      >
-                        No proposals submitted yet.
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
-            </div>
-          ))}
+        {activeTab === "Proposed Events" && (
+          <Table
+            columns={proposedEventColumns}
+            data={proposals}
+            loading={proposalsLoading}
+            emptyMessage="No proposals submitted yet."
+          />
+        )}
       </section>
 
       <EventModal

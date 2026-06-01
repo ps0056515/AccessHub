@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { articlesApi } from 'api/client';
 import { SITE_NAME } from 'brand';
+import Container from 'components/common/Container/Container';
 import styles from './Articles.module.css';
 
 export default function ArticleDetail() {
@@ -31,12 +32,12 @@ export default function ArticleDetail() {
     fetchArticle();
   }, [id, navigate]);
 
-  if (loading) return <div className={styles.detailContainer}>Loading article...</div>;
-  if (error) return <div className={styles.detailContainer} style={{ color: 'red' }}>{error}</div>;
+  if (loading) return <Container className={styles.detailContainer}>Loading article...</Container>;
+  if (error) return <Container className={styles.detailContainer} style={{ color: 'red' }}>{error}</Container>;
   if (!article) return null;
 
   return (
-    <article className={styles.detailContainer}>
+    <Container className={styles.detailContainer} style={{ display: 'block' }}>
       <Link to="/articles" className={styles.backBtn}>
         ← Back to Articles
       </Link>
@@ -58,6 +59,6 @@ export default function ArticleDetail() {
         className={styles.contentHtml} 
         dangerouslySetInnerHTML={{ __html: article.content_html }} 
       />
-    </article>
+    </Container>
   );
 }

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { CERTS, COLOR_MAP } from 'data';
 import { toolsApi } from 'api/client';
+import Container from 'components/common/Container/Container';
 import styles from './Tools.module.css';
 
 function BadgePill({ label, color }) {
@@ -37,7 +38,7 @@ export default function Tools() {
   }, []);
 
   return (
-    <div className={styles.page}>
+    <Container className={styles.page}>
       <header className={styles.pageHeader}>
         <h1 className={styles.pageTitle}>Tools &amp; certifications</h1>
         <p className={styles.pageSub}>
@@ -131,6 +132,6 @@ export default function Tools() {
           })}
         </div>
       </section>
-    </div>
+    </Container>
   );
 }

@@ -133,6 +133,17 @@ router.delete('/admin/proposals/:id', authMiddleware, adminMiddleware, async (re
   }
 });
 
+// DELETE /api/events/admin/proposals/:id/force (permanently delete)
+router.delete('/admin/proposals/:id/force', authMiddleware, adminMiddleware, async (req, res, next) => {
+  try {
+    const { rowCount } = await query("DELETE FROM event_proposals WHERE id=$1", [req.params.id]);
+    if (rowCount === 0) return res.status(404).json({ error: 'Proposal not found.' });
+    res.json({ ok: true });
+  } catch (err) {
+    next(err);
+  }
+});
+
 // PUT /api/events/admin/reorder
 router.put('/admin/reorder', authMiddleware, adminMiddleware, async (req, res, next) => {
   const { eventIds } = req.body || {};

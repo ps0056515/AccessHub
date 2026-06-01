@@ -45,15 +45,6 @@
   border-bottom-color: var(--accent, #074a9e);
 }
 
-/* ─── Table ───────────────────────────────────────────────────────────────── */
-.tableContainer {
-  overflow-x: auto;
-  overflow-y: auto;
-  max-height: 420px;
-  border: 1px solid var(--border, #e2e8f0);
-  border-radius: 8px;
-}
-
 .dateBadge {
   display: inline-flex;
   flex-direction: column;

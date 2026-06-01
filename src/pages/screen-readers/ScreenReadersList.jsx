@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { screenReadersApi } from 'api/client';
+import Container from 'components/common/Container/Container';
 import styles from './ScreenReaders.module.css';
 
 export default function ScreenReadersList() {
@@ -25,11 +26,11 @@ export default function ScreenReadersList() {
     }
   };
 
-  if (loading) return <div className={styles.container}>Loading guides...</div>;
-  if (error) return <div className={styles.container}>{error}</div>;
+  if (loading) return <Container className={styles.container}>Loading guides...</Container>;
+  if (error) return <Container className={styles.container}>{error}</Container>;
 
   return (
-    <div className={styles.container}>
+    <Container className={styles.container}>
       <header className={styles.header}>
         <h1 className={styles.title}>Screen Readers</h1>
         <p className={styles.subtitle}>
@@ -50,6 +51,6 @@ export default function ScreenReadersList() {
       {guides.length === 0 && (
         <p>No guides available at this time.</p>
       )}
-    </div>
+    </Container>
   );
 }

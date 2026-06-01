@@ -33,7 +33,22 @@ export function ConfigProvider({ children }) {
       { num: "15k+", label: "Questions answered" },
       { num: "80+", label: "Vetted tools" },
       { num: "12", label: "Upcoming events" },
-    ]
+    ],
+    askTopics: [
+      "WCAG 2.2",
+      "Screen readers",
+      "Legal",
+      "ARIA",
+      "Color contrast",
+      "Design systems",
+      "Strategy",
+      "Career advice",
+      "Mobile",
+      "PDFs",
+      "Other",
+    ],
+    askPlaceholder: 'Ask the community a question...',
+    searchPlaceholder: 'Search discussions, topics, or members...'
   });
 
   const [loading, setLoading] = useState(true);
@@ -55,6 +70,9 @@ export function ConfigProvider({ children }) {
           subheading: data.portal_hero_subheading || prev.subheading,
           tags: data.portal_hero_tags || prev.tags,
           stats: data.portal_stats || prev.stats,
+          askPlaceholder: data.portal_ask_placeholder || 'Ask the community a question...',
+          searchPlaceholder: data.portal_search_placeholder || 'Search discussions, topics, or members...',
+          askTopics: data.portal_ask_topics || prev.askTopics,
         }));
       }
     } catch (err) {

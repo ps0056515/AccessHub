@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "context/AuthContext";
 import { useConfig } from "context/ConfigContext";
+import Container from "components/common/Container/Container";
 import styles from "./Navbar.module.css";
 
 const SECTION_PATHS = {
@@ -75,7 +76,7 @@ export default function Navbar({
 
   return (
     <header className={styles.header} role="banner">
-      <div className={styles.inner}>
+      <Container className={styles.inner}>
         <button
           type="button"
           className={styles.logo}
@@ -189,7 +190,7 @@ export default function Navbar({
             />
           </button>
         </div>
-      </div>
+      </Container>
 
       {menuOpen && (
         <nav className={styles.mobileNav} aria-label="Mobile navigation">

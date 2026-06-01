@@ -3,6 +3,7 @@ import ReactQuill, { Quill } from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import ImageResize from 'quill-image-resize-module-react';
 import { articlesApi } from 'api/client';
+import Table from 'components/common/Table/Table';
 import styles from './ArticlesView.module.css';
 
 // Fix for React-Quill ImageResize module looking for window.Quill
@@ -178,6 +179,49 @@ export default function ArticlesView({ showToast }) {
     }
   };
 
+  const columns = [
+    { key: 'title', label: 'Title', render: (row) => <span style={{ fontWeight: 500 }}>{row.title}</span> },
+    { key: 'author', label: 'Author' },
+    { key: 'status', label: 'Status', render: (article) => (
+      <span style={{ 
+        padding: '4px 8px', 
+        borderRadius: '12px', 
+        fontSize: '12px', 
+        fontWeight: '600',
+        background: article.is_published ? '#dcfce7' : '#f1f5f9',
+        color: article.is_published ? '#166534' : '#64748b'
+      }}>
+        {article.is_published ? 'Published' : 'Draft'}
+      </span>
+    )},
+    { key: 'date', label: 'Published Date', render: (article) => new Date(article.published_date).toLocaleDateString() },
+    { key: 'actions', label: 'Actions', render: (article) => (
+      <div className={styles.actions}>
+        <button
+          type="button"
+          className={article.is_published ? styles.btnSecondary : styles.btnSuccess}
+          onClick={() => togglePublish(article)}
+        >
+          {article.is_published ? 'Unpublish' : 'Publish'}
+        </button>
+        <button
+          type="button"
+          className={styles.btnSecondary}
+          onClick={() => openEditor(article)}
+        >
+          Edit
+        </button>
+        <button
+          type="button"
+          className={styles.btnDanger}
+          onClick={() => handleDelete(article.id, article.title)}
+        >
+          Delete
+        </button>
+      </div>
+    )}
+  ];
+
   return (
     <div className={styles.container}>
       {!isEditing ? (
@@ -189,74 +233,12 @@ export default function ArticlesView({ showToast }) {
             </button>
           </div>
 
-          <div className={styles.tableWrap}>
-            {loading ? (
-              <p className={styles.emptyState}>Loading articles...</p>
-            ) : articles.length > 0 ? (
-              <table className={styles.table}>
-                <thead>
-                  <tr>
-                    <th>Title</th>
-                    <th>Author</th>
-                    <th>Status</th>
-                    <th>Published Date</th>
-                    <th style={{ width: '140px' }}>Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {articles.map(article => (
-                    <tr key={article.id}>
-                      <td style={{ fontWeight: 500 }}>{article.title}</td>
-                      <td>{article.author}</td>
-                      <td>
-                        <span style={{ 
-                          padding: '4px 8px', 
-                          borderRadius: '12px', 
-                          fontSize: '12px', 
-                          fontWeight: '600',
-                          background: article.is_published ? '#dcfce7' : '#f1f5f9',
-                          color: article.is_published ? '#166534' : '#64748b'
-                        }}>
-                          {article.is_published ? 'Published' : 'Draft'}
-                        </span>
-                      </td>
-                      <td>{new Date(article.published_date).toLocaleDateString()}</td>
-                      <td>
-                        <div className={styles.actions}>
-                          <button
-                            type="button"
-                            className={styles.editBtn}
-                            onClick={() => togglePublish(article)}
-                            title={article.is_published ? 'Unpublish' : 'Publish'}
-                          >
-                            {article.is_published ? '👁️‍🗨️' : '👁️'}
-                          </button>
-                          <button
-                            type="button"
-                            className={styles.editBtn}
-                            onClick={() => openEditor(article)}
-                            title="Edit"
-                          >
-                            ✏️
-                          </button>
-                          <button
-                            type="button"
-                            className={styles.deleteBtn}
-                            onClick={() => handleDelete(article.id, article.title)}
-                            title="Delete"
-                          >
-                            🗑
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            ) : (
-              <p className={styles.emptyState}>No articles found. Click "Create New Article" to start.</p>
-            )}
-          </div>
+          <Table 
+            columns={columns} 
+            data={articles} 
+            loading={loading} 
+            emptyMessage="No articles found." 
+          />
         </>
       ) : (
         <form onSubmit={handleSave} className={styles.form}>

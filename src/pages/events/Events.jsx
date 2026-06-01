@@ -2,6 +2,7 @@ import { useLayoutEffect, useMemo, useState, useEffect } from 'react';
 import { eventsApi } from 'api/client';
 import { useAuth } from 'context/AuthContext';
 import Modal from 'components/common/Modal/Modal';
+import Container from 'components/common/Container/Container';
 import styles from './Events.module.css';
 
 const TYPES = ['All', 'Free', 'Members only', 'In-person'];
@@ -164,7 +165,7 @@ export default function Events() {
   };
 
   return (
-    <div className={styles.page}>
+    <Container className={styles.page}>
       <header className={styles.pageHeader}>
         <h1 className={styles.pageTitle}>Events &amp; workshops</h1>
         <p className={styles.pageSub}>
@@ -414,7 +415,7 @@ export default function Events() {
           </form>
         </Modal>
       ) : null}
-    </div>
+    </Container>
   );
 }
 
