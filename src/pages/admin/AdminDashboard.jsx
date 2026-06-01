@@ -11,6 +11,8 @@ import ToolsView from './views/ToolsView/ToolsView';
 import EventsView from './views/EventsView/EventsView';
 import DiscussionsView from './views/DiscussionsView/DiscussionsView';
 import ArticlesView from './views/ArticlesView/ArticlesView';
+import BlogpostsView from './views/BlogpostsView/BlogpostsView';
+import ScreenReadersView from './views/ScreenReadersView/ScreenReadersView';
 import SettingsView from './views/SettingsView/SettingsView';
 
 const VIEWS = {
@@ -20,6 +22,8 @@ const VIEWS = {
   events: EventsView,
   discussions: DiscussionsView,
   articles: ArticlesView,
+  blogposts: BlogpostsView,
+  screen_readers: ScreenReadersView,
   settings: SettingsView,
 };
 
@@ -48,6 +52,8 @@ export default function AdminDashboard({ goToPortal }) {
     { id: 'events', label: 'Events', icon: '📅' },
     { id: 'discussions', label: 'Discussions', icon: '💬' },
     { id: 'articles', label: 'Articles', icon: '📝' },
+    { id: 'blogposts', label: 'Blogposts', icon: '📰' },
+    { id: 'screen_readers', label: 'Screen Readers', icon: '🔊' },
     { id: 'settings', label: 'Settings', icon: '⚙️' },
   ];
 
@@ -107,7 +113,7 @@ export default function AdminDashboard({ goToPortal }) {
               aria-label="Sign out of Admin Panel"
               title="Sign out"
             >
-              🚪
+              ➡️
             </button>
           </div>
         )}
@@ -134,6 +140,8 @@ export default function AdminDashboard({ goToPortal }) {
           {activeTab === 'events' && <EventsView showToast={addToast} />}
           {activeTab === 'discussions' && <DiscussionsView showToast={addToast} />}
           {activeTab === 'articles' && <ArticlesView showToast={addToast} />}
+          {activeTab === 'blogposts' && <BlogpostsView showToast={addToast} />}
+          {activeTab === 'screen_readers' && <ScreenReadersView showToast={addToast} />}
           {activeTab === 'settings' && <SettingsView showToast={addToast} />}
         </main>
       </div>

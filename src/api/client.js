@@ -158,10 +158,43 @@ export const articlesApi = {
   delete: id => api(`/api/articles/${id}`, { method: 'DELETE' }),
 };
 
+export const blogpostsApi = {
+  list: () => api('/api/blogposts'),
+  listAdmin: () => api('/api/blogposts/admin'),
+  get: id => api(`/api/blogposts/${id}`),
+  getAdmin: id => api(`/api/blogposts/admin/${id}`),
+  uploadCover: body => api('/api/blogposts/upload-cover', { method: 'POST', body: JSON.stringify(body) }),
+  create: body => api('/api/blogposts', { method: 'POST', body: JSON.stringify(body) }),
+  update: (id, body) => api(`/api/blogposts/${id}`, { method: 'PUT', body: JSON.stringify(body) }),
+  togglePublish: (id, is_published) => api(`/api/blogposts/${id}/publish`, { method: 'PATCH', body: JSON.stringify({ is_published }) }),
+  delete: id => api(`/api/blogposts/${id}`, { method: 'DELETE' }),
+};
+
 export const newsApi = {
   feed: () => api('/api/news/feed'),
 };
 
+export const screenReadersApi = {
+  list: () => api('/api/screen-readers'),
+  get: (id) => api(`/api/screen-readers/${id}`),
+  listAdmin: () => api('/api/screen-readers/admin/all'),
+  getAdmin: (id) => api(`/api/screen-readers/admin/${id}`),
+  create: (data) => api('/api/screen-readers', {
+    method: 'POST',
+    body: JSON.stringify(data),
+  }),
+  update: (id, data) => api(`/api/screen-readers/${id}`, {
+    method: 'PUT',
+    body: JSON.stringify(data),
+  }),
+  togglePublish: (id, isPublished) => api(`/api/screen-readers/${id}/publish`, {
+    method: 'PATCH',
+    body: JSON.stringify({ is_published: isPublished }),
+  }),
+  delete: (id) => api(`/api/screen-readers/${id}`, {
+    method: 'DELETE',
+  }),
+};
 
 export const resourcesApi = {
   // Public

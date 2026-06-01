@@ -12,6 +12,8 @@ const toolsRoutes = require('./routes/tools');
 const eventsRoutes = require('./routes/events');
 const resourcesRoutes = require('./routes/resources');
 const articlesRoutes = require('./routes/articles');
+const blogpostsRoutes = require('./routes/blogposts');
+const screenReadersRoutes = require('./routes/screen_readers');
 const { query, closePool } = require('./db');
 
 const PORT = Number(process.env.API_PORT || process.env.PORT) || 3015;
@@ -38,6 +40,8 @@ app.use('/api/tools', toolsRoutes);
 app.use('/api/events', eventsRoutes);
 app.use('/api/resources', resourcesRoutes);
 app.use('/api/articles', articlesRoutes);
+app.use('/api/blogposts', blogpostsRoutes);
+app.use('/api/screen-readers', screenReadersRoutes);
 app.use('/api/uploads', express.static(path.join(__dirname, 'uploads')));
 
 app.use((err, _req, res, _next) => {
