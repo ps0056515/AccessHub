@@ -1,0 +1,120 @@
+import { useState, useEffect } from 'react';
+import { screenReadersApi } from 'api/client';
+import ScreenReaderModal from './ScreenReaderModal';
+import Table from 'components/common/Table/Table';
+import styles from './ScreenReadersView.module.css';
+
+export default function ScreenReadersView({ showToast }) {
+  const [guides, setGuides] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [editingGuide, setEditingGuide] = useState(null);
+
+  useEffect(() => {
+    loadGuides();
+  }, []);
+
+  const loadGuides = async () => {
+    try {
+      setLoading(true);
+      const res = await screenReadersApi.listAdmin();
+      setGuides(res.data);
+    } catch (err) {
+      showToast?.('Failed to load screen readers', 'error');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const openModal = async (guide = null) => {
+    if (guide) {
+      try {
+        const res = await screenReadersApi.getAdmin(guide.id);
+        setEditingGuide(res);
+      } catch (err) {
+        showToast?.('Failed to load details', 'error');
+        return;
+      }
+    } else {
+      setEditingGuide(null);
+    }
+    setModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setModalOpen(false);
+    setEditingGuide(null);
+  };
+
+  const togglePublish = async (id, currentStatus) => {
+    try {
+      await screenReadersApi.togglePublish(id, !currentStatus);
+      showToast?.(`Guide ${!currentStatus ? 'published' : 'unpublished'}`, 'success');
+      loadGuides();
+    } catch (err) {
+      showToast?.('Failed to update status', 'error');
+    }
+  };
+
+  const handleDelete = async (id) => {
+    if (!window.confirm('Are you sure you want to delete this guide?')) return;
+    try {
+      await screenReadersApi.delete(id);
+      showToast?.('Guide deleted', 'success');
+      loadGuides();
+    } catch (err) {
+      showToast?.('Failed to delete guide', 'error');
+    }
+  };
+
+  if (loading) {
+    return <div className={styles.container}>Loading screen readers...</div>;
+  }
+
+  const columns = [
+    { key: 'title', label: 'Title', render: (guide) => <span className={styles.titleCell}>{guide.title}</span> },
+    { key: 'status', label: 'Status', render: (guide) => (
+      <span className={`${styles.statusBadge} ${guide.is_published ? styles.statusPublished : styles.statusDraft}`}>
+        {guide.is_published ? 'Published' : 'Draft'}
+      </span>
+    )},
+    { key: 'created', label: 'Created', render: (guide) => new Date(guide.created_at).toLocaleDateString() },
+    { key: 'actions', label: 'Actions', render: (guide) => (
+      <div className={styles.actions}>
+        <button onClick={() => openModal(guide)} className={styles.btnSecondary}>Edit</button>
+        <button 
+          onClick={() => togglePublish(guide.id, guide.is_published)}
+          className={guide.is_published ? styles.btnSecondary : styles.btnSuccess}
+        >
+          {guide.is_published ? 'Unpublish' : 'Publish'}
+        </button>
+        <button onClick={() => handleDelete(guide.id)} className={styles.btnDanger}>Delete</button>
+      </div>
+    )}
+  ];
+
+  return (
+    <div className={styles.container}>
+      <header className={styles.header}>
+        <h1 className={styles.title}>Screen Readers</h1>
+        <button onClick={() => openModal()} className={styles.addBtn}>
+          + New Guide
+        </button>
+      </header>
+
+      <Table 
+        columns={columns} 
+        data={guides} 
+        emptyMessage='No guides found. Click "New Guide" to create one.' 
+      />
+
+      <ScreenReaderModal
+        isOpen={modalOpen}
+        onClose={closeModal}
+        onSuccess={loadGuides}
+        editingGuide={editingGuide}
+        showToast={showToast}
+      />
+    </div>
+  );
+}

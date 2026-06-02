@@ -1,6 +1,6 @@
 const express = require('express');
 const { query } = require('../db');
-const { authMiddleware } = require('../auth');
+const { authMiddleware, adminMiddleware } = require('../auth');
 const { formatPost, formatComment, authorFromUser } = require('../posts');
 
 const router = express.Router();
@@ -15,6 +15,103 @@ router.get('/', async (_req, res, next) => {
   try {
     const { rows } = await query(`${POST_SELECT} ORDER BY p.created_at DESC`);
     res.json({ posts: rows.map(row => formatPost(row)) });
+  } catch (err) {
+    next(err);
+  }
+});
+
+router.get('/top-contributors', async (_req, res, next) => {
+  try {
+    const { rows } = await query(`
+      SELECT 
+        u.id AS user_id, 
+        u.display_name,
+        (SELECT COUNT(*) FROM posts p WHERE p.user_id = u.id) + 
+        (SELECT COUNT(*) FROM comments c WHERE c.user_id = u.id) AS total_contributions
+      FROM users u
+      WHERE 
+        (SELECT COUNT(*) FROM posts p WHERE p.user_id = u.id) + 
+        (SELECT COUNT(*) FROM comments c WHERE c.user_id = u.id) > 0
+      ORDER BY total_contributions DESC
+      LIMIT 5
+    `);
+
+    const contributors = rows.map((row, index) => {
+      const author = authorFromUser({ display_name: row.display_name });
+      return {
+        id: row.user_id,
+        initials: author.author_initials,
+        name: author.author_name,
+        role: author.author_role,
+        color: author.author_color,
+        hot: index === 0, // Top 1 is hot
+        contributions: parseInt(row.total_contributions, 10)
+      };
+    });
+
+    res.json({ contributors });
+  } catch (err) {
+    next(err);
+  }
+});
+
+router.get('/admin', authMiddleware, adminMiddleware, async (_req, res, next) => {
+  try {
+    const { rows } = await query(`${POST_SELECT} ORDER BY p.created_at DESC`);
+    res.json({ posts: rows.map(row => formatPost(row)) });
+  } catch (err) {
+    next(err);
+  }
+});
+
+router.put('/admin/:id', authMiddleware, adminMiddleware, async (req, res, next) => {
+  const id = Number(req.params.id);
+  const { title, body, tags } = req.body || {};
+  const trimmedTitle = title?.trim();
+  const trimmedBody = body?.trim();
+
+  if (!Number.isFinite(id)) {
+    return res.status(400).json({ error: 'Invalid post id.' });
+  }
+  if (!trimmedTitle || trimmedTitle.length < 5) {
+    return res.status(400).json({ error: 'Title must be at least 5 characters.' });
+  }
+  if (!trimmedBody || trimmedBody.length < 10) {
+    return res.status(400).json({ error: 'Please add more detail to your question.' });
+  }
+
+  const tagList = Array.isArray(tags) ? tags.filter(Boolean) : ['WCAG 2.2'];
+  const excerpt = trimmedBody.length > 160 ? `${trimmedBody.slice(0, 157).trim()}…` : trimmedBody;
+
+  try {
+    const { rowCount } = await query(
+      `UPDATE posts SET title = $1, body = $2, excerpt = $3, tags = $4 WHERE id = $5`,
+      [trimmedTitle, trimmedBody, excerpt, JSON.stringify(tagList), id]
+    );
+
+    if (rowCount === 0) {
+      return res.status(404).json({ error: 'Discussion not found.' });
+    }
+
+    const { rows } = await query(`${POST_SELECT} WHERE p.id = $1`, [id]);
+    res.json({ post: formatPost(rows[0]) });
+  } catch (err) {
+    next(err);
+  }
+});
+
+router.delete('/admin/:id', authMiddleware, adminMiddleware, async (req, res, next) => {
+  const id = Number(req.params.id);
+  if (!Number.isFinite(id)) {
+    return res.status(400).json({ error: 'Invalid post id.' });
+  }
+
+  try {
+    const { rowCount } = await query(`DELETE FROM posts WHERE id = $1`, [id]);
+    if (rowCount === 0) {
+      return res.status(404).json({ error: 'Discussion not found.' });
+    }
+    res.json({ ok: true });
   } catch (err) {
     next(err);
   }

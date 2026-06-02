@@ -1,0 +1,37 @@
+.errorContainer {
+  text-align: center;
+  padding: 48px;
+  color: var(--text-muted);
+}
+
+.retryBtn {
+  margin-top: 12px;
+}
+
+.actionBtn {
+  background: transparent;
+  border: 1px solid var(--border-strong, #cbd5e1);
+  border-radius: var(--radius-sm, 6px);
+  padding: 4px 10px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-muted, #475569);
+  cursor: pointer;
+  transition: all var(--transition, 0.15s ease);
+}
+
+.actionBtn:hover:not(:disabled) {
+  background: var(--bg-secondary, #f8fafc);
+  color: var(--accent, #074a9e);
+  border-color: var(--accent, #074a9e);
+}
+
+.actionBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.actionBtnDanger:hover:not(:disabled) {
+  color: var(--error, #ef4444);
+  border-color: var(--error, #ef4444);
+}
