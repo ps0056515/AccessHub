@@ -101,7 +101,7 @@ export default function Footer({ goToSection, goToPortal }) {
                A community for accessibility practitioners, designers,
                developers, and advocates building a more inclusive web.
             </p>
-            <div className={styles.socials} aria-label="Social links">
+            <nav className={styles.socials} aria-label="Social links">
               {socialLinks.map((s) =>
                 s.isExternal ? (
                   <a
@@ -119,7 +119,7 @@ export default function Footer({ goToSection, goToPortal }) {
                   </FooterRouteLink>
                 ),
               )}
-            </div>
+            </nav>
           </div>
 
           {footerColumns.map((col) => {
