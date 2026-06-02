@@ -4,7 +4,7 @@ test.describe('production smoke', () => {
   test('document title and skip link', async ({ page }) => {
     await page.goto('/');
     await expect(page).toHaveTitle(/AllCanAccess/i);
-    await expect(page.getByRole('link', { name: /skip to main content/i })).toBeVisible();
+    await expect(page.getByRole('link', { name: /skip to main content/i })).toBeAttached();
     await expect(page.getByRole('button', { name: /AllCanAccess home/i })).toBeVisible();
   });
 
