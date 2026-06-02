@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from 'context/AuthContext';
 import GoogleSignInSection from 'components/auth/GoogleSignInSection';
@@ -16,31 +16,42 @@ export default function SignInPage({ goToPortal }) {
   const { signIn, signInWithGoogle } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+  const [errorToast, setErrorToast] = useState(location.state?.errorToast || null);
   const [submitting, setSubmitting] = useState(false);
+
+  useEffect(() => {
+    if (errorToast) {
+      const timer = setTimeout(() => setErrorToast(null), 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [errorToast]);
+
+  const showError = (message) => {
+    setErrorToast(message);
+  };
 
   const handleSubmit = async e => {
     e.preventDefault();
-    setError('');
+    setErrorToast(null);
     setSubmitting(true);
     try {
       const profile = await signIn({ email, password });
       redirectAfterLogin(navigate, profile, from, redirectAfterAuth);
     } catch (err) {
-      setError(err.message || 'Could not sign in.');
+      showError(err.message || 'Could not sign in.');
     } finally {
       setSubmitting(false);
     }
   };
 
   const handleGoogleSuccess = async credential => {
-    setError('');
+    setErrorToast(null);
     setSubmitting(true);
     try {
       const profile = await signInWithGoogle({ credential });
       redirectAfterLogin(navigate, profile, from, redirectAfterAuth);
     } catch (err) {
-      setError(err.message || 'Google sign-in failed.');
+      showError(err.message || 'Google sign-in failed.');
     } finally {
       setSubmitting(false);
     }
@@ -59,15 +70,9 @@ export default function SignInPage({ goToPortal }) {
               : 'Welcome back. Sign in to participate in discussions and save your profile.'}
         </p>
 
-        {error && (
-          <div className={styles.error} role="alert">
-            {error}
-          </div>
-        )}
-
         <GoogleSignInSection
           onSuccess={handleGoogleSuccess}
-          onError={err => setError(err.message || 'Google sign-in failed.')}
+          onError={err => showError(err.message || 'Google sign-in failed.')}
           disabled={submitting}
         />
 
@@ -121,6 +126,23 @@ export default function SignInPage({ goToPortal }) {
           </Link>
         </p>
       </div>
+
+      {errorToast && (
+        <div className={styles.toastContainer} aria-live="polite">
+          <div className={`${styles.toast} ${styles.toastError}`} role="alert">
+            <span className={styles.toastIcon} aria-hidden="true">❌</span>
+            <div className={styles.toastContent}>{errorToast}</div>
+            <button
+              type="button"
+              className={styles.toastCloseBtn}
+              onClick={() => setErrorToast(null)}
+              aria-label="Close notification"
+            >
+              ✕
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -1,6 +1,6 @@
 .tableScrollWrap {
   max-height: 500px;
-  overflow-y: auto;
+  overflow: auto;
   border-radius: var(--radius-sm, 6px);
   border: 1px solid var(--border-strong, #cbd5e1);
   background: var(--bg-card, #ffffff);
@@ -8,6 +8,7 @@
 
 .table {
   width: 100%;
+  table-layout: fixed;
   border-collapse: collapse;
   text-align: left;
   font-size: 14px;
