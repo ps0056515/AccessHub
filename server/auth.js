@@ -47,6 +47,14 @@ async function authMiddleware(req, res, next) {
 
   try {
     const payload = verifyToken(token);
+    
+    // Immediate revocation check
+    const { rows } = await query('SELECT is_blocked FROM users WHERE id = $1', [payload.sub]);
+    if (rows.length === 0 || rows[0].is_blocked) {
+      res.status(401).json({ error: 'Your account has been blocked by an administrator.' });
+      return;
+    }
+
     req.userId = payload.sub;
     next();
   } catch {
@@ -75,10 +83,10 @@ async function adminMiddleware(req, res, next) {
 
 
   try {
-    const { rows } = await query('SELECT id, email FROM users WHERE id = $1', [req.userId]);
+    const { rows } = await query('SELECT id, email, is_admin FROM users WHERE id = $1', [req.userId]);
     const user = rows[0];
 
-    if (!user || !isAdminEmail(user.email)) {
+    if (!user || (!user.is_admin && !isAdminEmail(user.email))) {
       res.status(403).json({ error: 'Admin access required.' });
       return;
     }
@@ -98,7 +106,8 @@ function publicUser(row) {
     country: row.country || null,
     city: row.city || null,
     authMethod: row.google_id ? 'google' : 'email',
-    isAdmin: isAdminEmail(row.email),
+    isAdmin: Boolean(row.is_admin) || isAdminEmail(row.email),
+    isBlocked: Boolean(row.is_blocked),
     createdAt: row.created_at,
   };
 }
@@ -111,6 +120,8 @@ function adminUser(row) {
     country: row.country || null,
     city: row.city || null,
     authMethod: row.google_id ? 'google' : 'email',
+    isAdmin: Boolean(row.is_admin) || isAdminEmail(row.email),
+    isBlocked: Boolean(row.is_blocked),
     createdAt: row.created_at,
   };
 }

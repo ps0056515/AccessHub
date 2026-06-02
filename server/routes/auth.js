@@ -15,7 +15,7 @@ const router = express.Router();
 const GENERIC_RESET_MESSAGE =
   'If an account exists for that email, we sent password reset instructions.';
 const USER_RETURNING =
-  'id, email, password_hash, display_name, google_id, country, city, created_at';
+  'id, email, password_hash, display_name, google_id, country, city, is_admin, is_blocked, created_at';
 const USER_SELECT = `SELECT ${USER_RETURNING} FROM users`;
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -106,6 +106,11 @@ router.post('/signin', async (req, res, next) => {
       return;
     }
 
+    if (user.is_blocked) {
+      res.status(403).json({ error: 'Your account has been blocked by an administrator.' });
+      return;
+    }
+
     if (!user.password_hash) {
       res
         .status(401)
@@ -179,6 +184,11 @@ router.post('/google', async (req, res, next) => {
         );
         user = inserted.rows[0];
       }
+    }
+
+    if (user.is_blocked) {
+      res.status(403).json({ error: 'Your account has been blocked by an administrator.' });
+      return;
     }
 
     if (country?.trim() || city?.trim()) {

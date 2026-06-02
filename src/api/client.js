@@ -72,6 +72,10 @@ export async function api(path, options = {}) {
   }
 
   if (!res.ok) {
+    if (res.status === 401 && typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('aa-unauthorized'));
+    }
+
     let message = data?.error || `Request failed (${res.status})`;
     if (typeof message === 'string' && message.toLowerCase().includes('proxy')) {
       message =
@@ -102,6 +106,9 @@ export const authApi = {
 export const adminApi = {
   stats: () => api('/api/admin/stats'),
   users: () => api('/api/admin/users'),
+  toggleAdminRole: (id, is_admin) => api(`/api/admin/users/${id}/role`, { method: 'PATCH', body: JSON.stringify({ is_admin }) }),
+  toggleBlockUser: (id, is_blocked) => api(`/api/admin/users/${id}/block`, { method: 'PATCH', body: JSON.stringify({ is_blocked }) }),
+  deleteUser: (id) => api(`/api/admin/users/${id}`, { method: 'DELETE' }),
 };
 
 export const settingsApi = {
