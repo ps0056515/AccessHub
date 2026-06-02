@@ -1,4 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { authApi, getStoredToken, setStoredToken } from '../api/client';
 
 const AuthContext = createContext(null);
@@ -10,6 +11,7 @@ function applySession(setUser, token, profile) {
 }
 
 export function AuthProvider({ children }) {
+  const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [needsLocation, setNeedsLocation] = useState(false);
@@ -17,10 +19,14 @@ export function AuthProvider({ children }) {
   useEffect(() => {
     let cancelled = false;
 
+
     async function restoreSession() {
       const token = getStoredToken();
       if (!token) {
-        if (!cancelled) setLoading(false);
+        if (!cancelled) {
+          setUser(null);
+          setLoading(false);
+        }
         return;
       }
 
@@ -41,11 +47,21 @@ export function AuthProvider({ children }) {
       }
     }
 
+    const handleUnauthorized = () => {
+      setStoredToken(null);
+      setUser(null);
+      setNeedsLocation(false);
+      navigate('/sign-in', { replace: true, state: { errorToast: 'Your session expired or your account was blocked.' } });
+    };
+
+    window.addEventListener('aa-unauthorized', handleUnauthorized);
+
     restoreSession();
     return () => {
       cancelled = true;
+      window.removeEventListener('aa-unauthorized', handleUnauthorized);
     };
-  }, []);
+  }, [navigate]);
 
   const signUp = useCallback(async ({ email, password, displayName, country, city }) => {
     const { token, user: profile } = await authApi.signUp({
