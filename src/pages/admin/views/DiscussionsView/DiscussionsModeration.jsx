@@ -11,7 +11,9 @@ export default function DiscussionsModeration({ showToast }) {
   const [loading, setLoading] = useState(true);
   const [modalPost, setModalPost] = useState(null); // null = closed, {} = new, {id...} = edit
   const [isSaving, setIsSaving] = useState(false);
+
   const [discussionSearch, setDiscussionSearch] = useState("");
+  const [selectedIds, setSelectedIds] = useState([]);
 
   useEffect(() => {
     fetchPosts();
@@ -45,6 +47,18 @@ export default function DiscussionsModeration({ showToast }) {
       showToast?.('Discussion deleted.', 'success');
     } catch (err) {
       showToast?.(err.message || 'Failed to delete discussion.', 'error');
+    }
+  };
+
+  const handleBulkDelete = async () => {
+    if (!window.confirm(`Are you sure you want to delete ${selectedIds.length} discussions?`)) return;
+    try {
+      await Promise.all(selectedIds.map(id => postsApi.deleteAdmin(id)));
+      setPosts(prev => prev.filter(p => !selectedIds.includes(p.id)));
+      showToast?.(`Successfully deleted ${selectedIds.length} discussions.`, "success");
+      setSelectedIds([]);
+    } catch (err) {
+      showToast?.(err.message || "Failed to bulk delete discussions.", "error");
     }
   };
 
@@ -139,6 +153,15 @@ export default function DiscussionsModeration({ showToast }) {
               outline: 'none'
             }}
           />
+          {selectedIds.length > 0 && (
+            <button 
+              className={styles.btnDanger} 
+              onClick={handleBulkDelete}
+              style={{ padding: '8px 12px', fontSize: '14px', borderRadius: '6px' }}
+            >
+              🗑 Bulk Delete ({selectedIds.length})
+            </button>
+          )}
           <button className={styles.btnPrimary} onClick={handleCreateNew}>
             + Create Discussion
           </button>
@@ -151,6 +174,10 @@ export default function DiscussionsModeration({ showToast }) {
         loading={loading} 
         emptyMessage="No discussions found." 
         searchQuery={discussionSearch}
+        selectable
+        selectedRowIds={selectedIds}
+        onSelectChange={setSelectedIds}
+        pagination={true}
       />
 
       {modalPost && (
