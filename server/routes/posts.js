@@ -64,11 +64,67 @@ router.get('/admin', authMiddleware, adminMiddleware, async (_req, res, next) =>
   }
 });
 
-router.put('/admin/:id', authMiddleware, adminMiddleware, async (req, res, next) => {
-  const id = Number(req.params.id);
-  const { title, body, tags } = req.body || {};
+router.post('/admin', authMiddleware, adminMiddleware, async (req, res, next) => {
+  const { title, body, tags, votes, created_at } = req.body || {};
   const trimmedTitle = title?.trim();
   const trimmedBody = body?.trim();
+  const parsedVotes = Math.max(0, parseInt(votes, 10) || 0);
+  const parsedDate = created_at ? new Date(created_at).toISOString() : new Date().toISOString();
+
+  if (!trimmedTitle || trimmedTitle.length < 5) {
+    return res.status(400).json({ error: 'Title must be at least 5 characters.' });
+  }
+  if (!trimmedBody || trimmedBody.length < 10) {
+    return res.status(400).json({ error: 'Please add more detail to your question.' });
+  }
+
+  try {
+    const { rows: users } = await query('SELECT id, display_name FROM users WHERE id = $1', [req.userId]);
+    const user = users[0];
+
+    if (!user) {
+      return res.status(404).json({ error: 'User not found.' });
+    }
+
+    const author = authorFromUser(user);
+    const tagList = Array.isArray(tags) ? tags.filter(Boolean) : ['WCAG 2.2'];
+    const excerpt = trimmedBody.length > 160 ? `${trimmedBody.slice(0, 157).trim()}…` : trimmedBody;
+
+    const inserted = await query(
+      `INSERT INTO posts (
+        user_id, title, excerpt, body, author_name, author_initials, author_color,
+        author_role, votes, tags, created_at
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+      RETURNING id`,
+      [
+        user.id,
+        trimmedTitle,
+        excerpt,
+        trimmedBody,
+        author.author_name,
+        author.author_initials,
+        author.author_color,
+        author.author_role,
+        parsedVotes,
+        JSON.stringify(tagList),
+        parsedDate
+      ]
+    );
+
+    const { rows } = await query(`${POST_SELECT} WHERE p.id = $1`, [inserted.rows[0].id]);
+    res.status(201).json({ post: formatPost(rows[0]) });
+  } catch (err) {
+    next(err);
+  }
+});
+
+router.put('/admin/:id', authMiddleware, adminMiddleware, async (req, res, next) => {
+  const id = Number(req.params.id);
+  const { title, body, tags, votes, created_at } = req.body || {};
+  const trimmedTitle = title?.trim();
+  const trimmedBody = body?.trim();
+  const parsedVotes = Math.max(0, parseInt(votes, 10) || 0);
+  const parsedDate = created_at ? new Date(created_at).toISOString() : undefined;
 
   if (!Number.isFinite(id)) {
     return res.status(400).json({ error: 'Invalid post id.' });
@@ -84,10 +140,17 @@ router.put('/admin/:id', authMiddleware, adminMiddleware, async (req, res, next)
   const excerpt = trimmedBody.length > 160 ? `${trimmedBody.slice(0, 157).trim()}…` : trimmedBody;
 
   try {
-    const { rowCount } = await query(
-      `UPDATE posts SET title = $1, body = $2, excerpt = $3, tags = $4 WHERE id = $5`,
-      [trimmedTitle, trimmedBody, excerpt, JSON.stringify(tagList), id]
-    );
+    const updateFields = [trimmedTitle, trimmedBody, excerpt, JSON.stringify(tagList), parsedVotes];
+    let queryStr = `UPDATE posts SET title = $1, body = $2, excerpt = $3, tags = $4, votes = $5, updated_at = CURRENT_TIMESTAMP`;
+    if (parsedDate) {
+      queryStr += `, created_at = $6 WHERE id = $7`;
+      updateFields.push(parsedDate, id);
+    } else {
+      queryStr += ` WHERE id = $6`;
+      updateFields.push(id);
+    }
+
+    const { rowCount } = await query(queryStr, updateFields);
 
     if (rowCount === 0) {
       return res.status(404).json({ error: 'Discussion not found.' });
@@ -110,6 +173,46 @@ router.delete('/admin/:id', authMiddleware, adminMiddleware, async (req, res, ne
     const { rowCount } = await query(`DELETE FROM posts WHERE id = $1`, [id]);
     if (rowCount === 0) {
       return res.status(404).json({ error: 'Discussion not found.' });
+    }
+    res.json({ ok: true });
+  } catch (err) {
+    next(err);
+  }
+});
+
+router.put('/admin/:postId/comments/:commentId', authMiddleware, adminMiddleware, async (req, res, next) => {
+  const commentId = Number(req.params.commentId);
+  const { body } = req.body || {};
+  const trimmedBody = body?.trim();
+
+  if (!Number.isFinite(commentId) || !trimmedBody) {
+    return res.status(400).json({ error: 'Invalid comment data.' });
+  }
+
+  try {
+    const { rowCount } = await query(
+      'UPDATE comments SET body = $1, updated_at = CURRENT_TIMESTAMP WHERE id = $2',
+      [trimmedBody, commentId]
+    );
+    if (rowCount === 0) {
+      return res.status(404).json({ error: 'Comment not found.' });
+    }
+    const { rows } = await query('SELECT * FROM comments WHERE id = $1', [commentId]);
+    res.json({ comment: formatComment(rows[0]) });
+  } catch (err) {
+    next(err);
+  }
+});
+
+router.delete('/admin/:postId/comments/:commentId', authMiddleware, adminMiddleware, async (req, res, next) => {
+  const commentId = Number(req.params.commentId);
+  if (!Number.isFinite(commentId)) {
+    return res.status(400).json({ error: 'Invalid comment id.' });
+  }
+  try {
+    const { rowCount } = await query('DELETE FROM comments WHERE id = $1', [commentId]);
+    if (rowCount === 0) {
+      return res.status(404).json({ error: 'Comment not found.' });
     }
     res.json({ ok: true });
   } catch (err) {

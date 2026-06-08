@@ -194,7 +194,7 @@ router.put('/admin/:id', authMiddleware, adminMiddleware, async (req, res, next)
   }
   try {
     const { rows } = await query(
-      'UPDATE events SET event_date=$1, title=$2, type=$3, band=$4 WHERE id=$5 RETURNING *',
+      'UPDATE events SET event_date=$1, title=$2, type=$3, band=$4, updated_at=CURRENT_TIMESTAMP WHERE id=$5 RETURNING *',
       [event_date, title.trim(), type.trim(), band.trim(), id]
     );
     if (rows.length === 0) return res.status(404).json({ error: 'Event not found.' });

@@ -5,7 +5,7 @@ const { authMiddleware, adminMiddleware, adminUser } = require('../auth');
 const router = express.Router();
 
 const USER_SELECT =
-  'SELECT id, email, display_name, google_id, country, city, is_admin, is_blocked, created_at FROM users';
+  'SELECT id, email, display_name, google_id, country, city, is_admin, is_blocked, created_at, updated_at FROM users';
 
 router.use(authMiddleware, adminMiddleware);
 
@@ -80,7 +80,7 @@ router.patch('/users/:id/role', async (req, res, next) => {
     }
 
     const { rows } = await query(
-      `UPDATE users SET is_admin = $1 WHERE id = $2 RETURNING *`,
+      `UPDATE users SET is_admin = $1, updated_at = CURRENT_TIMESTAMP WHERE id = $2 RETURNING *`,
       [is_admin, req.params.id]
     );
 
@@ -106,7 +106,7 @@ router.patch('/users/:id/block', async (req, res, next) => {
     }
 
     const { rows } = await query(
-      `UPDATE users SET is_blocked = $1 WHERE id = $2 RETURNING *`,
+      `UPDATE users SET is_blocked = $1, updated_at = CURRENT_TIMESTAMP WHERE id = $2 RETURNING *`,
       [is_blocked, req.params.id]
     );
 

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "context/AuthContext";
 import { useConfig } from "context/ConfigContext";
@@ -20,6 +20,21 @@ export default function Navbar({
   onSearch,
 }) {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [profileOpen, setProfileOpen] = useState(false);
+  const profileRef = useRef(null);
+
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (profileRef.current && !profileRef.current.contains(event.target)) {
+        setProfileOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
   const navigate = useNavigate();
   const location = useLocation();
   const { user, signOut, loading: authLoading, isAdmin } = useAuth();
@@ -146,30 +161,75 @@ export default function Navbar({
             </button>
           )}
           {!authLoading && user && (
-            <>
-              {isAdmin && (
-                <button
-                  className={styles.adminBtn}
-                  type="button"
-                  onClick={() => navigate("/admin")}
-                >
-                  Admin
-                </button>
-              )}
-              <span className={styles.userLabel} title={user.email}>
-                {user.displayName}
-              </span>
+            <div ref={profileRef} style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
               <button
-                className={styles.signOutBtn}
                 type="button"
-                onClick={async () => {
-                  await signOut();
-                  navigate("/sign-in", { replace: true });
+                onClick={() => setProfileOpen(!profileOpen)}
+                aria-label="User Profile"
+                style={{ 
+                  background: 'none', border: '1px solid var(--border-strong, #cbd5e1)', borderRadius: '50%', 
+                  width: '34px', height: '34px', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  cursor: 'pointer', color: 'var(--text-muted, #475569)', padding: '0', transition: 'background 0.2s'
                 }}
+                onMouseOver={(e) => e.currentTarget.style.background = 'var(--bg-secondary, #f8fafc)'}
+                onMouseOut={(e) => e.currentTarget.style.background = 'none'}
               >
-                Sign out
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                  <circle cx="12" cy="7" r="4"></circle>
+                </svg>
               </button>
-            </>
+
+              {profileOpen && (
+                <div style={{
+                  position: 'absolute', top: '100%', right: 0, marginTop: '8px',
+                  background: 'var(--bg-card, #ffffff)', border: '1px solid var(--border, #e2e8f0)',
+                  borderRadius: 'var(--radius-sm, 6px)', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+                  minWidth: '220px', display: 'flex', flexDirection: 'column', zIndex: 1000
+                }}>
+                  <div style={{ padding: '12px 16px', borderBottom: '1px solid var(--border, #e2e8f0)' }}>
+                    <span style={{ display: 'block', fontSize: '14px', fontWeight: 600, color: 'var(--text, #0f172a)' }}>
+                      {user.displayName}
+                    </span>
+                    <span style={{ display: 'block', fontSize: '12px', color: 'var(--text-muted, #475569)', overflow: 'hidden', textOverflow: 'ellipsis' }} title={user.email}>
+                      {user.email}
+                    </span>
+                  </div>
+                  <div style={{ padding: '8px' }}>
+                    {isAdmin && (
+                      <button
+                        type="button"
+                        onClick={() => { setProfileOpen(false); navigate("/admin"); }}
+                        style={{
+                          width: '100%', textAlign: 'left', padding: '8px 12px', background: 'none', border: 'none',
+                          fontSize: '14px', cursor: 'pointer', borderRadius: '4px', color: 'var(--text, #0f172a)'
+                        }}
+                        onMouseOver={(e) => e.currentTarget.style.background = 'var(--bg-secondary, #f8fafc)'}
+                        onMouseOut={(e) => e.currentTarget.style.background = 'none'}
+                      >
+                        Admin dashboard
+                      </button>
+                    )}
+                    <button
+                      type="button"
+                      onClick={async () => {
+                        setProfileOpen(false);
+                        await signOut();
+                        navigate("/sign-in", { replace: true });
+                      }}
+                      style={{
+                        width: '100%', textAlign: 'left', padding: '8px 12px', background: 'none', border: 'none',
+                        fontSize: '14px', cursor: 'pointer', borderRadius: '4px', color: 'var(--text, #0f172a)'
+                      }}
+                      onMouseOver={(e) => e.currentTarget.style.background = 'var(--bg-secondary, #f8fafc)'}
+                      onMouseOut={(e) => e.currentTarget.style.background = 'none'}
+                    >
+                      Sign out
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
           )}
           {!authLoading && !user && (
             <button className={styles.joinBtn} type="button" onClick={goToJoin}>

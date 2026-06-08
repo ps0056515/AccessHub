@@ -5,6 +5,7 @@ import ImageResize from 'quill-image-resize-module-react';
 import { blogpostsApi } from 'api/client';
 import Table from 'components/common/Table/Table';
 import styles from './BlogpostsView.module.css';
+import { truncateText } from 'utils/commonUtils';
 
 // Fix for React-Quill ImageResize module looking for window.Quill
 window.Quill = Quill;
@@ -13,6 +14,7 @@ Quill.register('modules/imageResize', ImageResize);
 export default function BlogpostsView({ showToast }) {
   const [blogposts, setBlogposts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [blogpostSearch, setBlogpostSearch] = useState("");
   
   // Editor state
   const [isEditing, setIsEditing] = useState(false);
@@ -180,8 +182,8 @@ export default function BlogpostsView({ showToast }) {
   };
 
   const columns = [
-    { key: 'title', label: 'Title', render: (row) => <span style={{ fontWeight: 500 }}>{row.title}</span> },
-    { key: 'author', label: 'Author' },
+    { key: 'title', label: 'Title', width: '35%', render: (row) => <span style={{ fontWeight: 500 }}>{truncateText( row.title, 50)}</span> },
+    { key: 'author', label: 'Author', width: "20%" },
     { key: 'status', label: 'Status', render: (blogpost) => (
       <span style={{ 
         padding: '4px 8px', 
@@ -195,6 +197,7 @@ export default function BlogpostsView({ showToast }) {
       </span>
     )},
     { key: 'date', label: 'Published Date', render: (blogpost) => new Date(blogpost.published_date).toLocaleDateString() },
+    { key: 'updated_at', label: 'Last Updated', render: (blogpost) => blogpost.updated_at ? new Date(blogpost.updated_at).toLocaleString('en-US', { month: 'numeric', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit' }).replace(',', '') : '—' },
     { key: 'actions', label: 'Actions', render: (blogpost) => (
       <div className={styles.actions}>
         <button
@@ -226,11 +229,26 @@ export default function BlogpostsView({ showToast }) {
     <div className={styles.container}>
       {!isEditing ? (
         <>
-          <div className={styles.header}>
-            <h2 className={styles.title}>Blogposts & News</h2>
-            <button type="button" onClick={() => openEditor()} className={styles.createBtn}>
-              ➕ Create New Blogpost
-            </button>
+          <div className={styles.header} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+            <h2 className={styles.title} style={{ margin: 0 }}>Blogposts & News</h2>
+            <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
+              <input
+                type="text"
+                placeholder="Search blogposts..."
+                value={blogpostSearch}
+                onChange={(e) => setBlogpostSearch(e.target.value)}
+                style={{
+                  padding: '8px 12px',
+                  borderRadius: 'var(--radius-sm, 6px)',
+                  border: '1px solid var(--border-strong, #cbd5e1)',
+                  minWidth: '250px',
+                  outline: 'none'
+                }}
+              />
+              <button type="button" onClick={() => openEditor()} className={styles.createBtn}>
+                ➕ Create New Blogpost
+              </button>
+            </div>
           </div>
 
           <Table 
@@ -238,6 +256,7 @@ export default function BlogpostsView({ showToast }) {
             data={blogposts} 
             loading={loading} 
             emptyMessage="No blogposts found." 
+            searchQuery={blogpostSearch}
           />
         </>
       ) : (

@@ -15,7 +15,7 @@ const router = express.Router();
 const GENERIC_RESET_MESSAGE =
   'If an account exists for that email, we sent password reset instructions.';
 const USER_RETURNING =
-  'id, email, password_hash, display_name, google_id, country, city, is_admin, is_blocked, created_at';
+  'id, email, password_hash, display_name, google_id, country, city, company, is_admin, is_blocked, created_at';
 const USER_SELECT = `SELECT ${USER_RETURNING} FROM users`;
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -44,7 +44,7 @@ function validateSignUp({ email, password, displayName, country, city }) {
 }
 
 router.post('/signup', async (req, res, next) => {
-  const { email, password, displayName, country, city } = req.body || {};
+  const { email, password, displayName, country, city, company } = req.body || {};
   const validationError = validateSignUp({ email, password, displayName, country, city });
   if (validationError) {
     res.status(400).json({ error: validationError });
@@ -64,8 +64,8 @@ router.post('/signup', async (req, res, next) => {
 
     const passwordHash = await hashPassword(password);
     const inserted = await query(
-      `INSERT INTO users (email, password_hash, display_name, country, city)
-       VALUES ($1, $2, $3, $4, $5)
+      `INSERT INTO users (email, password_hash, display_name, country, city, company)
+       VALUES ($1, $2, $3, $4, $5, $6)
        RETURNING ${USER_RETURNING}`,
       [
         normalizedEmail,
@@ -73,6 +73,7 @@ router.post('/signup', async (req, res, next) => {
         displayName.trim(),
         normalizeLocation(country),
         normalizeLocation(city),
+        company?.trim() || null,
       ],
     );
 
@@ -132,7 +133,7 @@ router.post('/signin', async (req, res, next) => {
 });
 
 router.post('/google', async (req, res, next) => {
-  const { credential, country, city } = req.body || {};
+  const { credential, country, city, company } = req.body || {};
   if (!credential) {
     res.status(400).json({ error: 'Google credential is required.' });
     return;
@@ -177,10 +178,10 @@ router.post('/google', async (req, res, next) => {
       } else {
         isNew = true;
         const inserted = await query(
-          `INSERT INTO users (email, password_hash, display_name, google_id, country, city)
-           VALUES ($1, '', $2, $3, $4, $5)
+          `INSERT INTO users (email, password_hash, display_name, google_id, country, city, company)
+           VALUES ($1, '', $2, $3, $4, $5, $6)
            RETURNING ${USER_RETURNING}`,
-          [email, displayName, googleId, normalizeLocation(country), normalizeLocation(city)],
+          [email, displayName, googleId, normalizeLocation(country), normalizeLocation(city), company?.trim() || null],
         );
         user = inserted.rows[0];
       }
@@ -191,10 +192,10 @@ router.post('/google', async (req, res, next) => {
       return;
     }
 
-    if (country?.trim() || city?.trim()) {
+    if (country?.trim() || city?.trim() || company?.trim()) {
       await query(
-        `UPDATE users SET country = COALESCE($1, country), city = COALESCE($2, city) WHERE id = $3`,
-        [normalizeLocation(country), normalizeLocation(city), user.id],
+        `UPDATE users SET country = COALESCE($1, country), city = COALESCE($2, city), company = COALESCE($3, company) WHERE id = $4`,
+        [normalizeLocation(country), normalizeLocation(city), company?.trim() || null, user.id],
       );
       const updated = await query(`${USER_SELECT} WHERE id = $1`, [user.id]);
       user = updated.rows[0];

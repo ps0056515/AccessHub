@@ -1,9 +1,10 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { eventsApi } from "api/client";
 import EventModal from "./components/EventModal";
 import dashboardStyles from "../../AdminDashboard.module.css";
 import styles from "./EventsView.module.css";
 import Table from "components/common/Table/Table";
+import { truncateText } from "utils/commonUtils";
 
 const TABS = ["Active Events", "Proposed Events"];
 
@@ -58,6 +59,7 @@ function timingClass(timing, s) {
 
 export default function EventsView({ showToast }) {
   const [activeTab, setActiveTab] = useState("Active Events");
+  const [eventSearch, setEventSearch] = useState("");
 
   // Active events state
   const [eventsList, setEventsList] = useState([]);
@@ -190,6 +192,14 @@ export default function EventsView({ showToast }) {
     setApprovingProposal(null);
   };
 
+  const uniqueBands = useMemo(() => {
+    const bands = new Set();
+    eventsList.forEach((e) => {
+      if (e.band) bands.add(e.band);
+    });
+    return Array.from(bands).sort();
+  }, [eventsList]);
+
   const activeEventColumns = [
     {
       key: "date",
@@ -204,13 +214,23 @@ export default function EventsView({ showToast }) {
     {
       key: "title",
       label: "Title",
-      render: (ev) => <strong>{ev.title}</strong>,
+      render: (ev) => <strong>{truncateText(ev.title, 20)}</strong>,
     },
     { key: "type", label: "Type" },
-    { key: "band", label: "Band" },
+    {
+      key: "band",
+      label: "Band",
+      filterOptions: uniqueBands.length > 0 ? uniqueBands : undefined,
+    },
     {
       key: "timing",
       label: "Timing",
+      filterOptions: [
+        { label: "Upcoming", value: "upcoming" },
+        { label: "Live", value: "live" },
+        { label: "Past", value: "past" },
+      ],
+      filterMatch: (ev, val) => getEventTiming(ev.event_date) === val,
       render: (ev) => (
         <span
           className={`${styles.timingPill} ${timingClass(getEventTiming(ev.event_date), styles)}`}
@@ -225,6 +245,22 @@ export default function EventsView({ showToast }) {
       render: (ev) => (
         <span className={styles.rsvpCount}>{ev.rsvp_count ?? 0}</span>
       ),
+    },
+    {
+      key: "updated_at",
+      label: "Last Updated",
+      render: (ev) =>
+        ev.updated_at
+          ? new Date(ev.updated_at)
+              .toLocaleString("en-US", {
+                month: "numeric",
+                day: "numeric",
+                year: "numeric",
+                hour: "numeric",
+                minute: "2-digit",
+              })
+              .replace(",", "")
+          : "—",
     },
     {
       key: "actions",
@@ -300,6 +336,22 @@ export default function EventsView({ showToast }) {
       render: (p) => new Date(p.created_at).toLocaleDateString(),
     },
     {
+      key: "updated_at",
+      label: "Last Updated",
+      render: (p) =>
+        p.updated_at
+          ? new Date(p.updated_at)
+              .toLocaleString("en-US", {
+                month: "numeric",
+                day: "numeric",
+                year: "numeric",
+                hour: "numeric",
+                minute: "2-digit",
+              })
+              .replace(",", "")
+          : "—",
+    },
+    {
       key: "actions",
       label: "Actions",
       render: (p) =>
@@ -355,22 +407,48 @@ export default function EventsView({ showToast }) {
         aria-labelledby="events-cms-title"
       >
         {/* Panel header */}
-        <div className={styles.eventsHeader}>
-          <h2 id="events-cms-title" className={dashboardStyles.panelTitle}>
+        <div
+          className={styles.eventsHeader}
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+          }}
+        >
+          <h2
+            id="events-cms-title"
+            className={dashboardStyles.panelTitle}
+            style={{ margin: 0 }}
+          >
             Events Calendar
           </h2>
-          {activeTab === "Active Events" && (
-            <button
-              type="button"
-              onClick={() => {
-                setEditingEvent(null);
-                setIsModalOpen(true);
+          <div style={{ display: "flex", gap: "16px", alignItems: "center" }}>
+            <input
+              type="text"
+              placeholder="Search events..."
+              value={eventSearch}
+              onChange={(e) => setEventSearch(e.target.value)}
+              style={{
+                padding: "8px 12px",
+                borderRadius: "var(--radius-sm, 6px)",
+                border: "1px solid var(--border-strong, #cbd5e1)",
+                minWidth: "250px",
+                outline: "none",
               }}
-              className={styles.addEventBtn}
-            >
-              📅 Add Event
-            </button>
-          )}
+            />
+            {activeTab === "Active Events" && (
+              <button
+                type="button"
+                onClick={() => {
+                  setEditingEvent(null);
+                  setIsModalOpen(true);
+                }}
+                className={styles.addEventBtn}
+              >
+                📅 Add Event
+              </button>
+            )}
+          </div>
         </div>
 
         {/* Tabs */}
@@ -402,6 +480,7 @@ export default function EventsView({ showToast }) {
             data={eventsList}
             loading={eventsLoading}
             emptyMessage="No events yet. Click '📅 Add Event' to create one."
+            searchQuery={eventSearch}
           />
         )}
         {/* Proposed Events Tab */}
@@ -411,6 +490,7 @@ export default function EventsView({ showToast }) {
             data={proposals}
             loading={proposalsLoading}
             emptyMessage="No proposals submitted yet."
+            searchQuery={eventSearch}
           />
         )}
       </section>
