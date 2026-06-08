@@ -1,9 +1,12 @@
 import { useEffect, useState } from "react";
 import { adminApi } from "api/client";
 import { useAuth } from "context/AuthContext";
+import { Download } from "lucide-react";
 import dashboardStyles from "../../AdminDashboard.module.css";
 import styles from "./OverviewView.module.css";
 import Table from "components/common/Table/Table";
+import Tooltip from "components/common/Tooltip/Tooltip";
+import { exportToExcel } from "utils/commonUtils";
 
 function StatCard({ label, value, hint }) {
   return (
@@ -263,26 +266,39 @@ export default function OverviewView({ showToast }) {
             <h2 id="country-heading" className={dashboardStyles.panelTitle} style={{ margin: 0 }}>
               Members by country
             </h2>
-            <input 
-              type="text" 
-              placeholder="Search..." 
-              value={countrySearch}
-              onChange={(e) => setCountrySearch(e.target.value)}
-              style={{ 
-                padding: '6px 10px', 
-                borderRadius: 'var(--radius-sm, 6px)', 
-                border: '1px solid var(--border-strong, #cbd5e1)', 
-                width: '150px',
-                outline: 'none',
-                fontSize: '13px'
-              }}
-            />
+            <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+              <Tooltip content="Export to Excel" position="top">
+                <button 
+                  onClick={() => exportToExcel(stats.byCountry, "members_by_country")} 
+                  className={styles.actionBtn}
+                  style={{ padding: '8px', borderRadius: '6px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                  aria-label="Export to Excel"
+                >
+                  <Download size={16} />
+                </button>
+              </Tooltip>
+              <input 
+                type="text" 
+                placeholder="Search..." 
+                value={countrySearch}
+                onChange={(e) => setCountrySearch(e.target.value)}
+                style={{ 
+                  padding: '6px 10px', 
+                  borderRadius: 'var(--radius-sm, 6px)', 
+                  border: '1px solid var(--border-strong, #cbd5e1)', 
+                  width: '150px',
+                  outline: 'none',
+                  fontSize: '13px'
+                }}
+              />
+            </div>
           </div>
           <Table
             columns={countryColumns}
             data={stats.byCountry}
             emptyMessage="No data available."
             searchQuery={countrySearch}
+            pagination={true}
           />
         </section>
 
@@ -294,20 +310,35 @@ export default function OverviewView({ showToast }) {
             <h2 id="city-heading" className={dashboardStyles.panelTitle} style={{ margin: 0 }}>
               Members by city
             </h2>
-            <input 
-              type="text" 
-              placeholder="Search..." 
-              value={citySearch}
-              onChange={(e) => setCitySearch(e.target.value)}
-              style={{ 
-                padding: '6px 10px', 
-                borderRadius: 'var(--radius-sm, 6px)', 
-                border: '1px solid var(--border-strong, #cbd5e1)', 
-                width: '150px',
-                outline: 'none',
-                fontSize: '13px'
-              }}
-            />
+            <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+              <Tooltip content="Export to Excel" position="top">
+                <button 
+                  onClick={() => {
+                    const data = stats.byCity.map(r => ({ City: r.city, Country: r.country, Members: r.count }));
+                    exportToExcel(data, "members_by_city");
+                  }} 
+                  className={styles.actionBtn}
+                  style={{ padding: '8px', borderRadius: '6px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                  aria-label="Export to Excel"
+                >
+                  <Download size={16} />
+                </button>
+              </Tooltip>
+              <input 
+                type="text" 
+                placeholder="Search..." 
+                value={citySearch}
+                onChange={(e) => setCitySearch(e.target.value)}
+                style={{ 
+                  padding: '6px 10px', 
+                  borderRadius: 'var(--radius-sm, 6px)', 
+                  border: '1px solid var(--border-strong, #cbd5e1)', 
+                  width: '150px',
+                  outline: 'none',
+                  fontSize: '13px'
+                }}
+              />
+            </div>
           </div>
           <Table
             columns={cityColumns}
@@ -317,6 +348,7 @@ export default function OverviewView({ showToast }) {
             }))}
             emptyMessage="No data available."
             searchQuery={citySearch}
+            pagination={true}
           />
         </section>
       </div>
@@ -329,19 +361,43 @@ export default function OverviewView({ showToast }) {
           <h2 id="users-heading" className={dashboardStyles.panelTitle} style={{ margin: 0 }}>
             All members
           </h2>
-          <input 
-            type="text" 
-            placeholder="Search members..." 
-            value={memberSearch}
-            onChange={(e) => setMemberSearch(e.target.value)}
-            style={{ 
-              padding: '8px 12px', 
-              borderRadius: 'var(--radius-sm, 6px)', 
-              border: '1px solid var(--border-strong, #cbd5e1)', 
-              minWidth: '250px',
-              outline: 'none'
-            }}
-          />
+          <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
+            <Tooltip content="Export to Excel" position="top">
+              <button 
+                onClick={() => {
+                  const data = users.map(u => ({
+                    Name: u.displayName,
+                    Email: u.email,
+                    City: u.city || "",
+                    Country: u.country || "",
+                    AuthMethod: u.authMethod === "google" ? "Google" : "Email",
+                    Joined: formatDate(u.createdAt),
+                    Role: u.isAdmin ? "Admin" : "Member",
+                    Status: u.isBlocked ? "Blocked" : "Active"
+                  }));
+                  exportToExcel(data, "all_members");
+                }} 
+                className={styles.actionBtn}
+                style={{ padding: '8px', borderRadius: '6px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                aria-label="Export to Excel"
+              >
+                <Download size={16} />
+              </button>
+            </Tooltip>
+            <input 
+              type="text" 
+              placeholder="Search members..." 
+              value={memberSearch}
+              onChange={(e) => setMemberSearch(e.target.value)}
+              style={{ 
+                padding: '8px 12px', 
+                borderRadius: 'var(--radius-sm, 6px)', 
+                border: '1px solid var(--border-strong, #cbd5e1)', 
+                minWidth: '250px',
+                outline: 'none'
+              }}
+            />
+          </div>
         </div>
         <Table
           columns={userColumns}
@@ -350,6 +406,7 @@ export default function OverviewView({ showToast }) {
           getRowStyle={(u) => (u.isBlocked ? { opacity: 0.5 } : {})}
           minWidth="900px"
           searchQuery={memberSearch}
+          pagination
         />
       </section>
     </>

@@ -6,6 +6,24 @@
   margin-bottom: 20px;
 }
 
+.headerTitle {
+  margin: 0;
+}
+
+.headerActions {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+
+.searchInput {
+  padding: 8px 12px;
+  border-radius: var(--radius-sm, 6px);
+  border: 1px solid var(--border-strong, #cbd5e1);
+  min-width: 250px;
+  outline: none;
+}
+
 .addEventBtn {
   background: var(--accent, #074a9e);
   color: #ffffff;
@@ -18,6 +36,26 @@
   transition: background 0.2s;
 }
 .addEventBtn:hover { background: #063d82; }
+
+.resourceIcon {
+  font-size: 1.25rem;
+}
+
+.titleWrapper {
+  max-width: 100%;
+  overflow: hidden;
+}
+
+.metaLink {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.noteText {
+  color: var(--gray-600);
+}
 
 /* ─── Tabs ────────────────────────────────────────────────────────────────── */
 .tabs {
@@ -80,6 +118,7 @@
   border: 1px solid var(--border, #e2e8f0);
   border-radius: 9999px;
   padding: 2px 8px;
+  margin-left: 6px;
 }
 
 /* Sort controls */
@@ -126,6 +165,19 @@
   cursor: pointer;
 }
 .deleteBtn:hover { background: #fef2f2; }
+
+.bulkDeleteBtn {
+  padding: 8px 12px;
+  font-size: 14px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.actionBtnGroupSpaced {
+  justify-content: space-between;
+}
 
 /* ─── Modal form ──────────────────────────────────────────────────────────── */
 .formFields {

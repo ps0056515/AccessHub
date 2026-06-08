@@ -15,6 +15,7 @@ export default function BlogpostsView({ showToast }) {
   const [blogposts, setBlogposts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [blogpostSearch, setBlogpostSearch] = useState("");
+  const [selectedIds, setSelectedIds] = useState([]);
   
   // Editor state
   const [isEditing, setIsEditing] = useState(false);
@@ -166,6 +167,30 @@ export default function BlogpostsView({ showToast }) {
     }
   };
 
+  const handleBulkDelete = async () => {
+    if (!window.confirm(`Are you sure you want to delete ${selectedIds.length} blogposts?`)) return;
+    try {
+      await Promise.all(selectedIds.map(id => blogpostsApi.delete(id)));
+      showToast?.(`Successfully deleted ${selectedIds.length} blogposts.`, "success");
+      setSelectedIds([]);
+      await loadBlogposts();
+    } catch (err) {
+      showToast?.(err.message || "Failed to bulk delete blogposts.", "error");
+    }
+  };
+
+  const handleBulkPublish = async (publishState) => {
+    if (!window.confirm(`Are you sure you want to ${publishState ? "publish" : "unpublish"} ${selectedIds.length} blogposts?`)) return;
+    try {
+      await Promise.all(selectedIds.map(id => blogpostsApi.togglePublish(id, publishState)));
+      showToast?.(`Successfully ${publishState ? "published" : "unpublished"} ${selectedIds.length} blogposts.`, "success");
+      setSelectedIds([]);
+      await loadBlogposts();
+    } catch (err) {
+      showToast?.(err.message || `Failed to bulk ${publishState ? "publish" : "unpublish"} blogposts.`, "error");
+    }
+  };
+
   // React-Quill toolbar config
   const modules = {
     toolbar: [
@@ -245,6 +270,34 @@ export default function BlogpostsView({ showToast }) {
                   outline: 'none'
                 }}
               />
+              {selectedIds.length > 0 && (
+                <>
+                  <button
+                    type="button"
+                    onClick={() => handleBulkPublish(true)}
+                    className={styles.btnSuccess}
+                    style={{ padding: '8px 12px', fontSize: '14px', borderRadius: '6px' }}
+                  >
+                    📢 Bulk Publish
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleBulkPublish(false)}
+                    className={styles.btnSecondary}
+                    style={{ padding: '8px 12px', fontSize: '14px', borderRadius: '6px' }}
+                  >
+                    🚫 Bulk Unpublish
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleBulkDelete}
+                    className={styles.btnDanger}
+                    style={{ padding: '8px 12px', fontSize: '14px', borderRadius: '6px' }}
+                  >
+                    🗑 Bulk Delete ({selectedIds.length})
+                  </button>
+                </>
+              )}
               <button type="button" onClick={() => openEditor()} className={styles.createBtn}>
                 ➕ Create New Blogpost
               </button>
@@ -257,6 +310,10 @@ export default function BlogpostsView({ showToast }) {
             loading={loading} 
             emptyMessage="No blogposts found." 
             searchQuery={blogpostSearch}
+            selectable
+            selectedRowIds={selectedIds}
+            onSelectChange={setSelectedIds}
+            pagination={true}
           />
         </>
       ) : (

@@ -5,6 +5,7 @@ import styles from "./ResourcesView.module.css";
 import ResourceModal from "./components/ResourceModal";
 import Table from "components/common/Table/Table";
 import { truncateText } from "utils/commonUtils";
+import { Trash } from "lucide-react";
 
 const TABS = ["Active Resources", "Proposed Resources"];
 
@@ -20,6 +21,7 @@ export default function ResourcesView({ showToast }) {
   const [proposals, setProposals] = useState([]);
   const [proposalsLoading, setProposalsLoading] = useState(false);
   const [approvingProposal, setApprovingProposal] = useState(null);
+  const [selectedIds, setSelectedIds] = useState([]);
 
   const loadResources = useCallback(async () => {
     setResourcesLoading(true);
@@ -60,6 +62,26 @@ export default function ResourcesView({ showToast }) {
       loadResources();
     } catch (err) {
       showToast?.(err.message || "Failed to delete resource.", "error");
+    }
+  };
+
+  const handleBulkDelete = async () => {
+    if (
+      !window.confirm(
+        `Are you sure you want to delete ${selectedIds.length} resources?`,
+      )
+    )
+      return;
+    try {
+      await Promise.all(selectedIds.map((id) => resourcesApi.delete(id)));
+      showToast?.(
+        `Successfully deleted ${selectedIds.length} resources.`,
+        "success",
+      );
+      setSelectedIds([]);
+      loadResources();
+    } catch (err) {
+      showToast?.(err.message || "Failed to bulk delete resources.", "error");
     }
   };
 
@@ -107,14 +129,14 @@ export default function ResourcesView({ showToast }) {
       key: "icon",
       label: "Icon",
       width: "15%",
-      render: (res) => <span style={{ fontSize: "1.25rem" }}>{res.icon}</span>,
+      render: (res) => <span className={styles.resourceIcon}>{res.icon}</span>,
     },
     {
       key: "title",
       label: "Title",
       width: "40%",
       render: (res) => (
-        <div style={{ maxWidth: "100%", overflow: "hidden" }}>
+        <div className={styles.titleWrapper}>
           <strong>{res.title}</strong>
           <br />
           <a
@@ -122,12 +144,6 @@ export default function ResourcesView({ showToast }) {
             target="_blank"
             rel="noreferrer"
             className={styles.metaLink}
-            style={{
-              display: "block",
-              overflow: "hidden",
-              textOverflow: "ellipsis",
-              whiteSpace: "nowrap",
-            }}
           >
             {truncateText(res.view_url)}
           </a>
@@ -201,7 +217,7 @@ export default function ResourcesView({ showToast }) {
       label: "Title & URL",
       width: "40%",
       render: (p) => (
-        <div style={{ maxWidth: "100%", overflow: "hidden" }}>
+        <div className={styles.titleWrapper}>
           <strong>{p.title}</strong>
           <br />
           <a
@@ -209,12 +225,6 @@ export default function ResourcesView({ showToast }) {
             target="_blank"
             rel="noreferrer"
             className={styles.metaLink}
-            style={{
-              display: "block",
-              overflow: "hidden",
-              textOverflow: "ellipsis",
-              whiteSpace: "nowrap",
-            }}
           >
             {p.url}
           </a>
@@ -225,9 +235,7 @@ export default function ResourcesView({ showToast }) {
       key: "note",
       label: "Submitter Note",
       width: "15%",
-      render: (p) => (
-        <span style={{ color: "var(--gray-600)" }}>{p.note || "—"}</span>
-      ),
+      render: (p) => <span className={styles.noteText}>{p.note || "—"}</span>,
     },
     {
       key: "status",
@@ -287,8 +295,7 @@ export default function ResourcesView({ showToast }) {
           </div>
         ) : (
           <div
-            className={styles.actionBtnGroup}
-            style={{ justifyContent: "space-between" }}
+            className={`${styles.actionBtnGroup} ${styles.actionBtnGroupSpaced}`}
           >
             <button
               type="button"
@@ -318,35 +325,30 @@ export default function ResourcesView({ showToast }) {
         className={dashboardStyles.panel}
         aria-labelledby="resources-cms-title"
       >
-        <div
-          className={styles.eventsHeader}
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-          }}
-        >
+        <div className={styles.eventsHeader}>
           <h2
             id="resources-cms-title"
-            className={dashboardStyles.panelTitle}
-            style={{ margin: 0 }}
+            className={`${dashboardStyles.panelTitle} ${styles.headerTitle}`}
           >
             Resources Library
           </h2>
-          <div style={{ display: "flex", gap: "16px", alignItems: "center" }}>
+          <div className={styles.headerActions}>
             <input
               type="text"
               placeholder="Search resources..."
               value={resourceSearch}
               onChange={(e) => setResourceSearch(e.target.value)}
-              style={{
-                padding: "8px 12px",
-                borderRadius: "var(--radius-sm, 6px)",
-                border: "1px solid var(--border-strong, #cbd5e1)",
-                minWidth: "250px",
-                outline: "none",
-              }}
+              className={styles.searchInput}
             />
+            {activeTab === "Active Resources" && selectedIds.length > 0 && (
+              <button
+                type="button"
+                onClick={handleBulkDelete}
+                className={`${styles.deleteBtn} ${styles.bulkDeleteBtn}`}
+              >
+                <Trash size={16} /> Delete ({selectedIds.length})
+              </button>
+            )}
             {activeTab === "Active Resources" && (
               <button
                 type="button"
@@ -375,7 +377,7 @@ export default function ResourcesView({ showToast }) {
               {tab}
               {tab === "Proposed Resources" &&
                 proposals.filter((p) => p.status === "pending").length > 0 && (
-                  <span className={styles.rsvpCount} style={{ marginLeft: 6 }}>
+                  <span className={styles.rsvpCount}>
                     {proposals.filter((p) => p.status === "pending").length}
                   </span>
                 )}
@@ -393,6 +395,11 @@ export default function ResourcesView({ showToast }) {
               loading={resourcesLoading}
               emptyMessage="No active resources."
               searchQuery={resourceSearch}
+              selectable
+              selectedRowIds={selectedIds}
+              onSelectChange={setSelectedIds}
+              pagination={true}
+              
             />
           ))}
 
@@ -406,6 +413,7 @@ export default function ResourcesView({ showToast }) {
               loading={proposalsLoading}
               emptyMessage="No proposals yet."
               searchQuery={resourceSearch}
+              pagination={true}
             />
           ))}
       </section>

@@ -75,7 +75,6 @@
 .rsvpCount {
   font-size: 12px;
   font-weight: 600;
-  color: var(--text);
   background: var(--bg-secondary, #f8fafc);
   border: 1px solid var(--border, #e2e8f0);
   border-radius: 9999px;
@@ -127,69 +126,51 @@
 }
 .deleteBtn:hover { background: #fef2f2; }
 
-/* ─── Modal form ──────────────────────────────────────────────────────────── */
-.formFields {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  margin-bottom: 4px;
-}
-.formRow {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-}
-.formGroup { display: flex; flex-direction: column; gap: 6px; }
-.formLabel { font-size: 13px; font-weight: 600; color: var(--text); }
-
-.formInput, .formSelect {
-  padding: 8px 12px;
-  border-radius: 6px;
-  border: 1px solid var(--border, #cbd5e1);
-  background: var(--bg-card, #ffffff);
-  color: var(--text);
-  font-size: 14px;
-  width: 100%;
-  box-sizing: border-box;
-}
-.formInput:focus, .formSelect:focus {
-  outline: 2px solid var(--accent, #074a9e);
-  outline-offset: -1px;
-}
-
-.cancelBtn {
-  background: transparent;
-  border: 1px solid var(--border, #cbd5e1);
-  color: var(--text-muted);
-  padding: 8px 16px;
-  border-radius: 6px;
-  font-size: 14px;
-  cursor: pointer;
-}
-.cancelBtn:hover { background: var(--bg-secondary, #f8fafc); }
-
-.saveBtn {
-  background: var(--accent, #074a9e);
-  color: #ffffff;
+/* ─── Extracted Inline Styles ─────────────────────────────────────────────── */
+.rsvpBtn {
+  background: none;
   border: none;
-  padding: 8px 16px;
-  border-radius: 6px;
-  font-size: 14px;
-  font-weight: 500;
+  color: var(--accent, #074a9e);
   cursor: pointer;
+  padding: 0;
+  font-family: inherit;
 }
-.saveBtn:hover { background: #063d82; }
-.saveBtn:disabled { opacity: 0.7; cursor: not-allowed; }
 
-/* Status badge for proposals */
-.statusBadge {
-  display: inline-block;
-  font-size: 11px;
-  font-weight: 600;
-  padding: 2px 8px;
-  border-radius: 9999px;
-  text-transform: capitalize;
+.proposalDetails {
+  color: var(--text-muted);
 }
-.statusPending  { background: #fef9c3; color: #854d0e; }
-.statusApproved { background: #dcfce7; color: #15803d; }
-.statusRejected { background: #fee2e2; color: #b91c1c; }
+
+.actionBtnGroupEnd {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.panelTitle {
+  margin: 0;
+}
+
+.searchWrapper {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+
+.searchInput {
+  padding: 8px 12px;
+  border-radius: var(--radius-sm, 6px);
+  border: 1px solid var(--border-strong, #cbd5e1);
+  min-width: 250px;
+  outline: none;
+}
+
+.bulkDeleteBtn {
+  padding: 8px 12px;
+  font-size: 14px;
+  border-radius: 6px;
+}
+
+.tabBadge {
+  margin-left: 6px;
+}
+

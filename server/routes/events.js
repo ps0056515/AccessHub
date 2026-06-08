@@ -85,6 +85,23 @@ router.post('/:id/rsvp', async (req, res, next) => {
 
 // ─── Admin routes ──────────────────────────────────────────────────────────────
 
+// GET /api/events/admin/:id/rsvps
+router.get('/admin/:id/rsvps', authMiddleware, adminMiddleware, async (req, res, next) => {
+  const { id } = req.params;
+  try {
+    const { rows } = await query(`
+      SELECT r.id, r.email, u.display_name
+      FROM event_rsvps r
+      LEFT JOIN users u ON r.user_id = u.id
+      WHERE r.event_id = $1
+      ORDER BY r.created_at DESC
+    `, [id]);
+    res.json(rows);
+  } catch (err) {
+    next(err);
+  }
+});
+
 // GET /api/events/admin/proposals
 router.get('/admin/proposals', authMiddleware, adminMiddleware, async (req, res, next) => {
   try {

@@ -1,0 +1,123 @@
+/* ─── Shared Modal Elements (EventModal) ─────────────────────────────────── */
+.formFields {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 4px;
+}
+.formRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.formGroup { display: flex; flex-direction: column; gap: 6px; }
+.formLabel { font-size: 13px; font-weight: 600; color: var(--text); }
+
+.formInput, .formSelect {
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: 1px solid var(--border, #cbd5e1);
+  background: var(--bg-card, #ffffff);
+  color: var(--text);
+  font-size: 14px;
+  width: 100%;
+  box-sizing: border-box;
+}
+.formInput:focus, .formSelect:focus {
+  outline: 2px solid var(--accent, #074a9e);
+  outline-offset: -1px;
+}
+
+.cancelBtn {
+  background: transparent;
+  border: 1px solid var(--border, #cbd5e1);
+  color: var(--text-muted);
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
+}
+.cancelBtn:hover { background: var(--bg-secondary, #f8fafc); }
+
+.saveBtn {
+  background: var(--accent, #074a9e);
+  color: #ffffff;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+}
+.saveBtn:hover { background: #063d82; }
+.saveBtn:disabled { opacity: 0.7; cursor: not-allowed; }
+
+/* ─── RSVP Modal Specific ─────────────────────────────────────────────────── */
+.overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0,0,0,0.5);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal {
+  background-color: #fff;
+  border-radius: 8px;
+  width: 90%;
+  max-width: 500px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.title {
+  margin: 0;
+  font-size: 18px;
+}
+
+.closeBtn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+}
+
+.content {
+  max-height: 400px;
+  overflow-y: auto;
+  padding: 16px;
+}
+
+.emptyText {
+  color: #64748b;
+}
+
+.list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.listItem {
+  padding: 8px 0;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.itemName {
+  font-weight: 500;
+  margin-bottom: 4px;
+}
+
+.itemEmail {
+  color: #64748b;
+  font-size: 14px;
+}
