@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { eventsApi } from "api/client";
 import EventModal from "./components/EventModal";
+import RsvpModal from "./components/RsvpModal";
 import dashboardStyles from "../../AdminDashboard.module.css";
 import styles from "./EventsView.module.css";
 import Table from "components/common/Table/Table";
@@ -66,6 +67,8 @@ export default function EventsView({ showToast }) {
   const [eventsLoading, setEventsLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingEvent, setEditingEvent] = useState(null);
+  const [rsvpModalEvent, setRsvpModalEvent] = useState(null);
+  const [selectedIds, setSelectedIds] = useState([]);
 
   // Proposals state
   const [proposals, setProposals] = useState([]);
@@ -111,6 +114,26 @@ export default function EventsView({ showToast }) {
       loadEvents();
     } catch (err) {
       showToast?.(err.message || "Failed to delete event.", "error");
+    }
+  };
+
+  const handleBulkDelete = async () => {
+    if (
+      !window.confirm(
+        `Are you sure you want to delete ${selectedIds.length} events?`,
+      )
+    )
+      return;
+    try {
+      await Promise.all(selectedIds.map((id) => eventsApi.delete(id)));
+      showToast?.(
+        `Successfully deleted ${selectedIds.length} events.`,
+        "success",
+      );
+      setSelectedIds([]);
+      loadEvents();
+    } catch (err) {
+      showToast?.(err.message || "Failed to bulk delete events.", "error");
     }
   };
 
@@ -243,7 +266,13 @@ export default function EventsView({ showToast }) {
       key: "rsvps",
       label: "RSVPs",
       render: (ev) => (
-        <span className={styles.rsvpCount}>{ev.rsvp_count ?? 0}</span>
+        <button
+          onClick={() => ev.rsvp_count > 0 && setRsvpModalEvent(ev)}
+          className={styles.rsvpBtn}
+          title="View RSVPs"
+        >
+          <span className={styles.rsvpCount}>{ev.rsvp_count ?? 0}</span>
+        </button>
       ),
     },
     {
@@ -299,7 +328,7 @@ export default function EventsView({ showToast }) {
           {p.details && (
             <>
               <br />
-              <small style={{ color: "var(--text-muted)" }}>
+              <small className={styles.proposalDetails}>
                 {p.details.slice(0, 80)}
                 {p.details.length > 80 ? "…" : ""}
               </small>
@@ -373,10 +402,7 @@ export default function EventsView({ showToast }) {
             </button>
           </div>
         ) : (
-          <div
-            className={styles.actionBtnGroup}
-            style={{ justifyContent: "flex-end" }}
-          >
+          <div className={styles.actionBtnGroupEnd}>
             <button
               type="button"
               className={styles.deleteBtn}
@@ -407,35 +433,30 @@ export default function EventsView({ showToast }) {
         aria-labelledby="events-cms-title"
       >
         {/* Panel header */}
-        <div
-          className={styles.eventsHeader}
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-          }}
-        >
+        <div className={styles.eventsHeader}>
           <h2
             id="events-cms-title"
-            className={dashboardStyles.panelTitle}
-            style={{ margin: 0 }}
+            className={`${dashboardStyles.panelTitle} ${styles.panelTitle}`}
           >
             Events Calendar
           </h2>
-          <div style={{ display: "flex", gap: "16px", alignItems: "center" }}>
+          <div className={styles.searchWrapper}>
             <input
               type="text"
               placeholder="Search events..."
               value={eventSearch}
               onChange={(e) => setEventSearch(e.target.value)}
-              style={{
-                padding: "8px 12px",
-                borderRadius: "var(--radius-sm, 6px)",
-                border: "1px solid var(--border-strong, #cbd5e1)",
-                minWidth: "250px",
-                outline: "none",
-              }}
+              className={styles.searchInput}
             />
+            {activeTab === "Active Events" && selectedIds.length > 0 && (
+              <button
+                type="button"
+                onClick={handleBulkDelete}
+                className={`${styles.deleteBtn} ${styles.bulkDeleteBtn}`}
+              >
+                🗑 Bulk Delete ({selectedIds.length})
+              </button>
+            )}
             {activeTab === "Active Events" && (
               <button
                 type="button"
@@ -465,7 +486,7 @@ export default function EventsView({ showToast }) {
               {tab}
               {tab === "Proposed Events" &&
                 proposals.filter((p) => p.status === "pending").length > 0 && (
-                  <span className={styles.rsvpCount} style={{ marginLeft: 6 }}>
+                  <span className={`${styles.rsvpCount} ${styles.tabBadge}`}>
                     {proposals.filter((p) => p.status === "pending").length}
                   </span>
                 )}
@@ -481,6 +502,10 @@ export default function EventsView({ showToast }) {
             loading={eventsLoading}
             emptyMessage="No events yet. Click '📅 Add Event' to create one."
             searchQuery={eventSearch}
+            selectable
+            selectedRowIds={selectedIds}
+            onSelectChange={setSelectedIds}
+            pagination={true}
           />
         )}
         {/* Proposed Events Tab */}
@@ -491,6 +516,7 @@ export default function EventsView({ showToast }) {
             loading={proposalsLoading}
             emptyMessage="No proposals submitted yet."
             searchQuery={eventSearch}
+            pagination={true}
           />
         )}
       </section>
@@ -501,6 +527,12 @@ export default function EventsView({ showToast }) {
         onClose={handleModalClose}
         onSave={approvingProposal ? handleModalSave : loadEvents}
         showToast={showToast}
+      />
+
+      <RsvpModal
+        isOpen={!!rsvpModalEvent}
+        onClose={() => setRsvpModalEvent(null)}
+        event={rsvpModalEvent}
       />
     </>
   );

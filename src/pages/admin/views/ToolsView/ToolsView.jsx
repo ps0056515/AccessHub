@@ -5,6 +5,7 @@ import ToolModal from "./components/ToolModal";
 import dashboardStyles from "../../AdminDashboard.module.css";
 import styles from "./ToolsView.module.css";
 import Table from "components/common/Table/Table";
+import Tooltip from "components/common/Tooltip/Tooltip";
 import { truncateText } from "utils/commonUtils";
 
 export default function ToolsView({ showToast }) {
@@ -13,6 +14,8 @@ export default function ToolsView({ showToast }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingTool, setEditingTool] = useState(null);
   const [toolSearch, setToolSearch] = useState("");
+  const [selectedIds, setSelectedIds] = useState([]);
+  
   const loadTools = async () => {
     setLoading(true);
     try {
@@ -54,6 +57,18 @@ export default function ToolsView({ showToast }) {
     }
   };
 
+  const handleBulkDelete = async () => {
+    if (!window.confirm(`Are you sure you want to delete ${selectedIds.length} tools?`)) return;
+    try {
+      await Promise.all(selectedIds.map(id => toolsApi.delete(id)));
+      showToast?.(`Successfully deleted ${selectedIds.length} tools.`, "success");
+      setSelectedIds([]);
+      loadTools();
+    } catch (err) {
+      showToast?.(err.message || "Failed to bulk delete tools.", "error");
+    }
+  };
+
   const handleMoveTool = async (index, direction) => {
     const list = [...toolsList];
     const targetIndex = index + direction;
@@ -82,24 +97,28 @@ export default function ToolsView({ showToast }) {
       label: "Sort",
       render: (t, index) => (
         <div className={styles.sortButtons}>
-          <button
-            type="button"
-            disabled={index === 0}
-            onClick={() => handleMoveTool(index, -1)}
-            className={styles.sortBtn}
-            aria-label={`Move tool "${t.name}" up`}
-          >
-            ▲
-          </button>
-          <button
-            type="button"
-            disabled={index === toolsList.length - 1}
-            onClick={() => handleMoveTool(index, 1)}
-            className={styles.sortBtn}
-            aria-label={`Move tool "${t.name}" down`}
-          >
-            ▼
-          </button>
+          <Tooltip content="Move up" position="top" disabled={index === 0}>
+            <button
+              type="button"
+              disabled={index === 0}
+              onClick={() => handleMoveTool(index, -1)}
+              className={styles.sortBtn}
+              aria-label={`Move ${t.name} up in list`}
+            >
+              ▲
+            </button>
+          </Tooltip>
+          <Tooltip content="Move down" position="bottom" disabled={index === toolsList.length - 1}>
+            <button
+              type="button"
+              disabled={index === toolsList.length - 1}
+              onClick={() => handleMoveTool(index, 1)}
+              className={styles.sortBtn}
+              aria-label={`Move ${t.name} down in list`}
+            >
+              ▼
+            </button>
+          </Tooltip>
         </div>
       ),
     },
@@ -204,6 +223,16 @@ export default function ToolsView({ showToast }) {
                 outline: 'none'
               }}
             />
+            {selectedIds.length > 0 && (
+              <button
+                type="button"
+                onClick={handleBulkDelete}
+                className={styles.deleteBtn}
+                style={{ padding: '8px 12px', fontSize: '14px', borderRadius: '6px' }}
+              >
+                🗑 Bulk Delete ({selectedIds.length})
+              </button>
+            )}
             <button
               type="button"
               onClick={handleOpenCreateModal}
@@ -222,6 +251,10 @@ export default function ToolsView({ showToast }) {
             data={toolsList}
             emptyMessage='No tools found in the directory. Click "Add Recommended Tool" to create one.'
             searchQuery={toolSearch}
+            selectable
+            selectedRowIds={selectedIds}
+            onSelectChange={setSelectedIds}
+            pagination={true}
           />
         )}
       </section>

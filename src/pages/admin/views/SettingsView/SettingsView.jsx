@@ -403,10 +403,13 @@ export default function SettingsView({ showToast }) {
                 <div className={styles.logoPreviewBox}>
                   <img src={navbarLogoUrl} alt="Navbar Logo Preview" className={styles.logoPreviewImg} />
                 </div>
-                <label className={styles.uploadLabelBtn}>
-                  {logoLoading === 'navbar_logo_url' ? 'Uploading...' : 'Choose Navbar Logo'}
-                  <input type="file" accept="image/*" onChange={(e) => handleLogoUpload(e, 'navbar_logo_url')} className={styles.visuallyHidden} />
-                </label>
+                <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+                  <label className={styles.uploadLabelBtn}>
+                    {logoLoading === 'navbar_logo_url' ? 'Uploading...' : 'Choose Navbar Logo'}
+                    <input type="file" accept="image/*" onChange={(e) => handleLogoUpload(e, 'navbar_logo_url')} className={styles.visuallyHidden} />
+                  </label>
+                  <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>(JPG, PNG, SVG, WEBP)</span>
+                </div>
               </div>
 
               {/* Footer Logo */}
@@ -415,10 +418,13 @@ export default function SettingsView({ showToast }) {
                 <div className={styles.logoPreviewBox}>
                   <img src={footerLogoUrl} alt="Footer Logo Preview" className={styles.logoPreviewImg} />
                 </div>
-                <label className={styles.uploadLabelBtn}>
-                  {logoLoading === 'footer_logo_url' ? 'Uploading...' : 'Choose Footer Logo'}
-                  <input type="file" accept="image/*" onChange={(e) => handleLogoUpload(e, 'footer_logo_url')} className={styles.visuallyHidden} />
-                </label>
+                <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+                  <label className={styles.uploadLabelBtn}>
+                    {logoLoading === 'footer_logo_url' ? 'Uploading...' : 'Choose Footer Logo'}
+                    <input type="file" accept="image/*" onChange={(e) => handleLogoUpload(e, 'footer_logo_url')} className={styles.visuallyHidden} />
+                  </label>
+                  <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>(JPG, PNG, SVG, WEBP)</span>
+                </div>
               </div>
             </div>
           </section>
@@ -478,11 +484,12 @@ export default function SettingsView({ showToast }) {
                   <span style={{ color: '#666' }}>No custom background (using default theme color)</span>
                 )}
               </div>
-              <div style={{ display: 'flex', gap: '12px' }}>
+              <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
                 <label className={styles.uploadLabelBtn}>
                   {logoLoading === 'portal_hero_bg_url' ? 'Uploading...' : 'Upload New Hero Background'}
                   <input type="file" accept="image/*" onChange={(e) => handleLogoUpload(e, 'portal_hero_bg_url')} className={styles.visuallyHidden} />
                 </label>
+                <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>(JPG, PNG, SVG, WEBP)</span>
                 {localPortalConfig.bgUrl && (
                   <button type="button" onClick={handleDeleteHeroBg} disabled={portalSaving} className={styles.uploadLabelBtn} style={{ color: '#ef4444', background: '#fef2f2', border: '1px solid #fca5a5' }}>
                     🗑 Remove

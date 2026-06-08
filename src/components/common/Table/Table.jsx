@@ -1,5 +1,6 @@
 import React, { useState, useMemo, useEffect } from "react";
 import { Filter, ChevronUp, ChevronDown, ChevronsUpDown } from "lucide-react";
+import Pagination from "../Pagination/Pagination";
 import styles from "./Table.module.css";
 
 export default function Table({
@@ -10,10 +11,21 @@ export default function Table({
   getRowStyle,
   minWidth,
   searchQuery = "",
+  selectable = false,
+  selectedRowIds = [],
+  onSelectChange,
+  pagination = false,
+  itemsPerPage = 10,
 }) {
   const [sortConfig, setSortConfig] = useState(null);
   const [filters, setFilters] = useState({});
   const [openFilter, setOpenFilter] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+
+  // Reset to first page when data or filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [data, searchQuery, filters, sortConfig, itemsPerPage]);
 
   useEffect(() => {
     if (!openFilter) return;
@@ -87,6 +99,14 @@ export default function Table({
     });
   }, [filteredData, sortConfig]);
 
+  const paginatedData = useMemo(() => {
+    if (!pagination) return sortedData;
+    const start = (currentPage - 1) * itemsPerPage;
+    return sortedData.slice(start, start + itemsPerPage);
+  }, [sortedData, pagination, currentPage, itemsPerPage]);
+
+  const totalPages = pagination ? Math.ceil(sortedData.length / itemsPerPage) : 1;
+
   const requestSort = (key) => {
     let direction = "asc";
     if (
@@ -114,6 +134,9 @@ export default function Table({
     return <p className={styles.empty}>{emptyMessage}</p>;
   }
 
+  const isAllPageSelected = paginatedData.length > 0 && paginatedData.every(r => selectedRowIds.includes(r.id));
+  const isSomePageSelected = paginatedData.length > 0 && paginatedData.some(r => selectedRowIds.includes(r.id)) && !isAllPageSelected;
+
   return (
     <div className={styles.tableWrapper}>
       <div className={styles.scrollContainer}>
@@ -123,6 +146,32 @@ export default function Table({
         >
           <thead>
             <tr>
+              {selectable && (
+                <th className={styles.fixedHeader} style={{ width: '40px', minWidth: '40px', textAlign: 'center' }}>
+                  <input
+                    type="checkbox"
+                    style={{ cursor: 'pointer' }}
+                    checked={isAllPageSelected}
+                    ref={input => {
+                      if (input) {
+                        input.indeterminate = isSomePageSelected;
+                      }
+                    }}
+                    onChange={(e) => {
+                      if (!onSelectChange) return;
+                      if (e.target.checked) {
+                        const newIds = new Set(selectedRowIds);
+                        paginatedData.forEach(r => newIds.add(r.id));
+                        onSelectChange(Array.from(newIds));
+                      } else {
+                        const pageIds = new Set(paginatedData.map(r => r.id));
+                        onSelectChange(selectedRowIds.filter(id => !pageIds.has(id)));
+                      }
+                    }}
+                    aria-label="Select all rows on this page"
+                  />
+                </th>
+              )}
               {columns.map((col, i) => (
                 <th
                   key={col.key || i}
@@ -302,18 +351,36 @@ export default function Table({
           <tbody>
             {sortedData.length === 0 ? (
               <tr>
-                <td colSpan={columns.length} style={{ padding: 0 }}>
+                <td colSpan={columns.length + (selectable ? 1 : 0)} style={{ padding: 0 }}>
                   <div className={styles.noDataContent}>
                     No matching records found.
                   </div>
                 </td>
               </tr>
             ) : (
-              sortedData.map((row, rowIndex) => (
+              paginatedData.map((row, rowIndex) => (
                 <tr
                   key={row.id || rowIndex}
                   style={getRowStyle ? getRowStyle(row) : undefined}
                 >
+                  {selectable && (
+                    <td style={{ width: '40px', minWidth: '40px', textAlign: 'center' }} onClick={(e) => e.stopPropagation()}>
+                      <input
+                        type="checkbox"
+                        style={{ cursor: 'pointer' }}
+                        checked={selectedRowIds.includes(row.id)}
+                        onChange={(e) => {
+                          if (!onSelectChange) return;
+                          if (e.target.checked) {
+                            onSelectChange([...selectedRowIds, row.id]);
+                          } else {
+                            onSelectChange(selectedRowIds.filter(id => id !== row.id));
+                          }
+                        }}
+                        aria-label={`Select row ${rowIndex + 1}`}
+                      />
+                    </td>
+                  )}
                   {columns.map((col, colIndex) => (
                     <td key={col.key || colIndex}>
                       {col.render ? col.render(row, rowIndex) : row[col.key]}
@@ -325,6 +392,13 @@ export default function Table({
           </tbody>
         </table>
       </div>
+      {pagination && sortedData.length > 0 && (
+        <Pagination 
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={setCurrentPage}
+        />
+      )}
     </div>
   );
 }
