@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
+import { Country, City } from 'country-state-city';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from 'context/AuthContext';
 import GoogleSignInSection from 'components/auth/GoogleSignInSection';
@@ -15,17 +16,30 @@ export default function SignUpPage({ goToPortal }) {
   const [displayName, setDisplayName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [company, setCompany] = useState('');
+  const [countryCode, setCountryCode] = useState('');
   const [country, setCountry] = useState('');
   const [city, setCity] = useState('');
   const [error, setError] = useState('');
   const [submitting, setSubmitting] = useState(false);
+
+  const countries = useMemo(() => Country.getAllCountries(), []);
+  const cities = useMemo(() => countryCode ? City.getCitiesOfCountry(countryCode) : [], [countryCode]);
+
+  const handleCountryChange = (e) => {
+    const code = e.target.value;
+    setCountryCode(code);
+    const selectedCountry = countries.find(c => c.isoCode === code);
+    setCountry(selectedCountry ? selectedCountry.name : '');
+    setCity('');
+  };
 
   const handleSubmit = async e => {
     e.preventDefault();
     setError('');
     setSubmitting(true);
     try {
-      const profile = await signUp({ email, password, displayName, country, city });
+      const profile = await signUp({ email, password, displayName, country, city, company });
       redirectAfterLogin(navigate, profile, from, redirectAfterAuth);
     } catch (err) {
       setError(err.message || 'Could not create account.');
@@ -38,7 +52,7 @@ export default function SignUpPage({ goToPortal }) {
     setError('');
     setSubmitting(true);
     try {
-      const profile = await signInWithGoogle({ credential, country, city });
+      const profile = await signInWithGoogle({ credential, country, city, company });
       redirectAfterLogin(navigate, profile, from, redirectAfterAuth);
     } catch (err) {
       setError(err.message || 'Google sign-in failed.');
@@ -109,37 +123,61 @@ export default function SignUpPage({ goToPortal }) {
           </div>
 
           <div className={styles.field}>
+            <label className={styles.label} htmlFor="signup-company">
+              Company (optional)
+            </label>
+            <input
+              id="signup-company"
+              className={styles.input}
+              type="text"
+              autoComplete="organization"
+              placeholder="e.g. Acme Corp"
+              value={company}
+              onChange={e => setCompany(e.target.value)}
+              disabled={submitting}
+            />
+          </div>
+
+          <div className={styles.field}>
             <label className={styles.label} htmlFor="signup-country">
               Country
             </label>
-            <input
+            <select
               id="signup-country"
               className={styles.input}
-              type="text"
-              autoComplete="country-name"
               required
-              placeholder="e.g. United States"
-              value={country}
-              onChange={e => setCountry(e.target.value)}
+              value={countryCode}
+              onChange={handleCountryChange}
               disabled={submitting}
-            />
+            >
+              <option value="">Select a country</option>
+              {countries.map(c => (
+                <option key={c.isoCode} value={c.isoCode}>
+                  {c.name}
+                </option>
+              ))}
+            </select>
           </div>
 
           <div className={styles.field}>
             <label className={styles.label} htmlFor="signup-city">
               City
             </label>
-            <input
+            <select
               id="signup-city"
               className={styles.input}
-              type="text"
-              autoComplete="address-level2"
               required
-              placeholder="e.g. Chicago"
               value={city}
               onChange={e => setCity(e.target.value)}
-              disabled={submitting}
-            />
+              disabled={submitting || !countryCode || cities.length === 0}
+            >
+              <option value="">{cities.length === 0 && countryCode ? 'No cities available' : 'Select a city'}</option>
+              {cities.map((c, i) => (
+                <option key={`${c.name}-${i}`} value={c.name}>
+                  {c.name}
+                </option>
+              ))}
+            </select>
           </div>
 
           <div className={styles.field}>

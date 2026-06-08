@@ -192,10 +192,10 @@
   background: linear-gradient(
     to bottom,
     transparent,
-    rgba(var(--accent-rgb), 0.12),
+    rgba(var(--accent-rgb), 0.22),
     transparent
   );
-  right: 38%;
+  right: 35%;
 }
 
 /* ── Stats ── */

@@ -86,7 +86,7 @@ router.put('/admin/:id', authMiddleware, adminMiddleware, async (req, res, next)
     const trimmedType = type && type.trim() ? type.trim() : null;
 
     const updateRes = await query(
-      'UPDATE tools SET icon = $1, name = $2, type = $3, price = $4, badge = $5, badge_color = $6, url = $7 WHERE id = $8 RETURNING *',
+      'UPDATE tools SET icon = $1, name = $2, type = $3, price = $4, badge = $5, badge_color = $6, url = $7, updated_at = CURRENT_TIMESTAMP WHERE id = $8 RETURNING *',
       [
         trimmedIcon,
         name.trim(),

@@ -19,7 +19,7 @@ function slugify(text) {
 router.get("/", async (req, res, next) => {
   try {
     const { rows } = await query(
-      "SELECT id, slug, icon, title, description AS desc, color, category, view_url FROM resources ORDER BY created_at DESC",
+      "SELECT id, slug, icon, title, description AS desc, color, category, view_url, updated_at FROM resources ORDER BY created_at DESC",
     );
     res.json(rows);
   } catch (err) {
@@ -228,7 +228,7 @@ router.put(
     }
     try {
       const { rows } = await query(
-        "UPDATE resources SET title=$1, view_url=$2, icon=$3, description=$4, color=$5, category=$6 WHERE id=$7 RETURNING id, slug, icon, title, description AS desc, color, category, view_url, display_order",
+        "UPDATE resources SET title=$1, view_url=$2, icon=$3, description=$4, color=$5, category=$6, updated_at=CURRENT_TIMESTAMP WHERE id=$7 RETURNING id, slug, icon, title, description AS desc, color, category, view_url, display_order, updated_at",
         [
           title.trim(),
           view_url.trim(),

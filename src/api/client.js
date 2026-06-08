@@ -53,14 +53,15 @@ export function setStoredToken(token) {
 }
 
 export async function api(path, options = {}) {
+  const { suppressUnauthorizedEvent, ...fetchOptions } = options;
   const token = getStoredToken();
   const headers = {
     'Content-Type': 'application/json',
-    ...options.headers,
+    ...fetchOptions.headers,
   };
   if (token) headers.Authorization = `Bearer ${token}`;
 
-  const res = await fetch(`${API_BASE}${path}`, { ...options, headers });
+  const res = await fetch(`${API_BASE}${path}`, { ...fetchOptions, headers });
   let data = null;
   const text = await res.text();
   if (text) {
@@ -72,7 +73,7 @@ export async function api(path, options = {}) {
   }
 
   if (!res.ok) {
-    if (res.status === 401 && typeof window !== 'undefined') {
+    if (res.status === 401 && typeof window !== 'undefined' && !suppressUnauthorizedEvent) {
       window.dispatchEvent(new CustomEvent('aa-unauthorized'));
     }
 
@@ -90,17 +91,17 @@ export async function api(path, options = {}) {
 }
 
 export const authApi = {
-  signUp: body => api('/api/auth/signup', { method: 'POST', body: JSON.stringify(body) }),
-  signIn: body => api('/api/auth/signin', { method: 'POST', body: JSON.stringify(body) }),
+  signUp: body => api('/api/auth/signup', { method: 'POST', body: JSON.stringify(body), suppressUnauthorizedEvent: true }),
+  signIn: body => api('/api/auth/signin', { method: 'POST', body: JSON.stringify(body), suppressUnauthorizedEvent: true }),
   signInWithGoogle: body =>
-    api('/api/auth/google', { method: 'POST', body: JSON.stringify(body) }),
+    api('/api/auth/google', { method: 'POST', body: JSON.stringify(body), suppressUnauthorizedEvent: true }),
   updateProfile: body => api('/api/auth/profile', { method: 'PATCH', body: JSON.stringify(body) }),
-  me: () => api('/api/auth/me'),
+  me: () => api('/api/auth/me', { suppressUnauthorizedEvent: true }),
   signOut: () => api('/api/auth/signout', { method: 'POST' }),
   forgotPassword: body =>
-    api('/api/auth/forgot-password', { method: 'POST', body: JSON.stringify(body) }),
+    api('/api/auth/forgot-password', { method: 'POST', body: JSON.stringify(body), suppressUnauthorizedEvent: true }),
   resetPassword: body =>
-    api('/api/auth/reset-password', { method: 'POST', body: JSON.stringify(body) }),
+    api('/api/auth/reset-password', { method: 'POST', body: JSON.stringify(body), suppressUnauthorizedEvent: true }),
 };
 
 export const adminApi = {
@@ -132,8 +133,11 @@ export const postsApi = {
   topContributors: () => api('/api/posts/top-contributors'),
   // Admin methods
   listAdmin: () => api('/api/posts/admin'),
+  createAdmin: (body) => api('/api/posts/admin', { method: 'POST', body: JSON.stringify(body) }),
   updateAdmin: (id, body) => api(`/api/posts/admin/${id}`, { method: 'PUT', body: JSON.stringify(body) }),
   deleteAdmin: id => api(`/api/posts/admin/${id}`, { method: 'DELETE' }),
+  updateCommentAdmin: (postId, commentId, body) => api(`/api/posts/admin/${postId}/comments/${commentId}`, { method: 'PUT', body: JSON.stringify(body) }),
+  deleteCommentAdmin: (postId, commentId) => api(`/api/posts/admin/${postId}/comments/${commentId}`, { method: 'DELETE' }),
 };
 
 export const toolsApi = {
