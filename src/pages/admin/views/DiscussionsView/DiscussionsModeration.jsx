@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { postsApi } from 'api/client';
 import dashboardStyles from '../../AdminDashboard.module.css';
 import DiscussionModal from './DiscussionModal';
@@ -10,6 +10,7 @@ export default function DiscussionsModeration({ showToast }) {
   const [loading, setLoading] = useState(true);
   const [modalPost, setModalPost] = useState(null); // null = closed, {} = new, {id...} = edit
   const [isSaving, setIsSaving] = useState(false);
+  const [discussionSearch, setDiscussionSearch] = useState("");
 
   useEffect(() => {
     fetchPosts();
@@ -55,8 +56,8 @@ export default function DiscussionsModeration({ showToast }) {
         setPosts(prev => prev.map(p => p.id === modalPost.id ? res.post : p));
         showToast?.('Discussion updated.', 'success');
       } else {
-        // Create (we'll just use the public create endpoint for admins too, it expects title, body, tags)
-        const res = await postsApi.create(data);
+        // Create
+        const res = await postsApi.createAdmin(data);
         setPosts(prev => [res.post, ...prev]);
         showToast?.('Discussion created.', 'success');
       }
@@ -68,8 +69,23 @@ export default function DiscussionsModeration({ showToast }) {
     }
   };
 
+  const uniqueTags = useMemo(() => {
+    const tags = new Set();
+    posts.forEach(p => {
+      if (Array.isArray(p.tags)) {
+        p.tags.forEach(t => tags.add(t));
+      }
+    });
+    return Array.from(tags).sort();
+  }, [posts]);
+
   const columns = [
-    { key: 'title', label: 'Title', render: (post) => (
+    { 
+      key: 'title', 
+      label: 'Title', 
+      filterOptions: uniqueTags.length > 0 ? uniqueTags : undefined,
+      filterMatch: (row, val) => Array.isArray(row.tags) && row.tags.includes(val),
+      render: (post) => (
       <>
         <div style={{ fontWeight: 500 }}>{post.title}</div>
         {post.tags && post.tags.length > 0 && (
@@ -82,7 +98,8 @@ export default function DiscussionsModeration({ showToast }) {
     { key: 'author', label: 'Author' },
     { key: 'votes', label: 'Votes' },
     { key: 'replies', label: 'Replies' },
-    { key: 'time', label: 'Date' },
+    { key: 'time', label: 'Date', render: (post) => new Date(post.created_at).toLocaleDateString() },
+    { key: 'updated_at', label: 'Last Updated', render: (post) => post.updated_at ? new Date(post.updated_at).toLocaleString('en-US', { month: 'numeric', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit' }).replace(',', '') : '—' },
     { key: 'actions', label: 'Actions', render: (post) => (
       <div style={{ display: 'flex', gap: '8px' }}>
         <button 
@@ -106,10 +123,25 @@ export default function DiscussionsModeration({ showToast }) {
   return (
     <section className={dashboardStyles.panel} aria-labelledby="discussions-mod-title">
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
-        <h2 id="discussions-mod-title" className={dashboardStyles.panelTitle}>Discussions</h2>
-        <button className={styles.btnPrimary} onClick={handleCreateNew}>
-          + Create Discussion
-        </button>
+        <h2 id="discussions-mod-title" className={dashboardStyles.panelTitle} style={{ margin: 0 }}>Discussions</h2>
+        <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
+          <input
+            type="text"
+            placeholder="Search discussions..."
+            value={discussionSearch}
+            onChange={(e) => setDiscussionSearch(e.target.value)}
+            style={{
+              padding: '8px 12px',
+              borderRadius: 'var(--radius-sm, 6px)',
+              border: '1px solid var(--border-strong, #cbd5e1)',
+              minWidth: '250px',
+              outline: 'none'
+            }}
+          />
+          <button className={styles.btnPrimary} onClick={handleCreateNew}>
+            + Create Discussion
+          </button>
+        </div>
       </div>
 
       <Table 
@@ -117,6 +149,7 @@ export default function DiscussionsModeration({ showToast }) {
         data={posts} 
         loading={loading} 
         emptyMessage="No discussions found." 
+        searchQuery={discussionSearch}
       />
 
       {modalPost && (

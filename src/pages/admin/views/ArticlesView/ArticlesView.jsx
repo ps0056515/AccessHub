@@ -13,6 +13,7 @@ Quill.register('modules/imageResize', ImageResize);
 export default function ArticlesView({ showToast }) {
   const [articles, setArticles] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [articleSearch, setArticleSearch] = useState("");
   
   // Editor state
   const [isEditing, setIsEditing] = useState(false);
@@ -194,7 +195,8 @@ export default function ArticlesView({ showToast }) {
         {article.is_published ? 'Published' : 'Draft'}
       </span>
     )},
-    { key: 'date', label: 'Published Date', render: (article) => new Date(article.published_date).toLocaleDateString() },
+    { key: 'published', label: 'Published', render: (a) => new Date(a.published_date).toLocaleDateString() },
+    { key: 'updated_at', label: 'Last Updated', render: (a) => a.updated_at ? new Date(a.updated_at).toLocaleString('en-US', { month: 'numeric', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit' }).replace(',', '') : '—' },
     { key: 'actions', label: 'Actions', render: (article) => (
       <div className={styles.actions}>
         <button
@@ -226,11 +228,26 @@ export default function ArticlesView({ showToast }) {
     <div className={styles.container}>
       {!isEditing ? (
         <>
-          <div className={styles.header}>
-            <h2 className={styles.title}>Articles & News</h2>
-            <button type="button" onClick={() => openEditor()} className={styles.createBtn}>
-              ➕ Create New Article
-            </button>
+          <div className={styles.header} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+            <h2 className={styles.title} style={{ margin: 0 }}>Articles & News</h2>
+            <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
+              <input
+                type="text"
+                placeholder="Search articles..."
+                value={articleSearch}
+                onChange={(e) => setArticleSearch(e.target.value)}
+                style={{
+                  padding: '8px 12px',
+                  borderRadius: 'var(--radius-sm, 6px)',
+                  border: '1px solid var(--border-strong, #cbd5e1)',
+                  minWidth: '250px',
+                  outline: 'none'
+                }}
+              />
+              <button type="button" onClick={() => openEditor()} className={styles.createBtn}>
+                ➕ Create New Article
+              </button>
+            </div>
           </div>
 
           <Table 
@@ -238,6 +255,7 @@ export default function ArticlesView({ showToast }) {
             data={articles} 
             loading={loading} 
             emptyMessage="No articles found." 
+            searchQuery={articleSearch}
           />
         </>
       ) : (

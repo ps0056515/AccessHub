@@ -424,7 +424,7 @@ export default function Portal({
         aria-labelledby="hero-heading"
         style={portalConfig.bgUrl ? { backgroundImage: `url(${portalConfig.bgUrl})`, backgroundSize: 'cover', backgroundPosition: 'center' } : undefined}
       >
-        {portalConfig.bgUrl && <div style={{ position: 'absolute', inset: 0, background: 'rgba(255,255,255,0.7)' }} />}
+        {portalConfig.bgUrl && <div style={{ position: 'absolute', inset: 0, background: 'rgba(255,255,255,0.5)' }} />}
         <Container className={styles.heroInner} style={{ position: 'relative', zIndex: 1 }}>
           <div className={styles.heroBadge}>
             <span className={styles.heroDot} aria-hidden="true" />
@@ -471,11 +471,11 @@ export default function Portal({
             </button>
           </div>
         </Container>
-        <div className={styles.heroDecor} aria-hidden="true">
+        {!portalConfig.bgUrl && <div className={styles.heroDecor} aria-hidden="true">
           <div className={styles.decorCircle1} />
           <div className={styles.decorCircle2} />
           <div className={styles.decorLine} />
-        </div>
+        </div>}
       </section>
 
       <Container className={styles.statsBar} aria-label="Community statistics">
