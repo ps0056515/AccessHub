@@ -15,6 +15,7 @@ export default function ArticlesView({ showToast }) {
   const [articles, setArticles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [articleSearch, setArticleSearch] = useState("");
+  const [selectedIds, setSelectedIds] = useState([]);
 
   // Editor state
   const [isEditing, setIsEditing] = useState(false);
@@ -180,6 +181,30 @@ export default function ArticlesView({ showToast }) {
     }
   };
 
+  const handleBulkDelete = async () => {
+    if (!window.confirm(`Are you sure you want to delete ${selectedIds.length} articles?`)) return;
+    try {
+      await Promise.all(selectedIds.map(id => articlesApi.delete(id)));
+      showToast?.(`Successfully deleted ${selectedIds.length} articles.`, "success");
+      setSelectedIds([]);
+      await loadArticles();
+    } catch (err) {
+      showToast?.(err.message || "Failed to bulk delete articles.", "error");
+    }
+  };
+
+  const handleBulkPublish = async (publishState) => {
+    if (!window.confirm(`Are you sure you want to ${publishState ? "publish" : "unpublish"} ${selectedIds.length} articles?`)) return;
+    try {
+      await Promise.all(selectedIds.map(id => articlesApi.togglePublish(id, publishState)));
+      showToast?.(`Successfully ${publishState ? "published" : "unpublished"} ${selectedIds.length} articles.`, "success");
+      setSelectedIds([]);
+      await loadArticles();
+    } catch (err) {
+      showToast?.(err.message || `Failed to bulk ${publishState ? "publish" : "unpublish"} articles.`, "error");
+    }
+  };
+
   // React-Quill toolbar config
   const modules = {
     toolbar: [
@@ -307,6 +332,34 @@ export default function ArticlesView({ showToast }) {
                   outline: "none",
                 }}
               />
+              {selectedIds.length > 0 && (
+                <>
+                  <button
+                    type="button"
+                    onClick={() => handleBulkPublish(true)}
+                    className={styles.btnSuccess}
+                    style={{ padding: '8px 12px', fontSize: '14px', borderRadius: '6px' }}
+                  >
+                    📢 Bulk Publish
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleBulkPublish(false)}
+                    className={styles.btnSecondary}
+                    style={{ padding: '8px 12px', fontSize: '14px', borderRadius: '6px' }}
+                  >
+                    🚫 Bulk Unpublish
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleBulkDelete}
+                    className={styles.btnDanger}
+                    style={{ padding: '8px 12px', fontSize: '14px', borderRadius: '6px' }}
+                  >
+                    🗑 Bulk Delete ({selectedIds.length})
+                  </button>
+                </>
+              )}
               <button
                 type="button"
                 onClick={() => openEditor()}
@@ -323,6 +376,10 @@ export default function ArticlesView({ showToast }) {
             loading={loading}
             emptyMessage="No articles found."
             searchQuery={articleSearch}
+            selectable
+            selectedRowIds={selectedIds}
+            onSelectChange={setSelectedIds}
+            pagination={true}
           />
         </>
       ) : (

@@ -11,6 +11,7 @@ export default function ScreenReadersView({ showToast }) {
   const [modalOpen, setModalOpen] = useState(false);
   const [editingGuide, setEditingGuide] = useState(null);
   const [screenReaderSearch, setScreenReaderSearch] = useState("");
+  const [selectedIds, setSelectedIds] = useState([]);
 
   useEffect(() => {
     loadGuides();
@@ -69,6 +70,30 @@ export default function ScreenReadersView({ showToast }) {
       loadGuides();
     } catch (err) {
       showToast?.("Failed to delete guide", "error");
+    }
+  };
+
+  const handleBulkDelete = async () => {
+    if (!window.confirm(`Are you sure you want to delete ${selectedIds.length} guides?`)) return;
+    try {
+      await Promise.all(selectedIds.map(id => screenReadersApi.delete(id)));
+      showToast?.(`Successfully deleted ${selectedIds.length} guides.`, "success");
+      setSelectedIds([]);
+      loadGuides();
+    } catch (err) {
+      showToast?.(err.message || "Failed to bulk delete guides.", "error");
+    }
+  };
+
+  const handleBulkPublish = async (publishState) => {
+    if (!window.confirm(`Are you sure you want to ${publishState ? "publish" : "unpublish"} ${selectedIds.length} guides?`)) return;
+    try {
+      await Promise.all(selectedIds.map(id => screenReadersApi.togglePublish(id, publishState)));
+      showToast?.(`Successfully ${publishState ? "published" : "unpublished"} ${selectedIds.length} guides.`, "success");
+      setSelectedIds([]);
+      loadGuides();
+    } catch (err) {
+      showToast?.(err.message || `Failed to bulk ${publishState ? "publish" : "unpublish"} guides.`, "error");
     }
   };
 
@@ -175,6 +200,31 @@ export default function ScreenReadersView({ showToast }) {
               outline: "none",
             }}
           />
+          {selectedIds.length > 0 && (
+            <>
+              <button
+                onClick={() => handleBulkPublish(true)}
+                className={styles.btnSuccess}
+                style={{ padding: '8px 12px', fontSize: '14px', borderRadius: '6px' }}
+              >
+                📢 Bulk Publish
+              </button>
+              <button
+                onClick={() => handleBulkPublish(false)}
+                className={styles.btnSecondary}
+                style={{ padding: '8px 12px', fontSize: '14px', borderRadius: '6px' }}
+              >
+                🚫 Bulk Unpublish
+              </button>
+              <button
+                onClick={handleBulkDelete}
+                className={styles.btnDanger}
+                style={{ padding: '8px 12px', fontSize: '14px', borderRadius: '6px' }}
+              >
+                🗑 Bulk Delete ({selectedIds.length})
+              </button>
+            </>
+          )}
           <button onClick={() => openModal()} className={styles.addBtn}>
             + New Guide
           </button>
@@ -186,6 +236,10 @@ export default function ScreenReadersView({ showToast }) {
         data={guides}
         emptyMessage='No guides found. Click "New Guide" to create one.'
         searchQuery={screenReaderSearch}
+        selectable
+        selectedRowIds={selectedIds}
+        onSelectChange={setSelectedIds}
+        pagination={true}
       />
 
       <ScreenReaderModal

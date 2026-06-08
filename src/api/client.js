@@ -153,6 +153,7 @@ export const eventsApi = {
   rsvp: (eventId, body) => api(`/api/events/${eventId}/rsvp`, { method: 'POST', body: JSON.stringify(body) }),
   submitProposal: body => api('/api/events/proposals', { method: 'POST', body: JSON.stringify(body) }),
   // Admin endpoints
+  getRsvpsAdmin: id => api(`/api/events/admin/${id}/rsvps`),
   listProposals: () => api('/api/events/admin/proposals'),
   approveProposal: (id, body) => api(`/api/events/admin/proposals/${id}/approve`, { method: 'POST', body: JSON.stringify(body) }),
   rejectProposal: id => api(`/api/events/admin/proposals/${id}`, { method: 'DELETE' }),
