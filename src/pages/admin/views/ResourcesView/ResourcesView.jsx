@@ -4,6 +4,7 @@ import dashboardStyles from "../../AdminDashboard.module.css";
 import styles from "./ResourcesView.module.css";
 import ResourceModal from "./components/ResourceModal";
 import Table from "components/common/Table/Table";
+import { truncateText } from "utils/commonUtils";
 
 const TABS = ["Active Resources", "Proposed Resources"];
 
@@ -128,7 +129,7 @@ export default function ResourcesView({ showToast }) {
               whiteSpace: "nowrap",
             }}
           >
-            {res.view_url}
+            {truncateText(res.view_url)}
           </a>
         </div>
       ),
@@ -143,7 +144,23 @@ export default function ResourcesView({ showToast }) {
         <span style={{ color: `var(--${res.color}-600)` }}>{res.color}</span>
       ),
     },
-    { key: 'updated_at', label: 'Last Updated', width: "15%", render: (res) => res.updated_at ? new Date(res.updated_at).toLocaleString('en-US', { month: 'numeric', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit' }).replace(',', '') : '—' },
+    {
+      key: "updated_at",
+      label: "Last Updated",
+      width: "15%",
+      render: (res) =>
+        res.updated_at
+          ? new Date(res.updated_at)
+              .toLocaleString("en-US", {
+                month: "numeric",
+                day: "numeric",
+                year: "numeric",
+                hour: "numeric",
+                minute: "2-digit",
+              })
+              .replace(",", "")
+          : "—",
+    },
     {
       key: "actions",
       label: "Actions",
@@ -224,7 +241,23 @@ export default function ResourcesView({ showToast }) {
         </span>
       ),
     },
-    { key: 'updated_at', label: 'Last Updated', width: "10%", render: (p) => p.updated_at ? new Date(p.updated_at).toLocaleString('en-US', { month: 'numeric', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit' }).replace(',', '') : '—' },
+    {
+      key: "updated_at",
+      label: "Last Updated",
+      width: "10%",
+      render: (p) =>
+        p.updated_at
+          ? new Date(p.updated_at)
+              .toLocaleString("en-US", {
+                month: "numeric",
+                day: "numeric",
+                year: "numeric",
+                hour: "numeric",
+                minute: "2-digit",
+              })
+              .replace(",", "")
+          : "—",
+    },
     {
       key: "actions",
       label: "Actions",
@@ -285,22 +318,33 @@ export default function ResourcesView({ showToast }) {
         className={dashboardStyles.panel}
         aria-labelledby="resources-cms-title"
       >
-        <div className={styles.eventsHeader} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <h2 id="resources-cms-title" className={dashboardStyles.panelTitle} style={{ margin: 0 }}>
+        <div
+          className={styles.eventsHeader}
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+          }}
+        >
+          <h2
+            id="resources-cms-title"
+            className={dashboardStyles.panelTitle}
+            style={{ margin: 0 }}
+          >
             Resources Library
           </h2>
-          <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
+          <div style={{ display: "flex", gap: "16px", alignItems: "center" }}>
             <input
               type="text"
               placeholder="Search resources..."
               value={resourceSearch}
               onChange={(e) => setResourceSearch(e.target.value)}
               style={{
-                padding: '8px 12px',
-                borderRadius: 'var(--radius-sm, 6px)',
-                border: '1px solid var(--border-strong, #cbd5e1)',
-                minWidth: '250px',
-                outline: 'none'
+                padding: "8px 12px",
+                borderRadius: "var(--radius-sm, 6px)",
+                border: "1px solid var(--border-strong, #cbd5e1)",
+                minWidth: "250px",
+                outline: "none",
               }}
             />
             {activeTab === "Active Resources" && (

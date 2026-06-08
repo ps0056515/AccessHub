@@ -1,15 +1,15 @@
-import React, { useState, useMemo, useEffect } from 'react';
-import { Filter, ChevronUp, ChevronDown, ChevronsUpDown } from 'lucide-react';
-import styles from './Table.module.css';
+import React, { useState, useMemo, useEffect } from "react";
+import { Filter, ChevronUp, ChevronDown, ChevronsUpDown } from "lucide-react";
+import styles from "./Table.module.css";
 
-export default function Table({ 
-  columns, 
-  data, 
-  emptyMessage = "No records found.", 
-  loading = false, 
-  getRowStyle, 
+export default function Table({
+  columns,
+  data,
+  emptyMessage = "No records found.",
+  loading = false,
+  getRowStyle,
   minWidth,
-  searchQuery = ''
+  searchQuery = "",
 }) {
   const [sortConfig, setSortConfig] = useState(null);
   const [filters, setFilters] = useState({});
@@ -18,24 +18,24 @@ export default function Table({
   useEffect(() => {
     if (!openFilter) return;
     const handleDocClick = () => setOpenFilter(null);
-    document.addEventListener('click', handleDocClick);
-    return () => document.removeEventListener('click', handleDocClick);
+    document.addEventListener("click", handleDocClick);
+    return () => document.removeEventListener("click", handleDocClick);
   }, [openFilter]);
 
   const handleFilterChange = (key, value) => {
-    setFilters(prev => ({ ...prev, [key]: value }));
+    setFilters((prev) => ({ ...prev, [key]: value }));
   };
 
   const filteredData = useMemo(() => {
     if (!data) return [];
-    
+
     let result = data;
 
     if (Object.keys(filters).length > 0) {
-      result = result.filter(row => {
+      result = result.filter((row) => {
         return Object.entries(filters).every(([key, value]) => {
           if (!value) return true;
-          const colDef = columns.find(c => c.key === key);
+          const colDef = columns.find((c) => c.key === key);
           if (colDef && colDef.filterMatch) {
             return colDef.filterMatch(row, value);
           }
@@ -48,8 +48,8 @@ export default function Table({
 
     if (searchQuery) {
       const lowerQuery = searchQuery.toLowerCase();
-      result = result.filter(row => {
-        return columns.some(col => {
+      result = result.filter((row) => {
+        return columns.some((col) => {
           if (!col.key) return false;
           const val = row[col.key];
           if (val === null || val === undefined) return false;
@@ -57,41 +57,49 @@ export default function Table({
         });
       });
     }
-    
+
     return result;
   }, [data, searchQuery, columns, filters]);
 
   const sortedData = useMemo(() => {
     if (!sortConfig) return filteredData;
-    
+
     return [...filteredData].sort((a, b) => {
       let valA = a[sortConfig.key];
       let valB = b[sortConfig.key];
 
-      if (valA === null || valA === undefined) valA = '';
-      if (valB === null || valB === undefined) valB = '';
+      if (valA === null || valA === undefined) valA = "";
+      if (valB === null || valB === undefined) valB = "";
 
-      if (typeof valA === 'string' && typeof valB === 'string') {
-          return sortConfig.direction === 'asc' 
-            ? valA.localeCompare(valB) 
-            : valB.localeCompare(valA);
+      if (typeof valA === "string" && typeof valB === "string") {
+        return sortConfig.direction === "asc"
+          ? valA.localeCompare(valB)
+          : valB.localeCompare(valA);
       }
 
       if (valA < valB) {
-        return sortConfig.direction === 'asc' ? -1 : 1;
+        return sortConfig.direction === "asc" ? -1 : 1;
       }
       if (valA > valB) {
-        return sortConfig.direction === 'asc' ? 1 : -1;
+        return sortConfig.direction === "asc" ? 1 : -1;
       }
       return 0;
     });
   }, [filteredData, sortConfig]);
 
   const requestSort = (key) => {
-    let direction = 'asc';
-    if (sortConfig && sortConfig.key === key && sortConfig.direction === 'asc') {
-      direction = 'desc';
-    } else if (sortConfig && sortConfig.key === key && sortConfig.direction === 'desc') {
+    let direction = "asc";
+    if (
+      sortConfig &&
+      sortConfig.key === key &&
+      sortConfig.direction === "asc"
+    ) {
+      direction = "desc";
+    } else if (
+      sortConfig &&
+      sortConfig.key === key &&
+      sortConfig.direction === "desc"
+    ) {
       setSortConfig(null);
       return;
     }
@@ -109,105 +117,174 @@ export default function Table({
   return (
     <div className={styles.tableWrapper}>
       <div className={styles.scrollContainer}>
-        <table className={styles.table} style={minWidth ? { minWidth } : undefined}>
+        <table
+          className={styles.table}
+          style={minWidth ? { minWidth } : undefined}
+        >
           <thead>
             <tr>
               {columns.map((col, i) => (
-                <th 
-                  key={col.key || i} 
+                <th
+                  key={col.key || i}
                   className={styles.fixedHeader}
                   style={{
                     zIndex: openFilter === col.key ? 100 : undefined,
-                    ...(col.width ? { width: col.width, minWidth: col.width } : {}),
-                    ...(col.sortable ? { cursor: 'pointer', userSelect: 'none' } : {})
+                    ...(col.width
+                      ? { width: col.width, minWidth: col.width }
+                      : {}),
+                    ...(col.sortable
+                      ? { cursor: "pointer", userSelect: "none" }
+                      : {}),
                   }}
-                  onClick={col.sortable ? () => requestSort(col.key) : undefined}
+                  onClick={
+                    col.sortable ? () => requestSort(col.key) : undefined
+                  }
                   title={col.sortable ? "Click to sort" : undefined}
                 >
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "8px",
+                    }}
+                  >
                     <span style={{ flex: 1 }}>{col.label}</span>
                     {col.sortable && (
-                      <span style={{ display: 'flex', opacity: sortConfig?.key === col.key ? 1 : 0.4 }}>
-                        {sortConfig?.key === col.key 
-                          ? (sortConfig.direction === 'asc' ? <ChevronUp size={14} /> : <ChevronDown size={14} />)
-                          : <ChevronsUpDown size={14} />}
+                      <span
+                        style={{
+                          display: "flex",
+                          opacity: sortConfig?.key === col.key ? 1 : 0.4,
+                        }}
+                      >
+                        {sortConfig?.key === col.key ? (
+                          sortConfig.direction === "asc" ? (
+                            <ChevronUp size={14} />
+                          ) : (
+                            <ChevronDown size={14} />
+                          )
+                        ) : (
+                          <ChevronsUpDown size={14} />
+                        )}
                       </span>
                     )}
                     {col.filterOptions && (
                       <>
-                        <div 
-                          onClick={e => {
+                        <div
+                          onClick={(e) => {
                             e.stopPropagation();
-                            setOpenFilter(prev => prev === col.key ? null : col.key);
+                            setOpenFilter((prev) =>
+                              prev === col.key ? null : col.key,
+                            );
                           }}
-                          style={{ 
-                            display: 'flex', 
-                            alignItems: 'center', 
-                            gap: '4px',
-                            background: filters[col.key] || openFilter === col.key ? 'var(--surface-color-alt, #f1f5f9)' : 'transparent',
-                            padding: '4px',
-                            borderRadius: '4px',
-                            cursor: 'pointer'
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "4px",
+                            background:
+                              filters[col.key] || openFilter === col.key
+                                ? "var(--surface-color-alt, #f1f5f9)"
+                                : "transparent",
+                            padding: "4px",
+                            borderRadius: "4px",
+                            cursor: "pointer",
                           }}
                         >
-                          <Filter size={14} style={{ opacity: filters[col.key] || openFilter === col.key ? 1 : 0.4, flexShrink: 0 }} />
-                        </div>
-                        
-                        {openFilter === col.key && (
-                          <div 
-                            onClick={e => e.stopPropagation()}
+                          <Filter
+                            size={14}
                             style={{
-                              position: 'absolute',
-                              top: '100%',
+                              opacity:
+                                filters[col.key] || openFilter === col.key
+                                  ? 1
+                                  : 0.4,
+                              flexShrink: 0,
+                            }}
+                          />
+                        </div>
+
+                        {openFilter === col.key && (
+                          <div
+                            onClick={(e) => e.stopPropagation()}
+                            style={{
+                              position: "absolute",
+                              top: "100%",
                               right: "-49px",
-                              marginTop: '-10px',
-                              background: 'var(--surface-color, #ffffff)',
-                              border: '1px solid var(--border-color, #e2e8f0)',
-                              borderRadius: '6px',
-                              boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)',
+                              marginTop: "-10px",
+                              background: "var(--surface-color, #ffffff)",
+                              border: "1px solid var(--border-color, #e2e8f0)",
+                              borderRadius: "6px",
+                              boxShadow:
+                                "0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)",
                               zIndex: 2,
-                              minWidth: '140px',
-                              display: 'flex',
-                              flexDirection: 'column',
-                              padding: '4px',
-                              color: 'var(--text-color, #1e293b)',
-                              textAlign: 'left'
+                              minWidth: "140px",
+                              display: "flex",
+                              flexDirection: "column",
+                              padding: "4px",
+                              color: "var(--text-color, #1e293b)",
+                              textAlign: "left",
                             }}
                           >
-                            <div 
+                            <div
                               style={{
-                                padding: '8px 12px',
-                                cursor: 'pointer',
-                                borderRadius: '4px',
-                                fontSize: '13px',
-                                background: !filters[col.key] ? 'var(--surface-color-alt, #f1f5f9)' : 'transparent',
-                                fontWeight: !filters[col.key] ? 600 : 400
+                                padding: "8px 12px",
+                                cursor: "pointer",
+                                borderRadius: "4px",
+                                fontSize: "13px",
+                                background: !filters[col.key]
+                                  ? "var(--surface-color-alt, #f1f5f9)"
+                                  : "transparent",
+                                fontWeight: !filters[col.key] ? 600 : 400,
                               }}
-                              onClick={() => { handleFilterChange(col.key, ''); setOpenFilter(null); }}
-                              onMouseEnter={e => e.currentTarget.style.background = 'var(--surface-color-alt, #f1f5f9)'}
-                              onMouseLeave={e => e.currentTarget.style.background = !filters[col.key] ? 'var(--surface-color-alt, #f1f5f9)' : 'transparent'}
+                              onClick={() => {
+                                handleFilterChange(col.key, "");
+                                setOpenFilter(null);
+                              }}
+                              onMouseEnter={(e) =>
+                                (e.currentTarget.style.background =
+                                  "var(--surface-color-alt, #f1f5f9)")
+                              }
+                              onMouseLeave={(e) =>
+                                (e.currentTarget.style.background = !filters[
+                                  col.key
+                                ]
+                                  ? "var(--surface-color-alt, #f1f5f9)"
+                                  : "transparent")
+                              }
                             >
                               All
                             </div>
-                            {col.filterOptions.map(opt => {
-                              const isObj = typeof opt === 'object';
+                            {col.filterOptions.map((opt) => {
+                              const isObj = typeof opt === "object";
                               const val = isObj ? opt.value : opt;
                               const label = isObj ? opt.label : opt;
-                              const isSelected = filters[col.key] === String(val);
+                              const isSelected =
+                                filters[col.key] === String(val);
                               return (
-                                <div 
+                                <div
                                   key={val}
                                   style={{
-                                    padding: '8px 12px',
-                                    cursor: 'pointer',
-                                    borderRadius: '4px',
-                                    fontSize: '13px',
-                                    background: isSelected ? 'var(--surface-color-alt, #f1f5f9)' : 'transparent',
-                                    fontWeight: isSelected ? 600 : 400
+                                    padding: "8px 12px",
+                                    cursor: "pointer",
+                                    borderRadius: "4px",
+                                    fontSize: "13px",
+                                    background: isSelected
+                                      ? "var(--surface-color-alt, #f1f5f9)"
+                                      : "transparent",
+                                    fontWeight: isSelected ? 600 : 400,
                                   }}
-                                  onClick={() => { handleFilterChange(col.key, val); setOpenFilter(null); }}
-                                  onMouseEnter={e => e.currentTarget.style.background = 'var(--surface-color-alt, #f1f5f9)'}
-                                  onMouseLeave={e => e.currentTarget.style.background = isSelected ? 'var(--surface-color-alt, #f1f5f9)' : 'transparent'}
+                                  onClick={() => {
+                                    handleFilterChange(col.key, val);
+                                    setOpenFilter(null);
+                                  }}
+                                  onMouseEnter={(e) =>
+                                    (e.currentTarget.style.background =
+                                      "var(--surface-color-alt, #f1f5f9)")
+                                  }
+                                  onMouseLeave={(e) =>
+                                    (e.currentTarget.style.background =
+                                      isSelected
+                                        ? "var(--surface-color-alt, #f1f5f9)"
+                                        : "transparent")
+                                  }
                                 >
                                   {label}
                                 </div>
@@ -233,7 +310,10 @@ export default function Table({
               </tr>
             ) : (
               sortedData.map((row, rowIndex) => (
-                <tr key={row.id || rowIndex} style={getRowStyle ? getRowStyle(row) : undefined}>
+                <tr
+                  key={row.id || rowIndex}
+                  style={getRowStyle ? getRowStyle(row) : undefined}
+                >
                   {columns.map((col, colIndex) => (
                     <td key={col.key || colIndex}>
                       {col.render ? col.render(row, rowIndex) : row[col.key]}

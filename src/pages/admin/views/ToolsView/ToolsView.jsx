@@ -5,6 +5,7 @@ import ToolModal from "./components/ToolModal";
 import dashboardStyles from "../../AdminDashboard.module.css";
 import styles from "./ToolsView.module.css";
 import Table from "components/common/Table/Table";
+import { truncateText } from "utils/commonUtils";
 
 export default function ToolsView({ showToast }) {
   const [toolsList, setToolsList] = useState([]);
@@ -132,13 +133,14 @@ export default function ToolsView({ showToast }) {
       key: "url",
       label: "URL",
       render: (t) => (
+        
         <a
           href={t.url}
           target="_blank"
           rel="noopener noreferrer"
           style={{ wordBreak: "break-all" }}
         >
-          {t.url}
+          {truncateText(t.url)}
         </a>
       ),
     },
