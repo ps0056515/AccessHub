@@ -109,6 +109,7 @@ function publicUser(row) {
     isAdmin: Boolean(row.is_admin) || isAdminEmail(row.email),
     isBlocked: Boolean(row.is_blocked),
     createdAt: row.created_at,
+    updated_at: row.updated_at,
   };
 }
 
@@ -123,6 +124,7 @@ function adminUser(row) {
     isAdmin: Boolean(row.is_admin) || isAdminEmail(row.email),
     isBlocked: Boolean(row.is_blocked),
     createdAt: row.created_at,
+    updated_at: row.updated_at,
   };
 }
 

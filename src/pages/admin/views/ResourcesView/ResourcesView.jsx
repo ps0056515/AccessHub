@@ -9,6 +9,7 @@ const TABS = ["Active Resources", "Proposed Resources"];
 
 export default function ResourcesView({ showToast }) {
   const [activeTab, setActiveTab] = useState("Active Resources");
+  const [resourceSearch, setResourceSearch] = useState("");
 
   const [resourcesList, setResourcesList] = useState([]);
   const [resourcesLoading, setResourcesLoading] = useState(true);
@@ -104,13 +105,15 @@ export default function ResourcesView({ showToast }) {
     {
       key: "icon",
       label: "Icon",
+      width: "15%",
       render: (res) => <span style={{ fontSize: "1.25rem" }}>{res.icon}</span>,
     },
     {
       key: "title",
       label: "Title",
+      width: "40%",
       render: (res) => (
-        <>
+        <div style={{ maxWidth: "100%", overflow: "hidden" }}>
           <strong>{res.title}</strong>
           <br />
           <a
@@ -118,23 +121,33 @@ export default function ResourcesView({ showToast }) {
             target="_blank"
             rel="noreferrer"
             className={styles.metaLink}
+            style={{
+              display: "block",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap",
+            }}
           >
             {res.view_url}
           </a>
-        </>
+        </div>
       ),
     },
-    { key: "category", label: "Category" },
+    { key: "category", label: "Category", width: "15%" },
     {
       key: "color",
       label: "Color",
+      width: "15%",
+
       render: (res) => (
         <span style={{ color: `var(--${res.color}-600)` }}>{res.color}</span>
       ),
     },
+    { key: 'updated_at', label: 'Last Updated', width: "15%", render: (res) => res.updated_at ? new Date(res.updated_at).toLocaleString('en-US', { month: 'numeric', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit' }).replace(',', '') : '—' },
     {
       key: "actions",
       label: "Actions",
+      width: "25%",
       render: (res) => (
         <div className={styles.actionBtnGroup}>
           <button
@@ -163,13 +176,15 @@ export default function ResourcesView({ showToast }) {
     {
       key: "date",
       label: "Date",
+      width: "15%",
       render: (p) => new Date(p.created_at).toLocaleDateString(),
     },
     {
       key: "title",
       label: "Title & URL",
+      width: "40%",
       render: (p) => (
-        <>
+        <div style={{ maxWidth: "100%", overflow: "hidden" }}>
           <strong>{p.title}</strong>
           <br />
           <a
@@ -177,15 +192,22 @@ export default function ResourcesView({ showToast }) {
             target="_blank"
             rel="noreferrer"
             className={styles.metaLink}
+            style={{
+              display: "block",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap",
+            }}
           >
             {p.url}
           </a>
-        </>
+        </div>
       ),
     },
     {
       key: "note",
       label: "Submitter Note",
+      width: "15%",
       render: (p) => (
         <span style={{ color: "var(--gray-600)" }}>{p.note || "—"}</span>
       ),
@@ -193,6 +215,7 @@ export default function ResourcesView({ showToast }) {
     {
       key: "status",
       label: "Status",
+      width: "10%",
       render: (p) => (
         <span
           className={`${styles.statusBadge} ${styles["status" + p.status]}`}
@@ -201,9 +224,11 @@ export default function ResourcesView({ showToast }) {
         </span>
       ),
     },
+    { key: 'updated_at', label: 'Last Updated', width: "10%", render: (p) => p.updated_at ? new Date(p.updated_at).toLocaleString('en-US', { month: 'numeric', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit' }).replace(',', '') : '—' },
     {
       key: "actions",
       label: "Actions",
+      width: "20%",
       render: (p) =>
         p.status === "pending" ? (
           <div className={styles.actionBtnGroup}>
@@ -260,22 +285,37 @@ export default function ResourcesView({ showToast }) {
         className={dashboardStyles.panel}
         aria-labelledby="resources-cms-title"
       >
-        <div className={styles.eventsHeader}>
-          <h2 id="resources-cms-title" className={dashboardStyles.panelTitle}>
+        <div className={styles.eventsHeader} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <h2 id="resources-cms-title" className={dashboardStyles.panelTitle} style={{ margin: 0 }}>
             Resources Library
           </h2>
-          {activeTab === "Active Resources" && (
-            <button
-              type="button"
-              onClick={() => {
-                setEditingResource(null);
-                setIsModalOpen(true);
+          <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
+            <input
+              type="text"
+              placeholder="Search resources..."
+              value={resourceSearch}
+              onChange={(e) => setResourceSearch(e.target.value)}
+              style={{
+                padding: '8px 12px',
+                borderRadius: 'var(--radius-sm, 6px)',
+                border: '1px solid var(--border-strong, #cbd5e1)',
+                minWidth: '250px',
+                outline: 'none'
               }}
-              className={styles.addEventBtn}
-            >
-              📚 Add Resource
-            </button>
-          )}
+            />
+            {activeTab === "Active Resources" && (
+              <button
+                type="button"
+                onClick={() => {
+                  setEditingResource(null);
+                  setIsModalOpen(true);
+                }}
+                className={styles.addEventBtn}
+              >
+                📚 Add Resource
+              </button>
+            )}
+          </div>
         </div>
 
         <nav className={styles.tabs} aria-label="Resources admin sections">
@@ -299,8 +339,8 @@ export default function ResourcesView({ showToast }) {
           ))}
         </nav>
 
-        {activeTab === "Active Resources" && (
-          resourcesLoading && resourcesList.length === 0 ? (
+        {activeTab === "Active Resources" &&
+          (resourcesLoading && resourcesList.length === 0 ? (
             <p className={dashboardStyles.loading}>Loading resources…</p>
           ) : (
             <Table
@@ -308,12 +348,12 @@ export default function ResourcesView({ showToast }) {
               data={resourcesList}
               loading={resourcesLoading}
               emptyMessage="No active resources."
+              searchQuery={resourceSearch}
             />
-          )
-        )}
+          ))}
 
-        {activeTab === "Proposed Resources" && (
-          proposalsLoading && proposals.length === 0 ? (
+        {activeTab === "Proposed Resources" &&
+          (proposalsLoading && proposals.length === 0 ? (
             <p className={dashboardStyles.loading}>Loading proposals…</p>
           ) : (
             <Table
@@ -321,9 +361,9 @@ export default function ResourcesView({ showToast }) {
               data={proposals}
               loading={proposalsLoading}
               emptyMessage="No proposals yet."
+              searchQuery={resourceSearch}
             />
-          )
-        )}
+          ))}
       </section>
 
       <ResourceModal

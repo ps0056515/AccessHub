@@ -63,13 +63,14 @@ export function AuthProvider({ children }) {
     };
   }, [navigate]);
 
-  const signUp = useCallback(async ({ email, password, displayName, country, city }) => {
+  const signUp = useCallback(async ({ email, password, displayName, country, city, company }) => {
     const { token, user: profile } = await authApi.signUp({
       email,
       password,
       displayName,
       country,
       city,
+      company,
     });
     applySession(setUser, token, profile);
     setNeedsLocation(false);
@@ -83,11 +84,12 @@ export function AuthProvider({ children }) {
     return profile;
   }, []);
 
-  const signInWithGoogle = useCallback(async ({ credential, country, city } = {}) => {
+  const signInWithGoogle = useCallback(async ({ credential, country, city, company } = {}) => {
     const { token, user: profile, needsLocation: missingLocation } = await authApi.signInWithGoogle({
       credential,
       country,
       city,
+      company,
     });
     applySession(setUser, token, profile);
     setNeedsLocation(Boolean(missingLocation));
