@@ -39,6 +39,7 @@ function formatPost(row, replyCount) {
     role: row.author_role || 'Community member',
     time: relativeTime(row.created_at),
     raw_time: row.created_at,
+    updated_at: row.updated_at,
     replies: replyCount ?? row.reply_count ?? 0,
     title: row.title,
     excerpt: row.excerpt,

@@ -5,6 +5,7 @@ import ImageResize from 'quill-image-resize-module-react';
 import { blogpostsApi } from 'api/client';
 import Table from 'components/common/Table/Table';
 import styles from './BlogpostsView.module.css';
+import { truncateText } from 'utils/commonUtils';
 
 // Fix for React-Quill ImageResize module looking for window.Quill
 window.Quill = Quill;
@@ -181,8 +182,8 @@ export default function BlogpostsView({ showToast }) {
   };
 
   const columns = [
-    { key: 'title', label: 'Title', render: (row) => <span style={{ fontWeight: 500 }}>{row.title}</span> },
-    { key: 'author', label: 'Author' },
+    { key: 'title', label: 'Title', width: '35%', render: (row) => <span style={{ fontWeight: 500 }}>{truncateText( row.title, 50)}</span> },
+    { key: 'author', label: 'Author', width: "20%" },
     { key: 'status', label: 'Status', render: (blogpost) => (
       <span style={{ 
         padding: '4px 8px', 

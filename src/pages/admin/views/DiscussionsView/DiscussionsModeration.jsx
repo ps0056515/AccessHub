@@ -4,6 +4,7 @@ import dashboardStyles from '../../AdminDashboard.module.css';
 import DiscussionModal from './DiscussionModal';
 import Table from 'components/common/Table/Table';
 import styles from './DiscussionsView.module.css';
+import { truncateText } from 'utils/commonUtils';
 
 export default function DiscussionsModeration({ showToast }) {
   const [posts, setPosts] = useState([]);
@@ -87,7 +88,7 @@ export default function DiscussionsModeration({ showToast }) {
       filterMatch: (row, val) => Array.isArray(row.tags) && row.tags.includes(val),
       render: (post) => (
       <>
-        <div style={{ fontWeight: 500 }}>{post.title}</div>
+        <p style={{ fontWeight: 600 }}>{truncateText(post.title, 50)}</p>
         {post.tags && post.tags.length > 0 && (
           <div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginTop: '4px' }}>
             {post.tags.join(', ')}
@@ -98,7 +99,7 @@ export default function DiscussionsModeration({ showToast }) {
     { key: 'author', label: 'Author' },
     { key: 'votes', label: 'Votes' },
     { key: 'replies', label: 'Replies' },
-    { key: 'time', label: 'Date', render: (post) => new Date(post.created_at).toLocaleDateString() },
+    { key: 'time', label: 'Date', render: (post) => new Date(post.raw_time).toLocaleDateString() },
     { key: 'updated_at', label: 'Last Updated', render: (post) => post.updated_at ? new Date(post.updated_at).toLocaleString('en-US', { month: 'numeric', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit' }).replace(',', '') : '—' },
     { key: 'actions', label: 'Actions', render: (post) => (
       <div style={{ display: 'flex', gap: '8px' }}>

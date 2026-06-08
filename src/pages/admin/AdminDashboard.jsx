@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from 'context/AuthContext';
 import { SITE_NAME } from 'brand';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
+import Tooltip from 'components/common/Tooltip/Tooltip';
 import styles from './AdminDashboard.module.css';
 
 // Sub-page Views
@@ -32,6 +34,7 @@ export default function AdminDashboard({ goToPortal }) {
   const { user, signOut } = useAuth();
   const [activeTab, setActiveTab] = useState('overview');
   const [toasts, setToasts] = useState([]);
+  const [isCollapsed, setIsCollapsed] = useState(false);
 
   useEffect(() => {
     document.title = `Admin · ${SITE_NAME}`;
@@ -63,7 +66,7 @@ export default function AdminDashboard({ goToPortal }) {
   };
 
   return (
-    <div className={styles.cmsContainer}>
+    <div className={`${styles.cmsContainer} ${isCollapsed ? styles.cmsCollapsed : ''}`}>
       <a href="#cms-main-content" className={styles.skipLink}>
         Skip to main content
       </a>
@@ -72,25 +75,37 @@ export default function AdminDashboard({ goToPortal }) {
       <aside className={styles.sidebar} aria-label="CMS Management Menu">
         <div className={styles.sidebarBrand}>
           <span className={styles.brandEmoji} aria-hidden="true">🛡️</span>
-          <div>
-            <h2 className={styles.brandTitle}>AccessHub</h2>
+          <div className={styles.brandText}>
+            <h2 className={styles.brandTitle}>AllCanAccess</h2>
             <span className={styles.brandRole}>Admin Portal</span>
           </div>
+          <Tooltip content={isCollapsed ? "Expand sidebar" : "Collapse sidebar"} position="right">
+            <button 
+              type="button" 
+              onClick={() => setIsCollapsed(!isCollapsed)}
+              className={styles.collapseToggle}
+              aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+            >
+              {isCollapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
+            </button>
+          </Tooltip>
         </div>
 
         <nav className={styles.sidebarNav} aria-label="CMS Navigation Tabs">
           <ul className={styles.tabList}>
             {tabs.map(t => (
               <li key={t.id}>
-                <button
-                  type="button"
-                  className={`${styles.tabItem} ${activeTab === t.id ? styles.tabItemActive : ''}`}
-                  onClick={() => setActiveTab(t.id)}
-                  aria-current={activeTab === t.id ? 'page' : undefined}
-                >
-                  <span className={styles.tabIcon} aria-hidden="true">{t.icon}</span>
-                  <span className={styles.tabLabel}>{t.label}</span>
-                </button>
+                <Tooltip content={t.label} position="right" disabled={!isCollapsed} fullWidth>
+                  <button
+                    type="button"
+                    className={`${styles.tabItem} ${activeTab === t.id ? styles.tabItemActive : ''}`}
+                    onClick={() => setActiveTab(t.id)}
+                    aria-current={activeTab === t.id ? 'page' : undefined}
+                  >
+                    <span className={styles.tabIcon} aria-hidden="true">{t.icon}</span>
+                    <span className={styles.tabLabel}>{t.label}</span>
+                  </button>
+                </Tooltip>
               </li>
             ))}
           </ul>
@@ -106,15 +121,17 @@ export default function AdminDashboard({ goToPortal }) {
               <p className={styles.profileName}>{user.displayName}</p>
               <p className={styles.profileEmail} title={user.email}>{user.email}</p>
             </div>
-            <button
-              type="button"
-              className={styles.logoutBtn}
-              onClick={handleSignOut}
-              aria-label="Sign out of Admin Panel"
-              title="Sign out"
-            >
-              ➡️
-            </button>
+            <Tooltip content="Sign out" position="right" disabled={!isCollapsed}>
+              <button
+                type="button"
+                className={styles.logoutBtn}
+                onClick={handleSignOut}
+                aria-label="Sign out of Admin Panel"
+                title={!isCollapsed ? "Sign out" : undefined}
+              >
+                ➡️
+              </button>
+            </Tooltip>
           </div>
         )}
       </aside>
