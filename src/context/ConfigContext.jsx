@@ -7,13 +7,14 @@ export function ConfigProvider({ children }) {
   const [siteName, setSiteName] = useState('');
   const [navbarLogoUrl, setNavbarLogoUrl] = useState('/allcanaccess.png');
   const [footerLogoUrl, setFooterLogoUrl] = useState('/allcanaccess_footer.png');
-  const [navigation, setNavigation] = useState({
-    navbar: [],
-    footer_community: [],
-    footer_standards: [],
-    footer_org: [],
-    footer_socials: []
-  });
+const [navigation, setNavigation] = useState({
+  navbar: [],
+  footer_community: [],
+  footer_standards: [],
+  footer_org: [],
+  footer_socials: []
+});
+
   const [footerColumns, setFooterColumns] = useState([]);
   
   // Portal Hero config
