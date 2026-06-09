@@ -16,7 +16,13 @@ function relativeTime(iso) {
   if (diffSec < 3600) return `${Math.floor(diffSec / 60)}m ago`;
   if (diffSec < 86400) return `${Math.floor(diffSec / 3600)}h ago`;
   if (diffSec < 604800) return `${Math.floor(diffSec / 86400)}d ago`;
-  return new Date(then).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+
+  const dateObj = new Date(then);
+  const isCurrentYear = dateObj.getFullYear() === new Date().getFullYear();
+  if (!isCurrentYear) {
+    return dateObj.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
+  }
+  return dateObj.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
 }
 
 function parseTags(raw) {
