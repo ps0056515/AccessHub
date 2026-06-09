@@ -32,13 +32,25 @@ const VIEWS = {
 export default function AdminDashboard({ goToPortal }) {
   const navigate = useNavigate();
   const { user, signOut } = useAuth();
-  const [activeTab, setActiveTab] = useState('overview');
+  const [activeTab, setActiveTab] = useState(() => {
+    return localStorage.getItem('adminDashboardTab') || 'overview';
+  });
   const [toasts, setToasts] = useState([]);
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(() => {
+    return localStorage.getItem('adminDashboardCollapsed') === 'true';
+  });
 
   useEffect(() => {
     document.title = `Admin · ${SITE_NAME}`;
   }, []);
+
+  useEffect(() => {
+    localStorage.setItem('adminDashboardTab', activeTab);
+  }, [activeTab]);
+
+  useEffect(() => {
+    localStorage.setItem('adminDashboardCollapsed', isCollapsed);
+  }, [isCollapsed]);
 
   const addToast = (message, type = 'success') => {
     const id = Date.now();
@@ -61,6 +73,8 @@ export default function AdminDashboard({ goToPortal }) {
   ];
 
   const handleSignOut = async () => {
+    localStorage.removeItem('adminDashboardTab');
+    localStorage.removeItem('adminDashboardCollapsed');
     await signOut();
     navigate('/sign-in', { replace: true });
   };
@@ -143,7 +157,12 @@ export default function AdminDashboard({ goToPortal }) {
           <button
             type="button"
             className={styles.backBtn}
-            onClick={() => goToPortal?.() || navigate('/')}
+            onClick={() => {
+              localStorage.removeItem('adminDashboardTab');
+              localStorage.removeItem('adminDashboardCollapsed');
+              if (goToPortal) goToPortal();
+              else navigate('/');
+            }}
             aria-label="Return to the main community portal"
           >
             ← Exit to site
