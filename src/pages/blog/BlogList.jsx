@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { blogpostsApi } from 'api/client';
 import { SITE_NAME } from 'brand';
 import Container from 'components/common/Container/Container';
+import ContentCard from 'components/common/ContentCard/ContentCard';
 import styles from './Blog.module.css';
 
 export default function BlogpostsList() {
@@ -41,20 +42,15 @@ export default function BlogpostsList() {
       ) : blogposts.length > 0 ? (
         <div className={styles.grid}>
           {blogposts.map(blogpost => (
-            <Link to={`/blog/${blogpost.id}`} key={blogpost.id} className={styles.card}>
-              {blogpost.cover_image ? (
-                <img src={blogpost.cover_image} alt={blogpost.title} className={styles.cardImage} />
-              ) : (
-                <div className={styles.imagePlaceholder}>📰</div>
-              )}
-              <div className={styles.cardContent}>
-                <h2 className={styles.cardTitle}>{blogpost.title}</h2>
-                <div className={styles.cardMeta}>
-                  <span>{blogpost.author}</span>
-                  <span>{new Date(blogpost.published_date).toLocaleDateString()}</span>
-                </div>
-              </div>
-            </Link>
+            <ContentCard
+              key={blogpost.id}
+              to={`/blog/${blogpost.id}`}
+              image={blogpost.cover_image}
+              title={blogpost.title}
+              author={blogpost.author}
+              date={blogpost.published_date}
+              typeIcon="📰"
+            />
           ))}
         </div>
       ) : (

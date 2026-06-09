@@ -4,7 +4,7 @@ import { settingsApi } from 'api/client';
 const ConfigContext = createContext(null);
 
 export function ConfigProvider({ children }) {
-  const [siteName, setSiteName] = useState('AllCanAccess');
+  const [siteName, setSiteName] = useState('');
   const [navbarLogoUrl, setNavbarLogoUrl] = useState('/allcanaccess.png');
   const [footerLogoUrl, setFooterLogoUrl] = useState('/allcanaccess_footer.png');
   const [navigation, setNavigation] = useState({
@@ -19,6 +19,8 @@ export function ConfigProvider({ children }) {
   // Portal Hero config
   const [portalConfig, setPortalConfig] = useState({
     bgUrl: '',
+    bgOpacity: 0.5,
+    contentPosition: 'center',
     badge: 'Live community · weekly office hours',
     heading: 'Where accessibility\npractitioners connect',
     subheading: 'Crowd-sourced discussions, vetted guides, tooling, and events — built with practitioners who ship inclusive products in the real world.',
@@ -65,9 +67,11 @@ export function ConfigProvider({ children }) {
         
         setPortalConfig(prev => ({
           bgUrl: data.portal_hero_bg_url ?? prev.bgUrl,
-          badge: data.portal_hero_badge || prev.badge,
-          heading: data.portal_hero_heading || prev.heading,
-          subheading: data.portal_hero_subheading || prev.subheading,
+          bgOpacity: data.portal_hero_bg_opacity ?? prev.bgOpacity,
+          contentPosition: data.portal_hero_content_position || prev.contentPosition,
+          badge: data.portal_hero_badge ?? prev.badge,
+          heading: data.portal_hero_heading ?? prev.heading,
+          subheading: data.portal_hero_subheading ?? prev.subheading,
           tags: data.portal_hero_tags || prev.tags,
           stats: data.portal_stats || prev.stats,
           askPlaceholder: data.portal_ask_placeholder || 'Ask the community a question...',
