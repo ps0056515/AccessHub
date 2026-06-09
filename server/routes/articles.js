@@ -6,6 +6,20 @@ const { authMiddleware, adminMiddleware } = require("../auth");
 
 const router = express.Router();
 
+function deleteLocalImage(imageUrl) {
+  if (imageUrl && imageUrl.startsWith("/api/uploads/")) {
+    const filename = path.basename(imageUrl);
+    const filePath = path.join(__dirname, "..", "uploads", filename);
+    if (fs.existsSync(filePath)) {
+      try {
+        fs.unlinkSync(filePath);
+      } catch (err) {
+        console.error("Failed to delete old cover image:", err);
+      }
+    }
+  }
+}
+
 // GET /api/articles - List all published articles (Public)
 router.get("/", async (req, res, next) => {
   try {
@@ -173,6 +187,9 @@ router.put("/:id", authMiddleware, adminMiddleware, async (req, res, next) => {
   }
 
   try {
+    const oldArticleResult = await query("SELECT cover_image FROM articles WHERE id = $1", [req.params.id]);
+    const oldCoverImage = oldArticleResult.rows.length > 0 ? oldArticleResult.rows[0].cover_image : null;
+
     const pDate = published_date ? new Date(published_date) : new Date();
     const result = await query(
       "UPDATE articles SET title = $1, content_html = $2, author = $3, cover_image = $4, is_published = $5, published_date = $6, updated_at = NOW() WHERE id = $7 RETURNING *",
@@ -190,6 +207,11 @@ router.put("/:id", authMiddleware, adminMiddleware, async (req, res, next) => {
       res.status(404).json({ error: "Article not found." });
       return;
     }
+
+    if (oldCoverImage && oldCoverImage !== cover_image) {
+      deleteLocalImage(oldCoverImage);
+    }
+
     res.json({ article: result.rows[0] });
   } catch (err) {
     next(err);
@@ -227,12 +249,16 @@ router.delete(
   async (req, res, next) => {
     try {
       const result = await query(
-        "DELETE FROM articles WHERE id = $1 RETURNING id",
+        "DELETE FROM articles WHERE id = $1 RETURNING id, cover_image",
         [req.params.id],
       );
       if (result.rows.length === 0) {
         res.status(404).json({ error: "Article not found." });
         return;
+      }
+      const deletedCoverImage = result.rows[0].cover_image;
+      if (deletedCoverImage) {
+        deleteLocalImage(deletedCoverImage);
       }
       res.json({ ok: true });
     } catch (err) {

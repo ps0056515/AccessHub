@@ -53,13 +53,15 @@ router.get('/', async (req, res, next) => {
     });
 
     res.json({
-      site_name: settings.site_name || 'AllCanAccess',
+      site_name: settings.site_name !== undefined ? settings.site_name : 'AllCanAccess',
       navbar_logo_url: settings.navbar_logo_url || '/allcanaccess.png',
       footer_logo_url: settings.footer_logo_url || '/allcanaccess_footer.png',
       portal_hero_bg_url: settings.portal_hero_bg_url || '',
-      portal_hero_badge: settings.portal_hero_badge || '',
-      portal_hero_heading: settings.portal_hero_heading || '',
-      portal_hero_subheading: settings.portal_hero_subheading || '',
+      portal_hero_bg_opacity: settings.portal_hero_bg_opacity !== undefined ? parseFloat(settings.portal_hero_bg_opacity) : 0.5,
+      portal_hero_content_position: settings.portal_hero_content_position || 'left',
+      portal_hero_badge: settings.portal_hero_badge !== undefined ? settings.portal_hero_badge : null,
+      portal_hero_heading: settings.portal_hero_heading !== undefined ? settings.portal_hero_heading : null,
+      portal_hero_subheading: settings.portal_hero_subheading !== undefined ? settings.portal_hero_subheading : null,
       portal_hero_tags: settings.portal_hero_tags ? JSON.parse(settings.portal_hero_tags) : null,
       portal_stats: settings.portal_stats ? JSON.parse(settings.portal_stats) : null,
       portal_ask_placeholder: settings.portal_ask_placeholder || '',
@@ -83,15 +85,14 @@ router.put('/', authMiddleware, adminMiddleware, async (req, res, next) => {
     portal_hero_tags, 
     portal_stats, 
     portal_hero_bg_url,
+    portal_hero_bg_opacity,
+    portal_hero_content_position,
     portal_ask_placeholder,
     portal_search_placeholder,
     portal_ask_topics
   } = req.body || {};
   
-  if (site_name && !site_name.trim()) {
-    res.status(400).json({ error: 'Site name cannot be empty if provided.' });
-    return;
-  }
+
 
   try {
     const upsert = async (k, v) => {
@@ -121,11 +122,13 @@ router.put('/', authMiddleware, adminMiddleware, async (req, res, next) => {
       );
     };
 
-    if (site_name) await upsert('site_name', site_name.trim());
+    if (site_name !== undefined) await upsert('site_name', site_name.trim());
     await upsert('portal_hero_badge', portal_hero_badge);
     await upsert('portal_hero_heading', portal_hero_heading);
     await upsert('portal_hero_subheading', portal_hero_subheading);
     await upsert('portal_hero_bg_url', portal_hero_bg_url);
+    await upsert('portal_hero_bg_opacity', portal_hero_bg_opacity);
+    await upsert('portal_hero_content_position', portal_hero_content_position);
     await upsert('portal_ask_placeholder', portal_ask_placeholder);
     await upsert('portal_search_placeholder', portal_search_placeholder);
     

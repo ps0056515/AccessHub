@@ -1,39 +1,63 @@
-import { useEffect, useRef, useState, useMemo } from 'react';
-import { flushSync } from 'react-dom';
-import { useNavigate } from 'react-router-dom';
-import { TAG_COLORS, COLOR_MAP } from 'data';
-import { postsApi, eventsApi, getVoterKey, getStoredVote, setStoredVote } from 'api/client';
-import { voteDelta } from 'utils/voteDelta';
-import { useAuth } from 'context/AuthContext';
-import { useConfig } from 'context/ConfigContext';
-import Container from 'components/common/Container/Container';
-import styles from './Portal.module.css';
+import { useEffect, useRef, useState, useMemo } from "react";
+import { flushSync } from "react-dom";
+import { useNavigate } from "react-router-dom";
+import { TAG_COLORS, COLOR_MAP } from "data";
+import {
+  postsApi,
+  eventsApi,
+  getVoterKey,
+  getStoredVote,
+  setStoredVote,
+} from "api/client";
+import { voteDelta } from "utils/voteDelta";
+import { useAuth } from "context/AuthContext";
+import { useConfig } from "context/ConfigContext";
+import Container from "components/common/Container/Container";
+import Pagination from "components/common/Pagination/Pagination";
+import styles from "./Portal.module.css";
 
 const TOPIC_FILTERS = ["WCAG 2.2", "Screen readers", "Legal"];
 
-
-
-const MONTH_ABBRS = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+const MONTH_ABBRS = [
+  "JAN",
+  "FEB",
+  "MAR",
+  "APR",
+  "MAY",
+  "JUN",
+  "JUL",
+  "AUG",
+  "SEP",
+  "OCT",
+  "NOV",
+  "DEC",
+];
 
 function getEventTiming(eventDateStr) {
-  if (!eventDateStr) return 'upcoming';
+  if (!eventDateStr) return "upcoming";
   const today = new Date();
   today.setHours(0, 0, 0, 0);
-  const d = new Date(String(eventDateStr).slice(0, 10) + 'T00:00:00');
+  const d = new Date(String(eventDateStr).slice(0, 10) + "T00:00:00");
   const diff = d - today;
-  if (diff < 0) return 'past';
-  if (diff === 0) return 'live';
-  return 'upcoming';
+  if (diff < 0) return "past";
+  if (diff === 0) return "live";
+  return "upcoming";
 }
 
 function fmtMonth(dateStr) {
-  if (!dateStr) return '';
-  return MONTH_ABBRS[new Date(String(dateStr).slice(0, 10) + 'T00:00:00Z').getUTCMonth()] ?? '';
+  if (!dateStr) return "";
+  return (
+    MONTH_ABBRS[
+      new Date(String(dateStr).slice(0, 10) + "T00:00:00Z").getUTCMonth()
+    ] ?? ""
+  );
 }
 
 function fmtDay(dateStr) {
-  if (!dateStr) return '';
-  return String(new Date(String(dateStr).slice(0, 10) + 'T00:00:00Z').getUTCDate());
+  if (!dateStr) return "";
+  return String(
+    new Date(String(dateStr).slice(0, 10) + "T00:00:00Z").getUTCDate(),
+  );
 }
 
 const HERO_TOPICS = [
@@ -96,7 +120,7 @@ function PostCard({ post, onOpenThread, onVotesChange }) {
   const [votes, setVotes] = useState(post.votes);
   const [voted, setVoted] = useState(() => getStoredVote(post.id));
   const [voting, setVoting] = useState(false);
-  const [voteError, setVoteError] = useState('');
+  const [voteError, setVoteError] = useState("");
 
   useEffect(() => {
     setVotes(post.votes);
@@ -110,7 +134,7 @@ function PostCard({ post, onOpenThread, onVotesChange }) {
     const prevVoted = voted;
     const { delta, userVote: nextVoted } = voteDelta(voted, dir);
 
-    setVoteError('');
+    setVoteError("");
     setVotes(prevVotes + delta);
     setVoted(nextVoted);
     setVoting(true);
@@ -127,7 +151,7 @@ function PostCard({ post, onOpenThread, onVotesChange }) {
     } catch (err) {
       setVotes(prevVotes);
       setVoted(prevVoted);
-      setVoteError(err.message || 'Could not save your vote.');
+      setVoteError(err.message || "Could not save your vote.");
     } finally {
       setVoting(false);
     }
@@ -146,7 +170,11 @@ function PostCard({ post, onOpenThread, onVotesChange }) {
         >
           ▲
         </button>
-        <span className={styles.voteCount} aria-live="polite" aria-atomic="true">
+        <span
+          className={styles.voteCount}
+          aria-live="polite"
+          aria-atomic="true"
+        >
           {votes}
         </span>
         <button
@@ -205,21 +233,24 @@ export default function Portal({
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
   const { portalConfig } = useConfig();
-  const [activeTab, setActiveTab] = useState('hot');
-  const [query, setQuery] = useState('');
+  const [activeTab, setActiveTab] = useState("hot");
+  const [currentPage, setCurrentPage] = useState(1);
+  const postsPerPage = 10;
+  const [query, setQuery] = useState("");
   const [topicFilter, setTopicFilter] = useState(null);
-  const [draftQuestion, setDraftQuestion] = useState('');
-  const [draftTags, setDraftTags] = useState(['WCAG 2.2']);
-  const [postError, setPostError] = useState('');
+  const [draftQuestion, setDraftQuestion] = useState("");
+  const [draftTags, setDraftTags] = useState(["WCAG 2.2"]);
+  const [postError, setPostError] = useState("");
   const [posting, setPosting] = useState(false);
   const askBoxRef = useRef(null);
   const askTextareaRef = useRef(null);
   const searchInputRef = useRef(null);
   const [topContributors, setTopContributors] = useState([]);
-  
+
   useEffect(() => {
-    postsApi.topContributors()
-      .then(res => setTopContributors(res.contributors || []))
+    postsApi
+      .topContributors()
+      .then((res) => setTopContributors(res.contributors || []))
       .catch(console.error);
   }, []);
 
@@ -251,12 +282,15 @@ export default function Portal({
 
   useEffect(() => {
     try {
-      const raw = sessionStorage.getItem('aa-nav');
+      const raw = sessionStorage.getItem("aa-nav");
       if (!raw) return;
       const nav = JSON.parse(raw);
       if (nav.focusAsk) {
-        sessionStorage.removeItem('aa-nav');
-        askBoxRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        sessionStorage.removeItem("aa-nav");
+        askBoxRef.current?.scrollIntoView({
+          behavior: "smooth",
+          block: "start",
+        });
         askTextareaRef.current?.focus();
       }
     } catch {
@@ -276,7 +310,7 @@ export default function Portal({
     if (isActive) {
       flushSync(() => {
         setTopicFilter(null);
-        setQuery('');
+        setQuery("");
       });
       return;
     }
@@ -284,11 +318,14 @@ export default function Portal({
     flushSync(() => {
       setQuery(searchText);
       setTopicFilter(null);
-      setActiveTab('hot');
+      setActiveTab("hot");
     });
 
     requestAnimationFrame(() => {
-      searchInputRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      searchInputRef.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+      });
       searchInputRef.current?.focus({ preventScroll: true });
     });
   };
@@ -298,18 +335,20 @@ export default function Portal({
 
     if (isActive) {
       setTopicFilter(null);
-      setQuery('');
+      setQuery("");
       return;
     }
 
     setTopicFilter(filter);
     setQuery(filter);
-    setActiveTab('hot');
+    setActiveTab("hot");
     searchInputRef.current?.focus();
   };
 
   const handleVotesChange = (postId, newVotes) => {
-    setPosts((prev) => prev.map((p) => (p.id === postId ? { ...p, votes: newVotes } : p)));
+    setPosts((prev) =>
+      prev.map((p) => (p.id === postId ? { ...p, votes: newVotes } : p)),
+    );
   };
 
   const goToCertificationsSection = () => {
@@ -328,29 +367,31 @@ export default function Portal({
     }
 
     if (!isAuthenticated) {
-      navigate('/sign-in', { state: { from: '/' } });
+      navigate("/sign-in", { state: { from: "/" } });
       return;
     }
 
-    setPostError('');
+    setPostError("");
     setPosting(true);
     try {
       const title =
-        trimmedQuestion.length > 120 ? `${trimmedQuestion.slice(0, 117).trim()}…` : trimmedQuestion;
+        trimmedQuestion.length > 120
+          ? `${trimmedQuestion.slice(0, 117).trim()}…`
+          : trimmedQuestion;
       const { post: newPost } = await postsApi.create({
         title,
         body: trimmedQuestion,
         tags: draftTags,
       });
 
-      setPosts(prevPosts => [newPost, ...prevPosts]);
-      setDraftQuestion('');
-      setDraftTags(['WCAG 2.2']);
-      setQuery('');
-      setActiveTab('new');
+      setPosts((prevPosts) => [newPost, ...prevPosts]);
+      setDraftQuestion("");
+      setDraftTags(["WCAG 2.2"]);
+      setQuery("");
+      setActiveTab("new");
       navigate(`/thread/${newPost.id}`);
     } catch (err) {
-      setPostError(err.message || 'Could not post your question.');
+      setPostError(err.message || "Could not post your question.");
     } finally {
       setPosting(false);
     }
@@ -385,17 +426,30 @@ export default function Portal({
     return list;
   }, [baseFiltered, activeTab]);
 
+  const totalPages = Math.ceil(tabFiltered.length / postsPerPage) || 1;
+  const paginatedPosts = tabFiltered.slice(
+    (currentPage - 1) * postsPerPage,
+    currentPage * postsPerPage,
+  );
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [activeTab, query, topicFilter]);
+
   const [sidebarEvents, setSidebarEvents] = useState(() => []);
 
   useEffect(() => {
-    eventsApi.list()
-      .then(data => {
+    eventsApi
+      .list()
+      .then((data) => {
         if (Array.isArray(data)) {
           setSidebarEvents(
-            data.filter(e => {
-              const timing = getEventTiming(e.event_date);
-              return timing === 'upcoming' || timing === 'live';
-            }).slice(0, 4)
+            data
+              .filter((e) => {
+                const timing = getEventTiming(e.event_date);
+                return timing === "upcoming" || timing === "live";
+              })
+              .slice(0, 4),
           );
         }
       })
@@ -417,34 +471,79 @@ export default function Portal({
     else setActivePage?.("events");
   };
 
+  let heroAlignStyle = { position: "relative", zIndex: 1 };
+  let overlayBackground = "";
+  const opacity = portalConfig.bgOpacity ?? 0.8;
+
+  if (portalConfig.contentPosition === "center") {
+    heroAlignStyle.margin = "0 auto";
+    overlayBackground = `radial-gradient(circle at center, rgba(255,255,255,${opacity}) 0%, rgba(255,255,255,0) 75%)`;
+  } else if (portalConfig.contentPosition === "right") {
+    heroAlignStyle.margin = "0 0 0 auto";
+    overlayBackground = `linear-gradient(to left, rgba(255,255,255,${opacity}) 0%, rgba(255,255,255,0) 100%)`;
+  } else {
+    heroAlignStyle.margin = "0 auto 0 0";
+    overlayBackground = `linear-gradient(to right, rgba(255,255,255,${opacity}) 0%, rgba(255,255,255,0) 100%)`;
+  }
+
   return (
     <div className={styles.page}>
-      <section 
-        className={styles.hero} 
+      <section
+        className={styles.hero}
         aria-labelledby="hero-heading"
-        style={portalConfig.bgUrl ? { backgroundImage: `url(${portalConfig.bgUrl})`, backgroundSize: 'cover', backgroundPosition: 'center' } : undefined}
+        style={
+          portalConfig.bgUrl
+            ? {
+                backgroundImage: `url(${portalConfig.bgUrl})`,
+                backgroundSize: "cover",
+                backgroundPosition: "center",
+              }
+            : undefined
+        }
       >
-        {portalConfig.bgUrl && <div style={{ position: 'absolute', inset: 0, background: 'rgba(255,255,255,0.5)' }} />}
-        <Container className={styles.heroInner} style={{ position: 'relative', zIndex: 1 }}>
-          <div className={styles.heroBadge}>
-            <span className={styles.heroDot} aria-hidden="true" />
-            {portalConfig.badge}
-          </div>
-          <h1 id="hero-heading" className={`${styles.heroTitle} fade-up`} style={{ whiteSpace: 'pre-line' }}>
-            {portalConfig.heading}
-          </h1>
-          <p className={`${styles.heroSub} fade-up fade-up-1`}>
-            {portalConfig.subheading}
-          </p>
-          <ul className={`${styles.heroChips} fade-up fade-up-1`} aria-label="Popular topics">
-            {(portalConfig.tags || []).map(topic => {
+        {portalConfig.bgUrl && (
+          <div
+            style={{
+              position: "absolute",
+              inset: 0,
+              background: overlayBackground,
+            }}
+          />
+        )}
+        <Container className={styles.heroInner} style={heroAlignStyle}>
+          {portalConfig.badge && (
+            <div className={styles.heroBadge}>
+              <span className={styles.heroDot} aria-hidden="true" />
+              {portalConfig.badge}
+            </div>
+          )}
+          {portalConfig.heading && (
+            <h1
+              id="hero-heading"
+              className={`${styles.heroTitle} fade-up`}
+              style={{ whiteSpace: "pre-line" }}
+            >
+              {portalConfig.heading}
+            </h1>
+          )}
+          {portalConfig.subheading && (
+            <p className={`${styles.heroSub} fade-up fade-up-1`}>
+              {portalConfig.subheading}
+            </p>
+          )}
+          <ul
+            className={`${styles.heroChips} fade-up fade-up-1`}
+            aria-label="Popular topics"
+          >
+            {(portalConfig.tags || []).map((topic) => {
               const searchText = topic.searchText || topic.label;
-              const isActive = query.trim().toLowerCase() === searchText.toLowerCase();
+              const isActive =
+                query.trim().toLowerCase() === searchText.toLowerCase();
               return (
                 <li key={topic.label}>
                   <button
                     type="button"
-                    className={`${styles.heroChipBtn} ${isActive ? styles.heroChipBtnActive : ''}`}
+                    className={`${styles.heroChipBtn} ${isActive ? styles.heroChipBtnActive : ""}`}
                     aria-pressed={isActive}
                     onClick={() => applyHeroTopic(topic)}
                   >
@@ -471,11 +570,13 @@ export default function Portal({
             </button>
           </div>
         </Container>
-        {!portalConfig.bgUrl && <div className={styles.heroDecor} aria-hidden="true">
-          <div className={styles.decorCircle1} />
-          <div className={styles.decorCircle2} />
-          <div className={styles.decorLine} />
-        </div>}
+        {!portalConfig.bgUrl && (
+          <div className={styles.heroDecor} aria-hidden="true">
+            <div className={styles.decorCircle1} />
+            <div className={styles.decorCircle2} />
+            <div className={styles.decorLine} />
+          </div>
+        )}
       </section>
 
       <Container className={styles.statsBar} aria-label="Community statistics">
@@ -498,7 +599,10 @@ export default function Portal({
             <textarea
               className={styles.askTextarea}
               ref={askTextareaRef}
-              placeholder={portalConfig.askPlaceholder || "What accessibility challenge are you working through?"}
+              placeholder={
+                portalConfig.askPlaceholder ||
+                "What accessibility challenge are you working through?"
+              }
               rows={3}
               aria-label="Write your question"
               value={draftQuestion}
@@ -532,7 +636,7 @@ export default function Portal({
                 onClick={handlePostQuestion}
                 disabled={posting}
               >
-                {posting ? 'Posting…' : 'Post question →'}
+                {posting ? "Posting…" : "Post question →"}
               </button>
             </div>
           </div>
@@ -568,7 +672,10 @@ export default function Portal({
                 id="search"
                 className={styles.searchInput}
                 type="search"
-                placeholder={portalConfig.searchPlaceholder || "Search discussions by title or text…"}
+                placeholder={
+                  portalConfig.searchPlaceholder ||
+                  "Search discussions by title or text…"
+                }
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
               />
@@ -610,17 +717,25 @@ export default function Portal({
             ))}
           </div>
 
-          <div className={styles.postsContainer} role="tabpanel" aria-label={`${activeTab} discussions`}>
+          <div
+            className={styles.postsContainer}
+            role="tabpanel"
+            aria-label={`${activeTab} discussions`}
+          >
             {postsLoading ? (
               <p className={styles.empty}>Loading discussions…</p>
             ) : postsError ? (
               <div className={styles.empty}>
                 <p>{postsError}</p>
-                <button type="button" className={styles.retryBtn} onClick={onRetryPosts}>
+                <button
+                  type="button"
+                  className={styles.retryBtn}
+                  onClick={onRetryPosts}
+                >
                   Try again
                 </button>
               </div>
-            ) : tabFiltered.length === 0 ? (
+            ) : paginatedPosts.length === 0 ? (
               <p className={styles.empty}>
                 {query.trim()
                   ? `No discussions match “${query.trim()}”. Try another word or clear the search.`
@@ -629,7 +744,7 @@ export default function Portal({
                     : "No discussions match your filters."}
               </p>
             ) : (
-              tabFiltered.map((p) => (
+              paginatedPosts.map((p) => (
                 <PostCard
                   key={p.id}
                   post={p}
@@ -639,6 +754,15 @@ export default function Portal({
               ))
             )}
           </div>
+          {totalPages > 1 && (
+            <div style={{ display: "flex", justifyContent: "flex-end" }}>
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={setCurrentPage}
+              />
+            </div>
+          )}
         </main>
 
         <aside className={styles.sidebar} aria-label="Community sidebar">
@@ -658,8 +782,12 @@ export default function Portal({
                     onClick={() => goToEvent(e.id)}
                   >
                     <div className={styles.eventDate}>
-                      <span className={styles.eventMonth}>{fmtMonth(e.event_date)}</span>
-                      <span className={styles.eventDay}>{fmtDay(e.event_date)}</span>
+                      <span className={styles.eventMonth}>
+                        {fmtMonth(e.event_date)}
+                      </span>
+                      <span className={styles.eventDay}>
+                        {fmtDay(e.event_date)}
+                      </span>
                     </div>
                     <div className={styles.eventRowText}>
                       <p className={styles.eventTitle}>{e.title}</p>

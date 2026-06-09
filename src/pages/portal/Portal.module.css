@@ -7,7 +7,6 @@
   position: relative;
   overflow: hidden;
   background: linear-gradient(160deg, #f5f8fd 0%, #e8f1fb 100%);
-  border-bottom: 1px solid var(--border);
   padding: 64px 24px 56px;
 }
 
@@ -15,6 +14,7 @@
   position: relative;
   z-index: 1;
   max-width: 640px;
+  justify-content: flex-start;
 }
 
 .heroBadge {
@@ -68,7 +68,7 @@
 
 .heroSub {
   font-size: 16px;
-  color: var(--text-muted);
+  color: var(--text-faint);
   line-height: 1.7;
   max-width: 480px;
   margin-bottom: 28px;
@@ -99,7 +99,7 @@
 }
 
 .heroSecondary {
-  background: transparent;
+  background: var(--bg-secondary);
   color: var(--text);
   border: 1.5px solid var(--border-strong);
   border-radius: var(--radius-sm);
@@ -110,7 +110,7 @@
 }
 
 .heroSecondary:hover {
-  background: var(--bg-secondary);
+  background: var(--bg-tertiary);
 }
 
 .heroChips {
@@ -132,8 +132,8 @@
   padding: 6px 12px;
   border-radius: var(--radius-full);
   border: 1px solid var(--border-strong);
-  color: var(--text-muted);
-  background: rgba(255, 255, 255, 0.45);
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.6);
   cursor: pointer;
   transition:
     background var(--transition),

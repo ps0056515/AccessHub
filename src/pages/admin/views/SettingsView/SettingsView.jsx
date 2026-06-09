@@ -29,6 +29,8 @@ export default function SettingsView({ showToast }) {
   // Landing page config state
   const [localPortalConfig, setLocalPortalConfig] = useState({
     bgUrl: '',
+    bgOpacity: 0.5,
+    contentPosition: 'center',
     badge: '',
     heading: '',
     subheading: '',
@@ -80,10 +82,6 @@ export default function SettingsView({ showToast }) {
   // Handle saving general branding settings
   const handleSaveBranding = async (e) => {
     e.preventDefault();
-    if (!siteNameInput.trim()) {
-      showToast?.('Site name cannot be empty.', 'error');
-      return;
-    }
     setBrandingLoading(true);
     try {
       await settingsApi.update({ site_name: siteNameInput.trim() });
@@ -153,6 +151,8 @@ export default function SettingsView({ showToast }) {
     setPortalSaving(true);
     try {
       await settingsApi.update({
+        portal_hero_content_position: localPortalConfig.contentPosition,
+        portal_hero_bg_opacity: localPortalConfig.bgOpacity,
         portal_hero_badge: localPortalConfig.badge,
         portal_hero_heading: localPortalConfig.heading,
         portal_hero_subheading: localPortalConfig.subheading,
@@ -370,7 +370,7 @@ export default function SettingsView({ showToast }) {
       {/* Tab 1: Branding & Logos */}
       {activeSubTab === 'branding' && (
         <div className={styles.tabContent}>
-          <section className={dashboardStyles.panel}>
+          {/* <section className={dashboardStyles.panel}>
             <h2 className={dashboardStyles.panelTitle}>Site Brand</h2>
             <form onSubmit={handleSaveBranding}>
               <div className={styles.formGroup}>
@@ -391,7 +391,7 @@ export default function SettingsView({ showToast }) {
                 {brandingLoading ? 'Saving...' : 'Save Site Name'}
               </button>
             </form>
-          </section>
+          </section> */}
 
           <section className={dashboardStyles.panel}>
             <h2 className={dashboardStyles.panelTitle}>Website Logos (Max 2MB file size)</h2>
@@ -438,6 +438,18 @@ export default function SettingsView({ showToast }) {
             <h2 className={dashboardStyles.panelTitle}>Hero Section Text</h2>
             <form onSubmit={handleSavePortalConfig}>
               <div className={styles.formGroup}>
+                <label className={styles.formLabel}>Content Alignment</label>
+                <select
+                  value={localPortalConfig.contentPosition || 'center'}
+                  onChange={(e) => setLocalPortalConfig({...localPortalConfig, contentPosition: e.target.value})}
+                  className={styles.textInput}
+                >
+                  <option value="left">Left</option>
+                  <option value="center">Center</option>
+                  <option value="right">Right</option>
+                </select>
+              </div>
+              <div className={styles.formGroup}>
                 <label className={styles.formLabel}>Badge Text</label>
                 <input
                   type="text"
@@ -477,12 +489,30 @@ export default function SettingsView({ showToast }) {
           <section className={dashboardStyles.panel}>
             <h2 className={dashboardStyles.panelTitle}>Hero Background Image (Max 2MB file size)</h2>
             <div className={styles.logoCard}>
-              <div className={styles.logoPreviewBox} style={{ height: '160px', background: '#e0e0e0', overflow: 'hidden' }}>
+              <div className={styles.logoPreviewBox} style={{ height: '160px', background: '#e0e0e0', overflow: 'hidden', position: 'relative' }}>
                 {localPortalConfig.bgUrl ? (
-                  <img src={localPortalConfig.bgUrl} alt="Hero Background Preview" className={styles.logoPreviewImg} style={{ objectFit: 'cover', width: '100%', height: '100%' }} />
+                  <>
+                    <img src={localPortalConfig.bgUrl} alt="Hero Background Preview" className={styles.logoPreviewImg} style={{ objectFit: 'cover', width: '100%', height: '100%' }} />
+                    <div style={{ position: 'absolute', inset: 0, background: `rgba(255,255,255,${localPortalConfig.bgOpacity ?? 0.5})` }} />
+                  </>
                 ) : (
                   <span style={{ color: '#666' }}>No custom background (using default theme color)</span>
                 )}
+              </div>
+              <div className={styles.formGroup} style={{ marginTop: '16px', marginBottom: '16px' }}>
+                <label className={styles.formLabel}>Background Overlay Opacity</label>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  <input
+                    type="range"
+                    min="0"
+                    max="1"
+                    step="0.05"
+                    value={localPortalConfig.bgOpacity ?? 0.5}
+                    onChange={(e) => setLocalPortalConfig({ ...localPortalConfig, bgOpacity: parseFloat(e.target.value) })}
+                    style={{ flex: 1 }}
+                  />
+                  <span>{localPortalConfig.bgOpacity ?? 0.5}</span>
+                </div>
               </div>
               <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
                 <label className={styles.uploadLabelBtn}>
@@ -496,6 +526,15 @@ export default function SettingsView({ showToast }) {
                   </button>
                 )}
               </div>
+              <button
+                type="button"
+                disabled={portalSaving}
+                onClick={() => handleSavePortalConfig()}
+                className={`${dashboardStyles.backBtn} ${styles.saveBtn}`}
+                style={{ marginTop: '20px', width: "180px" }}
+              >
+                {portalSaving ? 'Saving...' : 'Save Overlay Opacity'}
+              </button>
             </div>
           </section>
 
