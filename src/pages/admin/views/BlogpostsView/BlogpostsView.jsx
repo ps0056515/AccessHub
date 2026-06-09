@@ -11,6 +11,16 @@ import { truncateText } from 'utils/commonUtils';
 window.Quill = Quill;
 Quill.register('modules/imageResize', ImageResize);
 
+// Allow javascript: links
+const Link = Quill.import('formats/link');
+const originalSanitize = Link.sanitize;
+Link.sanitize = function (url) {
+  if (url && url.startsWith('javascript:')) {
+    return url;
+  }
+  return originalSanitize ? originalSanitize.call(Link, url) : url;
+};
+
 export default function BlogpostsView({ showToast }) {
   const [blogposts, setBlogposts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -196,6 +206,7 @@ export default function BlogpostsView({ showToast }) {
     toolbar: [
       [{ 'header': [1, 2, 3, false] }],
       ['bold', 'italic', 'underline', 'strike'],
+      ['blockquote', 'code-block'],
       [{ 'list': 'ordered'}, { 'list': 'bullet' }],
       ['link', 'image', 'video'],
       ['clean']
@@ -362,6 +373,9 @@ export default function BlogpostsView({ showToast }) {
               className={styles.input}
               style={{ padding: '8px' }}
             />
+            <small style={{ color: "var(--text-faint, #64748b)", marginTop: "4px", display: "block" }}>
+              Recommended size: 1920x1080 | 1280x720 | 16:9 aspect ratio
+            </small>
             {(formData.cover_image_file || formData.cover_image) && (
               <img 
                 src={formData.cover_image_file || formData.cover_image} 

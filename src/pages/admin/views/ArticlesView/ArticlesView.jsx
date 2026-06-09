@@ -11,6 +11,16 @@ import { truncateText } from "utils/commonUtils";
 window.Quill = Quill;
 Quill.register("modules/imageResize", ImageResize);
 
+// Allow javascript: links
+const Link = Quill.import("formats/link");
+const originalSanitize = Link.sanitize;
+Link.sanitize = function (url) {
+  if (url && url.startsWith("javascript:")) {
+    return url;
+  }
+  return originalSanitize ? originalSanitize.call(Link, url) : url;
+};
+
 export default function ArticlesView({ showToast }) {
   const [articles, setArticles] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -182,10 +192,18 @@ export default function ArticlesView({ showToast }) {
   };
 
   const handleBulkDelete = async () => {
-    if (!window.confirm(`Are you sure you want to delete ${selectedIds.length} articles?`)) return;
+    if (
+      !window.confirm(
+        `Are you sure you want to delete ${selectedIds.length} articles?`,
+      )
+    )
+      return;
     try {
-      await Promise.all(selectedIds.map(id => articlesApi.delete(id)));
-      showToast?.(`Successfully deleted ${selectedIds.length} articles.`, "success");
+      await Promise.all(selectedIds.map((id) => articlesApi.delete(id)));
+      showToast?.(
+        `Successfully deleted ${selectedIds.length} articles.`,
+        "success",
+      );
       setSelectedIds([]);
       await loadArticles();
     } catch (err) {
@@ -194,14 +212,28 @@ export default function ArticlesView({ showToast }) {
   };
 
   const handleBulkPublish = async (publishState) => {
-    if (!window.confirm(`Are you sure you want to ${publishState ? "publish" : "unpublish"} ${selectedIds.length} articles?`)) return;
+    if (
+      !window.confirm(
+        `Are you sure you want to ${publishState ? "publish" : "unpublish"} ${selectedIds.length} articles?`,
+      )
+    )
+      return;
     try {
-      await Promise.all(selectedIds.map(id => articlesApi.togglePublish(id, publishState)));
-      showToast?.(`Successfully ${publishState ? "published" : "unpublished"} ${selectedIds.length} articles.`, "success");
+      await Promise.all(
+        selectedIds.map((id) => articlesApi.togglePublish(id, publishState)),
+      );
+      showToast?.(
+        `Successfully ${publishState ? "published" : "unpublished"} ${selectedIds.length} articles.`,
+        "success",
+      );
       setSelectedIds([]);
       await loadArticles();
     } catch (err) {
-      showToast?.(err.message || `Failed to bulk ${publishState ? "publish" : "unpublish"} articles.`, "error");
+      showToast?.(
+        err.message ||
+          `Failed to bulk ${publishState ? "publish" : "unpublish"} articles.`,
+        "error",
+      );
     }
   };
 
@@ -210,6 +242,7 @@ export default function ArticlesView({ showToast }) {
     toolbar: [
       [{ header: [1, 2, 3, false] }],
       ["bold", "italic", "underline", "strike"],
+      ["blockquote", "code-block"],
       [{ list: "ordered" }, { list: "bullet" }],
       ["link", "image", "video"],
       ["clean"],
@@ -338,7 +371,11 @@ export default function ArticlesView({ showToast }) {
                     type="button"
                     onClick={() => handleBulkPublish(true)}
                     className={styles.btnSuccess}
-                    style={{ padding: '8px 12px', fontSize: '14px', borderRadius: '6px' }}
+                    style={{
+                      padding: "8px 12px",
+                      fontSize: "14px",
+                      borderRadius: "6px",
+                    }}
                   >
                     📢 Bulk Publish
                   </button>
@@ -346,7 +383,11 @@ export default function ArticlesView({ showToast }) {
                     type="button"
                     onClick={() => handleBulkPublish(false)}
                     className={styles.btnSecondary}
-                    style={{ padding: '8px 12px', fontSize: '14px', borderRadius: '6px' }}
+                    style={{
+                      padding: "8px 12px",
+                      fontSize: "14px",
+                      borderRadius: "6px",
+                    }}
                   >
                     🚫 Bulk Unpublish
                   </button>
@@ -354,7 +395,11 @@ export default function ArticlesView({ showToast }) {
                     type="button"
                     onClick={handleBulkDelete}
                     className={styles.btnDanger}
-                    style={{ padding: '8px 12px', fontSize: '14px', borderRadius: '6px' }}
+                    style={{
+                      padding: "8px 12px",
+                      fontSize: "14px",
+                      borderRadius: "6px",
+                    }}
                   >
                     🗑 Bulk Delete ({selectedIds.length})
                   </button>
@@ -442,6 +487,15 @@ export default function ArticlesView({ showToast }) {
               className={styles.input}
               style={{ padding: "8px" }}
             />
+            <small
+              style={{
+                color: "var(--text-faint, #64748b)",
+                marginTop: "4px",
+                display: "block",
+              }}
+            >
+              Recommended size: 1920x1080 | 1280x720 | 16:9 aspect ratio
+            </small>
             {(formData.cover_image_file || formData.cover_image) && (
               <img
                 src={formData.cover_image_file || formData.cover_image}
