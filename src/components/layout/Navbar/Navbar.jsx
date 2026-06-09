@@ -85,13 +85,11 @@ export default function Navbar({
         >
           <img
             src={navbarLogoUrl}
-            alt=""
+            alt={`${siteName}`}
             className={styles.logoImg}
-            width={128}
-            height={40}
+         
           />
-          <span className={`sr-only ${styles.logoName}`}>{siteName}</span>
-          <span className={styles.logoBadge}>Beta</span>
+
         </button>
 
         <nav className={styles.nav} aria-label="Main navigation">
