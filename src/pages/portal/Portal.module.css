@@ -8,6 +8,9 @@
   overflow: hidden;
   background: linear-gradient(160deg, #f5f8fd 0%, #e8f1fb 100%);
   padding: 64px 24px 56px;
+  min-height: clamp(90dvh, 65vh, 700px);
+  display: flex;
+  align-items: center;
 }
 
 .heroInner {
