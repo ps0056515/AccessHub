@@ -126,8 +126,8 @@ router.post('/admin/proposals/:id/approve', authMiddleware, adminMiddleware, asy
     const orderRes = await client.query('SELECT COALESCE(MAX(display_order), 0) AS max FROM events');
     const display_order = orderRes.rows[0].max + 1;
     const eventRes = await client.query(
-      'INSERT INTO events (event_date, title, type, band, display_order) VALUES ($1,$2,$3,$4,$5) RETURNING *',
-      [event_date, title.trim(), type.trim(), band.trim(), display_order]
+      'INSERT INTO events (event_date, title, type, band, display_order, tags) VALUES ($1,$2,$3,$4,$5,$6) RETURNING *',
+      [event_date, title.trim(), type.trim(), band.trim(), display_order, '[]']
     );
     await client.query("UPDATE event_proposals SET status='approved' WHERE id=$1", [id]);
     await client.query('COMMIT');
@@ -185,7 +185,7 @@ router.put('/admin/reorder', authMiddleware, adminMiddleware, async (req, res, n
 
 // POST /api/events/admin
 router.post('/admin', authMiddleware, adminMiddleware, async (req, res, next) => {
-  const { event_date, title, type, band } = req.body || {};
+  const { event_date, title, type, band, tags } = req.body || {};
   if (!event_date || !title || !type || !band) {
     return res.status(400).json({ error: 'event_date, title, type, and band are required.' });
   }
@@ -193,8 +193,8 @@ router.post('/admin', authMiddleware, adminMiddleware, async (req, res, next) =>
     const orderRes = await query('SELECT COALESCE(MAX(display_order), 0) AS max FROM events');
     const display_order = orderRes.rows[0].max + 1;
     const { rows } = await query(
-      'INSERT INTO events (event_date, title, type, band, display_order) VALUES ($1,$2,$3,$4,$5) RETURNING *',
-      [event_date, title.trim(), type.trim(), band.trim(), display_order]
+      'INSERT INTO events (event_date, title, type, band, display_order, tags) VALUES ($1,$2,$3,$4,$5,$6) RETURNING *',
+      [event_date, title.trim(), type.trim(), band.trim(), display_order, JSON.stringify(tags || [])]
     );
     res.json(rows[0]);
   } catch (err) {
@@ -205,14 +205,14 @@ router.post('/admin', authMiddleware, adminMiddleware, async (req, res, next) =>
 // PUT /api/events/admin/:id
 router.put('/admin/:id', authMiddleware, adminMiddleware, async (req, res, next) => {
   const { id } = req.params;
-  const { event_date, title, type, band } = req.body || {};
+  const { event_date, title, type, band, tags } = req.body || {};
   if (!event_date || !title || !type || !band) {
     return res.status(400).json({ error: 'event_date, title, type, and band are required.' });
   }
   try {
     const { rows } = await query(
-      'UPDATE events SET event_date=$1, title=$2, type=$3, band=$4, updated_at=CURRENT_TIMESTAMP WHERE id=$5 RETURNING *',
-      [event_date, title.trim(), type.trim(), band.trim(), id]
+      'UPDATE events SET event_date=$1, title=$2, type=$3, band=$4, tags=$5, updated_at=CURRENT_TIMESTAMP WHERE id=$6 RETURNING *',
+      [event_date, title.trim(), type.trim(), band.trim(), JSON.stringify(tags || []), id]
     );
     if (rows.length === 0) return res.status(404).json({ error: 'Event not found.' });
     res.json(rows[0]);

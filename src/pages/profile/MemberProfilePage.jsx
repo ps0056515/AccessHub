@@ -1,20 +1,42 @@
+import { useState, useEffect } from 'react';
 import { useParams, useLocation } from 'react-router-dom';
-import { MEMBERS, COLOR_MAP } from 'data';
+import { usersApi } from 'api/client';
+import { COLOR_MAP } from 'data';
 import styles from './MemberProfilePage.module.css';
-
-function findMember(id) {
-  return MEMBERS.find(m => m.id === id) ?? null;
-}
 
 export default function MemberProfilePage({ goToPortal }) {
   const { memberId } = useParams();
   const location = useLocation();
-  const member = memberId ? findMember(memberId) : null;
+  const [member, setMember] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  if (!member) {
+  useEffect(() => {
+    if (!memberId) return;
+    setLoading(true);
+    usersApi.getProfile(memberId)
+      .then(res => {
+        setMember(res.profile);
+        setLoading(false);
+      })
+      .catch(err => {
+        setError(err.message || "Failed to load profile.");
+        setLoading(false);
+      });
+  }, [memberId]);
+
+  if (loading) {
     return (
       <div className={styles.page}>
-        <p className={styles.missing}>This profile could not be found.</p>
+        <p className={styles.missing}>Loading profile...</p>
+      </div>
+    );
+  }
+
+  if (error || !member) {
+    return (
+      <div className={styles.page}>
+        <p className={styles.missing}>{error || "This profile could not be found."}</p>
         <button type="button" className={styles.back} onClick={goToPortal}>
           Back to community
         </button>

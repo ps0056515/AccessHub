@@ -1,7 +1,7 @@
-import { Link } from 'react-router-dom';
-import { useConfig } from 'context/ConfigContext';
-import FooterLogo from 'components/layout/FooterLogo/FooterLogo';
-import Container from 'components/common/Container/Container';
+import { Link } from "react-router-dom";
+import { useConfig } from "context/ConfigContext";
+import FooterLogo from "components/layout/FooterLogo/FooterLogo";
+import Container from "components/common/Container/Container";
 import styles from "./Footer.module.css";
 
 function scrollToTop() {
@@ -24,12 +24,12 @@ export default function Footer({ goToSection, goToPortal }) {
   const socialLinks = navigation.footer_socials || [];
 
   const getPageIdFromUrl = (url) => {
-    if (url === '/') return 'portal';
-    if (url === '/resources') return 'resources';
-    if (url === '/tools') return 'tools';
-    if (url === '/events') return 'events';
-    if (url === '/screen-readers') return 'screen-readers';
-    return '';
+    if (url === "/") return "portal";
+    if (url === "/resources") return "resources";
+    if (url === "/tools") return "tools";
+    if (url === "/events") return "events";
+    if (url === "/screen-readers") return "guide";
+    return "";
   };
 
   const goToPage = (url) => {
@@ -64,9 +64,9 @@ export default function Footer({ goToSection, goToPortal }) {
           type="button"
           className={styles.colLink}
           onClick={() => {
-            if (page === 'portal') {
-              if (typeof goToPortal === 'function') goToPortal();
-            } else if (typeof goToSection === 'function') {
+            if (page === "portal") {
+              if (typeof goToPortal === "function") goToPortal();
+            } else if (typeof goToSection === "function") {
               goToSection(page);
             }
           }}
@@ -94,12 +94,16 @@ export default function Footer({ goToSection, goToPortal }) {
               onClick={() => goToPage("/")}
             >
               <span className={styles.logo}>
-                <FooterLogo className={styles.logoImg} width={200} height={60} />
+                <FooterLogo
+                  className={styles.logoImg}
+                  width={200}
+                  height={60}
+                />
               </span>
             </button>
             <p className={styles.brandDesc}>
-               A community for accessibility practitioners, designers,
-               developers, and advocates building a more inclusive web.
+              A community for accessibility practitioners, designers,
+              developers, and advocates building a more inclusive web.
             </p>
             <nav className={styles.socials} aria-label="Social links">
               {socialLinks.map((s) =>
@@ -114,7 +118,11 @@ export default function Footer({ goToSection, goToPortal }) {
                     {s.label}
                   </a>
                 ) : (
-                  <FooterRouteLink key={s.label} to={s.url} className={styles.social}>
+                  <FooterRouteLink
+                    key={s.label}
+                    to={s.url}
+                    className={styles.social}
+                  >
                     {s.label}
                   </FooterRouteLink>
                 ),
@@ -125,13 +133,15 @@ export default function Footer({ goToSection, goToPortal }) {
           {footerColumns.map((col) => {
             const colLinks = navigation[`footer_${col.key_name}`] || [];
             return (
-              <nav key={col.key_name} className={styles.col} aria-label={col.title}>
+              <nav
+                key={col.key_name}
+                className={styles.col}
+                aria-label={col.title}
+              >
                 <p className={styles.colHeading}>{col.title}</p>
                 <ul className={styles.colLinks}>
                   {colLinks.map((l) => (
-                    <li key={l.label}>
-                      {renderLink(l)}
-                    </li>
+                    <li key={l.label}>{renderLink(l)}</li>
                   ))}
                 </ul>
               </nav>
