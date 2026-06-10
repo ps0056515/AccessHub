@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useConfig } from 'context/ConfigContext';
+import { useConfirm } from 'context/ConfirmContext';
 import { settingsApi } from 'api/client';
 import dashboardStyles from '../../AdminDashboard.module.css';
 import styles from './SettingsView.module.css';
 
 export default function SettingsView({ showToast }) {
+  const confirm = useConfirm();
   const { siteName, navbarLogoUrl, footerLogoUrl, navigation, footerColumns, portalConfig, refreshConfig } = useConfig();
 
   // Tab state: 'branding', 'navbar', 'footer', 'landing'
@@ -283,7 +285,7 @@ export default function SettingsView({ showToast }) {
   };
 
   const handleDeleteColumn = async (key, title) => {
-    if (!window.confirm(`Are you sure you want to delete the column "${title}"? This will permanently delete all its navigation links.`)) {
+    if (!(await confirm(`Are you sure you want to delete the column "${title}"? This will permanently delete all its navigation links.`))) {
       return;
     }
     try {

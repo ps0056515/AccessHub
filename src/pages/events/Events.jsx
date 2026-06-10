@@ -434,6 +434,23 @@ function EventCard({ ev, i, onRsvp, timing }) {
         <p className={styles.timingPill}>{timing} • {fmtTime(ev.event_date)}</p>
         <h2 className={styles.eventTitle}>{ev.title}</h2>
         <p className={styles.eventMeta}>{ev.type}</p>
+        
+        {(() => {
+          let parsedTags = [];
+          if (ev.tags) {
+            try {
+              parsedTags = JSON.parse(ev.tags);
+            } catch (err) {}
+          }
+          if (!parsedTags || parsedTags.length === 0) return null;
+          return (
+            <div className={styles.eventTags}>
+              {parsedTags.map(tag => (
+                <span key={tag} className={styles.eventTag}>{tag}</span>
+              ))}
+            </div>
+          );
+        })()}
       </div>
       <button
         type="button"
