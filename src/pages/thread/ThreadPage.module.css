@@ -242,3 +242,66 @@
   .page { padding: 16px 16px 64px; }
   .title { font-size: 1.35rem; }
 }
+
+/* Edit and Delete Post Actions */
+.ownerActions {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.editBtn, .deleteBtn {
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 4px 10px;
+  font-size: 12px;
+  cursor: pointer;
+  color: var(--text-muted);
+}
+
+.editBtn:hover { background: var(--bg-hover); color: var(--text); }
+.deleteBtn { border-color: var(--red-bg); color: var(--red); }
+.deleteBtn:hover { background: var(--red-bg); color: var(--red-text); }
+
+.editForm {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+}
+
+.editInput {
+  width: 100%;
+  font: inherit;
+  font-size: 16px;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+}
+
+.editInput:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.editActions {
+  display: flex;
+  gap: 12px;
+}
+
+.cancelBtn {
+  background: var(--bg-card);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.cancelBtn:hover {
+  background: var(--bg-hover);
+}
+

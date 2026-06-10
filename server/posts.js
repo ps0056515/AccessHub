@@ -38,6 +38,7 @@ function formatPost(row, replyCount) {
   const tags = parseTags(row.tags);
   return {
     id: row.id,
+    userId: row.user_id,
     votes: row.votes,
     initials: row.author_initials,
     color: row.author_color,

@@ -6,6 +6,7 @@ import dashboardStyles from "../../AdminDashboard.module.css";
 import styles from "./EventsView.module.css";
 import Table from "components/common/Table/Table";
 import { truncateText } from "utils/commonUtils";
+import { useConfirm } from "context/ConfirmContext";
 
 const TABS = ["Active Events", "Proposed Events"];
 
@@ -59,6 +60,7 @@ function timingClass(timing, s) {
 }
 
 export default function EventsView({ showToast }) {
+  const confirm = useConfirm();
   const [activeTab, setActiveTab] = useState("Active Events");
   const [eventSearch, setEventSearch] = useState("");
 
@@ -107,7 +109,7 @@ export default function EventsView({ showToast }) {
   }, [activeTab, loadProposals]);
 
   const handleDeleteEvent = async (id, title) => {
-    if (!window.confirm(`Delete event "${title}"?`)) return;
+    if (!(await confirm(`Delete event "${title}"?`))) return;
     try {
       await eventsApi.delete(id);
       showToast?.(`Event "${title}" deleted.`, "success");
@@ -119,9 +121,9 @@ export default function EventsView({ showToast }) {
 
   const handleBulkDelete = async () => {
     if (
-      !window.confirm(
+      !(await confirm(
         `Are you sure you want to delete ${selectedIds.length} events?`,
-      )
+      ))
     )
       return;
     try {
@@ -153,7 +155,7 @@ export default function EventsView({ showToast }) {
   };
 
   const handleRejectProposal = async (id, title) => {
-    if (!window.confirm(`Reject proposal "${title}"?`)) return;
+    if (!(await confirm(`Reject proposal "${title}"?`))) return;
     try {
       await eventsApi.rejectProposal(id);
       showToast?.(`Proposal "${title}" rejected.`, "success");
@@ -164,7 +166,7 @@ export default function EventsView({ showToast }) {
   };
 
   const handleDeleteProposal = async (id, title) => {
-    if (!window.confirm(`Permanently delete proposal "${title}"?`)) return;
+    if (!(await confirm(`Permanently delete proposal "${title}"?`))) return;
     try {
       await eventsApi.deleteProposal(id);
       showToast?.(`Proposal "${title}" deleted.`, "success");

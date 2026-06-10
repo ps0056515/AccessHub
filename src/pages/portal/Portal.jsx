@@ -116,7 +116,7 @@ function Tag({ label }) {
   );
 }
 
-function PostCard({ post, onOpenThread, onVotesChange }) {
+function PostCard({ post, isAuthenticated, navigate, onOpenThread, onVotesChange }) {
   const [votes, setVotes] = useState(post.votes);
   const [voted, setVoted] = useState(() => getStoredVote(post.id));
   const [voting, setVoting] = useState(false);
@@ -129,6 +129,11 @@ function PostCard({ post, onOpenThread, onVotesChange }) {
   const vote = async (dir, e) => {
     e.stopPropagation();
     if (voting) return;
+
+    if (!isAuthenticated) {
+      navigate('/sign-in', { state: { from: '/' } });
+      return;
+    }
 
     const prevVotes = votes;
     const prevVoted = voted;
@@ -758,6 +763,8 @@ export default function Portal({
                 <PostCard
                   key={p.id}
                   post={p}
+                  isAuthenticated={isAuthenticated}
+                  navigate={navigate}
                   onOpenThread={(post) => navigate(`/thread/${post.id}`)}
                   onVotesChange={handleVotesChange}
                 />

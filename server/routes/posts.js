@@ -246,6 +246,68 @@ router.get('/:id', async (req, res, next) => {
   }
 });
 
+router.put('/:id', authMiddleware, async (req, res, next) => {
+  const id = Number(req.params.id);
+  const { title, body, tags } = req.body || {};
+  const trimmedTitle = title?.trim();
+  const trimmedBody = body?.trim();
+
+  if (!Number.isFinite(id)) {
+    return res.status(400).json({ error: 'Invalid post id.' });
+  }
+  if (!trimmedTitle || trimmedTitle.length < 5) {
+    return res.status(400).json({ error: 'Title must be at least 5 characters.' });
+  }
+  if (!trimmedBody || trimmedBody.length < 10) {
+    return res.status(400).json({ error: 'Please add more detail to your question.' });
+  }
+
+  const tagList = Array.isArray(tags) ? tags.filter(Boolean) : ['WCAG 2.2'];
+  const excerpt = trimmedBody.length > 160 ? `${trimmedBody.slice(0, 157).trim()}…` : trimmedBody;
+
+  try {
+    const { rows } = await query('SELECT user_id FROM posts WHERE id = $1', [id]);
+    if (rows.length === 0) {
+      return res.status(404).json({ error: 'Discussion not found.' });
+    }
+    if (rows[0].user_id !== req.userId) {
+      return res.status(403).json({ error: 'You do not have permission to edit this discussion.' });
+    }
+
+    await query(
+      `UPDATE posts SET title = $1, body = $2, excerpt = $3, tags = $4, updated_at = CURRENT_TIMESTAMP WHERE id = $5`,
+      [trimmedTitle, trimmedBody, excerpt, JSON.stringify(tagList), id]
+    );
+
+    const updated = await query(`${POST_SELECT} WHERE p.id = $1`, [id]);
+    res.json({ post: formatPost(updated.rows[0]) });
+  } catch (err) {
+    next(err);
+  }
+});
+
+router.delete('/:id', authMiddleware, async (req, res, next) => {
+  const id = Number(req.params.id);
+  if (!Number.isFinite(id)) {
+    return res.status(400).json({ error: 'Invalid post id.' });
+  }
+
+  try {
+    const { rows } = await query('SELECT user_id FROM posts WHERE id = $1', [id]);
+    if (rows.length === 0) {
+      return res.status(404).json({ error: 'Discussion not found.' });
+    }
+    if (rows[0].user_id !== req.userId) {
+      return res.status(403).json({ error: 'You do not have permission to delete this discussion.' });
+    }
+
+    await query('DELETE FROM posts WHERE id = $1', [id]);
+    res.json({ ok: true });
+  } catch (err) {
+    next(err);
+  }
+});
+
 router.post('/', authMiddleware, async (req, res, next) => {
   const { title, body, tags } = req.body || {};
   const trimmedTitle = title?.trim();
@@ -303,16 +365,12 @@ router.post('/', authMiddleware, async (req, res, next) => {
   }
 });
 
-router.post('/:id/vote', async (req, res, next) => {
+router.post('/:id/vote', authMiddleware, async (req, res, next) => {
   const id = Number(req.params.id);
-  const { direction, voterKey } = req.body || {};
+  const { direction } = req.body || {};
 
   if (!Number.isFinite(id)) {
     res.status(400).json({ error: 'Invalid post id.' });
-    return;
-  }
-  if (!voterKey?.trim()) {
-    res.status(400).json({ error: 'Voter key is required.' });
     return;
   }
   if (direction !== 'up' && direction !== 'down') {
@@ -321,7 +379,7 @@ router.post('/:id/vote', async (req, res, next) => {
   }
 
   const voteValue = direction === 'up' ? 1 : -1;
-  const key = voterKey.trim();
+  const key = req.userId.toString();
 
   try {
     const { rows: posts } = await query('SELECT id, votes FROM posts WHERE id = $1', [id]);

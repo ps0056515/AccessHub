@@ -4,12 +4,14 @@ import dashboardStyles from "../../AdminDashboard.module.css";
 import styles from "./ResourcesView.module.css";
 import ResourceModal from "./components/ResourceModal";
 import Table from "components/common/Table/Table";
+import { useConfirm } from "context/ConfirmContext";
 import { truncateText } from "utils/commonUtils";
 import { Trash } from "lucide-react";
 
 const TABS = ["Active Resources", "Proposed Resources"];
 
 export default function ResourcesView({ showToast }) {
+  const confirm = useConfirm();
   const [activeTab, setActiveTab] = useState("Active Resources");
   const [resourceSearch, setResourceSearch] = useState("");
 
@@ -55,7 +57,7 @@ export default function ResourcesView({ showToast }) {
   }, [activeTab, loadProposals]);
 
   const handleDeleteResource = async (id, title) => {
-    if (!window.confirm(`Delete resource "${title}"?`)) return;
+    if (!(await confirm(`Delete resource "${title}"?`))) return;
     try {
       await resourcesApi.delete(id);
       showToast?.(`Resource "${title}" deleted.`, "success");
@@ -67,9 +69,9 @@ export default function ResourcesView({ showToast }) {
 
   const handleBulkDelete = async () => {
     if (
-      !window.confirm(
-        `Are you sure you want to delete ${selectedIds.length} resources?`,
-      )
+      !(await confirm(
+        `Are you sure you want to delete ${selectedIds.length} resources?`
+      ))
     )
       return;
     try {
@@ -86,7 +88,7 @@ export default function ResourcesView({ showToast }) {
   };
 
   const handleRejectProposal = async (id) => {
-    if (!window.confirm("Reject this proposal?")) return;
+    if (!(await confirm("Reject this proposal?"))) return;
     try {
       await resourcesApi.rejectProposal(id);
       showToast?.("Proposal rejected.", "success");
@@ -97,7 +99,7 @@ export default function ResourcesView({ showToast }) {
   };
 
   const handleDeleteProposal = async (id) => {
-    if (!window.confirm("Permanently delete this proposal?")) return;
+    if (!(await confirm("Permanently delete this proposal?"))) return;
     try {
       await resourcesApi.deleteProposal(id);
       showToast?.("Proposal deleted.", "success");
