@@ -140,7 +140,7 @@ export default function Footer({ goToSection, goToPortal }) {
         </div>
         <div className={styles.bottom}>
           <p className={styles.copy}>
-            © 2026 {siteName} · Built for the accessibility community
+            © 2026 AllCanAccess · Built for the accessibility community
           </p>
           <div className={styles.bottomLinks}>
             <FooterRouteLink className={styles.bottomLink} to="/privacy">
