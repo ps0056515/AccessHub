@@ -367,6 +367,20 @@ router.post('/reset-password', async (req, res, next) => {
   }
 });
 
+router.get('/check-email', async (req, res, next) => {
+  const { email } = req.query;
+  if (!email?.trim()) {
+    return res.json({ exists: false });
+  }
+  try {
+    const normalizedEmail = email.trim().toLowerCase();
+    const existing = await query('SELECT id FROM users WHERE LOWER(email) = $1', [normalizedEmail]);
+    res.json({ exists: existing.rows.length > 0 });
+  } catch (err) {
+    next(err);
+  }
+});
+
 router.post('/signout', (_req, res) => {
   res.json({ ok: true });
 });

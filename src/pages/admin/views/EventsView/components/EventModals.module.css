@@ -13,7 +13,7 @@
 .formGroup { display: flex; flex-direction: column; gap: 6px; }
 .formLabel { font-size: 13px; font-weight: 600; color: var(--text); }
 
-.formInput, .formSelect {
+.formInput, .formSelect, .formTextarea {
   padding: 8px 12px;
   border-radius: 6px;
   border: 1px solid var(--border, #cbd5e1);
@@ -23,7 +23,11 @@
   width: 100%;
   box-sizing: border-box;
 }
-.formInput:focus, .formSelect:focus {
+.formTextarea {
+  font-family: inherit;
+  resize: vertical;
+}
+.formInput:focus, .formSelect:focus, .formTextarea:focus {
   outline: 2px solid var(--accent, #074a9e);
   outline-offset: -1px;
 }

@@ -7,8 +7,10 @@ import styles from "./ToolsView.module.css";
 import Table from "components/common/Table/Table";
 import Tooltip from "components/common/Tooltip/Tooltip";
 import { truncateText } from "utils/commonUtils";
+import { useConfirm } from "context/ConfirmContext";
 
 export default function ToolsView({ showToast }) {
+  const confirm = useConfirm();
   const [toolsList, setToolsList] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -45,7 +47,7 @@ export default function ToolsView({ showToast }) {
   };
 
   const handleDeleteTool = async (id, toolName) => {
-    if (!window.confirm(`Are you sure you want to delete "${toolName}"?`)) {
+    if (!(await confirm(`Are you sure you want to delete "${toolName}"?`))) {
       return;
     }
     try {
@@ -58,7 +60,7 @@ export default function ToolsView({ showToast }) {
   };
 
   const handleBulkDelete = async () => {
-    if (!window.confirm(`Are you sure you want to delete ${selectedIds.length} tools?`)) return;
+    if (!(await confirm(`Are you sure you want to delete ${selectedIds.length} tools?`))) return;
     try {
       await Promise.all(selectedIds.map(id => toolsApi.delete(id)));
       showToast?.(`Successfully deleted ${selectedIds.length} tools.`, "success");

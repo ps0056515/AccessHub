@@ -2,9 +2,10 @@ import { useState, useEffect } from 'react';
 import ReactQuill, { Quill } from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import ImageResize from 'quill-image-resize-module-react';
-import { blogpostsApi } from 'api/client';
-import Table from 'components/common/Table/Table';
-import styles from './BlogpostsView.module.css';
+import { blogpostsApi } from "api/client";
+import Table from "components/common/Table/Table";
+import { useConfirm } from "context/ConfirmContext";
+import styles from "./BlogpostsView.module.css";
 import { truncateText } from 'utils/commonUtils';
 
 // Fix for React-Quill ImageResize module looking for window.Quill
@@ -22,6 +23,7 @@ Link.sanitize = function (url) {
 };
 
 export default function BlogpostsView({ showToast }) {
+  const confirm = useConfirm();
   const [blogposts, setBlogposts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [blogpostSearch, setBlogpostSearch] = useState("");
@@ -167,7 +169,7 @@ export default function BlogpostsView({ showToast }) {
   };
 
   const handleDelete = async (id, title) => {
-    if (!window.confirm(`Are you sure you want to delete "${title}"?`)) return;
+    if (!(await confirm(`Are you sure you want to delete "${title}"?`))) return;
     try {
       await blogpostsApi.delete(id);
       showToast?.('Blogpost deleted successfully!', 'success');
@@ -178,7 +180,7 @@ export default function BlogpostsView({ showToast }) {
   };
 
   const handleBulkDelete = async () => {
-    if (!window.confirm(`Are you sure you want to delete ${selectedIds.length} blogposts?`)) return;
+    if (!(await confirm(`Are you sure you want to delete ${selectedIds.length} blogposts?`))) return;
     try {
       await Promise.all(selectedIds.map(id => blogpostsApi.delete(id)));
       showToast?.(`Successfully deleted ${selectedIds.length} blogposts.`, "success");
@@ -190,7 +192,7 @@ export default function BlogpostsView({ showToast }) {
   };
 
   const handleBulkPublish = async (publishState) => {
-    if (!window.confirm(`Are you sure you want to ${publishState ? "publish" : "unpublish"} ${selectedIds.length} blogposts?`)) return;
+    if (!(await confirm(`Are you sure you want to ${publishState ? "publish" : "unpublish"} ${selectedIds.length} blogposts?`))) return;
     try {
       await Promise.all(selectedIds.map(id => blogpostsApi.togglePublish(id, publishState)));
       showToast?.(`Successfully ${publishState ? "published" : "unpublished"} ${selectedIds.length} blogposts.`, "success");
