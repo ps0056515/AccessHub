@@ -183,14 +183,15 @@ export default function AdminDashboard({ goToPortal }) {
       </div>
 
       {/* Dynamic Toast Container */}
-      <div className={styles.toastContainer} aria-live="polite">
+      <div className={styles.toastContainer} aria-live="polite" aria-atomic="true">
         {toasts.map((toast) => (
           <div
             key={toast.id}
             className={`${styles.toast} ${
               toast.type === 'error' ? styles.toastError : styles.toastSuccess
             }`}
-            role="alert"
+            role={toast.type === 'error' ? 'alert' : 'status'}
+            aria-atomic="true"
           >
             <span className={styles.toastIcon} aria-hidden="true">
               {toast.type === 'error' ? '❌' : '✔'}
