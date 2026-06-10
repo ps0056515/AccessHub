@@ -3,10 +3,12 @@ import { postsApi } from 'api/client';
 import dashboardStyles from '../../AdminDashboard.module.css';
 import DiscussionModal from './DiscussionModal';
 import Table from 'components/common/Table/Table';
+import { useConfirm } from 'context/ConfirmContext';
 import styles from './DiscussionsView.module.css';
 import { truncateText } from 'utils/commonUtils';
 
 export default function DiscussionsModeration({ showToast }) {
+  const confirm = useConfirm();
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [modalPost, setModalPost] = useState(null); // null = closed, {} = new, {id...} = edit
@@ -40,7 +42,7 @@ export default function DiscussionsModeration({ showToast }) {
   };
 
   const handleDelete = async (id) => {
-    if (!window.confirm('Are you sure you want to delete this discussion?')) return;
+    if (!(await confirm('Are you sure you want to delete this discussion?'))) return;
     try {
       await postsApi.deleteAdmin(id);
       setPosts(prev => prev.filter(p => p.id !== id));
@@ -51,7 +53,7 @@ export default function DiscussionsModeration({ showToast }) {
   };
 
   const handleBulkDelete = async () => {
-    if (!window.confirm(`Are you sure you want to delete ${selectedIds.length} discussions?`)) return;
+    if (!(await confirm(`Are you sure you want to delete ${selectedIds.length} discussions?`))) return;
     try {
       await Promise.all(selectedIds.map(id => postsApi.deleteAdmin(id)));
       setPosts(prev => prev.filter(p => !selectedIds.includes(p.id)));

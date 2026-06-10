@@ -102,6 +102,9 @@ select {
 }
 
 /* ── Utilities ── */
+.required-asterisk {
+  color: var(--red);
+}
 .sr-only {
   position: absolute;
   width: 1px;

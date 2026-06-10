@@ -2,10 +2,12 @@ import { useState, useEffect } from "react";
 import { screenReadersApi } from "api/client";
 import ScreenReaderModal from "./ScreenReaderModal";
 import Table from "components/common/Table/Table";
+import { useConfirm } from "context/ConfirmContext";
 import styles from "./ScreenReadersView.module.css";
 import { truncateText } from "utils/commonUtils";
 
 export default function ScreenReadersView({ showToast }) {
+  const confirm = useConfirm();
   const [guides, setGuides] = useState([]);
   const [loading, setLoading] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
@@ -63,7 +65,7 @@ export default function ScreenReadersView({ showToast }) {
   };
 
   const handleDelete = async (id) => {
-    if (!window.confirm("Are you sure you want to delete this guide?")) return;
+    if (!(await confirm("Are you sure you want to delete this guide?"))) return;
     try {
       await screenReadersApi.delete(id);
       showToast?.("Guide deleted", "success");
@@ -74,7 +76,7 @@ export default function ScreenReadersView({ showToast }) {
   };
 
   const handleBulkDelete = async () => {
-    if (!window.confirm(`Are you sure you want to delete ${selectedIds.length} guides?`)) return;
+    if (!(await confirm(`Are you sure you want to delete ${selectedIds.length} guides?`))) return;
     try {
       await Promise.all(selectedIds.map(id => screenReadersApi.delete(id)));
       showToast?.(`Successfully deleted ${selectedIds.length} guides.`, "success");
@@ -86,7 +88,7 @@ export default function ScreenReadersView({ showToast }) {
   };
 
   const handleBulkPublish = async (publishState) => {
-    if (!window.confirm(`Are you sure you want to ${publishState ? "publish" : "unpublish"} ${selectedIds.length} guides?`)) return;
+    if (!(await confirm(`Are you sure you want to ${publishState ? "publish" : "unpublish"} ${selectedIds.length} guides?`))) return;
     try {
       await Promise.all(selectedIds.map(id => screenReadersApi.togglePublish(id, publishState)));
       showToast?.(`Successfully ${publishState ? "published" : "unpublished"} ${selectedIds.length} guides.`, "success");
