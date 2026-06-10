@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { postsApi } from 'api/client';
+import { useConfirm } from 'context/ConfirmContext';
 import styles from './DiscussionsView.module.css';
 import dashboardStyles from '../../AdminDashboard.module.css';
 import { useConfig } from 'context/ConfigContext';
@@ -20,6 +21,7 @@ function toDatetimeLocal(isoString) {
 
 export default function DiscussionModal({ post, onClose, onSave, isSaving }) {
   const { portalConfig } = useConfig();
+  const confirm = useConfirm();
   const [formData, setFormData] = useState({
     title: '',
     body: '',
@@ -88,7 +90,7 @@ export default function DiscussionModal({ post, onClose, onSave, isSaving }) {
   };
 
   const handleDeleteComment = async (commentId) => {
-    if (!window.confirm('Are you sure you want to delete this reply?')) return;
+    if (!(await confirm('Are you sure you want to delete this reply?'))) return;
     try {
       await postsApi.deleteCommentAdmin(post.id, commentId);
       setComments(prev => prev.filter(c => c.id !== commentId));

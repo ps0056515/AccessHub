@@ -6,6 +6,7 @@ import dashboardStyles from "../../AdminDashboard.module.css";
 import styles from "./OverviewView.module.css";
 import Table from "components/common/Table/Table";
 import Tooltip from "components/common/Tooltip/Tooltip";
+import { useConfirm } from "context/ConfirmContext";
 import { exportToExcel } from "utils/commonUtils";
 
 function StatCard({ label, value, hint }) {
@@ -32,6 +33,7 @@ function formatDate(iso) {
 
 export default function OverviewView({ showToast }) {
   const { user: currentUser } = useAuth();
+  const confirm = useConfirm();
   const [stats, setStats] = useState(null);
   const [users, setUsers] = useState([]);
   const [error, setError] = useState("");
@@ -76,9 +78,9 @@ export default function OverviewView({ showToast }) {
 
   const deleteUser = async (userToDelete) => {
     if (
-      !window.confirm(
+      !(await confirm(
         `Are you sure you want to completely delete ${userToDelete.displayName} (${userToDelete.email})? This action cannot be undone.`,
-      )
+      ))
     ) {
       return;
     }

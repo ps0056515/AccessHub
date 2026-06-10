@@ -1,9 +1,12 @@
 import { useState, useEffect } from 'react';
+import { useFormik } from 'formik';
+import { signInInitialValues, signInValidationSchema } from './typesAndValidations';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from 'context/AuthContext';
 import GoogleSignInSection from 'components/auth/GoogleSignInSection';
 import { useAuthRedirect } from 'hooks/useAuthRedirect';
 import { redirectAfterLogin } from 'utils/authRedirect';
+import { useToast } from 'context/ToastContext';
 import styles from 'components/auth/AuthPage.module.css';
 
 export default function SignInPage({ goToPortal }) {
@@ -14,47 +17,47 @@ export default function SignInPage({ goToPortal }) {
   const redirectedFromProtected = from !== '/' && from !== '/join';
   const redirectAfterAuth = useAuthRedirect(goToPortal);
   const { signIn, signInWithGoogle } = useAuth();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [errorToast, setErrorToast] = useState(location.state?.errorToast || null);
-  const [submitting, setSubmitting] = useState(false);
+  const { addToast } = useToast();
+  const [submittingGoogle, setSubmittingGoogle] = useState(false);
 
-  useEffect(() => {
-    if (errorToast) {
-      const timer = setTimeout(() => setErrorToast(null), 5000);
-      return () => clearTimeout(timer);
-    }
-  }, [errorToast]);
-
-  const showError = (message) => {
-    setErrorToast(message);
-  };
-
-  const handleSubmit = async e => {
-    e.preventDefault();
-    setErrorToast(null);
-    setSubmitting(true);
-    try {
-      const profile = await signIn({ email, password });
-      redirectAfterLogin(navigate, profile, from, redirectAfterAuth);
-    } catch (err) {
-      showError(err.message || 'Could not sign in.');
-    } finally {
-      setSubmitting(false);
-    }
-  };
+  const formik = useFormik({
+    initialValues: signInInitialValues,
+    validationSchema: signInValidationSchema,
+    onSubmit: async (values, { setSubmitting }) => {
+      try {
+        const profile = await signIn(values);
+        redirectAfterLogin(navigate, profile, from, redirectAfterAuth);
+      } catch (err) {
+        showError(err.message || 'Could not sign in.');
+      } finally {
+        setSubmitting(false);
+      }
+    },
+  });
 
   const handleGoogleSuccess = async credential => {
-    setErrorToast(null);
-    setSubmitting(true);
+    setSubmittingGoogle(true);
     try {
       const profile = await signInWithGoogle({ credential });
       redirectAfterLogin(navigate, profile, from, redirectAfterAuth);
     } catch (err) {
       showError(err.message || 'Google sign-in failed.');
     } finally {
-      setSubmitting(false);
+      setSubmittingGoogle(false);
     }
+  };
+
+  // If we came from another page with an error toast, show it on mount
+  useEffect(() => {
+    if (location.state?.errorToast) {
+      addToast(location.state.errorToast, 'error');
+      // Clear the state so it doesn't show again on reload
+      navigate(location.pathname, { replace: true, state: {} });
+    }
+  }, [location.state?.errorToast, addToast, navigate, location.pathname]);
+
+  const showError = (message) => {
+    addToast(message, 'error');
   };
 
   return (
@@ -73,30 +76,34 @@ export default function SignInPage({ goToPortal }) {
         <GoogleSignInSection
           onSuccess={handleGoogleSuccess}
           onError={err => showError(err.message || 'Google sign-in failed.')}
-          disabled={submitting}
+          disabled={formik.isSubmitting || submittingGoogle}
         />
 
-        <form className={styles.form} onSubmit={handleSubmit} noValidate>
+        <form className={styles.form} onSubmit={formik.handleSubmit} noValidate>
           <div className={styles.field}>
             <label className={styles.label} htmlFor="signin-email">
-              Email
+              Email<span className="required-asterisk"> *</span>
             </label>
             <input
               id="signin-email"
-              className={styles.input}
+              name="email"
+              className={`${styles.input} ${formik.touched.email && formik.errors.email ? styles.inputError : ''}`}
               type="email"
               autoComplete="email"
-              required
-              value={email}
-              onChange={e => setEmail(e.target.value)}
-              disabled={submitting}
+              value={formik.values.email}
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              disabled={formik.isSubmitting || submittingGoogle}
             />
+            {formik.touched.email && formik.errors.email && (
+              <div className={styles.errorText}>{formik.errors.email}</div>
+            )}
           </div>
 
           <div className={styles.field}>
             <div className={styles.labelRow}>
               <label className={styles.label} htmlFor="signin-password">
-                Password
+                Password<span className="required-asterisk"> *</span>
               </label>
               <Link className={styles.linkInline} to="/forgot-password">
                 Forgot password?
@@ -104,18 +111,22 @@ export default function SignInPage({ goToPortal }) {
             </div>
             <input
               id="signin-password"
-              className={styles.input}
+              name="password"
+              className={`${styles.input} ${formik.touched.password && formik.errors.password ? styles.inputError : ''}`}
               type="password"
               autoComplete="current-password"
-              required
-              value={password}
-              onChange={e => setPassword(e.target.value)}
-              disabled={submitting}
+              value={formik.values.password}
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              disabled={formik.isSubmitting || submittingGoogle}
             />
+            {formik.touched.password && formik.errors.password && (
+              <div className={styles.errorText}>{formik.errors.password}</div>
+            )}
           </div>
 
-          <button type="submit" className={styles.submit} disabled={submitting}>
-            {submitting ? 'Signing in…' : 'Sign in'}
+          <button type="submit" className={styles.submit} disabled={formik.isSubmitting || submittingGoogle || !formik.isValid || !formik.dirty}>
+            {formik.isSubmitting ? 'Signing in…' : 'Sign in'}
           </button>
         </form>
 
@@ -126,23 +137,6 @@ export default function SignInPage({ goToPortal }) {
           </Link>
         </p>
       </div>
-
-      {errorToast && (
-        <div className={styles.toastContainer} aria-live="polite">
-          <div className={`${styles.toast} ${styles.toastError}`} role="alert">
-            <span className={styles.toastIcon} aria-hidden="true">❌</span>
-            <div className={styles.toastContent}>{errorToast}</div>
-            <button
-              type="button"
-              className={styles.toastCloseBtn}
-              onClick={() => setErrorToast(null)}
-              aria-label="Close notification"
-            >
-              ✕
-            </button>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

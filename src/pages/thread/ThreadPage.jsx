@@ -4,6 +4,7 @@ import { TAG_COLORS, COLOR_MAP } from 'data';
 import { postsApi, getVoterKey, getStoredVote, setStoredVote } from 'api/client';
 import { voteDelta } from 'utils/voteDelta';
 import { useAuth } from 'context/AuthContext';
+import { useConfirm } from 'context/ConfirmContext';
 import styles from './ThreadPage.module.css';
 import { SITE_NAME } from 'brand';
 
@@ -38,7 +39,8 @@ function Avatar({ initials, color, size = 40 }) {
 export default function ThreadPage({ posts, setPosts, refreshPosts, returnToCommunity }) {
   const { postId } = useParams();
   const navigate = useNavigate();
-  const { isAuthenticated } = useAuth();
+  const confirm = useConfirm();
+  const { isAuthenticated, user } = useAuth();
   const id = useMemo(() => {
     const n = Number(postId);
     return Number.isFinite(n) ? n : null;
@@ -60,6 +62,13 @@ export default function ThreadPage({ posts, setPosts, refreshPosts, returnToComm
   const [commentBody, setCommentBody] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [commentError, setCommentError] = useState('');
+
+  const [isEditing, setIsEditing] = useState(false);
+  const [editTitle, setEditTitle] = useState('');
+  const [editBody, setEditBody] = useState('');
+  const [editTags, setEditTags] = useState([]);
+  const [editError, setEditError] = useState('');
+  const [savingEdit, setSavingEdit] = useState(false);
 
   useEffect(() => {
     if (id == null) {
@@ -105,6 +114,49 @@ export default function ThreadPage({ posts, setPosts, refreshPosts, returnToComm
       document.title = `${SITE_NAME} — accessibility community`;
     };
   }, [post]);
+
+  const isOwner = isAuthenticated && user?.id && post?.userId === user.id;
+
+  const startEdit = () => {
+    setEditTitle(post.title);
+    setEditBody(post.body || post.excerpt);
+    setEditTags(post.tags || []);
+    setEditError('');
+    setIsEditing(true);
+  };
+
+  const handleEditSave = async (e) => {
+    e.preventDefault();
+    setEditError('');
+    setSavingEdit(true);
+    try {
+      const { post: updatedPost } = await postsApi.update(id, {
+        title: editTitle,
+        body: editBody,
+        tags: editTags,
+      });
+      setPost(updatedPost);
+      setPosts((list) => list.map((p) => (p.id === id ? updatedPost : p)));
+      setIsEditing(false);
+      refreshPosts?.();
+    } catch (err) {
+      setEditError(err.message || 'Could not save changes.');
+    } finally {
+      setSavingEdit(false);
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!(await confirm('Are you sure you want to delete this discussion?'))) return;
+    try {
+      await postsApi.delete(id);
+      setPosts((list) => list.map((p) => (p.id === id ? { ...p, _deleted: true } : p)));
+      refreshPosts?.();
+      returnToCommunity ? returnToCommunity() : navigate('/');
+    } catch (err) {
+      alert(err.message || 'Could not delete discussion.');
+    }
+  };
 
   const addComment = async e => {
     e.preventDefault();
@@ -157,6 +209,11 @@ export default function ThreadPage({ posts, setPosts, refreshPosts, returnToComm
 
   const vote = async (dir) => {
     if (voting || id == null) return;
+
+    if (!isAuthenticated) {
+      navigate('/sign-in', { state: { from: `/thread/${id}` } });
+      return;
+    }
 
     const prevVotes = votes;
     const prevVoted = voted;
@@ -243,15 +300,60 @@ export default function ThreadPage({ posts, setPosts, refreshPosts, returnToComm
               <span className={styles.dot}>·</span>
               <span>{post.replies} replies</span>
             </p>
-            <h1 className={styles.title}>{post.title}</h1>
-            <div className={styles.tags}>
-              {post.tags.map(t => (
-                <Tag key={t} label={t} />
-              ))}
-            </div>
-            <div className={styles.prose}>
-              {post.body || post.excerpt}
-            </div>
+            {isEditing ? (
+              <form onSubmit={handleEditSave} className={styles.editForm}>
+                {editError && <p className={styles.commentError}>{editError}</p>}
+                <input
+                  type="text"
+                  value={editTitle}
+                  onChange={(e) => setEditTitle(e.target.value)}
+                  className={styles.editInput}
+                  disabled={savingEdit}
+                  required
+                />
+                <textarea
+                  value={editBody}
+                  onChange={(e) => setEditBody(e.target.value)}
+                  className={styles.textarea}
+                  rows={6}
+                  disabled={savingEdit}
+                  required
+                />
+                <div className={styles.editActions}>
+                  <button type="submit" className={styles.submit} disabled={savingEdit}>
+                    {savingEdit ? 'Saving…' : 'Save'}
+                  </button>
+                  <button
+                    type="button"
+                    className={styles.cancelBtn}
+                    onClick={() => setIsEditing(false)}
+                    disabled={savingEdit}
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </form>
+            ) : (
+              <>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                  <h1 className={styles.title}>{post.title}</h1>
+                  {isOwner && (
+                    <div className={styles.ownerActions}>
+                      <button type="button" onClick={startEdit} className={styles.editBtn}>Edit</button>
+                      <button type="button" onClick={handleDelete} className={styles.deleteBtn}>Delete</button>
+                    </div>
+                  )}
+                </div>
+                <div className={styles.tags}>
+                  {post.tags.map(t => (
+                    <Tag key={t} label={t} />
+                  ))}
+                </div>
+                <div className={styles.prose}>
+                  {post.body || post.excerpt}
+                </div>
+              </>
+            )}
           </div>
         </div>
       </article>

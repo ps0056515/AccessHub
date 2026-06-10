@@ -4,6 +4,7 @@ import { useAuth } from 'context/AuthContext';
 import { SITE_NAME } from 'brand';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import Tooltip from 'components/common/Tooltip/Tooltip';
+import { useToast } from 'context/ToastContext';
 import styles from './AdminDashboard.module.css';
 
 // Sub-page Views
@@ -35,7 +36,7 @@ export default function AdminDashboard({ goToPortal }) {
   const [activeTab, setActiveTab] = useState(() => {
     return localStorage.getItem('adminDashboardTab') || 'overview';
   });
-  const [toasts, setToasts] = useState([]);
+  const { addToast } = useToast();
   const [isCollapsed, setIsCollapsed] = useState(() => {
     return localStorage.getItem('adminDashboardCollapsed') === 'true';
   });
@@ -51,14 +52,6 @@ export default function AdminDashboard({ goToPortal }) {
   useEffect(() => {
     localStorage.setItem('adminDashboardCollapsed', isCollapsed);
   }, [isCollapsed]);
-
-  const addToast = (message, type = 'success') => {
-    const id = Date.now();
-    setToasts((prev) => [...prev, { id, message, type }]);
-    setTimeout(() => {
-      setToasts((prev) => prev.filter((t) => t.id !== id));
-    }, 4000);
-  };
 
   const tabs = [
     { id: 'overview', label: 'Overview', icon: '📊' },
@@ -180,32 +173,6 @@ export default function AdminDashboard({ goToPortal }) {
           {activeTab === 'screen_readers' && <ScreenReadersView showToast={addToast} />}
           {activeTab === 'settings' && <SettingsView showToast={addToast} />}
         </main>
-      </div>
-
-      {/* Dynamic Toast Container */}
-      <div className={styles.toastContainer} aria-live="polite">
-        {toasts.map((toast) => (
-          <div
-            key={toast.id}
-            className={`${styles.toast} ${
-              toast.type === 'error' ? styles.toastError : styles.toastSuccess
-            }`}
-            role="alert"
-          >
-            <span className={styles.toastIcon} aria-hidden="true">
-              {toast.type === 'error' ? '❌' : '✔'}
-            </span>
-            <div className={styles.toastContent}>{toast.message}</div>
-            <button
-              type="button"
-              className={styles.toastCloseBtn}
-              onClick={() => setToasts((prev) => prev.filter((t) => t.id !== toast.id))}
-              aria-label="Close notification"
-            >
-              ✕
-            </button>
-          </div>
-        ))}
       </div>
     </div>
   );

@@ -5,25 +5,31 @@ import RequireAuth from "components/auth/RequireAuth";
 import RequireAdmin from "components/auth/RequireAdmin";
 import { AuthProvider } from "context/AuthContext";
 import { ConfigProvider } from "context/ConfigContext";
+import { ToastProvider } from "context/ToastContext";
+import { ConfirmProvider } from "context/ConfirmContext";
 
 export default function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
         <ConfigProvider>
-          <Routes>
-            <Route element={<RequireAuth />}>
-              <Route
-                path="/admin"
-                element={
-                  <RequireAdmin>
-                    <AdminDashboard />
-                  </RequireAdmin>
-                }
-              />
-            </Route>
-            <Route path="*" element={<AppShell />} />
-          </Routes>
+          <ToastProvider>
+            <ConfirmProvider>
+              <Routes>
+                <Route element={<RequireAuth />}>
+                  <Route
+                    path="/admin"
+                    element={
+                      <RequireAdmin>
+                        <AdminDashboard />
+                      </RequireAdmin>
+                    }
+                  />
+                </Route>
+                <Route path="*" element={<AppShell />} />
+              </Routes>
+            </ConfirmProvider>
+          </ToastProvider>
         </ConfigProvider>
       </AuthProvider>
     </BrowserRouter>

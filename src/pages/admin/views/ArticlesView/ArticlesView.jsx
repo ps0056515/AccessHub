@@ -4,6 +4,7 @@ import "react-quill/dist/quill.snow.css";
 import ImageResize from "quill-image-resize-module-react";
 import { articlesApi } from "api/client";
 import Table from "components/common/Table/Table";
+import { useConfirm } from "context/ConfirmContext";
 import styles from "./ArticlesView.module.css";
 import { truncateText } from "utils/commonUtils";
 
@@ -22,6 +23,7 @@ Link.sanitize = function (url) {
 };
 
 export default function ArticlesView({ showToast }) {
+  const confirm = useConfirm();
   const [articles, setArticles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [articleSearch, setArticleSearch] = useState("");
@@ -181,7 +183,7 @@ export default function ArticlesView({ showToast }) {
   };
 
   const handleDelete = async (id, title) => {
-    if (!window.confirm(`Are you sure you want to delete "${title}"?`)) return;
+    if (!(await confirm(`Are you sure you want to delete "${title}"?`))) return;
     try {
       await articlesApi.delete(id);
       showToast?.("Article deleted successfully!", "success");
@@ -193,9 +195,9 @@ export default function ArticlesView({ showToast }) {
 
   const handleBulkDelete = async () => {
     if (
-      !window.confirm(
+      !(await confirm(
         `Are you sure you want to delete ${selectedIds.length} articles?`,
-      )
+      ))
     )
       return;
     try {
@@ -213,9 +215,9 @@ export default function ArticlesView({ showToast }) {
 
   const handleBulkPublish = async (publishState) => {
     if (
-      !window.confirm(
+      !(await confirm(
         `Are you sure you want to ${publishState ? "publish" : "unpublish"} ${selectedIds.length} articles?`,
-      )
+      ))
     )
       return;
     try {

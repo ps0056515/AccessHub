@@ -10,6 +10,7 @@ const DEFAULT_FORM = {
   title: '',
   type: '',
   band: 'Free',
+  tags: '',
 };
 
 export default function EventModal({ isOpen, event, onClose, onSave, showToast }) {
@@ -18,12 +19,22 @@ export default function EventModal({ isOpen, event, onClose, onSave, showToast }
 
   useEffect(() => {
     if (isOpen) {
+      let parsedTags = '';
+      if (event?.tags) {
+        try {
+          const t = JSON.parse(event.tags);
+          if (Array.isArray(t)) parsedTags = t.join('\n');
+        } catch (e) {
+          console.error("Failed to parse tags", e);
+        }
+      }
       setFormData(event ? {
         // event_date comes as full ISO timestamp from Postgres; keep up to minutes (YYYY-MM-DDTHH:mm)
         event_date: event.event_date ? new Date(event.event_date).toISOString().slice(0, 16) : '',
         title: event.title || '',
         type: event.type || '',
         band: event.band || 'Free',
+        tags: parsedTags,
       } : DEFAULT_FORM);
     }
   }, [event, isOpen]);
@@ -37,14 +48,15 @@ export default function EventModal({ isOpen, event, onClose, onSave, showToast }
 
   const handleSave = async (e) => {
     e.preventDefault();
-    const { event_date, title, type, band } = formData;
+    const { event_date, title, type, band, tags } = formData;
     if (!event_date || !title.trim() || !type.trim() || !band) {
       showToast?.('Please fill in all required fields.', 'error');
       return;
     }
 
     setSubmitting(true);
-    const body = { event_date, title: title.trim(), type: type.trim(), band };
+    const parsedTagsArray = tags.split('\n').map(t => t.trim()).filter(Boolean);
+    const body = { event_date, title: title.trim(), type: type.trim(), band, tags: parsedTagsArray };
 
     try {
       if (event?._proposalId) {
@@ -142,6 +154,19 @@ export default function EventModal({ isOpen, event, onClose, onSave, showToast }
             >
               {BAND_OPTIONS.map(b => <option key={b} value={b}>{b}</option>)}
             </select>
+          </div>
+          
+          <div className={styles.formGroup}>
+            <label htmlFor="event-tags" className={styles.formLabel}>Tags (One per line)</label>
+            <textarea
+              id="event-tags"
+              name="tags"
+              value={formData.tags}
+              onChange={handleChange}
+              className={styles.formTextarea}
+              placeholder="e.g. WCAG 2.2 implementations&#10;Screen reader testing"
+              rows={4}
+            />
           </div>
         </div>
       </form>
