@@ -92,13 +92,12 @@ export default function Navbar({
           type="button"
           className={styles.logo}
           onClick={() => visitPortal()}
-          aria-label={`${siteName} home`}
+          aria-label="AllCanAccess home"
         >
           <img
             src={navbarLogoUrl}
-            alt={`${siteName}`}
+            alt="AllCanAccess"
             className={styles.logoImg}
-         
           />
 
         </button>
