@@ -7,6 +7,7 @@ import { AuthProvider } from "context/AuthContext";
 import { ConfigProvider } from "context/ConfigContext";
 import { ToastProvider } from "context/ToastContext";
 import { ConfirmProvider } from "context/ConfirmContext";
+import { AriaLiveProvider } from "context/AriaLiveContext";
 
 export default function App() {
   return (
@@ -15,19 +16,21 @@ export default function App() {
         <ConfigProvider>
           <ToastProvider>
             <ConfirmProvider>
-              <Routes>
-                <Route element={<RequireAuth />}>
-                  <Route
-                    path="/admin"
-                    element={
-                      <RequireAdmin>
-                        <AdminDashboard />
-                      </RequireAdmin>
-                    }
-                  />
-                </Route>
-                <Route path="*" element={<AppShell />} />
-              </Routes>
+              <AriaLiveProvider>
+                <Routes>
+                  <Route element={<RequireAuth />}>
+                    <Route
+                      path="/admin"
+                      element={
+                        <RequireAdmin>
+                          <AdminDashboard />
+                        </RequireAdmin>
+                      }
+                    />
+                  </Route>
+                  <Route path="*" element={<AppShell />} />
+                </Routes>
+              </AriaLiveProvider>
             </ConfirmProvider>
           </ToastProvider>
         </ConfigProvider>

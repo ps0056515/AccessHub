@@ -28,7 +28,12 @@ export default function SignInPage({ goToPortal }) {
         const profile = await signIn(values);
         redirectAfterLogin(navigate, profile, from, redirectAfterAuth);
       } catch (err) {
-        showError(err.message || 'Could not sign in.');
+        if (err.needsVerification && err.email) {
+          addToast(err.message, 'error');
+          navigate('/sign-up', { state: { verificationEmail: err.email, from } });
+        } else {
+          showError(err.message || 'Could not sign in.');
+        }
       } finally {
         setSubmitting(false);
       }
@@ -82,7 +87,7 @@ export default function SignInPage({ goToPortal }) {
         <form className={styles.form} onSubmit={formik.handleSubmit} noValidate>
           <div className={styles.field}>
             <label className={styles.label} htmlFor="signin-email">
-              Email<span className="required-asterisk"> *</span>
+              Email<span className="required-asterisk" aria-hidden="true"> *</span>
             </label>
             <input
               id="signin-email"
@@ -94,6 +99,7 @@ export default function SignInPage({ goToPortal }) {
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}
               disabled={formik.isSubmitting || submittingGoogle}
+              required
             />
             {formik.touched.email && formik.errors.email && (
               <div className={styles.errorText}>{formik.errors.email}</div>
@@ -103,7 +109,7 @@ export default function SignInPage({ goToPortal }) {
           <div className={styles.field}>
             <div className={styles.labelRow}>
               <label className={styles.label} htmlFor="signin-password">
-                Password<span className="required-asterisk"> *</span>
+                Password<span className="required-asterisk" aria-hidden="true"> *</span>
               </label>
               <Link className={styles.linkInline} to="/forgot-password">
                 Forgot password?
@@ -119,6 +125,7 @@ export default function SignInPage({ goToPortal }) {
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}
               disabled={formik.isSubmitting || submittingGoogle}
+              required
             />
             {formik.touched.password && formik.errors.password && (
               <div className={styles.errorText}>{formik.errors.password}</div>

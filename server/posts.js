@@ -77,7 +77,7 @@ function authorFromUser(user) {
     author_name: user.display_name,
     author_initials: initials,
     author_color: 'blue',
-    author_role: 'Community member',
+    author_role: user.role || 'Community member',
   };
 }
 

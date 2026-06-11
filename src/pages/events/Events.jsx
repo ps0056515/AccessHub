@@ -1,6 +1,8 @@
 import { useLayoutEffect, useMemo, useState, useEffect } from 'react';
 import { eventsApi } from 'api/client';
 import { useAuth } from 'context/AuthContext';
+import { useToast } from 'context/ToastContext';
+import { useAriaLive } from 'context/AriaLiveContext';
 import Modal from 'components/common/Modal/Modal';
 import Container from 'components/common/Container/Container';
 import styles from './Events.module.css';
@@ -45,6 +47,8 @@ function timingLabel(timing) {
 
 export default function Events() {
   const { user } = useAuth();
+  const { addToast } = useToast();
+  const { announce } = useAriaLive();
   const [eventsList, setEventsList] = useState([]);
   const [eventsLoading, setEventsLoading] = useState(true);
   const [filter, setFilter] = useState('All');
@@ -104,6 +108,13 @@ export default function Events() {
     return { past, live, upcoming };
   }, [filtered]);
 
+  useEffect(() => {
+    // We only want to announce when the user explicitly applies a filter, but since filter changes immediately on radio button click, 
+    // we can just announce whenever the filtered array length changes.
+    // If it's the initial load, it might announce "All events", which is fine.
+    announce(`Filters applied: ${filtered.length} events found.`);
+  }, [filtered.length, announce]);
+
   const closeHost = () => {
     setHostOpen(false);
     setHostMsg(null);
@@ -130,6 +141,7 @@ export default function Events() {
         displayName: user?.displayName || null,
       });
       setRsvpMsg("✨ You're on the list! Check your email for a calendar invite.");
+      addToast("Successfully RSVP'd to the event!", "success");
     } catch (err) {
       setRsvpMsg(err.message || 'Something went wrong. Please try again.');
     } finally {

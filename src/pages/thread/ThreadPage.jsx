@@ -5,6 +5,7 @@ import { postsApi, getVoterKey, getStoredVote, setStoredVote } from 'api/client'
 import { voteDelta } from 'utils/voteDelta';
 import { useAuth } from 'context/AuthContext';
 import { useConfirm } from 'context/ConfirmContext';
+import { useToast } from 'context/ToastContext';
 import styles from './ThreadPage.module.css';
 import { SITE_NAME } from 'brand';
 
@@ -40,6 +41,7 @@ export default function ThreadPage({ posts, setPosts, refreshPosts, returnToComm
   const { postId } = useParams();
   const navigate = useNavigate();
   const confirm = useConfirm();
+  const { addToast } = useToast();
   const { isAuthenticated, user } = useAuth();
   const id = useMemo(() => {
     const n = Number(postId);
@@ -138,6 +140,7 @@ export default function ThreadPage({ posts, setPosts, refreshPosts, returnToComm
       setPost(updatedPost);
       setPosts((list) => list.map((p) => (p.id === id ? updatedPost : p)));
       setIsEditing(false);
+      addToast("Discussion updated successfully!", "success");
       refreshPosts?.();
     } catch (err) {
       setEditError(err.message || 'Could not save changes.');
@@ -151,10 +154,11 @@ export default function ThreadPage({ posts, setPosts, refreshPosts, returnToComm
     try {
       await postsApi.delete(id);
       setPosts((list) => list.map((p) => (p.id === id ? { ...p, _deleted: true } : p)));
+      addToast("Discussion deleted.", "success");
       refreshPosts?.();
       returnToCommunity ? returnToCommunity() : navigate('/');
     } catch (err) {
-      alert(err.message || 'Could not delete discussion.');
+      addToast(err.message || 'Could not delete discussion.', "error");
     }
   };
 
@@ -180,6 +184,7 @@ export default function ThreadPage({ posts, setPosts, refreshPosts, returnToComm
         return updated;
       });
       setCommentBody('');
+      addToast("Reply posted successfully!", "success");
       refreshPosts?.();
     } catch (err) {
       setCommentError(err.message || 'Could not post reply.');

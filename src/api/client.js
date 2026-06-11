@@ -92,6 +92,9 @@ export async function api(path, options = {}) {
     }
     const err = new Error(message);
     err.status = res.status;
+    if (data && typeof data === 'object') {
+      Object.assign(err, data);
+    }
     throw err;
   }
 
@@ -113,6 +116,18 @@ export const authApi = {
     }),
   signInWithGoogle: (body) =>
     api("/api/auth/google", {
+      method: "POST",
+      body: JSON.stringify(body),
+      suppressUnauthorizedEvent: true,
+    }),
+  verifyOtp: (body) =>
+    api("/api/auth/verify-otp", {
+      method: "POST",
+      body: JSON.stringify(body),
+      suppressUnauthorizedEvent: true,
+    }),
+  resendOtp: (body) =>
+    api("/api/auth/resend-otp", {
       method: "POST",
       body: JSON.stringify(body),
       suppressUnauthorizedEvent: true,

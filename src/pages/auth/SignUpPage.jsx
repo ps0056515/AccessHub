@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useFormik } from 'formik';
 import { signUpInitialValues, signUpValidationSchema } from './typesAndValidations';
 import { Country, City } from 'country-state-city';
@@ -15,9 +15,57 @@ export default function SignUpPage({ goToPortal }) {
   const location = useLocation();
   const from = location.state?.from || '/';
   const redirectAfterAuth = useAuthRedirect(goToPortal);
-  const { signUp, signInWithGoogle } = useAuth();
+  const { signUp, signInWithGoogle, verifyOtp, resendOtp } = useAuth();
   const { addToast } = useToast();
   const [submittingGoogle, setSubmittingGoogle] = useState(false);
+
+  // OTP Verification state
+  const [verificationEmail, setVerificationEmail] = useState(location.state?.verificationEmail || null);
+  const [otp, setOtp] = useState('');
+  const [verifying, setVerifying] = useState(false);
+  const [timeLeft, setTimeLeft] = useState(120);
+
+  useEffect(() => {
+    if (!verificationEmail) return;
+    if (timeLeft <= 0) return;
+    const timerId = setInterval(() => setTimeLeft((t) => t - 1), 1000);
+    return () => clearInterval(timerId);
+  }, [verificationEmail, timeLeft]);
+
+  const handleVerifyOtp = async (e) => {
+    e.preventDefault();
+    if (!otp.trim()) {
+      addToast('Please enter the verification code.', 'error');
+      return;
+    }
+    setVerifying(true);
+    try {
+      const profile = await verifyOtp({ email: verificationEmail, otp: otp.trim() });
+      addToast('Email verified successfully!', 'success');
+      redirectAfterLogin(navigate, profile, from, redirectAfterAuth);
+    } catch (err) {
+      addToast(err.message || 'Invalid or expired code.', 'error');
+    } finally {
+      setVerifying(false);
+    }
+  };
+
+  const handleResendOtp = async () => {
+    if (timeLeft > 0) return;
+    try {
+      await resendOtp({ email: verificationEmail });
+      setTimeLeft(120);
+      addToast('A new code has been sent.', 'success');
+    } catch (err) {
+      addToast(err.message || 'Could not resend code.', 'error');
+    }
+  };
+
+  const formatTime = (secs) => {
+    const m = Math.floor(secs / 60);
+    const s = secs % 60;
+    return `${m}:${s < 10 ? '0' : ''}${s}`;
+  };
 
   const countries = useMemo(() => Country.getAllCountries(), []);
 
@@ -27,15 +75,23 @@ export default function SignUpPage({ goToPortal }) {
     onSubmit: async (values, { setSubmitting }) => {
       try {
         const countryName = values.countryCode;
-        const profile = await signUp({ 
+        const response = await signUp({ 
           email: values.email, 
           password: values.password, 
           displayName: values.displayName, 
           country: countryName, 
           city: values.city, 
-          company: values.company 
+          company: values.company,
+          designation: values.designation
         });
-        redirectAfterLogin(navigate, profile, from, redirectAfterAuth);
+        if (response.needsVerification) {
+          setVerificationEmail(values.email);
+          setTimeLeft(120);
+          addToast('Verification code sent!', 'success');
+        } else {
+          // Fallback if no verification needed
+          redirectAfterLogin(navigate, response.user, from, redirectAfterAuth);
+        }
       } catch (err) {
         addToast(err.message || 'Could not create account.', 'error');
       } finally {
@@ -60,7 +116,8 @@ export default function SignUpPage({ goToPortal }) {
         credential, 
         country: countryName, 
         city: formik.values.city, 
-        company: formik.values.company 
+        company: formik.values.company,
+        designation: formik.values.designation
       });
       redirectAfterLogin(navigate, profile, from, redirectAfterAuth);
     } catch (err) {
@@ -80,21 +137,75 @@ export default function SignUpPage({ goToPortal }) {
         <p className={styles.kicker}>Community</p>
         <h1 className={styles.title}>Join community</h1>
         <p className={styles.lead}>
-          Create your free account to take part in discussions and connect with accessibility
-          practitioners.
+          {verificationEmail 
+            ? `We've sent a 6-digit code to ${verificationEmail}. Please enter it below to verify your account.`
+            : 'Create your free account to take part in discussions and connect with accessibility practitioners.'}
         </p>
 
-        <GoogleSignInSection
-          onSuccess={handleGoogleSuccess}
-          onError={err => addToast(err.message || 'Google sign-in failed.', 'error')}
-          text="signup_with"
-          disabled={formik.isSubmitting || submittingGoogle}
-        />
+        {!verificationEmail && (
+          <GoogleSignInSection
+            onSuccess={handleGoogleSuccess}
+            onError={err => addToast(err.message || 'Google sign-in failed.', 'error')}
+            text="signup_with"
+            disabled={formik.isSubmitting || submittingGoogle}
+          />
+        )}
 
-        <form className={styles.form} onSubmit={formik.handleSubmit} noValidate>
+        {verificationEmail ? (
+          <form className={styles.form} onSubmit={handleVerifyOtp} noValidate>
+            <div className={styles.field}>
+              <label className={styles.label} htmlFor="verify-otp">
+                Verification Code<span className="required-asterisk" aria-hidden="true"> *</span>
+              </label>
+              <input
+                id="verify-otp"
+                name="otp"
+                className={styles.input}
+                type="text"
+                autoComplete="one-time-code"
+                placeholder="123456"
+                value={otp}
+                onChange={(e) => setOtp(e.target.value)}
+                disabled={verifying}
+                required
+              />
+            </div>
+            
+            <button type="submit" className={styles.submit} disabled={verifying || !otp.trim()}>
+              {verifying ? 'Verifying…' : 'Verify Account'}
+            </button>
+
+            <div style={{ marginTop: '16px', textAlign: 'center', fontSize: '14px', color: 'var(--text-muted)' }}>
+              Didn't receive the code?{' '}
+              {timeLeft > 0 ? (
+                <span>Resend in {formatTime(timeLeft)}</span>
+              ) : (
+                <button 
+                  type="button" 
+                  className={styles.linkInline} 
+                  onClick={handleResendOtp}
+                >
+                  Resend Code
+                </button>
+              )}
+            </div>
+            
+            <div style={{ marginTop: '12px', textAlign: 'center' }}>
+              <button 
+                type="button" 
+                className={styles.linkInline} 
+                onClick={() => setVerificationEmail(null)}
+              >
+                Use a different email
+              </button>
+            </div>
+          </form>
+        ) : (
+          <>
+            <form className={styles.form} onSubmit={formik.handleSubmit} noValidate>
           <div className={styles.field}>
             <label className={styles.label} htmlFor="signup-name">
-              Display name<span className="required-asterisk"> *</span>
+              Display name<span className="required-asterisk" aria-hidden="true"> *</span>
             </label>
             <input
               id="signup-name"
@@ -106,6 +217,7 @@ export default function SignUpPage({ goToPortal }) {
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}
               disabled={formik.isSubmitting || submittingGoogle}
+              required
             />
             {formik.touched.displayName && formik.errors.displayName && (
               <div className={styles.errorText}>{formik.errors.displayName}</div>
@@ -114,7 +226,7 @@ export default function SignUpPage({ goToPortal }) {
 
           <div className={styles.field}>
             <label className={styles.label} htmlFor="signup-email">
-              Email<span className="required-asterisk"> *</span>
+              Email<span className="required-asterisk" aria-hidden="true"> *</span>
             </label>
             <input
               id="signup-email"
@@ -142,6 +254,7 @@ export default function SignUpPage({ goToPortal }) {
                 }
               }}
               disabled={formik.isSubmitting || submittingGoogle}
+              required
             />
             {formik.touched.email && formik.errors.email && (
               <div className={styles.errorText}>{formik.errors.email}</div>
@@ -170,8 +283,29 @@ export default function SignUpPage({ goToPortal }) {
           </div>
 
           <div className={styles.field}>
+            <label className={styles.label} htmlFor="signup-designation">
+              Designation / Job Title
+            </label>
+            <input
+              id="signup-designation"
+              name="designation"
+              className={`${styles.input} ${formik.touched.designation && formik.errors.designation ? styles.inputError : ''}`}
+              type="text"
+              autoComplete="organization-title"
+              placeholder="e.g. Accessibility Engineer"
+              value={formik.values.designation}
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              disabled={formik.isSubmitting || submittingGoogle}
+            />
+            {formik.touched.designation && formik.errors.designation && (
+              <div className={styles.errorText}>{formik.errors.designation}</div>
+            )}
+          </div>
+
+          <div className={styles.field}>
             <label className={styles.label} htmlFor="signup-country">
-              Country<span className="required-asterisk"> *</span>
+              Country<span className="required-asterisk" aria-hidden="true"> *</span>
             </label>
             <input
               list="signup-country-list"
@@ -183,6 +317,7 @@ export default function SignUpPage({ goToPortal }) {
               onChange={handleCountryChange}
               onBlur={formik.handleBlur}
               disabled={formik.isSubmitting || submittingGoogle}
+              required
             />
             <datalist id="signup-country-list">
               {countries.map(c => (
@@ -196,7 +331,7 @@ export default function SignUpPage({ goToPortal }) {
 
           <div className={styles.field}>
             <label className={styles.label} htmlFor="signup-city">
-              City<span className="required-asterisk"> *</span>
+              City<span className="required-asterisk" aria-hidden="true"> *</span>
             </label>
             <input
               list="signup-city-list"
@@ -208,6 +343,7 @@ export default function SignUpPage({ goToPortal }) {
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}
               disabled={formik.isSubmitting || submittingGoogle || !formik.values.countryCode || cities.length === 0}
+              required
             />
             <datalist id="signup-city-list">
               {cities.map((c, i) => (
@@ -221,7 +357,7 @@ export default function SignUpPage({ goToPortal }) {
 
           <div className={styles.field}>
             <label className={styles.label} htmlFor="signup-password">
-              Password<span className="required-asterisk"> *</span>
+              Password<span className="required-asterisk" aria-hidden="true"> *</span>
             </label>
             <input
               id="signup-password"
@@ -233,6 +369,7 @@ export default function SignUpPage({ goToPortal }) {
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}
               disabled={formik.isSubmitting || submittingGoogle}
+              required
             />
             {formik.touched.password && formik.errors.password ? (
               <div className={styles.errorText}>{formik.errors.password}</div>
@@ -248,12 +385,14 @@ export default function SignUpPage({ goToPortal }) {
           </button>
         </form>
 
-        <p className={styles.footer}>
-          Already have an account?{' '}
-          <Link className={styles.link} to="/sign-in" state={location.state}>
-            Sign in
-          </Link>
-        </p>
+          <p className={styles.footer}>
+            Already have an account?{' '}
+            <Link className={styles.link} to="/sign-in" state={location.state}>
+              Sign in
+            </Link>
+          </p>
+          </>
+        )}
       </div>
     </div>
   );
