@@ -1,10 +1,11 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { TAG_COLORS, COLOR_MAP } from 'data';
-import { postsApi, getVoterKey, getStoredVote, setStoredVote } from 'api/client';
+import { postsApi } from 'api/client';
 import { voteDelta } from 'utils/voteDelta';
 import { useAuth } from 'context/AuthContext';
 import { useConfirm } from 'context/ConfirmContext';
+import { useToast } from 'context/ToastContext';
 import styles from './ThreadPage.module.css';
 import { SITE_NAME } from 'brand';
 
@@ -40,6 +41,7 @@ export default function ThreadPage({ posts, setPosts, refreshPosts, returnToComm
   const { postId } = useParams();
   const navigate = useNavigate();
   const confirm = useConfirm();
+  const { addToast } = useToast();
   const { isAuthenticated, user } = useAuth();
   const id = useMemo(() => {
     const n = Number(postId);
@@ -56,7 +58,7 @@ export default function ThreadPage({ posts, setPosts, refreshPosts, returnToComm
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState('');
   const [votes, setVotes] = useState(cachedPost?.votes ?? 0);
-  const [voted, setVoted] = useState(() => (id != null ? getStoredVote(id) : null));
+  const [voted, setVoted] = useState(cachedPost?.userVote || null);
   const [voting, setVoting] = useState(false);
   const [voteError, setVoteError] = useState('');
   const [commentBody, setCommentBody] = useState('');
@@ -87,7 +89,7 @@ export default function ThreadPage({ posts, setPosts, refreshPosts, returnToComm
           setPost(data);
           setComments(threadComments);
           setVotes(data.votes);
-          setVoted(getStoredVote(id));
+          setVoted(data.userVote || null);
           setPosts(prev => {
             const exists = prev.some(p => p.id === data.id);
             if (exists) return prev.map(p => (p.id === data.id ? data : p));
@@ -138,6 +140,7 @@ export default function ThreadPage({ posts, setPosts, refreshPosts, returnToComm
       setPost(updatedPost);
       setPosts((list) => list.map((p) => (p.id === id ? updatedPost : p)));
       setIsEditing(false);
+      addToast("Discussion updated successfully!", "success");
       refreshPosts?.();
     } catch (err) {
       setEditError(err.message || 'Could not save changes.');
@@ -151,10 +154,11 @@ export default function ThreadPage({ posts, setPosts, refreshPosts, returnToComm
     try {
       await postsApi.delete(id);
       setPosts((list) => list.map((p) => (p.id === id ? { ...p, _deleted: true } : p)));
+      addToast("Discussion deleted.", "success");
       refreshPosts?.();
       returnToCommunity ? returnToCommunity() : navigate('/');
     } catch (err) {
-      alert(err.message || 'Could not delete discussion.');
+      addToast(err.message || 'Could not delete discussion.', "error");
     }
   };
 
@@ -180,6 +184,7 @@ export default function ThreadPage({ posts, setPosts, refreshPosts, returnToComm
         return updated;
       });
       setCommentBody('');
+      addToast("Reply posted successfully!", "success");
       refreshPosts?.();
     } catch (err) {
       setCommentError(err.message || 'Could not post reply.');
@@ -227,13 +232,11 @@ export default function ThreadPage({ posts, setPosts, refreshPosts, returnToComm
     try {
       const { votes: newVotes, userVote } = await postsApi.vote(id, {
         direction: dir,
-        voterKey: getVoterKey(),
       });
       setVotes(newVotes);
       setVoted(userVote);
-      setStoredVote(id, userVote);
-      setPost((prev) => (prev ? { ...prev, votes: newVotes } : prev));
-      setPosts((list) => list.map((p) => (p.id === id ? { ...p, votes: newVotes } : p)));
+      setPost((prev) => (prev ? { ...prev, votes: newVotes, userVote } : prev));
+      setPosts((list) => list.map((p) => (p.id === id ? { ...p, votes: newVotes, userVote } : p)));
     } catch (err) {
       setVotes(prevVotes);
       setVoted(prevVoted);

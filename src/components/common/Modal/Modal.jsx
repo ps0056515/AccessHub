@@ -1,18 +1,38 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import styles from './Modal.module.css';
 
 export default function Modal({ title, children, onClose, footer, width= "50%", height }) {
+  const dialogRef = useRef(null);
+  const previousFocusRef = useRef(null);
+
   useEffect(() => {
+    // Store the currently focused element
+    previousFocusRef.current = document.activeElement;
+
+    // Use a small timeout to ensure the portal is fully mounted before focusing
+    const focusTimeout = setTimeout(() => {
+      if (dialogRef.current) {
+        dialogRef.current.focus();
+      }
+    }, 10);
+
     const onKey = e => {
       if (e.key === 'Escape') onClose?.();
     };
     window.addEventListener('keydown', onKey);
     const prevOverflow = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
+    
     return () => {
+      clearTimeout(focusTimeout);
       window.removeEventListener('keydown', onKey);
       document.body.style.overflow = prevOverflow;
+      
+      // Restore focus when modal closes
+      if (previousFocusRef.current && typeof previousFocusRef.current.focus === 'function') {
+        previousFocusRef.current.focus();
+      }
     };
   }, [onClose]);
 
@@ -34,6 +54,7 @@ export default function Modal({ title, children, onClose, footer, width= "50%", 
       onKeyDown={e => e.key === 'Escape' && onClose?.()}
     >
       <div
+        ref={dialogRef}
         className={styles.dialog}
         style={dialogStyle}
         role="dialog"

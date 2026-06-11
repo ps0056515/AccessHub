@@ -62,6 +62,26 @@ async function authMiddleware(req, res, next) {
   }
 }
 
+async function optionalAuthMiddleware(req, res, next) {
+  const header = req.headers.authorization || '';
+  const token = header.startsWith('Bearer ') ? header.slice(7) : null;
+
+  if (!token) {
+    return next();
+  }
+
+  try {
+    const payload = verifyToken(token);
+    const { rows } = await query('SELECT is_blocked FROM users WHERE id = $1', [payload.sub]);
+    if (rows.length > 0 && !rows[0].is_blocked) {
+      req.userId = payload.sub;
+    }
+  } catch {
+    // Ignore invalid tokens for optional auth
+  }
+  next();
+}
+
 async function adminMiddleware(req, res, next) {
   if (!req.userId) {
     const header = req.headers.authorization || '';
@@ -105,6 +125,10 @@ function publicUser(row) {
     displayName: row.display_name,
     country: row.country || null,
     city: row.city || null,
+    company: row.company || null,
+    designation: row.designation || null,
+    role: row.role || null,
+    bio: row.bio || null,
     authMethod: row.google_id ? 'google' : 'email',
     isAdmin: Boolean(row.is_admin) || isAdminEmail(row.email),
     isBlocked: Boolean(row.is_blocked),
@@ -120,6 +144,8 @@ function adminUser(row) {
     displayName: row.display_name,
     country: row.country || null,
     city: row.city || null,
+    company: row.company || null,
+    designation: row.designation || null,
     authMethod: row.google_id ? 'google' : 'email',
     isAdmin: Boolean(row.is_admin) || isAdminEmail(row.email),
     isBlocked: Boolean(row.is_blocked),
@@ -135,6 +161,7 @@ module.exports = {
   verifyToken,
   authMiddleware,
   adminMiddleware,
+  optionalAuthMiddleware,
   isAdminEmail,
   publicUser,
   adminUser,

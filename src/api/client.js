@@ -1,40 +1,5 @@
 const API_BASE = process.env.REACT_APP_API_URL || "";
 const TOKEN_KEY = "aa-auth-token";
-const VOTER_KEY = "aa-voter-key";
-
-export function getVoterKey() {
-  try {
-    let key = localStorage.getItem(VOTER_KEY);
-    if (!key) {
-      key =
-        typeof crypto !== "undefined" && crypto.randomUUID
-          ? crypto.randomUUID()
-          : `v-${Date.now()}-${Math.random().toString(36).slice(2)}`;
-      localStorage.setItem(VOTER_KEY, key);
-    }
-    return key;
-  } catch {
-    return "anonymous";
-  }
-}
-
-export function getStoredVote(postId) {
-  try {
-    const raw = localStorage.getItem(`aa-vote-${postId}`);
-    return raw === "up" || raw === "down" ? raw : null;
-  } catch {
-    return null;
-  }
-}
-
-export function setStoredVote(postId, direction) {
-  try {
-    if (direction) localStorage.setItem(`aa-vote-${postId}`, direction);
-    else localStorage.removeItem(`aa-vote-${postId}`);
-  } catch {
-    /* ignore */
-  }
-}
 
 export function getStoredToken() {
   try {
@@ -92,6 +57,9 @@ export async function api(path, options = {}) {
     }
     const err = new Error(message);
     err.status = res.status;
+    if (data && typeof data === 'object') {
+      Object.assign(err, data);
+    }
     throw err;
   }
 
@@ -113,6 +81,18 @@ export const authApi = {
     }),
   signInWithGoogle: (body) =>
     api("/api/auth/google", {
+      method: "POST",
+      body: JSON.stringify(body),
+      suppressUnauthorizedEvent: true,
+    }),
+  verifyOtp: (body) =>
+    api("/api/auth/verify-otp", {
+      method: "POST",
+      body: JSON.stringify(body),
+      suppressUnauthorizedEvent: true,
+    }),
+  resendOtp: (body) =>
+    api("/api/auth/resend-otp", {
       method: "POST",
       body: JSON.stringify(body),
       suppressUnauthorizedEvent: true,

@@ -13,6 +13,7 @@ import ScreenReaderDetail from "pages/screen-readers/ScreenReaderDetail";
 import ThreadPage from "pages/thread/ThreadPage";
 import JoinCommunityPage from "pages/join/JoinCommunityPage";
 import MemberProfilePage from "pages/profile/MemberProfilePage";
+import MyProfilePage from "pages/profile/MyProfilePage";
 import ArticlesList from "pages/articles/ArticlesList";
 import ArticleDetail from "pages/articles/ArticleDetail";
 import BlogList from "pages/blog/BlogList";
@@ -33,6 +34,8 @@ import En301549 from "pages/footer-pages/En301549";
 import AboutUs from "pages/footer-pages/AboutUs";
 import { SITE_NAME } from "brand";
 import { postsApi } from "api/client";
+import { useAriaLive } from "context/AriaLiveContext";
+import { useAuth } from "context/AuthContext";
 
 const FOOTER_PAGE_TITLES = {
   "/news": `News · ${SITE_NAME}`,
@@ -77,6 +80,8 @@ function scrollWindowTopInstant() {
 export default function AppShell() {
   const navigate = useNavigate();
   const location = useLocation();
+  const { announce } = useAriaLive();
+  const { user } = useAuth();
   const [activePage, setActivePageState] = useState("portal");
   const [posts, setPosts] = useState([]);
   const [postsLoading, setPostsLoading] = useState(true);
@@ -97,7 +102,7 @@ export default function AppShell() {
 
   useEffect(() => {
     loadPosts();
-  }, [loadPosts]);
+  }, [loadPosts, user?.id]);
 
   const isThreadRoute = location.pathname.startsWith("/thread/");
   const isProfileRoute = location.pathname.startsWith("/profile/");
@@ -140,47 +145,37 @@ export default function AppShell() {
 
   useLayoutEffect(() => {
     if (isThreadRoute) return;
+    
+    let newTitle = PAGE_TITLES.portal;
+
     if (location.pathname === "/join") {
-      document.title = `Join · ${SITE_NAME}`;
-      return;
+      newTitle = `Join · ${SITE_NAME}`;
+    } else if (location.pathname === "/sign-in") {
+      newTitle = `Sign in · ${SITE_NAME}`;
+    } else if (location.pathname === "/sign-up") {
+      newTitle = `Join community · ${SITE_NAME}`;
+    } else if (location.pathname === "/forgot-password") {
+      newTitle = `Forgot password · ${SITE_NAME}`;
+    } else if (location.pathname === "/reset-password") {
+      newTitle = `Reset password · ${SITE_NAME}`;
+    } else if (location.pathname === "/admin") {
+      newTitle = `Admin · ${SITE_NAME}`;
+    } else if (location.pathname === "/my-profile") {
+      newTitle = `My Profile · ${SITE_NAME}`;
+    } else if (location.pathname === "/complete-profile") {
+      newTitle = `Complete profile · ${SITE_NAME}`;
+    } else if (isProfileRoute) {
+      newTitle = `Member profile · ${SITE_NAME}`;
+    } else if (sectionFromPath) {
+      newTitle = PAGE_TITLES[sectionFromPath];
+    } else if (FOOTER_PAGE_TITLES[location.pathname]) {
+      newTitle = FOOTER_PAGE_TITLES[location.pathname];
+    } else {
+      newTitle = PAGE_TITLES[activePage] || PAGE_TITLES.portal;
     }
-    if (location.pathname === "/sign-in") {
-      document.title = `Sign in · ${SITE_NAME}`;
-      return;
-    }
-    if (location.pathname === "/sign-up") {
-      document.title = `Join community · ${SITE_NAME}`;
-      return;
-    }
-    if (location.pathname === "/forgot-password") {
-      document.title = `Forgot password · ${SITE_NAME}`;
-      return;
-    }
-    if (location.pathname === "/reset-password") {
-      document.title = `Reset password · ${SITE_NAME}`;
-      return;
-    }
-    if (location.pathname === "/admin") {
-      document.title = `Admin · ${SITE_NAME}`;
-      return;
-    }
-    if (location.pathname === "/complete-profile") {
-      document.title = `Complete profile · ${SITE_NAME}`;
-      return;
-    }
-    if (isProfileRoute) {
-      document.title = `Member profile · ${SITE_NAME}`;
-      return;
-    }
-    if (sectionFromPath) {
-      document.title = PAGE_TITLES[sectionFromPath];
-      return;
-    }
-    if (FOOTER_PAGE_TITLES[location.pathname]) {
-      document.title = FOOTER_PAGE_TITLES[location.pathname];
-      return;
-    }
-    document.title = PAGE_TITLES[activePage] || PAGE_TITLES.portal;
+    
+    document.title = newTitle;
+    announce(`Navigated to ${newTitle.split(" · ")[0]}`);
   }, [
     isThreadRoute,
     isProfileRoute,
@@ -369,6 +364,10 @@ export default function AppShell() {
             <Route
               path="/profile/:memberId"
               element={<MemberProfilePage goToPortal={goToPortal} />}
+            />
+            <Route
+              path="/my-profile"
+              element={<MyProfilePage />}
             />
           </Route>
         </Routes>

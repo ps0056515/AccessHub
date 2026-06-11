@@ -7,6 +7,7 @@ import GoogleSignInSection from 'components/auth/GoogleSignInSection';
 import { useAuthRedirect } from 'hooks/useAuthRedirect';
 import { redirectAfterLogin } from 'utils/authRedirect';
 import { useToast } from 'context/ToastContext';
+import { Eye, EyeOff } from 'lucide-react';
 import styles from 'components/auth/AuthPage.module.css';
 
 export default function SignInPage({ goToPortal }) {
@@ -19,6 +20,7 @@ export default function SignInPage({ goToPortal }) {
   const { signIn, signInWithGoogle } = useAuth();
   const { addToast } = useToast();
   const [submittingGoogle, setSubmittingGoogle] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const formik = useFormik({
     initialValues: signInInitialValues,
@@ -28,7 +30,12 @@ export default function SignInPage({ goToPortal }) {
         const profile = await signIn(values);
         redirectAfterLogin(navigate, profile, from, redirectAfterAuth);
       } catch (err) {
-        showError(err.message || 'Could not sign in.');
+        if (err.needsVerification && err.email) {
+          addToast(err.message, 'error');
+          navigate('/sign-up', { state: { verificationEmail: err.email, from } });
+        } else {
+          showError(err.message || 'Could not sign in.');
+        }
       } finally {
         setSubmitting(false);
       }
@@ -82,7 +89,7 @@ export default function SignInPage({ goToPortal }) {
         <form className={styles.form} onSubmit={formik.handleSubmit} noValidate>
           <div className={styles.field}>
             <label className={styles.label} htmlFor="signin-email">
-              Email<span className="required-asterisk"> *</span>
+              Email<span className="required-asterisk" aria-hidden="true"> *</span>
             </label>
             <input
               id="signin-email"
@@ -94,6 +101,7 @@ export default function SignInPage({ goToPortal }) {
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}
               disabled={formik.isSubmitting || submittingGoogle}
+              required
             />
             {formik.touched.email && formik.errors.email && (
               <div className={styles.errorText}>{formik.errors.email}</div>
@@ -103,23 +111,35 @@ export default function SignInPage({ goToPortal }) {
           <div className={styles.field}>
             <div className={styles.labelRow}>
               <label className={styles.label} htmlFor="signin-password">
-                Password<span className="required-asterisk"> *</span>
+                Password<span className="required-asterisk" aria-hidden="true"> *</span>
               </label>
               <Link className={styles.linkInline} to="/forgot-password">
                 Forgot password?
               </Link>
             </div>
-            <input
-              id="signin-password"
-              name="password"
-              className={`${styles.input} ${formik.touched.password && formik.errors.password ? styles.inputError : ''}`}
-              type="password"
-              autoComplete="current-password"
-              value={formik.values.password}
-              onChange={formik.handleChange}
-              onBlur={formik.handleBlur}
-              disabled={formik.isSubmitting || submittingGoogle}
-            />
+            <div className={styles.passwordWrapper}>
+              <input
+                id="signin-password"
+                name="password"
+                className={`${styles.input} ${formik.touched.password && formik.errors.password ? styles.inputError : ''}`}
+                style={{ paddingRight: '40px' }}
+                type={showPassword ? 'text' : 'password'}
+                autoComplete="current-password"
+                value={formik.values.password}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                disabled={formik.isSubmitting || submittingGoogle}
+                required
+              />
+              <button
+                type="button"
+                className={styles.passwordToggle}
+                onClick={() => setShowPassword(!showPassword)}
+                aria-label={showPassword ? 'Hide password' : 'Show password'}
+              >
+                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
+            </div>
             {formik.touched.password && formik.errors.password && (
               <div className={styles.errorText}>{formik.errors.password}</div>
             )}

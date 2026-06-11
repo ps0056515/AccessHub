@@ -196,6 +196,8 @@
     border-top: 1px solid var(--border);
     background: var(--bg-card);
     gap: 4px;
+    max-height: calc(100vh - 60px);
+    overflow-y: auto;
   }
 
   .mobileLink {
@@ -257,6 +259,88 @@
 
   .mobileJoinGhost:hover { background: var(--bg-secondary); }
 
+  .profileWrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+  
+  .avatarBtn {
+    background: none;
+    border: 1px solid var(--border-strong, #cbd5e1);
+    border-radius: 50%;
+    width: 34px;
+    height: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: var(--text-muted, #475569);
+    padding: 0;
+    transition: background 0.2s;
+  }
+  
+  .avatarBtn:hover {
+    background: var(--bg-secondary, #f8fafc);
+  }
+  
+  .profileDropdown {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    margin-top: 8px;
+    background: var(--bg-card, #ffffff);
+    border: 1px solid var(--border, #e2e8f0);
+    border-radius: var(--radius-sm, 6px);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    min-width: 220px;
+    display: flex;
+    flex-direction: column;
+    z-index: 1000;
+    max-height: calc(100vh - 80px);
+    overflow-y: auto;
+  }
+  
+  .dropdownHeader {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border, #e2e8f0);
+  }
+  
+  .dropdownName {
+    display: block;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text, #0f172a);
+  }
+  
+  .dropdownEmail {
+    display: block;
+    font-size: 12px;
+    color: var(--text-muted, #475569);
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  
+  .dropdownBody {
+    padding: 8px;
+  }
+  
+  .dropdownItem {
+    width: 100%;
+    text-align: left;
+    padding: 8px 12px;
+    background: none;
+    border: none;
+    font-size: 14px;
+    cursor: pointer;
+    border-radius: 4px;
+    color: var(--text, #0f172a);
+  }
+  
+  .dropdownItem:hover {
+    background: var(--bg-secondary, #f8fafc);
+  }
+
   @media (max-width: 768px) {
     .nav { display: none; }
     .signInBtn { display: none; }
@@ -276,5 +360,8 @@
     .logoImg {
       max-width: min(140px, 42vw);
       height: 34px;
+    }
+    .joinBtn {
+      display: none;
     }
   }
