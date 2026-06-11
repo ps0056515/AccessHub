@@ -11,7 +11,7 @@ router.get('/:id/profile', async (req, res, next) => {
   }
 
   try {
-    const { rows } = await query('SELECT id, display_name FROM users WHERE id = $1', [id]);
+    const { rows } = await query('SELECT id, display_name, role, bio FROM users WHERE id = $1', [id]);
     const user = rows[0];
     
     if (!user) {
@@ -38,10 +38,10 @@ router.get('/:id/profile', async (req, res, next) => {
         id: user.id,
         initials: author.author_initials,
         name: author.author_name,
-        role: author.author_role,
+        role: user.role || author.author_role,
         color: author.author_color,
         hot: isHot,
-        bio: 'Community member passionate about web accessibility. Joined to learn, connect with other practitioners, and share knowledge.',
+        bio: user.bio || 'Community member passionate about web accessibility. Joined to learn, connect with other practitioners, and share knowledge.',
       }
     });
   } catch (err) {

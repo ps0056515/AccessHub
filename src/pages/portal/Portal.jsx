@@ -12,6 +12,8 @@ import {
 import { voteDelta } from "utils/voteDelta";
 import { useAuth } from "context/AuthContext";
 import { useConfig } from "context/ConfigContext";
+import { useToast } from "context/ToastContext";
+import { useAriaLive } from "context/AriaLiveContext";
 import Container from "components/common/Container/Container";
 import Pagination from "components/common/Pagination/Pagination";
 import styles from "./Portal.module.css";
@@ -238,6 +240,8 @@ export default function Portal({
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
   const { portalConfig } = useConfig();
+  const { addToast } = useToast();
+  const { announce } = useAriaLive();
   const [activeTab, setActiveTab] = useState("hot");
   const [currentPage, setCurrentPage] = useState(1);
   const postsPerPage = 10;
@@ -394,6 +398,7 @@ export default function Portal({
       setDraftTags(["WCAG 2.2"]);
       setQuery("");
       setActiveTab("new");
+      addToast("Discussion posted successfully!", "success");
       navigate(`/thread/${newPost.id}`);
     } catch (err) {
       setPostError(err.message || "Could not post your question.");
@@ -430,6 +435,10 @@ export default function Portal({
     if (activeTab === "unanswered") return list.filter((p) => p.replies === 0);
     return list;
   }, [baseFiltered, activeTab]);
+
+  useEffect(() => {
+    announce(`Filters applied: ${tabFiltered.length} discussions found.`);
+  }, [tabFiltered.length, announce]);
 
   const totalPages = Math.ceil(tabFiltered.length / postsPerPage) || 1;
   const paginatedPosts = tabFiltered.slice(
@@ -682,7 +691,10 @@ export default function Portal({
                   "Search discussions by title or text…"
                 }
                 value={query}
-                onChange={(e) => setQuery(e.target.value)}
+                onChange={(e) => {
+                  setQuery(e.target.value);
+                  setTopicFilter(null);
+                }}
               />
             </div>
             <div

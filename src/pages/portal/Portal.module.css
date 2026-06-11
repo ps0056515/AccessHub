@@ -367,6 +367,7 @@
   gap: 8px;
   margin-top: 10px;
   align-items: flex-start;
+  flex-wrap: wrap;
 }
 
 .topicPicker {
@@ -895,5 +896,18 @@
   }
   .postCard {
     padding: 14px 16px;
+  }
+}
+
+@media (max-width: 400px) {
+  .statsBar {
+    grid-template-columns: 1fr;
+  }
+  .statItem {
+    border-right: none;
+    border-bottom: 1px solid var(--border);
+  }
+  .statItem:last-child {
+    border-bottom: none;
   }
 }

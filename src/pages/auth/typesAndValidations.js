@@ -24,6 +24,7 @@ export const signUpInitialValues = {
   displayName: '',
   email: '',
   company: '',
+  designation: '',
   countryCode: '',
   city: '',
   password: '',
@@ -37,6 +38,7 @@ export const signUpValidationSchema = Yup.object({
     .matches(emailRegex, 'Invalid email address')
     .required('Email is required'),
   company: Yup.string(),
+  designation: Yup.string(),
   countryCode: Yup.string()
     .required('Country is required'),
   city: Yup.string()

@@ -172,10 +172,38 @@ async function sendEventRsvpEmail({ event, email, displayName }) {
 }
 
 
+async function sendOtpEmail({ to, otp, displayName }) {
+  const from = process.env.EMAIL_FROM || 'AccessHub <noreply@accesshub.local>';
+  const name = displayName || 'there';
+  const subject = 'Your AccessHub Verification Code';
+  const text = `Hi ${name},
+
+Your verification code is: ${otp}
+
+Please enter this code to verify your account. It will expire in 2 minutes.
+
+— AccessHub`;
+
+  const html = `<p>Hi ${escapeHtml(name)},</p>
+<p>Your verification code is: <strong><span style="font-size: 24px;">${escapeHtml(otp)}</span></strong></p>
+<p>Please enter this code to verify your account. It will expire in 2 minutes.</p>
+<p>— AccessHub</p>`;
+
+  const transport = getTransporter();
+  if (!transport) {
+    console.log('[otp-email] SMTP not configured — OTP for', to);
+    console.log('OTP Code:', otp);
+    return { delivered: false, mode: 'console' };
+  }
+
+  await transport.sendMail({ from, to, subject, text, html });
+  return { delivered: true, mode: 'smtp' };
+}
+
 module.exports = {
   sendPasswordResetEmail,
   sendEventRsvpEmail,
+  sendOtpEmail,
   buildResetUrl,
   getAppOrigin,
 };
-

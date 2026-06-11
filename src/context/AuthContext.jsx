@@ -64,7 +64,7 @@ export function AuthProvider({ children }) {
   }, [navigate]);
 
   const signUp = useCallback(async ({ email, password, displayName, country, city, company }) => {
-    const { token, user: profile } = await authApi.signUp({
+    const response = await authApi.signUp({
       email,
       password,
       displayName,
@@ -72,9 +72,19 @@ export function AuthProvider({ children }) {
       city,
       company,
     });
+    // Do not applySession here because the user is not verified yet.
+    return response;
+  }, []);
+
+  const verifyOtp = useCallback(async ({ email, otp }) => {
+    const { token, user: profile } = await authApi.verifyOtp({ email, otp });
     applySession(setUser, token, profile);
-    setNeedsLocation(false);
+    setNeedsLocation(!profile.country || !profile.city);
     return profile;
+  }, []);
+
+  const resendOtp = useCallback(async ({ email }) => {
+    return await authApi.resendOtp({ email });
   }, []);
 
   const signIn = useCallback(async ({ email, password }) => {
@@ -96,10 +106,10 @@ export function AuthProvider({ children }) {
     return profile;
   }, []);
 
-  const updateProfile = useCallback(async ({ country, city }) => {
-    const { user: profile } = await authApi.updateProfile({ country, city });
+  const updateProfile = useCallback(async (updates) => {
+    const { user: profile } = await authApi.updateProfile(updates);
     setUser(profile);
-    setNeedsLocation(false);
+    setNeedsLocation(!profile.country || !profile.city);
     return profile;
   }, []);
 
@@ -122,12 +132,14 @@ export function AuthProvider({ children }) {
       signUp,
       signIn,
       signInWithGoogle,
+      verifyOtp,
+      resendOtp,
       updateProfile,
       signOut,
       isAuthenticated: !!user,
       isAdmin: !!user?.isAdmin,
     }),
-    [user, loading, needsLocation, signUp, signIn, signInWithGoogle, updateProfile, signOut]
+    [user, loading, needsLocation, signUp, signIn, signInWithGoogle, verifyOtp, resendOtp, updateProfile, signOut]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

@@ -10,6 +10,8 @@ export default function CompleteProfilePage({ goToPortal }) {
   const { user, updateProfile } = useAuth();
   const [country, setCountry] = useState(user?.country || '');
   const [city, setCity] = useState(user?.city || '');
+  const [company, setCompany] = useState(user?.company || '');
+  const [designation, setDesignation] = useState(user?.designation || '');
   const [error, setError] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
@@ -18,7 +20,7 @@ export default function CompleteProfilePage({ goToPortal }) {
     setError('');
     setSubmitting(true);
     try {
-      await updateProfile({ country, city });
+      await updateProfile({ country, city, company, designation });
       redirectAfterAuth();
     } catch (err) {
       setError(err.message || 'Could not save your location.');
@@ -46,6 +48,38 @@ export default function CompleteProfilePage({ goToPortal }) {
               {error}
             </div>
           )}
+
+          <div className={styles.field}>
+            <label className={styles.label} htmlFor="profile-company">
+              Company
+            </label>
+            <input
+              id="profile-company"
+              className={styles.input}
+              type="text"
+              autoComplete="organization"
+              placeholder="e.g. Acme Corp"
+              value={company}
+              onChange={e => setCompany(e.target.value)}
+              disabled={submitting}
+            />
+          </div>
+
+          <div className={styles.field}>
+            <label className={styles.label} htmlFor="profile-designation">
+              Designation / Job Title
+            </label>
+            <input
+              id="profile-designation"
+              className={styles.input}
+              type="text"
+              autoComplete="organization-title"
+              placeholder="e.g. Accessibility Engineer"
+              value={designation}
+              onChange={e => setDesignation(e.target.value)}
+              disabled={submitting}
+            />
+          </div>
 
           <div className={styles.field}>
             <label className={styles.label} htmlFor="profile-country">
