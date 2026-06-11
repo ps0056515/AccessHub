@@ -116,7 +116,7 @@ function Tag({ label }) {
   );
 }
 
-function PostCard({ post, isAuthenticated, navigate, onOpenThread, onVotesChange }) {
+function PostCard({ post, onOpenThread, onVotesChange, isAuthenticated, navigate }) {
   const [votes, setVotes] = useState(post.votes);
   const [voted, setVoted] = useState(() => getStoredVote(post.id));
   const [voting, setVoting] = useState(false);
@@ -126,15 +126,15 @@ function PostCard({ post, isAuthenticated, navigate, onOpenThread, onVotesChange
     setVotes(post.votes);
   }, [post.votes]);
 
+
+
   const vote = async (dir, e) => {
     e.stopPropagation();
     if (voting) return;
 
-    if (!isAuthenticated) {
-      navigate('/sign-in', { state: { from: '/' } });
-      return;
+    if(!isAuthenticated) {
+      navigate("/sign-in", { state: { from: `/` } });
     }
-
     const prevVotes = votes;
     const prevVoted = voted;
     const { delta, userVote: nextVoted } = voteDelta(voted, dir);
@@ -244,7 +244,8 @@ export default function Portal({
   const [query, setQuery] = useState("");
   const [topicFilter, setTopicFilter] = useState(null);
   const [draftQuestion, setDraftQuestion] = useState("");
-  const [draftTags, setDraftTags] = useState([]);
+  const [draftTitle, setDraftTitle] = useState("");
+  const [draftTags, setDraftTags] = useState([""]);
   const [postError, setPostError] = useState("");
   const [posting, setPosting] = useState(false);
   const askBoxRef = useRef(null);
@@ -363,40 +364,39 @@ export default function Portal({
     );
     setActivePage?.("resources");
   };
-
   const handlePostQuestion = async () => {
+    const trimmedTitle = draftTitle.trim();
     const trimmedQuestion = draftQuestion.trim();
-    if (!trimmedQuestion) {
-      askTextareaRef.current?.focus();
+
+    if (!trimmedTitle) {
+      setPostError("Please enter a title.");
       return;
     }
-    if (!draftTags.length || !draftTags[0]) {
-  setPostError("Please select a topic.");
-  return;
-}
 
+
+    if (!draftTags[0]) {
+      setPostError("Please select a topic.");
+      return;
+    }
 
     if (!isAuthenticated) {
       navigate("/sign-in", { state: { from: "/" } });
       return;
     }
-
     setPostError("");
     setPosting(true);
     try {
-      const title =
-        trimmedQuestion.length > 120
-          ? `${trimmedQuestion.slice(0, 117).trim()}…`
-          : trimmedQuestion;
+      const title = trimmedTitle;
       const { post: newPost } = await postsApi.create({
-        title,
-        body: trimmedQuestion,
+        title: trimmedTitle,
+        body: trimmedQuestion || null,
         tags: draftTags,
       });
 
       setPosts((prevPosts) => [newPost, ...prevPosts]);
+      setDraftTitle("");
       setDraftQuestion("");
-      setDraftTags([]);
+      setDraftTags([""]);
       setQuery("");
       setActiveTab("new");
       navigate(`/thread/${newPost.id}`);
@@ -606,16 +606,29 @@ export default function Portal({
         <main className={styles.feed}>
           <div className={styles.askBox} ref={askBoxRef}>
             <p className={styles.askLabel}>Ask the community</p>
+            <label className={styles.fieldLabel}>
+              Title <span aria-hidden="true">*</span>
+            </label>
+
+            <input
+              type="text"
+              className={styles.askTitleInput}
+              placeholder="Ask the community a question..."
+              value={draftTitle}
+              onChange={(e) => setDraftTitle(e.target.value)}
+              aria-required="true"
+            />
+
+            <label className={styles.fieldLabel}>
+              Description (Optional)
+            </label>
 
             <textarea
               className={styles.askTextarea}
               ref={askTextareaRef}
-              placeholder={
-                portalConfig.askPlaceholder ||
-                "What accessibility challenge are you working through?"
-              }
+              placeholder="Provide additional details, context, or examples (optional)"
               rows={3}
-              aria-label="Write your question"
+              aria-label="Question description"
               value={draftQuestion}
               onChange={(e) => setDraftQuestion(e.target.value)}
             />
@@ -630,13 +643,11 @@ export default function Portal({
                 <select
                   id="ask-topic"
                   className={styles.topicSelect}
-                  value={draftTags[0] || ""}
+                  value={draftTags[0]}
                   onChange={(e) => setDraftTags([e.target.value])}
                   disabled={posting}
                 >
-                  <option value="">
-                    Select Topic
-                  </option>
+                  <option value="">Select Topic</option>
 
                   {(portalConfig.askTopics || []).map((topic) => (
                     <option key={topic} value={topic}>
@@ -763,9 +774,9 @@ export default function Portal({
                 <PostCard
                   key={p.id}
                   post={p}
+                  onOpenThread={(post) => navigate(`/thread/${post.id}`)}
                   isAuthenticated={isAuthenticated}
                   navigate={navigate}
-                  onOpenThread={(post) => navigate(`/thread/${post.id}`)}
                   onVotesChange={handleVotesChange}
                 />
               ))
