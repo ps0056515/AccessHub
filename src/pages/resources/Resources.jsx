@@ -1,4 +1,6 @@
 import { useLayoutEffect, useMemo, useState, useEffect } from "react";
+import { useToast } from "context/ToastContext";
+import { useAriaLive } from "context/AriaLiveContext";
 import { COLOR_MAP } from "data";
 import { resourcesApi } from "api/client";
 import Modal from "components/common/Modal/Modal";
@@ -19,6 +21,8 @@ function loadSaved() {
 }
 
 export default function Resources({ setActivePage }) {
+  const { addToast } = useToast();
+  const { announce } = useAriaLive();
   const [activeCategory, setActiveCategory] = useState("All");
   const [query, setQuery] = useState("");
   const [saved, setSaved] = useState(loadSaved);
@@ -85,16 +89,22 @@ export default function Resources({ setActivePage }) {
     });
   }, [activeCategory, query, resources]);
 
+  useEffect(() => {
+    announce(`Filters applied: ${filtered.length} resources found.`);
+  }, [filtered.length, activeCategory, query, announce]);
+
   const toggleSave = (slug) => {
     setSaved((prev) => {
       const next = new Set(prev);
-      if (next.has(slug)) next.delete(slug);
+      const isCurrentlySaved = next.has(slug);
+      if (isCurrentlySaved) next.delete(slug);
       else next.add(slug);
       try {
         localStorage.setItem(SAVED_KEY, JSON.stringify([...next]));
       } catch {
         /* private mode / quota — state still updates this session */
       }
+      addToast(isCurrentlySaved ? "Resource removed from saved list." : "Resource saved successfully.", "success");
       return next;
     });
   };

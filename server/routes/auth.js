@@ -9,13 +9,18 @@ const {
 } = require('../auth');
 const { verifyGoogleToken } = require('../google');
 const { generateResetToken, hashResetToken, resetExpiresAt } = require('../passwordReset');
-const { sendPasswordResetEmail, buildResetUrl } = require('../email');
+const { sendPasswordResetEmail, sendOtpEmail, buildResetUrl } = require('../email');
+const crypto = require('crypto');
+
+function generateOtp() {
+  return crypto.randomInt(100000, 999999).toString();
+}
 
 const router = express.Router();
 const GENERIC_RESET_MESSAGE =
   'If an account exists for that email, we sent password reset instructions.';
 const USER_RETURNING =
-  'id, email, password_hash, display_name, google_id, country, city, company, is_admin, is_blocked, created_at';
+  'id, email, password_hash, display_name, google_id, country, city, company, designation, role, bio, is_admin, is_blocked, created_at, is_verified, otp_hash, otp_expires_at';
 const USER_SELECT = `SELECT ${USER_RETURNING} FROM users`;
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -44,7 +49,7 @@ function validateSignUp({ email, password, displayName, country, city }) {
 }
 
 router.post('/signup', async (req, res, next) => {
-  const { email, password, displayName, country, city, company } = req.body || {};
+  const { email, password, displayName, country, city, company, designation } = req.body || {};
   const validationError = validateSignUp({ email, password, displayName, country, city });
   if (validationError) {
     res.status(400).json({ error: validationError });
@@ -63,9 +68,13 @@ router.post('/signup', async (req, res, next) => {
     }
 
     const passwordHash = await hashPassword(password);
+    const otp = generateOtp();
+    const otpHash = await hashPassword(otp);
+    const otpExpiresAt = new Date(Date.now() + 2 * 60 * 1000).toISOString();
+
     const inserted = await query(
-      `INSERT INTO users (email, password_hash, display_name, country, city, company)
-       VALUES ($1, $2, $3, $4, $5, $6)
+      `INSERT INTO users (email, password_hash, display_name, country, city, company, designation, is_verified, otp_hash, otp_expires_at)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, false, $8, $9)
        RETURNING ${USER_RETURNING}`,
       [
         normalizedEmail,
@@ -74,12 +83,26 @@ router.post('/signup', async (req, res, next) => {
         normalizeLocation(country),
         normalizeLocation(city),
         company?.trim() || null,
+        designation?.trim() || null,
+        otpHash,
+        otpExpiresAt
       ],
     );
 
     const user = inserted.rows[0];
-    const token = signToken(user);
-    res.status(201).json({ token, user: publicUser(user) });
+    
+    try {
+      await sendOtpEmail({
+        to: user.email,
+        otp,
+        displayName: user.display_name,
+      });
+    } catch (mailErr) {
+      console.error('OTP email failed:', mailErr);
+      // We still return success but maybe log the error. The user can resend.
+    }
+
+    res.status(201).json({ message: "OTP sent.", email: user.email, needsVerification: true });
   } catch (err) {
     if (err.code === '23505') {
       res.status(409).json({ error: 'An account with this email already exists.' });
@@ -112,6 +135,11 @@ router.post('/signin', async (req, res, next) => {
       return;
     }
 
+    if (!user.is_verified) {
+      res.status(401).json({ error: 'Please verify your email address. Request a new OTP if needed.', needsVerification: true, email: user.email });
+      return;
+    }
+
     if (!user.password_hash) {
       res
         .status(401)
@@ -133,7 +161,7 @@ router.post('/signin', async (req, res, next) => {
 });
 
 router.post('/google', async (req, res, next) => {
-  const { credential, country, city, company } = req.body || {};
+  const { credential, country, city, company, designation } = req.body || {};
   if (!credential) {
     res.status(400).json({ error: 'Google credential is required.' });
     return;
@@ -178,10 +206,10 @@ router.post('/google', async (req, res, next) => {
       } else {
         isNew = true;
         const inserted = await query(
-          `INSERT INTO users (email, password_hash, display_name, google_id, country, city, company)
-           VALUES ($1, '', $2, $3, $4, $5, $6)
+          `INSERT INTO users (email, password_hash, display_name, google_id, country, city, company, designation, is_verified)
+           VALUES ($1, '', $2, $3, $4, $5, $6, $7, true)
            RETURNING ${USER_RETURNING}`,
-          [email, displayName, googleId, normalizeLocation(country), normalizeLocation(city), company?.trim() || null],
+          [email, displayName, googleId, normalizeLocation(country), normalizeLocation(city), company?.trim() || null, designation?.trim() || null],
         );
         user = inserted.rows[0];
       }
@@ -216,18 +244,59 @@ router.post('/google', async (req, res, next) => {
 });
 
 router.patch('/profile', authMiddleware, async (req, res, next) => {
-  const { country, city } = req.body || {};
-  if (!country?.trim() || !city?.trim()) {
-    res.status(400).json({ error: 'Country and city are required.' });
-    return;
+  const { displayName, role, bio, company, designation, country, city } = req.body || {};
+
+  const updates = [];
+  const values = [];
+  let paramCount = 1;
+
+  if (displayName !== undefined) {
+    if (!displayName.trim()) {
+      return res.status(400).json({ error: 'Display name cannot be empty.' });
+    }
+    updates.push(`display_name = $${paramCount++}`);
+    values.push(displayName.trim());
+  }
+  if (role !== undefined) {
+    updates.push(`role = $${paramCount++}`);
+    values.push(role.trim());
+  }
+  if (bio !== undefined) {
+    updates.push(`bio = $${paramCount++}`);
+    values.push(bio.trim());
+  }
+  if (company !== undefined) {
+    updates.push(`company = $${paramCount++}`);
+    values.push(company.trim());
+  }
+  if (designation !== undefined) {
+    updates.push(`designation = $${paramCount++}`);
+    values.push(designation.trim());
+  }
+  if (country !== undefined) {
+    if (!country.trim()) {
+      return res.status(400).json({ error: 'Country cannot be empty.' });
+    }
+    updates.push(`country = $${paramCount++}`);
+    values.push(normalizeLocation(country));
+  }
+  if (city !== undefined) {
+    if (!city.trim()) {
+      return res.status(400).json({ error: 'City cannot be empty.' });
+    }
+    updates.push(`city = $${paramCount++}`);
+    values.push(normalizeLocation(city));
   }
 
+  if (updates.length === 0) {
+    return res.status(400).json({ error: 'No fields to update.' });
+  }
+
+  values.push(req.userId);
+  const queryStr = `UPDATE users SET ${updates.join(', ')} WHERE id = $${paramCount}`;
+
   try {
-    await query('UPDATE users SET country = $1, city = $2 WHERE id = $3', [
-      normalizeLocation(country),
-      normalizeLocation(city),
-      req.userId,
-    ]);
+    await query(queryStr, values);
 
     const { rows } = await query(`${USER_SELECT} WHERE id = $1`, [req.userId]);
     const user = rows[0];
@@ -362,6 +431,85 @@ router.post('/reset-password', async (req, res, next) => {
     );
 
     res.json({ message: 'Your password has been updated. You can sign in with your new password.' });
+  } catch (err) {
+    next(err);
+  }
+});
+
+router.post('/verify-otp', async (req, res, next) => {
+  const { email, otp } = req.body || {};
+  if (!email || !otp) {
+    return res.status(400).json({ error: 'Email and OTP are required.' });
+  }
+
+  try {
+    const { rows } = await query(
+      `${USER_SELECT} WHERE LOWER(email) = $1 AND otp_expires_at > NOW()`,
+      [email.trim().toLowerCase()]
+    );
+    const user = rows[0];
+
+    if (!user) {
+      return res.status(400).json({ error: 'Invalid or expired OTP.' });
+    }
+
+    const valid = await verifyPassword(otp, user.otp_hash);
+    if (!valid) {
+      return res.status(400).json({ error: 'Invalid or expired OTP.' });
+    }
+
+    await query(
+      `UPDATE users SET is_verified = true, otp_hash = NULL, otp_expires_at = NULL WHERE id = $1`,
+      [user.id]
+    );
+
+    const updated = await query(`${USER_SELECT} WHERE id = $1`, [user.id]);
+    const verifiedUser = updated.rows[0];
+    const token = signToken(verifiedUser);
+    res.json({ token, user: publicUser(verifiedUser) });
+  } catch (err) {
+    next(err);
+  }
+});
+
+router.post('/resend-otp', async (req, res, next) => {
+  const { email } = req.body || {};
+  if (!email) {
+    return res.status(400).json({ error: 'Email is required.' });
+  }
+
+  try {
+    const { rows } = await query(`${USER_SELECT} WHERE LOWER(email) = $1`, [email.trim().toLowerCase()]);
+    const user = rows[0];
+
+    if (!user) {
+      return res.json({ message: "If that email is registered, a new OTP has been sent." });
+    }
+    if (user.is_verified) {
+      return res.status(400).json({ error: 'This account is already verified. Please sign in.' });
+    }
+
+    const otp = generateOtp();
+    const otpHash = await hashPassword(otp);
+    const otpExpiresAt = new Date(Date.now() + 2 * 60 * 1000).toISOString();
+
+    await query(
+      `UPDATE users SET otp_hash = $1, otp_expires_at = $2 WHERE id = $3`,
+      [otpHash, otpExpiresAt, user.id]
+    );
+
+    try {
+      await sendOtpEmail({
+        to: user.email,
+        otp,
+        displayName: user.display_name,
+      });
+    } catch (mailErr) {
+      console.error('Resend OTP email failed:', mailErr);
+      return res.status(503).json({ error: 'Could not send the OTP email. Try again later.' });
+    }
+
+    res.json({ message: "A new OTP has been sent." });
   } catch (err) {
     next(err);
   }

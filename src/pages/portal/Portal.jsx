@@ -2,16 +2,12 @@ import { useEffect, useRef, useState, useMemo } from "react";
 import { flushSync } from "react-dom";
 import { useNavigate } from "react-router-dom";
 import { TAG_COLORS, COLOR_MAP } from "data";
-import {
-  postsApi,
-  eventsApi,
-  getVoterKey,
-  getStoredVote,
-  setStoredVote,
-} from "api/client";
+import { postsApi, eventsApi } from "api/client";
 import { voteDelta } from "utils/voteDelta";
 import { useAuth } from "context/AuthContext";
 import { useConfig } from "context/ConfigContext";
+import { useToast } from "context/ToastContext";
+import { useAriaLive } from "context/AriaLiveContext";
 import Container from "components/common/Container/Container";
 import Pagination from "components/common/Pagination/Pagination";
 import styles from "./Portal.module.css";
@@ -48,7 +44,7 @@ function fmtMonth(dateStr) {
   if (!dateStr) return "";
   return (
     MONTH_ABBRS[
-    new Date(String(dateStr).slice(0, 10) + "T00:00:00Z").getUTCMonth()
+      new Date(String(dateStr).slice(0, 10) + "T00:00:00Z").getUTCMonth()
     ] ?? ""
   );
 }
@@ -116,24 +112,30 @@ function Tag({ label }) {
   );
 }
 
-function PostCard({ post, onOpenThread, onVotesChange, isAuthenticated, navigate }) {
+function PostCard({
+  post,
+  onOpenThread,
+  onVotesChange,
+  isAuthenticated,
+  navigate,
+}) {
   const [votes, setVotes] = useState(post.votes);
-  const [voted, setVoted] = useState(() => getStoredVote(post.id));
+  const [voted, setVoted] = useState(post.userVote || null);
   const [voting, setVoting] = useState(false);
   const [voteError, setVoteError] = useState("");
 
   useEffect(() => {
     setVotes(post.votes);
-  }, [post.votes]);
-
-
+    setVoted(post.userVote || null);
+  }, [post.votes, post.userVote]);
 
   const vote = async (dir, e) => {
     e.stopPropagation();
     if (voting) return;
 
-    if(!isAuthenticated) {
+    if (!isAuthenticated) {
       navigate("/sign-in", { state: { from: `/` } });
+      return;
     }
     const prevVotes = votes;
     const prevVoted = voted;
@@ -147,12 +149,10 @@ function PostCard({ post, onOpenThread, onVotesChange, isAuthenticated, navigate
     try {
       const { votes: newVotes, userVote } = await postsApi.vote(post.id, {
         direction: dir,
-        voterKey: getVoterKey(),
       });
       setVotes(newVotes);
       setVoted(userVote);
-      setStoredVote(post.id, userVote);
-      onVotesChange?.(post.id, newVotes);
+      onVotesChange?.(post.id, newVotes, userVote);
     } catch (err) {
       setVotes(prevVotes);
       setVoted(prevVoted);
@@ -238,6 +238,8 @@ export default function Portal({
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
   const { portalConfig } = useConfig();
+  const { addToast } = useToast();
+  const { announce } = useAriaLive();
   const [activeTab, setActiveTab] = useState("hot");
   const [currentPage, setCurrentPage] = useState(1);
   const postsPerPage = 10;
@@ -351,9 +353,11 @@ export default function Portal({
     searchInputRef.current?.focus();
   };
 
-  const handleVotesChange = (postId, newVotes) => {
+  const handleVotesChange = (postId, newVotes, userVote) => {
     setPosts((prev) =>
-      prev.map((p) => (p.id === postId ? { ...p, votes: newVotes } : p)),
+      prev.map((p) =>
+        p.id === postId ? { ...p, votes: newVotes, userVote } : p,
+      ),
     );
   };
 
@@ -372,7 +376,6 @@ export default function Portal({
       setPostError("Please enter a title.");
       return;
     }
-
 
     if (!draftTags[0]) {
       setPostError("Please select a topic.");
@@ -399,6 +402,7 @@ export default function Portal({
       setDraftTags([""]);
       setQuery("");
       setActiveTab("new");
+      addToast("Discussion posted successfully!", "success");
       navigate(`/thread/${newPost.id}`);
     } catch (err) {
       setPostError(err.message || "Could not post your question.");
@@ -436,6 +440,10 @@ export default function Portal({
     return list;
   }, [baseFiltered, activeTab]);
 
+  useEffect(() => {
+    announce(`Filters applied: ${tabFiltered.length} discussions found.`);
+  }, [tabFiltered.length, announce]);
+
   const totalPages = Math.ceil(tabFiltered.length / postsPerPage) || 1;
   const paginatedPosts = tabFiltered.slice(
     (currentPage - 1) * postsPerPage,
@@ -463,7 +471,7 @@ export default function Portal({
           );
         }
       })
-      .catch(() => { });
+      .catch(() => {});
   }, []);
 
   const goToEvent = (id) => {
@@ -504,10 +512,10 @@ export default function Portal({
         style={
           portalConfig.bgUrl
             ? {
-              backgroundImage: `url(${portalConfig.bgUrl})`,
-              backgroundSize: "cover",
-              backgroundPosition: "center",
-            }
+                backgroundImage: `url(${portalConfig.bgUrl})`,
+                backgroundSize: "cover",
+                backgroundPosition: "center",
+              }
             : undefined
         }
       >
@@ -619,9 +627,7 @@ export default function Portal({
               aria-required="true"
             />
 
-            <label className={styles.fieldLabel}>
-              Description (Optional)
-            </label>
+            <label className={styles.fieldLabel}>Description (Optional)</label>
 
             <textarea
               className={styles.askTextarea}
@@ -703,7 +709,10 @@ export default function Portal({
                   "Search discussions by title or text…"
                 }
                 value={query}
-                onChange={(e) => setQuery(e.target.value)}
+                onChange={(e) => {
+                  setQuery(e.target.value);
+                  setTopicFilter(null);
+                }}
               />
             </div>
             <div

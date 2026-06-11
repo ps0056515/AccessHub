@@ -1,6 +1,6 @@
 const express = require('express');
 const { query } = require('../db');
-const { authMiddleware, adminMiddleware } = require('../auth');
+const { authMiddleware, adminMiddleware, optionalAuthMiddleware } = require('../auth');
 const { formatPost, formatComment, authorFromUser } = require('../posts');
 
 const router = express.Router();
@@ -11,9 +11,23 @@ const POST_SELECT = `
   FROM posts p
 `;
 
-router.get('/', async (_req, res, next) => {
+router.get('/', optionalAuthMiddleware, async (req, res, next) => {
   try {
-    const { rows } = await query(`${POST_SELECT} ORDER BY p.created_at DESC`);
+    let queryStr = `${POST_SELECT} ORDER BY p.created_at DESC`;
+    let params = [];
+    
+    if (req.userId) {
+      queryStr = `
+        SELECT p.*,
+          (SELECT COUNT(*)::int FROM comments c WHERE c.post_id = p.id) AS reply_count,
+          (SELECT direction FROM post_votes pv WHERE pv.post_id = p.id AND pv.voter_key = $1 LIMIT 1) AS user_vote_direction
+        FROM posts p
+        ORDER BY p.created_at DESC
+      `;
+      params.push(req.userId.toString());
+    }
+    
+    const { rows } = await query(queryStr, params);
     res.json({ posts: rows.map(row => formatPost(row)) });
   } catch (err) {
     next(err);
@@ -182,18 +196,29 @@ router.delete('/admin/:id', authMiddleware, adminMiddleware, async (req, res, ne
 
 router.put('/admin/:postId/comments/:commentId', authMiddleware, adminMiddleware, async (req, res, next) => {
   const commentId = Number(req.params.commentId);
-  const { body } = req.body || {};
+  const { body, created_at } = req.body || {};
   const trimmedBody = body?.trim();
+  const parsedDate = created_at ? new Date(created_at).toISOString() : undefined;
 
   if (!Number.isFinite(commentId) || !trimmedBody) {
     return res.status(400).json({ error: 'Invalid comment data.' });
   }
 
   try {
-    const { rowCount } = await query(
-      'UPDATE comments SET body = $1, updated_at = CURRENT_TIMESTAMP WHERE id = $2',
-      [trimmedBody, commentId]
-    );
+    let rowCount;
+    if (parsedDate) {
+      const result = await query(
+        'UPDATE comments SET body = $1, created_at = $2, updated_at = CURRENT_TIMESTAMP WHERE id = $3',
+        [trimmedBody, parsedDate, commentId]
+      );
+      rowCount = result.rowCount;
+    } else {
+      const result = await query(
+        'UPDATE comments SET body = $1, updated_at = CURRENT_TIMESTAMP WHERE id = $2',
+        [trimmedBody, commentId]
+      );
+      rowCount = result.rowCount;
+    }
     if (rowCount === 0) {
       return res.status(404).json({ error: 'Comment not found.' });
     }
@@ -220,7 +245,7 @@ router.delete('/admin/:postId/comments/:commentId', authMiddleware, adminMiddlew
   }
 });
 
-router.get('/:id', async (req, res, next) => {
+router.get('/:id', optionalAuthMiddleware, async (req, res, next) => {
   const id = Number(req.params.id);
   if (!Number.isFinite(id)) {
     res.status(400).json({ error: 'Invalid post id.' });
@@ -228,7 +253,21 @@ router.get('/:id', async (req, res, next) => {
   }
 
   try {
-    const { rows } = await query(`${POST_SELECT} WHERE p.id = $1`, [id]);
+    let queryStr = `${POST_SELECT} WHERE p.id = $1`;
+    let params = [id];
+
+    if (req.userId) {
+      queryStr = `
+        SELECT p.*,
+          (SELECT COUNT(*)::int FROM comments c WHERE c.post_id = p.id) AS reply_count,
+          (SELECT direction FROM post_votes pv WHERE pv.post_id = p.id AND pv.voter_key = $2 LIMIT 1) AS user_vote_direction
+        FROM posts p
+        WHERE p.id = $1
+      `;
+      params.push(req.userId.toString());
+    }
+
+    const { rows } = await query(queryStr, params);
     const row = rows[0];
     if (!row) {
       res.status(404).json({ error: 'Discussion not found.' });
@@ -401,18 +440,12 @@ router.post('/:id/vote', authMiddleware, async (req, res, next) => {
       if (current === voteValue) {
         await query('DELETE FROM post_votes WHERE post_id = $1 AND voter_key = $2', [id, key]);
         delta = -voteValue;
-      } else if (current === -1 && voteValue === 1) {
-        await query('DELETE FROM post_votes WHERE post_id = $1 AND voter_key = $2', [id, key]);
-        delta = 1;
-      } else if (current === 1 && voteValue === -1) {
-        await query('DELETE FROM post_votes WHERE post_id = $1 AND voter_key = $2', [id, key]);
-        delta = -1;
       } else {
         await query(
           'UPDATE post_votes SET direction = $1 WHERE post_id = $2 AND voter_key = $3',
           [voteValue, id, key],
         );
-        delta = voteValue - current;
+        delta = voteValue === 1 ? 2 : -2; // Switching from -1 to 1 is +2, switching from 1 to -1 is -2.
         userVote = direction;
       }
     } else {
