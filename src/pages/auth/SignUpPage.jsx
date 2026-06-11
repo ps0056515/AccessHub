@@ -8,6 +8,7 @@ import GoogleSignInSection from 'components/auth/GoogleSignInSection';
 import { useAuthRedirect } from 'hooks/useAuthRedirect';
 import { redirectAfterLogin } from 'utils/authRedirect';
 import { useToast } from 'context/ToastContext';
+import { Eye, EyeOff } from 'lucide-react';
 import styles from 'components/auth/AuthPage.module.css';
 
 export default function SignUpPage({ goToPortal }) {
@@ -18,6 +19,7 @@ export default function SignUpPage({ goToPortal }) {
   const { signUp, signInWithGoogle, verifyOtp, resendOtp } = useAuth();
   const { addToast } = useToast();
   const [submittingGoogle, setSubmittingGoogle] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   // OTP Verification state
   const [verificationEmail, setVerificationEmail] = useState(location.state?.verificationEmail || null);
@@ -359,18 +361,29 @@ export default function SignUpPage({ goToPortal }) {
             <label className={styles.label} htmlFor="signup-password">
               Password<span className="required-asterisk" aria-hidden="true"> *</span>
             </label>
-            <input
-              id="signup-password"
-              name="password"
-              className={`${styles.input} ${formik.touched.password && formik.errors.password ? styles.inputError : ''}`}
-              type="password"
-              autoComplete="new-password"
-              value={formik.values.password}
-              onChange={formik.handleChange}
-              onBlur={formik.handleBlur}
-              disabled={formik.isSubmitting || submittingGoogle}
-              required
-            />
+            <div className={styles.passwordWrapper}>
+              <input
+                id="signup-password"
+                name="password"
+                className={`${styles.input} ${formik.touched.password && formik.errors.password ? styles.inputError : ''}`}
+                style={{ paddingRight: '40px' }}
+                type={showPassword ? 'text' : 'password'}
+                autoComplete="new-password"
+                value={formik.values.password}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                disabled={formik.isSubmitting || submittingGoogle}
+                required
+              />
+              <button
+                type="button"
+                className={styles.passwordToggle}
+                onClick={() => setShowPassword(!showPassword)}
+                aria-label={showPassword ? 'Hide password' : 'Show password'}
+              >
+                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
+            </div>
             {formik.touched.password && formik.errors.password ? (
               <div className={styles.errorText}>{formik.errors.password}</div>
             ) : (

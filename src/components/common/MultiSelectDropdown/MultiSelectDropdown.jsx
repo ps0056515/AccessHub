@@ -28,9 +28,26 @@ export default function MultiSelectDropdown({ options, value, onChange, placehol
     onChange(value.filter(v => v !== option));
   };
 
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      setIsOpen(!isOpen);
+    } else if (e.key === 'Escape') {
+      setIsOpen(false);
+    }
+  };
+
   return (
     <div className={styles.container} ref={containerRef}>
-      <div className={styles.inputArea} onClick={() => setIsOpen(!isOpen)}>
+      <div 
+        className={styles.inputArea} 
+        onClick={() => setIsOpen(!isOpen)}
+        onKeyDown={handleKeyDown}
+        tabIndex={0}
+        role="combobox"
+        aria-expanded={isOpen}
+        aria-haspopup="listbox"
+      >
         <div className={styles.pillsContainer}>
           {value.length === 0 && <span className={styles.placeholder}>{placeholder}</span>}
           {value.map(tag => (
