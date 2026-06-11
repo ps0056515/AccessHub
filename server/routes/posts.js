@@ -122,7 +122,7 @@ router.put('/admin/:id', authMiddleware, adminMiddleware, async (req, res, next)
   const id = Number(req.params.id);
   const { title, body, tags, votes, created_at } = req.body || {};
   const trimmedTitle = title?.trim();
-  const trimmedBody = body?.trim();
+  const trimmedBody = body?.trim() || "";
   const parsedVotes = Math.max(0, parseInt(votes, 10) || 0);
   const parsedDate = created_at ? new Date(created_at).toISOString() : undefined;
 
@@ -317,10 +317,7 @@ router.post('/', authMiddleware, async (req, res, next) => {
     res.status(400).json({ error: 'Title must be at least 5 characters.' });
     return;
   }
-  if (!trimmedBody || trimmedBody.length < 10) {
-    res.status(400).json({ error: 'Please add more detail to your question.' });
-    return;
-  }
+
 
   try {
     const { rows: users } = await query(
@@ -336,8 +333,11 @@ router.post('/', authMiddleware, async (req, res, next) => {
 
     const author = authorFromUser(user);
     const tagList = Array.isArray(tags) ? tags.filter(Boolean) : ['WCAG 2.2'];
-    const excerpt =
-      trimmedBody.length > 160 ? `${trimmedBody.slice(0, 157).trim()}…` : trimmedBody;
+    const excerpt = trimmedBody
+      ? trimmedBody.length > 160
+        ? `${trimmedBody.slice(0, 157).trim()}…`
+        : trimmedBody
+      : "";
 
     const inserted = await query(
       `INSERT INTO posts (
