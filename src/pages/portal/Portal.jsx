@@ -50,7 +50,7 @@ function fmtMonth(dateStr) {
   if (!dateStr) return "";
   return (
     MONTH_ABBRS[
-      new Date(String(dateStr).slice(0, 10) + "T00:00:00Z").getUTCMonth()
+    new Date(String(dateStr).slice(0, 10) + "T00:00:00Z").getUTCMonth()
     ] ?? ""
   );
 }
@@ -248,7 +248,7 @@ export default function Portal({
   const [query, setQuery] = useState("");
   const [topicFilter, setTopicFilter] = useState(null);
   const [draftQuestion, setDraftQuestion] = useState("");
-  const [draftTags, setDraftTags] = useState(["WCAG 2.2"]);
+  const [draftTags, setDraftTags] = useState([]);
   const [postError, setPostError] = useState("");
   const [posting, setPosting] = useState(false);
   const askBoxRef = useRef(null);
@@ -374,6 +374,11 @@ export default function Portal({
       askTextareaRef.current?.focus();
       return;
     }
+    if (!draftTags.length || !draftTags[0]) {
+  setPostError("Please select a topic.");
+  return;
+}
+
 
     if (!isAuthenticated) {
       navigate("/sign-in", { state: { from: "/" } });
@@ -395,7 +400,7 @@ export default function Portal({
 
       setPosts((prevPosts) => [newPost, ...prevPosts]);
       setDraftQuestion("");
-      setDraftTags(["WCAG 2.2"]);
+      setDraftTags([]);
       setQuery("");
       setActiveTab("new");
       addToast("Discussion posted successfully!", "success");
@@ -467,7 +472,7 @@ export default function Portal({
           );
         }
       })
-      .catch(() => {});
+      .catch(() => { });
   }, []);
 
   const goToEvent = (id) => {
@@ -508,10 +513,10 @@ export default function Portal({
         style={
           portalConfig.bgUrl
             ? {
-                backgroundImage: `url(${portalConfig.bgUrl})`,
-                backgroundSize: "cover",
-                backgroundPosition: "center",
-              }
+              backgroundImage: `url(${portalConfig.bgUrl})`,
+              backgroundSize: "cover",
+              backgroundPosition: "center",
+            }
             : undefined
         }
       >
@@ -610,6 +615,7 @@ export default function Portal({
         <main className={styles.feed}>
           <div className={styles.askBox} ref={askBoxRef}>
             <p className={styles.askLabel}>Ask the community</p>
+
             <textarea
               className={styles.askTextarea}
               ref={askTextareaRef}
@@ -633,10 +639,14 @@ export default function Portal({
                 <select
                   id="ask-topic"
                   className={styles.topicSelect}
-                  value={draftTags[0] || portalConfig.askTopics?.[0]}
+                  value={draftTags[0] || ""}
                   onChange={(e) => setDraftTags([e.target.value])}
                   disabled={posting}
                 >
+                  <option value="">
+                    Select Topic
+                  </option>
+
                   {(portalConfig.askTopics || []).map((topic) => (
                     <option key={topic} value={topic}>
                       {topic}
