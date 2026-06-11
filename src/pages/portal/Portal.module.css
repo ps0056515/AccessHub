@@ -391,8 +391,10 @@
   outline: none;
   border-color: var(--accent);
 }
+.askTitleInput::placeholder,
 .askTextarea::placeholder {
   color: var(--text-faint);
+  opacity: 1;
 }
 .communityHint {
   font-size: 12px;
@@ -400,15 +402,12 @@
   font-weight: 500;
   margin-bottom: 12px;
 }
-
 .askFooter {
   display: flex;
   justify-content: space-between;
   align-items: flex-end;
   gap: 16px;
-  margin-top: 10px;
 }
-
 .topicPicker {
   display: flex;
   flex-direction: column;
@@ -933,4 +932,33 @@
   .postCard {
     padding: 14px 16px;
   }
+}
+.askTitleInput {
+  width: 100%;
+  height: 44px;
+  padding: 0 14px;
+  margin-bottom: 12px;
+
+  border: 1px solid #d0d7de;
+  border-radius: 8px;
+
+  background: #fff;
+  color: #24292f;
+
+  font-size: 14px;
+  font-family: inherit;
+}
+
+.askTitleInput:focus {
+  outline: none;
+  border-color: #245FA9;
+  box-shadow: 0 0 0 3px rgba(36,95,169,0.15);
+}
+.fieldLabel {
+  display: block;
+  margin-bottom: 6px;
+
+  font-size: 13px;
+  font-weight: 600;
+  color: #344054;
 }

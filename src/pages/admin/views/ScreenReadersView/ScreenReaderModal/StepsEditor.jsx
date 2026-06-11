@@ -1,4 +1,15 @@
 import styles from './ScreenReaderModal.module.css';
+import ReactQuill from "react-quill";
+import "react-quill/dist/quill.snow.css";
+const quillModules = {
+  toolbar: [
+    [{ header: [1, 2, false] }],
+    ["bold", "italic", "underline"],
+    [{ list: "ordered" }, { list: "bullet" }],
+    ["link"],
+    ["clean"],
+  ],
+};
 
 export default function StepsEditor({ items, onChange }) {
   const handleChange = (index, field, value) => {
@@ -15,26 +26,32 @@ export default function StepsEditor({ items, onChange }) {
     onChange(items.filter((_, i) => i !== index));
   };
 
+
   return (
     <div className={styles.nestedList}>
       {items.map((step, index) => (
         <div key={index} className={styles.nestedItem}>
           <div className={styles.nestedItemContent}>
-            <input 
-              type="text" 
-              className={styles.input} 
-              value={step.title || ''} 
+            <input
+              type="text"
+              className={styles.input}
+              value={step.title || ''}
               onChange={e => handleChange(index, 'title', e.target.value)}
               placeholder={`Step ${index + 1} Title`}
               required
             />
-            <textarea 
-              className={styles.textarea} 
-              value={step.desc || ''} 
-              onChange={e => handleChange(index, 'desc', e.target.value)}
-              placeholder="Step Description"
-              required
-            />
+            <div className={styles.editorWrapper}>
+              <ReactQuill
+                theme="snow"
+                value={step.desc || ""}
+                onChange={(value, delta, source) => {
+                  if (source === "user") {
+                    handleChange(index, "desc", value);
+                  }
+                }}
+                modules={quillModules}
+              />
+            </div>
           </div>
           <button type="button" onClick={() => handleRemove(index)} className={styles.removeBtn} title="Remove Step">
             ✕
