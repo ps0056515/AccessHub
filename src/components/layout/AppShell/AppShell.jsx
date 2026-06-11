@@ -35,6 +35,7 @@ import AboutUs from "pages/footer-pages/AboutUs";
 import { SITE_NAME } from "brand";
 import { postsApi } from "api/client";
 import { useAriaLive } from "context/AriaLiveContext";
+import { useAuth } from "context/AuthContext";
 
 const FOOTER_PAGE_TITLES = {
   "/news": `News · ${SITE_NAME}`,
@@ -80,6 +81,7 @@ export default function AppShell() {
   const navigate = useNavigate();
   const location = useLocation();
   const { announce } = useAriaLive();
+  const { user } = useAuth();
   const [activePage, setActivePageState] = useState("portal");
   const [posts, setPosts] = useState([]);
   const [postsLoading, setPostsLoading] = useState(true);
@@ -100,7 +102,7 @@ export default function AppShell() {
 
   useEffect(() => {
     loadPosts();
-  }, [loadPosts]);
+  }, [loadPosts, user?.id]);
 
   const isThreadRoute = location.pathname.startsWith("/thread/");
   const isProfileRoute = location.pathname.startsWith("/profile/");

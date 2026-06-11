@@ -5,9 +5,6 @@ import { TAG_COLORS, COLOR_MAP } from "data";
 import {
   postsApi,
   eventsApi,
-  getVoterKey,
-  getStoredVote,
-  setStoredVote,
 } from "api/client";
 import { voteDelta } from "utils/voteDelta";
 import { useAuth } from "context/AuthContext";
@@ -120,13 +117,14 @@ function Tag({ label }) {
 
 function PostCard({ post, isAuthenticated, navigate, onOpenThread, onVotesChange }) {
   const [votes, setVotes] = useState(post.votes);
-  const [voted, setVoted] = useState(() => getStoredVote(post.id));
+  const [voted, setVoted] = useState(post.userVote || null);
   const [voting, setVoting] = useState(false);
   const [voteError, setVoteError] = useState("");
 
   useEffect(() => {
     setVotes(post.votes);
-  }, [post.votes]);
+    setVoted(post.userVote || null);
+  }, [post.votes, post.userVote]);
 
   const vote = async (dir, e) => {
     e.stopPropagation();
@@ -149,12 +147,10 @@ function PostCard({ post, isAuthenticated, navigate, onOpenThread, onVotesChange
     try {
       const { votes: newVotes, userVote } = await postsApi.vote(post.id, {
         direction: dir,
-        voterKey: getVoterKey(),
       });
       setVotes(newVotes);
       setVoted(userVote);
-      setStoredVote(post.id, userVote);
-      onVotesChange?.(post.id, newVotes);
+      onVotesChange?.(post.id, newVotes, userVote);
     } catch (err) {
       setVotes(prevVotes);
       setVoted(prevVoted);
@@ -354,9 +350,9 @@ export default function Portal({
     searchInputRef.current?.focus();
   };
 
-  const handleVotesChange = (postId, newVotes) => {
+  const handleVotesChange = (postId, newVotes, userVote) => {
     setPosts((prev) =>
-      prev.map((p) => (p.id === postId ? { ...p, votes: newVotes } : p)),
+      prev.map((p) => (p.id === postId ? { ...p, votes: newVotes, userVote } : p)),
     );
   };
 

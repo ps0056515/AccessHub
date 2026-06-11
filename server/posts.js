@@ -36,10 +36,15 @@ function parseTags(raw) {
 
 function formatPost(row, replyCount) {
   const tags = parseTags(row.tags);
+  let userVote = null;
+  if (row.user_vote_direction === 1) userVote = 'up';
+  if (row.user_vote_direction === -1) userVote = 'down';
+
   return {
     id: row.id,
     userId: row.user_id,
     votes: row.votes,
+    userVote,
     initials: row.author_initials,
     color: row.author_color,
     author: row.author_name,
@@ -63,6 +68,7 @@ function formatComment(row) {
     initials: row.author_initials,
     color: row.author_color,
     time: relativeTime(row.created_at),
+    raw_time: row.created_at,
     body: row.body,
   };
 }
