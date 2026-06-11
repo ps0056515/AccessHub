@@ -88,7 +88,7 @@ export default function ScreenReaderDetail() {
                     <span className={styles.stepNum} aria-hidden="true">{i + 1}</span>
                     <div>
                       <h3 className={styles.stepTitle}>{s.title}</h3>
-                      <p className={styles.stepDesc}>{s.desc}</p>
+                      <div className={styles.stepDesc} dangerouslySetInnerHTML={{ __html: s.desc }} />
                     </div>
                   </li>
                 ))}

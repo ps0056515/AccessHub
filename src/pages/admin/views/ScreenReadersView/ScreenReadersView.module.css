@@ -108,3 +108,19 @@
   background: #dcfce7;
   color: #15803d;
 }
+
+.editorWrapper {
+  margin-top: 8px;
+}
+
+.editorWrapper :global(.ql-editor) {
+  min-height: 120px;
+}
+
+.editorWrapper :global(.ql-toolbar) {
+  border-radius: 6px 6px 0 0;
+}
+
+.editorWrapper :global(.ql-container) {
+  border-radius: 0 0 6px 6px;
+}
