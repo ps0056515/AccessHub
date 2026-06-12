@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { SITE_NAME } from 'brand';
+import styles from './Contribute.module.css';
 
 const GUIDELINES = [
   {
@@ -51,30 +52,25 @@ export default function Contribute() {
   };
 
   return (
-    <div style={{ padding: '40px 24px', maxWidth: '800px', margin: '0 auto' }}>
+    <div className={styles.container}>
       <h1>Contribute</h1>
-      <p style={{ lineHeight: 1.7, color: 'var(--text-muted)' }}>
+      <p className={styles.intro}>
         {SITE_NAME} is built by practitioners sharing knowledge. Here is how to contribute
         discussions, guides, and feedback to the community.
       </p>
 
-      <section style={{ marginTop: '2.5rem' }} aria-labelledby="guidelines-heading">
-        <h2 id="guidelines-heading" style={{ fontSize: '1.25rem', marginBottom: '1rem' }}>
+      <section className={styles.section} aria-labelledby="guidelines-heading">
+        <h2 id="guidelines-heading" className={styles.sectionTitle}>
           Contribution guidelines
         </h2>
-        <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'grid', gap: '1rem' }}>
+        <ul className={styles.list}>
           {GUIDELINES.map((item) => (
             <li
               key={item.title}
-              style={{
-                padding: '1rem',
-                border: '1px solid var(--border)',
-                borderRadius: '8px',
-                background: 'var(--bg-card, #fff)',
-              }}
+              className={styles.card}
             >
               <strong>{item.title}</strong>
-              <p style={{ margin: '0.5rem 0 0', lineHeight: 1.65, color: 'var(--text-muted)' }}>
+              <p className={styles.cardBody}>
                 {item.body}
               </p>
             </li>
@@ -82,40 +78,36 @@ export default function Contribute() {
         </ul>
       </section>
 
-      <section style={{ marginTop: '2.5rem' }} aria-labelledby="workflow-heading">
-        <h2 id="workflow-heading" style={{ fontSize: '1.25rem', marginBottom: '1rem' }}>
+      <section className={styles.section} aria-labelledby="workflow-heading">
+        <h2 id="workflow-heading" className={styles.sectionTitle}>
           Contribution workflow
         </h2>
-        <ol style={{ listStyle: 'none', padding: 0, margin: 0, display: 'grid', gap: '1rem' }}>
+        <ol className={styles.list}>
           {WORKFLOW.map((item) => (
             <li
               key={item.step}
-              style={{
-                padding: '1rem',
-                border: '1px solid var(--border)',
-                borderRadius: '8px',
-              }}
+              className={styles.workflowCard}
             >
-              <p style={{ margin: 0, fontWeight: 600 }}>
+              <p className={styles.cardTitle}>
                 {item.step}. {item.title}
               </p>
-              <p style={{ margin: '0.5rem 0 0', lineHeight: 1.65, color: 'var(--text-muted)' }}>
+              <p className={styles.cardBody}>
                 {item.body}
               </p>
               {item.cta && (
-                <p style={{ margin: '0.75rem 0 0' }}>
+                <p className={styles.cardAction}>
                   {item.cta.action === 'ask' ? (
                     <Link
                       to={item.cta.to}
                       onClick={queueStartDiscussion}
-                      style={{ color: 'var(--accent, #074a9e)', fontWeight: 500 }}
+                      className={styles.link}
                     >
                       {item.cta.label} →
                     </Link>
                   ) : (
                     <Link
                       to={item.cta.to}
-                      style={{ color: 'var(--accent, #074a9e)', fontWeight: 500 }}
+                      className={styles.link}
                     >
                       {item.cta.label} →
                     </Link>
@@ -127,11 +119,11 @@ export default function Contribute() {
         </ol>
       </section>
 
-      <section style={{ marginTop: '2.5rem' }} aria-labelledby="other-ways-heading">
-        <h2 id="other-ways-heading" style={{ fontSize: '1.25rem', marginBottom: '1rem' }}>
+      <section className={styles.section} aria-labelledby="other-ways-heading">
+        <h2 id="other-ways-heading" className={styles.sectionTitle}>
           Other ways to help
         </h2>
-        <ul style={{ lineHeight: 1.8 }}>
+        <ul className={styles.otherWaysList}>
           <li>
             <Link to="/events">Suggest an event or workshop</Link> the community should know about.
           </li>

@@ -468,6 +468,43 @@ router.post('/:id/vote', authMiddleware, async (req, res, next) => {
   }
 });
 
+router.post('/:id/view', authMiddleware, async (req, res, next) => {
+  const id = Number(req.params.id);
+  if (!Number.isFinite(id)) {
+    return res.status(400).json({ error: 'Invalid post id.' });
+  }
+
+  try {
+    const { rows: posts } = await query('SELECT id FROM posts WHERE id = $1', [id]);
+    if (posts.length === 0) {
+      return res.status(404).json({ error: 'Discussion not found.' });
+    }
+
+    await query(
+      `INSERT INTO user_recently_viewed (user_id, post_id, viewed_at)
+       VALUES ($1, $2, NOW())
+       ON CONFLICT (user_id, post_id) DO UPDATE SET viewed_at = NOW()`,
+      [req.userId, id]
+    );
+
+    await query(
+      `DELETE FROM user_recently_viewed
+       WHERE user_id = $1
+       AND post_id NOT IN (
+         SELECT post_id FROM user_recently_viewed
+         WHERE user_id = $1
+         ORDER BY viewed_at DESC
+         LIMIT 10
+       )`,
+      [req.userId]
+    );
+
+    res.json({ ok: true });
+  } catch (err) {
+    next(err);
+  }
+});
+
 router.post('/:id/comments', authMiddleware, async (req, res, next) => {
   const id = Number(req.params.id);
   const { body } = req.body || {};

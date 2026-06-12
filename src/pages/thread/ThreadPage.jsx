@@ -6,6 +6,7 @@ import { voteDelta } from 'utils/voteDelta';
 import { useAuth } from 'context/AuthContext';
 import { useConfirm } from 'context/ConfirmContext';
 import { useToast } from 'context/ToastContext';
+import RelativeTime from 'components/common/RelativeTime/RelativeTime';
 import styles from './ThreadPage.module.css';
 import { SITE_NAME } from 'brand';
 
@@ -87,6 +88,9 @@ export default function ThreadPage({ posts, setPosts, refreshPosts, returnToComm
         const { post: data, comments: threadComments } = await postsApi.get(id);
         if (!cancelled) {
           setPost(data);
+          if (isAuthenticated) {
+            postsApi.markViewed(id).catch(() => {});
+          }
           setComments(threadComments);
           setVotes(data.votes);
           setVoted(data.userVote || null);
@@ -299,7 +303,7 @@ export default function ThreadPage({ posts, setPosts, refreshPosts, returnToComm
             <p className={styles.meta}>
               <span className={styles.author}>{post.author}</span>
               <span className={styles.dot}>·</span>
-              <span>{post.time}</span>
+              <RelativeTime rawTime={post.raw_time} fallback={post.time} />
               <span className={styles.dot}>·</span>
               <span>{post.replies} replies</span>
             </p>
@@ -373,7 +377,7 @@ export default function ThreadPage({ posts, setPosts, refreshPosts, returnToComm
                 <p className={styles.replyMeta}>
                   <span className={styles.author}>{c.author}</span>
                   <span className={styles.dot}>·</span>
-                  <span>{c.time}</span>
+                  <RelativeTime rawTime={c.raw_time} fallback={c.time} />
                 </p>
                 <p className={styles.replyText}>{c.body}</p>
               </div>
