@@ -335,6 +335,15 @@ export default function AppShell() {
           <Route path="/blog/:id" element={<BlogDetail />} />
           <Route path="/en-301-549" element={<En301549 />} />
           <Route path="/about-us" element={<AboutUs />} />
+          <Route
+            path="/join"
+            element={
+              <JoinCommunityPage
+                goToPortal={goToPortal}
+                goToSection={goToSection}
+              />
+            }
+          />
           <Route element={<RequireAuth />}>
             <Route
               path="/thread/:postId"
@@ -347,15 +356,7 @@ export default function AppShell() {
                 />
               }
             />
-            <Route
-              path="/join"
-              element={
-                <JoinCommunityPage
-                  goToPortal={goToPortal}
-                  goToSection={goToSection}
-                />
-              }
-            />
+
             <Route
               path="/complete-profile"
               element={<CompleteProfilePage goToPortal={goToPortal} />}

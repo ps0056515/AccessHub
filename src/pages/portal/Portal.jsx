@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, useMemo } from "react";
 import { flushSync } from "react-dom";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { TAG_COLORS, COLOR_MAP } from "data";
 import { postsApi, eventsApi } from "api/client";
 import { voteDelta } from "utils/voteDelta";
@@ -10,6 +10,8 @@ import { useToast } from "context/ToastContext";
 import { useAriaLive } from "context/AriaLiveContext";
 import Container from "components/common/Container/Container";
 import Pagination from "components/common/Pagination/Pagination";
+import RelativeTime from "components/common/RelativeTime/RelativeTime";
+import { usersApi } from "api/client";
 import styles from "./Portal.module.css";
 
 const TOPIC_FILTERS = ["WCAG 2.2", "Screen readers", "Legal"];
@@ -209,7 +211,7 @@ function PostCard({
           <div className={styles.postMeta}>
             <span className={styles.postAuthor}>{post.author}</span>
             <span className={styles.postDot}>·</span>
-            <span>{post.time}</span>
+            <RelativeTime rawTime={post.raw_time} fallback={post.time} />
             <span className={styles.postDot}>·</span>
             <span>{post.replies} replies</span>
           </div>
@@ -245,7 +247,19 @@ export default function Portal({
   const postsPerPage = 10;
   const [query, setQuery] = useState("");
   const [topicFilter, setTopicFilter] = useState(null);
+  const [recentViews, setRecentViews] = useState([]);
   const [draftQuestion, setDraftQuestion] = useState("");
+
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      usersApi.getRecentlyViewed()
+        .then((res) => setRecentViews(res.recentPosts || []))
+        .catch(() => setRecentViews([]));
+    } else {
+      setRecentViews([]);
+    }
+  }, [isAuthenticated]);
   const [draftTitle, setDraftTitle] = useState("");
   const [draftTags, setDraftTags] = useState([""]);
   const [postError, setPostError] = useState("");
@@ -752,11 +766,12 @@ export default function Portal({
             ))}
           </div>
 
-          <div
-            className={styles.postsContainer}
-            role="tabpanel"
-            aria-label={`${activeTab} discussions`}
-          >
+          <div className={styles.postsWrapper}>
+            <div
+              className={styles.postsContainer}
+              role="tabpanel"
+              aria-label={`${activeTab} discussions`}
+            >
             {postsLoading ? (
               <p className={styles.empty}>Loading discussions…</p>
             ) : postsError ? (
@@ -790,6 +805,7 @@ export default function Portal({
                 />
               ))
             )}
+            </div>
           </div>
           {totalPages > 1 && (
             <div style={{ display: "flex", justifyContent: "flex-end" }}>
@@ -803,6 +819,26 @@ export default function Portal({
         </main>
 
         <aside className={styles.sidebar} aria-label="Community sidebar">
+          <section className={styles.sideSection} aria-labelledby="recent-views-heading">
+            <h2 id="recent-views-heading" className={styles.sideTitle}>Recently viewed</h2>
+            {recentViews.length > 0 ? (
+              <ul className={styles.recentList}>
+                {recentViews.map(rp => (
+                  <li key={rp.id} className={styles.recentItem}>
+                    <Link to={`/thread/${rp.id}`} className={styles.recentLink}>
+                      <span className={styles.recentTitle}>{rp.title}</span>
+                      <span className={styles.recentMeta}>
+                        <RelativeTime rawTime={rp.viewedAt} fallback="Just now" />
+                      </span>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className={styles.recentEmpty}>Your viewing history will appear here.</p>
+            )}
+          </section>
+
           <section
             className={styles.sideSection}
             aria-labelledby="events-heading"
