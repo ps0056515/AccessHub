@@ -930,13 +930,21 @@
   color: var(--text);
   margin-bottom: 8px;
 }
-
 .checkerInput:focus {
   outline: none;
   border-color: var(--accent);
 }
 .checkerInput::placeholder {
   color: var(--text-faint);
+}
+
+.checkerError {
+  display: block;
+  color: var(--red-text);
+  font-size: 12px;
+  margin-top: -4px;
+  margin-bottom: 8px;
+  text-align: left;
 }
 
 .checkerBtn {
