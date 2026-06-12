@@ -11,6 +11,8 @@ const { verifyGoogleToken } = require('../google');
 const { generateResetToken, hashResetToken, resetExpiresAt } = require('../passwordReset');
 const { sendPasswordResetEmail, sendOtpEmail, buildResetUrl } = require('../email');
 const crypto = require('crypto');
+const fs = require('fs');
+const path = require('path');
 
 function generateOtp() {
   return crypto.randomInt(100000, 999999).toString();
@@ -20,7 +22,7 @@ const router = express.Router();
 const GENERIC_RESET_MESSAGE =
   'If an account exists for that email, we sent password reset instructions.';
 const USER_RETURNING =
-  'id, email, password_hash, display_name, google_id, country, city, company, designation, role, bio, is_admin, is_blocked, created_at, is_verified, otp_hash, otp_expires_at';
+  'id, email, password_hash, display_name, google_id, country, city, company, designation, role, bio, avatar_url, is_admin, is_blocked, created_at, is_verified, otp_hash, otp_expires_at';
 const USER_SELECT = `SELECT ${USER_RETURNING} FROM users`;
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -307,6 +309,75 @@ router.patch('/profile', authMiddleware, async (req, res, next) => {
     }
 
     res.json({ user: publicUser(user) });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// POST /api/auth/avatar — Upload profile photo (base64 data URI)
+router.post('/avatar', authMiddleware, async (req, res, next) => {
+  const { data } = req.body || {};
+  if (!data) {
+    return res.status(400).json({ error: 'Image data is required.' });
+  }
+
+  const match = data.match(/^data:image\/(png|jpe?g|webp|gif);base64,(.+)$/);
+  if (!match) {
+    return res.status(400).json({ error: 'Invalid image format. Use PNG, JPEG, WebP, or GIF.' });
+  }
+
+  const ext = match[1] === 'jpeg' ? 'jpg' : match[1];
+  const base64Data = match[2];
+  const buffer = Buffer.from(base64Data, 'base64');
+
+  if (buffer.length > 2 * 1024 * 1024) {
+    return res.status(400).json({ error: 'Image must be smaller than 2 MB.' });
+  }
+
+  try {
+    const avatarsDir = path.join(__dirname, '..', 'uploads', 'avatars');
+    if (!fs.existsSync(avatarsDir)) {
+      fs.mkdirSync(avatarsDir, { recursive: true });
+    }
+
+    // Delete old avatar file if it exists
+    const { rows: oldRows } = await query('SELECT avatar_url FROM users WHERE id = $1', [req.userId]);
+    if (oldRows[0]?.avatar_url?.startsWith('/api/uploads/')) {
+      const oldFile = path.join(__dirname, '..', 'uploads', path.basename(oldRows[0].avatar_url.replace('/api/uploads/avatars/', '')));
+      const oldAvatarFile = path.join(avatarsDir, path.basename(oldRows[0].avatar_url));
+      try { if (fs.existsSync(oldAvatarFile)) fs.unlinkSync(oldAvatarFile); } catch { /* ignore */ }
+    }
+
+    const filename = `avatar_${req.userId}_${Date.now()}.${ext}`;
+    const filePath = path.join(avatarsDir, filename);
+    fs.writeFileSync(filePath, buffer);
+
+    const avatarUrl = `/api/uploads/avatars/${filename}`;
+    await query('UPDATE users SET avatar_url = $1, updated_at = NOW() WHERE id = $2', [avatarUrl, req.userId]);
+
+    const { rows } = await query(`${USER_SELECT} WHERE id = $1`, [req.userId]);
+    res.json({ user: publicUser(rows[0]) });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// DELETE /api/auth/avatar — Remove profile photo
+router.delete('/avatar', authMiddleware, async (req, res, next) => {
+  try {
+    const { rows: oldRows } = await query('SELECT avatar_url FROM users WHERE id = $1', [req.userId]);
+    const oldUrl = oldRows[0]?.avatar_url;
+
+    if (oldUrl?.startsWith('/api/uploads/avatars/')) {
+      const avatarsDir = path.join(__dirname, '..', 'uploads', 'avatars');
+      const oldFile = path.join(avatarsDir, path.basename(oldUrl));
+      try { if (fs.existsSync(oldFile)) fs.unlinkSync(oldFile); } catch { /* ignore */ }
+    }
+
+    await query("UPDATE users SET avatar_url = '', updated_at = NOW() WHERE id = $1", [req.userId]);
+
+    const { rows } = await query(`${USER_SELECT} WHERE id = $1`, [req.userId]);
+    res.json({ user: publicUser(rows[0]) });
   } catch (err) {
     next(err);
   }

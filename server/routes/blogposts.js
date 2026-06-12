@@ -2,8 +2,8 @@ const express = require("express");
 const fs = require("fs");
 const path = require("path");
 const { pool, query } = require("../db");
-const { authMiddleware, adminMiddleware } = require("../auth");
-
+const { authMiddleware, adminMiddleware, optionalAuthMiddleware } = require("../auth");
+const { authorFromUser } = require("../posts");
 const router = express.Router();
 
 function deleteLocalImage(imageUrl) {
@@ -24,7 +24,7 @@ function deleteLocalImage(imageUrl) {
 router.get("/", async (req, res, next) => {
   try {
     const result = await query(
-      "SELECT id, title, author, cover_image, is_published, published_date, created_at, updated_at FROM blogposts WHERE is_published = true ORDER BY published_date DESC",
+      "SELECT id, title, author, cover_image, is_published, published_date, created_at, updated_at, votes FROM blogposts WHERE is_published = true ORDER BY published_date DESC",
     );
     res.json({ blogposts: result.rows });
   } catch (err) {
@@ -40,7 +40,7 @@ router.get(
   async (req, res, next) => {
     try {
       const result = await query(
-        "SELECT id, title, author, cover_image, is_published, published_date, created_at, updated_at FROM blogposts ORDER BY published_date DESC",
+        "SELECT id, title, author, cover_image, is_published, published_date, created_at, updated_at, votes FROM blogposts ORDER BY published_date DESC",
       );
       res.json({ blogposts: result.rows });
     } catch (err) {
@@ -71,17 +71,141 @@ router.get(
 );
 
 // GET /api/blogposts/:id - Get a specific blogpost by ID (Public)
-router.get("/:id", async (req, res, next) => {
+router.get("/:id", optionalAuthMiddleware, async (req, res, next) => {
   try {
     const result = await query(
       "SELECT * FROM blogposts WHERE id = $1 AND is_published = true",
       [req.params.id],
     );
     if (result.rows.length === 0) {
-      res.status(404).json({ error: "blogpost not found." });
+      res.status(404).json({ error: "Blogpost not found." });
       return;
     }
-    res.json({ blogpost: result.rows[0] });
+
+    const blogpost = result.rows[0];
+    let userVote = 0;
+
+    if (req.userId) {
+      const voteResult = await query(
+        "SELECT direction FROM blogpost_votes WHERE blogpost_id = $1 AND user_id = $2",
+        [blogpost.id, req.userId]
+      );
+      if (voteResult.rows.length > 0) {
+        userVote = voteResult.rows[0].direction;
+      }
+    }
+
+    res.json({ blogpost, userVote });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// GET /api/blogposts/:id/comments - Get comments for a blogpost
+router.get("/:id/comments", async (req, res, next) => {
+  try {
+    const { rows } = await query(
+      "SELECT * FROM blogpost_comments WHERE blogpost_id = $1 ORDER BY created_at DESC",
+      [req.params.id]
+    );
+    res.json({ comments: rows });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// POST /api/blogposts/:id/comments - Add a comment to a blogpost
+router.post("/:id/comments", authMiddleware, async (req, res, next) => {
+  const { body } = req.body || {};
+  if (!body || !body.trim()) {
+    return res.status(400).json({ error: 'Comment body is required.' });
+  }
+  try {
+    // Get user info
+    const userRes = await query("SELECT * FROM users WHERE id = $1", [req.userId]);
+    const user = userRes.rows[0];
+    if (!user) return res.status(404).json({ error: 'User not found.' });
+    
+    const author = authorFromUser(user);
+
+    const { rows } = await query(
+      `INSERT INTO blogpost_comments 
+        (blogpost_id, user_id, author_name, author_initials, author_color, body) 
+       VALUES ($1, $2, $3, $4, $5, $6) 
+       RETURNING *`,
+      [req.params.id, req.userId, author.author_name, author.author_initials, author.author_color, body.trim()]
+    );
+    res.status(201).json({ comment: rows[0] });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// POST /api/blogposts/:id/vote - Upvote/Downvote a blogpost
+router.post("/:id/vote", authMiddleware, async (req, res, next) => {
+  const { direction } = req.body;
+  if (![1, -1].includes(direction)) {
+    return res.status(400).json({ error: 'Invalid vote direction.' });
+  }
+  
+  const blogpostId = req.params.id;
+  
+  try {
+    // Check if blogpost exists
+    const check = await query("SELECT id FROM blogposts WHERE id = $1", [blogpostId]);
+    if (check.rows.length === 0) {
+      return res.status(404).json({ error: 'Blogpost not found.' });
+    }
+
+    const { rows: existing } = await query(
+      'SELECT direction FROM blogpost_votes WHERE blogpost_id = $1 AND user_id = $2',
+      [blogpostId, req.userId]
+    );
+
+    if (existing.length === 0) {
+      // Insert new vote
+      await query(
+        'INSERT INTO blogpost_votes (blogpost_id, user_id, direction) VALUES ($1, $2, $3)',
+        [blogpostId, req.userId, direction]
+      );
+    } else {
+      const currentDir = existing[0].direction;
+      if (currentDir === direction) {
+        // Toggle off
+        await query(
+          'DELETE FROM blogpost_votes WHERE blogpost_id = $1 AND user_id = $2',
+          [blogpostId, req.userId]
+        );
+      } else {
+        // Update direction
+        await query(
+          'UPDATE blogpost_votes SET direction = $1 WHERE blogpost_id = $2 AND user_id = $3',
+          [direction, blogpostId, req.userId]
+        );
+      }
+    }
+
+    // Recalculate total votes
+    const sumRes = await query(
+      'SELECT COALESCE(SUM(direction), 0) AS total FROM blogpost_votes WHERE blogpost_id = $1',
+      [blogpostId]
+    );
+    const newTotal = parseInt(sumRes.rows[0].total, 10);
+
+    // Update blogposts table
+    await query('UPDATE blogposts SET votes = $1 WHERE id = $2', [newTotal, blogpostId]);
+
+    // Get current user vote to return
+    let userVote = 0;
+    const finalVoteRes = await query(
+      'SELECT direction FROM blogpost_votes WHERE blogpost_id = $1 AND user_id = $2',
+      [blogpostId, req.userId]
+    );
+    if (finalVoteRes.rows.length > 0) {
+      userVote = finalVoteRes.rows[0].direction;
+    }
+
+    res.json({ votes: newTotal, userVote });
   } catch (err) {
     next(err);
   }

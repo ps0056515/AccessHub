@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, Link } from 'react-router-dom';
 import { TAG_COLORS, COLOR_MAP } from 'data';
 import { postsApi } from 'api/client';
 import { voteDelta } from 'utils/voteDelta';
@@ -298,10 +298,22 @@ export default function ThreadPage({ posts, setPosts, refreshPosts, returnToComm
               </p>
             ) : null}
           </div>
-          <Avatar initials={post.initials} color={post.color} size={44} />
+          <Link 
+            to={`/profile/${post.userId}`} 
+            aria-label={`View ${post.author}'s profile`}
+            style={{ textDecoration: 'none', display: 'flex' }}
+          >
+            <Avatar initials={post.initials} color={post.color} size={44} />
+          </Link>
           <div className={styles.rootBody}>
             <p className={styles.meta}>
-              <span className={styles.author}>{post.author}</span>
+              <Link 
+                to={`/profile/${post.userId}`} 
+                className={styles.author} 
+                style={{ textDecoration: 'none', color: 'inherit' }}
+              >
+                {post.author}
+              </Link>
               <span className={styles.dot}>·</span>
               <RelativeTime rawTime={post.raw_time} fallback={post.time} />
               <span className={styles.dot}>·</span>
@@ -372,10 +384,22 @@ export default function ThreadPage({ posts, setPosts, refreshPosts, returnToComm
         <ol className={styles.replyList}>
           {comments.map(c => (
             <li key={c.id} className={styles.reply}>
-              <Avatar initials={c.initials} color={c.color} size={36} />
+              <Link 
+                to={`/profile/${c.userId}`} 
+                aria-label={`View ${c.author}'s profile`}
+                style={{ textDecoration: 'none', display: 'flex' }}
+              >
+                <Avatar initials={c.initials} color={c.color} size={36} />
+              </Link>
               <div className={styles.replyBody}>
                 <p className={styles.replyMeta}>
-                  <span className={styles.author}>{c.author}</span>
+                  <Link 
+                    to={`/profile/${c.userId}`} 
+                    className={styles.author} 
+                    style={{ textDecoration: 'none', color: 'inherit' }}
+                  >
+                    {c.author}
+                  </Link>
                   <span className={styles.dot}>·</span>
                   <RelativeTime rawTime={c.raw_time} fallback={c.time} />
                 </p>

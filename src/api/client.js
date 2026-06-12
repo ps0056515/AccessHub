@@ -113,6 +113,10 @@ export const authApi = {
       body: JSON.stringify(body),
       suppressUnauthorizedEvent: true,
     }),
+  uploadAvatar: (body) =>
+    api("/api/auth/avatar", { method: "POST", body: JSON.stringify(body) }),
+  removeAvatar: () =>
+    api("/api/auth/avatar", { method: "DELETE" }),
 };
 
 export const adminApi = {
@@ -273,12 +277,23 @@ export const articlesApi = {
     api("/api/articles", { method: "POST", body: JSON.stringify(body) }),
   update: (id, body) =>
     api(`/api/articles/${id}`, { method: "PUT", body: JSON.stringify(body) }),
-  togglePublish: (id, is_published) =>
+  togglePublish: (id, isPublished) =>
     api(`/api/articles/${id}/publish`, {
       method: "PATCH",
-      body: JSON.stringify({ is_published }),
+      body: JSON.stringify({ is_published: isPublished }),
     }),
   delete: (id) => api(`/api/articles/${id}`, { method: "DELETE" }),
+  getComments: (id) => api(`/api/articles/${id}/comments`),
+  addComment: (id, body) =>
+    api(`/api/articles/${id}/comments`, {
+      method: "POST",
+      body: JSON.stringify({ body }),
+    }),
+  vote: (id, direction) =>
+    api(`/api/articles/${id}/vote`, {
+      method: "POST",
+      body: JSON.stringify({ direction }),
+    }),
 };
 
 export const blogpostsApi = {
@@ -295,12 +310,23 @@ export const blogpostsApi = {
     api("/api/blogposts", { method: "POST", body: JSON.stringify(body) }),
   update: (id, body) =>
     api(`/api/blogposts/${id}`, { method: "PUT", body: JSON.stringify(body) }),
-  togglePublish: (id, is_published) =>
+  togglePublish: (id, isPublished) =>
     api(`/api/blogposts/${id}/publish`, {
       method: "PATCH",
-      body: JSON.stringify({ is_published }),
+      body: JSON.stringify({ is_published: isPublished }),
     }),
   delete: (id) => api(`/api/blogposts/${id}`, { method: "DELETE" }),
+  getComments: (id) => api(`/api/blogposts/${id}/comments`),
+  addComment: (id, body) =>
+    api(`/api/blogposts/${id}/comments`, {
+      method: "POST",
+      body: JSON.stringify({ body }),
+    }),
+  vote: (id, direction) =>
+    api(`/api/blogposts/${id}/vote`, {
+      method: "POST",
+      body: JSON.stringify({ direction }),
+    }),
 };
 
 export const newsApi = {

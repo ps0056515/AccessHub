@@ -1,21 +1,70 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from 'context/AuthContext';
 import { useToast } from 'context/ToastContext';
 import { useAriaLive } from 'context/AriaLiveContext';
 import { Country, City } from 'country-state-city';
 import { COLOR_MAP } from 'data';
+import {
+  Camera, Mail, MapPin, Building2, Calendar, Edit3,
+  Briefcase, User, CheckCircle2, ChevronRight,
+} from 'lucide-react';
 import styles from './MyProfilePage.module.css';
+
+const COMPLETENESS_FIELDS = [
+  { key: 'displayName', label: 'Display name' },
+  { key: 'bio', label: 'Bio' },
+  { key: 'avatarUrl', label: 'Profile photo' },
+  { key: 'company', label: 'Company' },
+  { key: 'designation', label: 'Designation' },
+  { key: 'role', label: 'Role' },
+  { key: 'country', label: 'Country' },
+  { key: 'city', label: 'City' },
+];
+
+function calcCompleteness(user) {
+  if (!user) return { filled: 0, total: COMPLETENESS_FIELDS.length, percent: 0, missing: [] };
+  const missing = [];
+  let filled = 0;
+  for (const f of COMPLETENESS_FIELDS) {
+    if (user[f.key]) filled++;
+    else missing.push(f.label);
+  }
+  return { filled, total: COMPLETENESS_FIELDS.length, percent: Math.round((filled / COMPLETENESS_FIELDS.length) * 100), missing };
+}
+
+function formatDate(dateStr) {
+  if (!dateStr) return '';
+  const d = new Date(dateStr);
+  return d.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+}
+
+function timeSince(dateStr) {
+  if (!dateStr) return '';
+  const d = new Date(dateStr);
+  const now = new Date();
+  const diffMs = now - d;
+  const days = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+  if (days < 30) return `${days} day${days !== 1 ? 's' : ''} ago`;
+  const months = Math.floor(days / 30);
+  if (months < 12) return `${months} month${months !== 1 ? 's' : ''} ago`;
+  const years = Math.floor(months / 12);
+  const rem = months % 12;
+  if (rem === 0) return `${years} year${years !== 1 ? 's' : ''} ago`;
+  return `${years} year${years !== 1 ? 's' : ''}, ${rem} month${rem !== 1 ? 's' : ''} ago`;
+}
 
 export default function MyProfilePage() {
   const navigate = useNavigate();
-  const { user, updateProfile } = useAuth();
+  const { user, updateProfile, uploadAvatar, removeAvatar } = useAuth();
   const { addToast } = useToast();
   const { announce } = useAriaLive();
 
   const [isEditing, setIsEditing] = useState(false);
   const [saving, setSaving] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
+  const [avatarUploading, setAvatarUploading] = useState(false);
+  const fileInputRef = useRef(null);
 
   const [formData, setFormData] = useState({
     displayName: "",
@@ -60,6 +109,61 @@ export default function MyProfilePage() {
     });
   };
 
+  const completeness = useMemo(() => calcCompleteness(user), [user]);
+
+  const handleAvatarSelect = useCallback(async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.match(/^image\/(png|jpe?g|webp|gif)$/)) {
+      addToast('Please select a PNG, JPEG, WebP, or GIF image.', 'error');
+      return;
+    }
+    if (file.size > 2 * 1024 * 1024) {
+      addToast('Image must be smaller than 2 MB.', 'error');
+      return;
+    }
+
+    setAvatarUploading(true);
+    try {
+      const reader = new FileReader();
+      reader.onload = async () => {
+        try {
+          await uploadAvatar(reader.result);
+          addToast('Profile photo updated!', 'success');
+          announce('Profile photo updated');
+        } catch (err) {
+          addToast(err.message || 'Failed to upload photo.', 'error');
+        } finally {
+          setAvatarUploading(false);
+        }
+      };
+      reader.onerror = () => {
+        addToast('Failed to read file.', 'error');
+        setAvatarUploading(false);
+      };
+      reader.readAsDataURL(file);
+    } catch {
+      setAvatarUploading(false);
+    }
+
+    // Reset file input so the same file can be re-selected
+    e.target.value = '';
+  }, [uploadAvatar, addToast, announce]);
+
+  const handleRemoveAvatar = useCallback(async () => {
+    setAvatarUploading(true);
+    try {
+      await removeAvatar();
+      addToast('Profile photo removed.', 'success');
+      announce('Profile photo removed');
+    } catch (err) {
+      addToast(err.message || 'Failed to remove photo.', 'error');
+    } finally {
+      setAvatarUploading(false);
+    }
+  }, [removeAvatar, addToast, announce]);
+
   if (!user) return null;
 
   const handleSave = async (e) => {
@@ -99,7 +203,196 @@ export default function MyProfilePage() {
 
   const colors = COLOR_MAP[user.color] || COLOR_MAP.blue;
   const initial = user.displayName ? user.displayName.charAt(0).toUpperCase() : "?";
+  const hasAvatar = !!user.avatarUrl;
 
+  // Build location string
+  const locationParts = [user.city, user.country].filter(Boolean);
+  const locationStr = locationParts.join(', ');
+
+  // Build company line
+  const companyLine = [user.designation, user.company].filter(Boolean).join(' at ');
+
+  /* ── AVATAR ELEMENT (shared between view and edit modes) ── */
+  const avatarElement = (
+    <div className={styles.avatarWrapper}>
+      <div
+        className={styles.avatar}
+        style={!hasAvatar ? { background: colors.bg, color: colors.text } : undefined}
+        aria-hidden="true"
+      >
+        {hasAvatar ? (
+          <img src={user.avatarUrl} alt="" className={styles.avatarImg} />
+        ) : (
+          initial
+        )}
+      </div>
+      <button
+        type="button"
+        className={styles.avatarOverlay}
+        onClick={() => fileInputRef.current?.click()}
+        disabled={avatarUploading}
+        aria-label="Change profile photo"
+      >
+        <Camera size={20} />
+        <span>{avatarUploading ? 'Uploading...' : 'Change'}</span>
+      </button>
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/png,image/jpeg,image/webp,image/gif"
+        className={styles.avatarHiddenInput}
+        onChange={handleAvatarSelect}
+        aria-label="Upload profile photo"
+      />
+    </div>
+  );
+
+  /* ══════════════════════════════════════════════════════════
+     EDIT MODE
+     ══════════════════════════════════════════════════════════ */
+  if (isEditing) {
+    return (
+      <div className={styles.page}>
+        <nav className={styles.breadcrumb} aria-label="Breadcrumb">
+          <button type="button" className={styles.crumbBtn} onClick={() => navigate("/")}>
+            Community
+          </button>
+          <span aria-hidden="true" className={styles.sep}>/</span>
+          <span className={styles.crumbCurrent}>Edit Profile</span>
+        </nav>
+
+        <div className={`${styles.coverBanner} ${styles.fadeUp}`} />
+
+        <form onSubmit={handleSave} noValidate>
+          <div className={`${styles.editCard} ${styles.fadeUp} ${styles.fadeUp1}`}>
+            <div className={styles.profileHeader}>
+              {avatarElement}
+              <div className={styles.profileHeaderInfo}>
+                {hasAvatar && (
+                  <div className={styles.avatarActions}>
+                    <button
+                      type="button"
+                      className={styles.avatarRemoveBtn}
+                      onClick={handleRemoveAvatar}
+                      disabled={avatarUploading}
+                    >
+                      Remove photo
+                    </button>
+                  </div>
+                )}
+                <h1 className={styles.editTitle}>Edit Profile</h1>
+              </div>
+            </div>
+
+            {errorMsg && <p className={styles.errorMsg} role="alert">{errorMsg}</p>}
+
+            <div className={styles.formGrid}>
+              <div className={styles.formGroup}>
+                <label htmlFor="edit-name" className={styles.formLabel}>Display Name *</label>
+                <input
+                  id="edit-name"
+                  className={styles.formInput}
+                  value={formData.displayName}
+                  onChange={e => setFormData({ ...formData, displayName: e.target.value })}
+                />
+              </div>
+
+              <div className={styles.formGroup}>
+                <label htmlFor="edit-role" className={styles.formLabel}>Role / Job Title</label>
+                <input
+                  id="edit-role"
+                  className={styles.formInput}
+                  value={formData.role}
+                  onChange={e => setFormData({ ...formData, role: e.target.value })}
+                  placeholder="e.g. Accessibility Engineer"
+                />
+              </div>
+
+              <div className={styles.formGroup}>
+                <label htmlFor="edit-company" className={styles.formLabel}>Company</label>
+                <input
+                  id="edit-company"
+                  className={styles.formInput}
+                  value={formData.company}
+                  onChange={e => setFormData({ ...formData, company: e.target.value })}
+                />
+              </div>
+
+              <div className={styles.formGroup}>
+                <label htmlFor="edit-designation" className={styles.formLabel}>Designation</label>
+                <input
+                  id="edit-designation"
+                  className={styles.formInput}
+                  value={formData.designation}
+                  onChange={e => setFormData({ ...formData, designation: e.target.value })}
+                  placeholder="e.g. Senior Engineer"
+                />
+              </div>
+
+              <div className={styles.formGroup}>
+                <label htmlFor="edit-country" className={styles.formLabel}>Country</label>
+                <input
+                  list="edit-country-list"
+                  id="edit-country"
+                  className={styles.formInput}
+                  value={formData.country}
+                  onChange={handleCountryChange}
+                  placeholder="Search or select a country"
+                />
+                <datalist id="edit-country-list">
+                  {countries.map((c) => (
+                    <option key={c.isoCode} value={c.name} />
+                  ))}
+                </datalist>
+              </div>
+
+              <div className={styles.formGroup}>
+                <label htmlFor="edit-city" className={styles.formLabel}>City</label>
+                <input
+                  list="edit-city-list"
+                  id="edit-city"
+                  className={styles.formInput}
+                  value={formData.city}
+                  onChange={e => setFormData({ ...formData, city: e.target.value })}
+                  placeholder={cities.length === 0 && formData.country ? 'No cities available' : 'Search or select a city'}
+                  disabled={!formData.country || cities.length === 0}
+                />
+                <datalist id="edit-city-list">
+                  {cities.map((c, i) => (
+                    <option key={`${c.name}-${i}`} value={c.name} />
+                  ))}
+                </datalist>
+              </div>
+
+              <div className={`${styles.formGroup} ${styles.formGroupFull}`}>
+                <label htmlFor="edit-bio" className={styles.formLabel}>About Me</label>
+                <textarea
+                  id="edit-bio"
+                  className={styles.formTextarea}
+                  value={formData.bio}
+                  onChange={e => setFormData({ ...formData, bio: e.target.value })}
+                  placeholder="Tell the community about yourself, your experience, and interests..."
+                />
+              </div>
+            </div>
+
+            <div className={styles.formActions}>
+              <button type="submit" className={styles.saveBtn} disabled={saving}>
+                {saving ? "Saving..." : "Save changes"}
+              </button>
+              <button type="button" className={styles.cancelBtn} onClick={handleCancel} disabled={saving}>
+                Cancel
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+    );
+  }
+
+  /* ══════════════════════════════════════════════════════════
+     VIEW MODE
+     ══════════════════════════════════════════════════════════ */
   return (
     <div className={styles.page}>
       <nav className={styles.breadcrumb} aria-label="Breadcrumb">
@@ -110,163 +403,150 @@ export default function MyProfilePage() {
         <span className={styles.crumbCurrent}>My Profile</span>
       </nav>
 
-      {isEditing ? (
-        <form onSubmit={handleSave} noValidate>
-          <header className={styles.header}>
-            <div
-              className={styles.avatar}
-              style={{ background: colors.bg, color: colors.text }}
-              aria-hidden="true"
-            >
-              {initial}
-            </div>
-            <div className={styles.headerText} style={{ flex: 1 }}>
-              <h1 className={styles.name}>Edit Profile</h1>
-            </div>
-          </header>
+      {/* Cover banner */}
+      <div className={`${styles.coverBanner} ${styles.fadeUp}`} />
 
-          {errorMsg && <p className={styles.errorMsg} role="alert">{errorMsg}</p>}
+      {/* Profile card */}
+      <div className={`${styles.profileCard} ${styles.fadeUp} ${styles.fadeUp1}`}>
+        <button
+          type="button"
+          className={styles.editBtnTop}
+          onClick={() => setIsEditing(true)}
+        >
+          <Edit3 /> Edit Profile
+        </button>
 
-          <div className={styles.formGroup}>
-            <label htmlFor="edit-name" className={styles.formLabel}>Display Name</label>
-            <input
-              id="edit-name"
-              className={styles.formInput}
-              value={formData.displayName}
-              onChange={e => setFormData({ ...formData, displayName: e.target.value })}
-            />
-          </div>
-
-          <div className={styles.formGroup}>
-            <label htmlFor="edit-role" className={styles.formLabel}>Role / Job Title</label>
-            <input
-              id="edit-role"
-              className={styles.formInput}
-              value={formData.role}
-              onChange={e => setFormData({ ...formData, role: e.target.value })}
-              placeholder="e.g. Accessibility Engineer"
-            />
-          </div>
-
-          <div className={styles.formGroup} style={{ display: 'flex', gap: '12px' }}>
-            <div style={{ flex: 1 }}>
-              <label htmlFor="edit-company" className={styles.formLabel}>Company</label>
-              <input
-                id="edit-company"
-                className={styles.formInput}
-                value={formData.company}
-                onChange={e => setFormData({ ...formData, company: e.target.value })}
-              />
-            </div>
-            <div style={{ flex: 1 }}>
-              <label htmlFor="edit-designation" className={styles.formLabel}>Designation</label>
-              <input
-                id="edit-designation"
-                className={styles.formInput}
-                value={formData.designation}
-                onChange={e => setFormData({ ...formData, designation: e.target.value })}
-                placeholder="e.g. Accessibility Engineer"
-              />
-            </div>
-          </div>
-
-          <div className={styles.formGroup} style={{ display: 'flex', gap: '12px' }}>
-            <div style={{ flex: 1 }}>
-              <label htmlFor="edit-country" className={styles.formLabel}>Country</label>
-              <input
-                list="edit-country-list"
-                id="edit-country"
-                className={styles.formInput}
-                value={formData.country}
-                onChange={handleCountryChange}
-                placeholder="Search or select a country"
-              />
-              <datalist id="edit-country-list">
-                {countries.map((c) => (
-                  <option key={c.isoCode} value={c.name} />
-                ))}
-              </datalist>
-            </div>
-            <div style={{ flex: 1 }}>
-              <label htmlFor="edit-city" className={styles.formLabel}>City</label>
-              <input
-                list="edit-city-list"
-                id="edit-city"
-                className={styles.formInput}
-                value={formData.city}
-                onChange={e => setFormData({ ...formData, city: e.target.value })}
-                placeholder={cities.length === 0 && formData.country ? 'No cities available' : 'Search or select a city'}
-                disabled={!formData.country || cities.length === 0}
-              />
-              <datalist id="edit-city-list">
-                {cities.map((c, i) => (
-                  <option key={`${c.name}-${i}`} value={c.name} />
-                ))}
-              </datalist>
-            </div>
-          </div>
-
-          <div className={styles.formGroup}>
-            <label htmlFor="edit-bio" className={styles.formLabel}>About Me</label>
-            <textarea
-              id="edit-bio"
-              className={styles.formTextarea}
-              value={formData.bio}
-              onChange={e => setFormData({ ...formData, bio: e.target.value })}
-            />
-          </div>
-
-          <div className={styles.formActions}>
-            <button type="submit" className={styles.saveBtn} disabled={saving}>
-              {saving ? "Saving..." : "Save changes"}
-            </button>
-            <button type="button" className={styles.cancelBtn} onClick={handleCancel} disabled={saving}>
-              Cancel
-            </button>
-          </div>
-        </form>
-      ) : (
-        <>
-          <header className={styles.header}>
-            <div
-              className={styles.avatar}
-              style={{ background: colors.bg, color: colors.text }}
-              aria-hidden="true"
-            >
-              {initial}
-            </div>
-            <div className={styles.headerText}>
+        <div className={styles.profileHeader}>
+          {avatarElement}
+          <div className={styles.profileHeaderInfo}>
+            <div className={styles.nameRow}>
               <h1 className={styles.name}>{user.displayName}</h1>
-              {user.role && <p className={styles.role}>{user.role}</p>}
-              {(user.designation || user.company || user.city || user.country) && (
-                <p className={styles.companyLoc}>
-                  {user.designation}{user.designation && user.company ? ' at ' : ''}
-                  {user.company}{((user.designation || user.company) && (user.city || user.country)) ? ' · ' : ''}
-                  {user.city}{user.city && user.country ? ', ' : ''}{user.country}
-                </p>
+              {user.role && <span className={styles.roleBadge}>{user.role}</span>}
+            </div>
+
+            <div className={styles.metaRow}>
+              {user.email && (
+                <span className={styles.metaItem}>
+                  <Mail className={styles.metaIcon} />
+                  {user.email}
+                </span>
+              )}
+              {companyLine && (
+                <span className={styles.metaItem}>
+                  <Building2 className={styles.metaIcon} />
+                  {companyLine}
+                </span>
+              )}
+              {locationStr && (
+                <span className={styles.metaItem}>
+                  <MapPin className={styles.metaIcon} />
+                  {locationStr}
+                </span>
               )}
             </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Profile Completeness */}
+      {completeness.percent < 100 && (
+        <div className={`${styles.completenessCard} ${styles.fadeUp} ${styles.fadeUp2}`}>
+          <div className={styles.completenessHeader}>
+            <span className={styles.completenessTitle}>
+              <CheckCircle2 size={14} style={{ marginRight: 4, verticalAlign: -2 }} />
+              Profile Completeness
+            </span>
+            <span className={styles.completenessPercent}>
+              {completeness.filled} / {completeness.total}
+            </span>
+          </div>
+          <div className={styles.completenessBar}>
+            <div
+              className={styles.completenessFill}
+              style={{ width: `${completeness.percent}%` }}
+            />
+          </div>
+          <p className={styles.completenessHint}>
+            Complete your profile to help others connect with you.
+            {completeness.missing.length > 0 && (
+              <> Add your <strong>{completeness.missing.slice(0, 3).join(', ')}</strong>{completeness.missing.length > 3 ? ` and ${completeness.missing.length - 3} more` : ''}. </>
+            )}
             <button
               type="button"
-              className={styles.editBtn}
+              className={styles.crumbBtn}
               onClick={() => setIsEditing(true)}
+              style={{ fontSize: 12, marginLeft: 4 }}
             >
-              Edit Profile
+              Complete now <ChevronRight size={12} style={{ verticalAlign: -2 }} />
             </button>
-          </header>
-
-          <section className={styles.section} aria-labelledby="about-heading">
-            <h2 id="about-heading" className={styles.sectionTitle}>About</h2>
-            {user.bio ? (
-              <p className={styles.bio}>{user.bio}</p>
-            ) : (
-              <p className={styles.bio} style={{ color: 'var(--text-muted)', fontStyle: 'italic' }}>
-                No bio provided yet.
-              </p>
-            )}
-          </section>
-        </>
+          </p>
+        </div>
       )}
+
+      {/* Info Cards */}
+      <div className={`${styles.cardsGrid} ${styles.fadeUp} ${styles.fadeUp3}`}>
+        {/* About */}
+        <div className={`${styles.infoCard} ${styles.infoCardFull}`}>
+          <h2 className={styles.cardTitle}>
+            <User size={14} /> About
+          </h2>
+          {user.bio ? (
+            <p className={styles.bio}>{user.bio}</p>
+          ) : (
+            <p className={styles.bioEmpty}>
+              No bio provided yet. Tell the community about yourself!
+            </p>
+          )}
+        </div>
+
+        {/* Contact & Details */}
+        <div className={styles.infoCard}>
+          <h2 className={styles.cardTitle}>
+            <Mail size={14} /> Contact & Details
+          </h2>
+          <div className={styles.cardRow}>
+            <Mail className={styles.cardRowIcon} />
+            <div>
+              <div className={styles.cardRowLabel}>Email</div>
+              <div className={styles.cardRowValue}>{user.email || <span className={styles.cardRowEmpty}>Not set</span>}</div>
+            </div>
+          </div>
+          <div className={styles.cardRow}>
+            <Building2 className={styles.cardRowIcon} />
+            <div>
+              <div className={styles.cardRowLabel}>Company</div>
+              <div className={styles.cardRowValue}>
+                {user.company || <span className={styles.cardRowEmpty}>Not set</span>}
+              </div>
+            </div>
+          </div>
+          <div className={styles.cardRow}>
+            <Briefcase className={styles.cardRowIcon} />
+            <div>
+              <div className={styles.cardRowLabel}>Designation</div>
+              <div className={styles.cardRowValue}>
+                {user.designation || <span className={styles.cardRowEmpty}>Not set</span>}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Location & Membership */}
+        <div className={styles.infoCard}>
+          <h2 className={styles.cardTitle}>
+            <MapPin size={14} /> Location
+          </h2>
+          <div className={styles.cardRow}>
+            <MapPin className={styles.cardRowIcon} />
+            <div>
+              <div className={styles.cardRowLabel}>Location</div>
+              <div className={styles.cardRowValue}>
+                {locationStr || <span className={styles.cardRowEmpty}>Not set</span>}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
