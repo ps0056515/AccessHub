@@ -6,6 +6,13 @@ export default function Modal({ title, children, onClose, footer, width= "50%", 
   const dialogRef = useRef(null);
   const previousFocusRef = useRef(null);
 
+  const onCloseRef = useRef(onClose);
+
+  // Keep ref updated with the latest onClose function without triggering re-renders
+  useEffect(() => {
+    onCloseRef.current = onClose;
+  }, [onClose]);
+
   useEffect(() => {
     // Store the currently focused element
     previousFocusRef.current = document.activeElement;
@@ -19,7 +26,7 @@ export default function Modal({ title, children, onClose, footer, width= "50%", 
 
     const onKey = e => {
       if (e.key === 'Escape') {
-        onClose?.();
+        onCloseRef.current?.();
         return;
       }
       
@@ -64,7 +71,7 @@ export default function Modal({ title, children, onClose, footer, width= "50%", 
         previousFocusRef.current.focus();
       }
     };
-  }, [onClose]);
+  }, []);
 
   const dialogStyle = {};
   if (width) {

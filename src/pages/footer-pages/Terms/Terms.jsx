@@ -1,15 +1,5 @@
 import { useState, useEffect } from "react";
-
-const accent = "#074a9e";
-const accentLight = "#eff6ff";
-const accentBorder = "#bfdbfe";
-const textPrimary = "#0f172a";
-const textSecondary = "#334155";
-const textMuted = "#475569";
-const borderColor = "#e2e8f0";
-const bgPage = "#f8fafc";
-const bgWhite = "#ffffff";
-const bgSubtle = "#f1f5f9";
+import styles from "./Terms.module.css";
 
 const SECTIONS = [
   {
@@ -127,10 +117,10 @@ const SECTIONS = [
 
 function BulletList({ items }) {
   return (
-    <ul style={{ listStyle: "none", padding: 0, margin: "12px 0 0 0", display: "flex", flexDirection: "column", gap: 8 }}>
+    <ul className={styles.bulletList}>
       {items.map((item, i) => (
-        <li key={i} style={{ display: "flex", alignItems: "flex-start", gap: 10, fontSize: 15, lineHeight: 1.7, color: textSecondary }}>
-          <span style={{ flexShrink: 0, width: 6, height: 6, borderRadius: "50%", background: accent, marginTop: 9, display: "inline-block" }} aria-hidden="true" />
+        <li key={i} className={styles.bulletListItem}>
+          <span className={styles.bulletListIcon} aria-hidden="true" />
           {item}
         </li>
       ))}
@@ -141,69 +131,50 @@ function BulletList({ items }) {
 export default function Terms() {
   const [activeSection, setActiveSection] = useState(null);
 
-useEffect(() => {
-  const observer = new IntersectionObserver(
-    (entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) setActiveSection(entry.target.id);
-      });
-    },
-    { rootMargin: "-20% 0px -70% 0px" }
-  );
-  SECTIONS.forEach((s) => {
-    const el = document.getElementById(s.id);
-    if (el) observer.observe(el);
-  });
-  return () => observer.disconnect();
-}, []);
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) setActiveSection(entry.target.id);
+        });
+      },
+      { rootMargin: "-20% 0px -70% 0px" }
+    );
+    SECTIONS.forEach((s) => {
+      const el = document.getElementById(s.id);
+      if (el) observer.observe(el);
+    });
+    return () => observer.disconnect();
+  }, []);
 
   return (
-    <div style={{ minHeight: "100vh", background: bgPage }}>
-      {/* Accent strip */}
-
-      <div style={{ maxWidth: 1100, margin: "0 auto", padding: "52px 24px 80px" }}>
-        {/* Header */}
-        <header style={{ maxWidth: 660, marginBottom: 52 }}>
-          <span style={{
-            display: "inline-block", fontSize: 11, fontWeight: 700, letterSpacing: "0.1em",
-            textTransform: "uppercase", color: accent, background: accentLight,
-            border: `1px solid ${accentBorder}`, borderRadius: 4, padding: "3px 10px", marginBottom: 16
-          }}>
+    <div className={styles.container}>
+      <div className={styles.wrapper}>
+        <header className={styles.header}>
+          <span className={styles.badge}>
             Legal
           </span>
-          <h1 style={{ fontSize: "clamp(28px, 4vw, 38px)", fontWeight: 800, color: textPrimary, letterSpacing: "-0.02em", lineHeight: 1.15, margin: "0 0 10px" }}>
+          <h1 className={styles.title}>
             Terms of Use
           </h1>
-          <p style={{ fontSize: 13, color: textMuted, margin: "0 0 18px" }}>Last updated: <time>June 2025</time></p>
-          <p style={{ fontSize: 17, lineHeight: 1.75, color: textSecondary, margin: 0 }}>
+          <p className={styles.date}>Last updated: <time>June 2025</time></p>
+          <p className={styles.description}>
             By using AllCanAccess, you agree to these terms. Please read them carefully before participating in our community.
           </p>
         </header>
 
-        {/* Layout */}
-        <div style={{ display: "grid", gridTemplateColumns: "200px 1fr", gap: 48, alignItems: "start" }}>
-
-          {/* Sidebar TOC */}
-          <aside aria-label="Table of contents" style={{
-            position: "sticky", top: 80, background: bgWhite,
-            border: `1px solid ${borderColor}`, borderRadius: 10, padding: 20
-          }}>
-            <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: "#94a3b8", margin: "0 0 12px" }}>
+        <div className={styles.contentGrid}>
+          <aside aria-label="Table of contents" className={styles.sidebar}>
+            <p className={styles.sidebarTitle}>
               On this page
             </p>
             <nav>
-              <ol style={{ listStyle: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: 2 }}>
+              <ol className={styles.tocList}>
                 {SECTIONS.map((s) => (
                   <li key={s.id}>
                     <a
                       href={`#${s.id}`}
-                      style={{
-                        display: "block", fontSize: 13, color: activeSection === s.id ? accent : textMuted,
-                        textDecoration: "none", padding: "6px 8px", borderRadius: 6,
-                        background: activeSection === s.id ? accentLight : "transparent",
-                        lineHeight: 1.4, transition: "background 0.15s, color 0.15s",
-                        fontWeight: activeSection === s.id ? 600 : 400,
-                      }}
+                      className={`${styles.tocLink} ${activeSection === s.id ? styles.tocLinkActive : ""}`}
                       onClick={() => setActiveSection(s.id)}
                     >
                       {s.title}
@@ -214,43 +185,36 @@ useEffect(() => {
             </nav>
           </aside>
 
-          {/* Content */}
           <main>
             {SECTIONS.map((section) => (
-              <section key={section.id} id={section.id} aria-labelledby={`${section.id}-heading`}
-                style={{ padding: "32px 0", borderBottom: `1px solid ${borderColor}` }}>
-                <h2 id={`${section.id}-heading`} style={{ fontSize: 20, fontWeight: 700, color: textPrimary, margin: "0 0 12px", letterSpacing: "-0.01em" }}>
+              <section key={section.id} id={section.id} aria-labelledby={`${section.id}-heading`} className={styles.section}>
+                <h2 id={`${section.id}-heading`} className={styles.sectionTitle}>
                   {section.title}
                 </h2>
                 {section.content && (
-                  <p style={{ fontSize: 15, lineHeight: 1.75, color: textSecondary, margin: "0 0 12px" }}>{section.content}</p>
+                  <p className={styles.sectionContent}>{section.content}</p>
                 )}
                 {section.list && <BulletList items={section.list} />}
                 {section.subsection && (
-                  <div style={{ marginTop: 20, padding: "14px 18px", background: bgSubtle, borderLeft: `3px solid ${accent}`, borderRadius: "0 8px 8px 0" }}>
-                    <h3 style={{ fontSize: 13, fontWeight: 700, color: textPrimary, margin: "0 0 10px", textTransform: "uppercase", letterSpacing: "0.04em" }}>
+                  <div className={styles.subsection}>
+                    <h3 className={styles.subsectionTitle}>
                       {section.subsection.title}
                     </h3>
                     <BulletList items={section.subsection.list} />
                   </div>
                 )}
                 {section.footer && (
-                  <p style={{ fontSize: 15, lineHeight: 1.75, color: textMuted, margin: "14px 0 0", fontStyle: "italic" }}>{section.footer}</p>
+                  <p className={styles.footerText}>{section.footer}</p>
                 )}
               </section>
             ))}
 
-            {/* Closing card */}
-            <div style={{
-              marginTop: 48, padding: "36px 40px",
-              background: "linear-gradient(135deg, #0f172a 0%, #1e3a5f 100%)",
-              borderRadius: 16, color: "#fff"
-            }}>
-              <h2 style={{ fontSize: 22, fontWeight: 800, margin: "0 0 14px", letterSpacing: "-0.01em" }}>Our Community Promise</h2>
-              <p style={{ fontSize: 15, lineHeight: 1.75, color: "#cbd5e1", margin: "0 0 18px" }}>
+            <div className={styles.commitmentCard}>
+              <h2 className={styles.commitmentTitle}>Our Community Promise</h2>
+              <p className={styles.commitmentText}>
                 AllCanAccess exists to promote accessibility, inclusion, learning, and collaboration. By participating in this community, you help create a space where people can share knowledge, exchange ideas, and work together toward a more accessible and inclusive digital world.
               </p>
-              <p style={{ fontSize: 14, fontWeight: 600, color: "#60a5fa", margin: 0 }}>
+              <p className={styles.commitmentFooter}>
                 Thank you for being part of AllCanAccess.
               </p>
             </div>

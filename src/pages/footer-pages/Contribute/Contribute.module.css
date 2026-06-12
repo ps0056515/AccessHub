@@ -1,0 +1,64 @@
+.container {
+  padding: 40px 24px;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.intro {
+  line-height: 1.7;
+  color: var(--text-muted);
+}
+
+.section {
+  margin-top: 2.5rem;
+}
+
+.sectionTitle {
+  font-size: 1.25rem;
+  margin-bottom: 1rem;
+}
+
+.list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 1rem;
+}
+
+.card {
+  padding: 1rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg-card);
+}
+
+.workflowCard {
+  padding: 1rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+
+.cardTitle {
+  margin: 0;
+  font-weight: 600;
+}
+
+.cardBody {
+  margin: 0.5rem 0 0;
+  line-height: 1.65;
+  color: var(--text-muted);
+}
+
+.cardAction {
+  margin: 0.75rem 0 0;
+}
+
+.link {
+  color: var(--accent);
+  font-weight: 500;
+}
+
+.otherWaysList {
+  line-height: 1.8;
+}
