@@ -43,12 +43,14 @@ export default function ScreenReaderDetail() {
   const PHASES = guide.content_json || [];
   const current = PHASES.find(p => p.id === phase) || PHASES[0];
   const checklistPhase = PHASES.find(p => p.id === 'checklist');
-  const checklist = checklistPhase ? checklistPhase.checklist : [];
+ const checklist = checklistPhase?.checklist ?? [];
   const checkedCount = Object.values(checked).filter(Boolean).length;
 
   const toggleCheck = (i) => setChecked(prev => ({ ...prev, [i]: !prev[i] }));
 
   const groups = [...new Set(checklist.map(c => c.group))];
+
+
 
   return (
     <Container className={styles.page}>
