@@ -177,6 +177,10 @@ export const postsApi = {
       method: "POST",
       body: JSON.stringify(body),
     }),
+  markViewed: (id) =>
+    api(`/api/posts/${id}/view`, {
+      method: "POST",
+    }),
   topContributors: () => api("/api/posts/top-contributors"),
   // Admin methods
   listAdmin: () => api("/api/posts/admin"),
@@ -366,4 +370,5 @@ export const resourcesApi = {
 
 export const usersApi = {
   getProfile: (id) => api(`/api/users/${id}/profile`),
+  getRecentlyViewed: () => api('/api/users/me/recently-viewed'),
 };

@@ -1,8 +1,26 @@
 const express = require('express');
 const { query } = require('../db');
 const { authorFromUser } = require('../posts');
+const { authMiddleware } = require('../auth');
 
 const router = express.Router();
+
+router.get('/me/recently-viewed', authMiddleware, async (req, res, next) => {
+  try {
+    const { rows } = await query(
+      `SELECT p.id, p.title, urv.viewed_at
+       FROM user_recently_viewed urv
+       JOIN posts p ON p.id = urv.post_id
+       WHERE urv.user_id = $1
+       ORDER BY urv.viewed_at DESC
+       LIMIT 10`,
+      [req.userId]
+    );
+    res.json({ recentPosts: rows.map(r => ({ id: r.id, title: r.title, viewedAt: r.viewed_at })) });
+  } catch (err) {
+    next(err);
+  }
+});
 
 router.get('/:id/profile', async (req, res, next) => {
   const id = Number(req.params.id);
