@@ -1,0 +1,29 @@
+.container {
+  padding: 40px 24px;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.description {
+  line-height: 1.7;
+  color: var(--text-muted);
+}
+
+.section {
+  margin-top: 2rem;
+}
+
+.heading {
+  font-size: 1.25rem;
+  margin-bottom: 1rem;
+}
+
+.list {
+  line-height: 1.8;
+}
+
+.related {
+  margin-top: 2rem;
+  font-size: 0.875rem;
+  color: var(--text-muted);
+}

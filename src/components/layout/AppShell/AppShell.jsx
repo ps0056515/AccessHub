@@ -24,14 +24,14 @@ import ForgotPasswordPage from "pages/auth/ForgotPasswordPage";
 import ResetPasswordPage from "pages/auth/ResetPasswordPage";
 import CompleteProfilePage from "pages/auth/CompleteProfilePage";
 // Footer pages
-import Privacy from "pages/footer-pages/Privacy";
-import Terms from "pages/footer-pages/Terms";
-import AccessibilityStatement from "pages/footer-pages/AccessibilityStatement";
-import News from "pages/footer-pages/News";
-import Contact from "pages/footer-pages/Contact";
-import Contribute from "pages/footer-pages/Contribute";
-import En301549 from "pages/footer-pages/En301549";
-import AboutUs from "pages/footer-pages/AboutUs";
+import Privacy from "pages/footer-pages/Privacy/Privacy";
+import Terms from "pages/footer-pages/Terms/Terms";
+import AccessibilityStatement from "pages/footer-pages/AccessibilityStatement/AccessibilityStatement";
+import News from "pages/footer-pages/News/News";
+import Contact from "pages/footer-pages/Contact/Contact";
+import Contribute from "pages/footer-pages/Contribute/Contribute";
+import En301549 from "pages/footer-pages/En301549/En301549";
+import AboutUs from "pages/footer-pages/AboutUs/AboutUs";
 import { SITE_NAME } from "brand";
 import { postsApi } from "api/client";
 import { useAriaLive } from "context/AriaLiveContext";
@@ -335,6 +335,15 @@ export default function AppShell() {
           <Route path="/blog/:id" element={<BlogDetail />} />
           <Route path="/en-301-549" element={<En301549 />} />
           <Route path="/about-us" element={<AboutUs />} />
+          <Route
+            path="/join"
+            element={
+              <JoinCommunityPage
+                goToPortal={goToPortal}
+                goToSection={goToSection}
+              />
+            }
+          />
           <Route element={<RequireAuth />}>
             <Route
               path="/thread/:postId"
@@ -347,15 +356,7 @@ export default function AppShell() {
                 />
               }
             />
-            <Route
-              path="/join"
-              element={
-                <JoinCommunityPage
-                  goToPortal={goToPortal}
-                  goToSection={goToSection}
-                />
-              }
-            />
+
             <Route
               path="/complete-profile"
               element={<CompleteProfilePage goToPortal={goToPortal} />}

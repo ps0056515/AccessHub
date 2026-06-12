@@ -6,6 +6,13 @@ export default function Modal({ title, children, onClose, footer, width= "50%", 
   const dialogRef = useRef(null);
   const previousFocusRef = useRef(null);
 
+  const onCloseRef = useRef(onClose);
+
+  // Keep ref updated with the latest onClose function without triggering re-renders
+  useEffect(() => {
+    onCloseRef.current = onClose;
+  }, [onClose]);
+
   useEffect(() => {
     // Store the currently focused element
     previousFocusRef.current = document.activeElement;
@@ -18,7 +25,37 @@ export default function Modal({ title, children, onClose, footer, width= "50%", 
     }, 10);
 
     const onKey = e => {
-      if (e.key === 'Escape') onClose?.();
+      if (e.key === 'Escape') {
+        onCloseRef.current?.();
+        return;
+      }
+      
+      if (e.key === 'Tab') {
+        if (!dialogRef.current) return;
+        
+        const focusableElements = dialogRef.current.querySelectorAll(
+          'a[href], button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])'
+        );
+        
+        if (focusableElements.length === 0) return;
+        
+        const firstElement = focusableElements[0];
+        const lastElement = focusableElements[focusableElements.length - 1];
+
+        if (e.shiftKey) {
+          // Shift + Tab
+          if (document.activeElement === firstElement || document.activeElement === dialogRef.current) {
+            e.preventDefault();
+            lastElement.focus();
+          }
+        } else {
+          // Tab
+          if (document.activeElement === lastElement) {
+            e.preventDefault();
+            firstElement.focus();
+          }
+        }
+      }
     };
     window.addEventListener('keydown', onKey);
     const prevOverflow = document.body.style.overflow;
@@ -34,7 +71,7 @@ export default function Modal({ title, children, onClose, footer, width= "50%", 
         previousFocusRef.current.focus();
       }
     };
-  }, [onClose]);
+  }, []);
 
   const dialogStyle = {};
   if (width) {

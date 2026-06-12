@@ -1,7 +1,10 @@
 import { useState, useEffect } from "react";
 import { toolsApi } from "api/client";
 import Modal from "components/common/Modal/Modal";
+import MultiSelectDropdown from "components/common/MultiSelectDropdown/MultiSelectDropdown";
 import styles from "../ToolsView.module.css";
+
+const COMPATIBILITY_OPTIONS = ["Web", "Android", "iOS", "React", "Angular", "PDF"];
 
 export default function ToolModal({
   isOpen,
@@ -18,6 +21,7 @@ export default function ToolModal({
     badge: "",
     badgeColor: "blue",
     url: "",
+    compatibility: [],
   });
   const [submitting, setSubmitting] = useState(false);
 
@@ -32,6 +36,7 @@ export default function ToolModal({
           badge: tool.badge || "",
           badgeColor: tool.badge_color || tool.badgeColor || "blue",
           url: tool.url || "",
+          compatibility: tool.compatibility || [],
         });
       } else {
         setFormData({
@@ -42,6 +47,7 @@ export default function ToolModal({
           badge: "",
           badgeColor: "blue",
           url: "https://",
+          compatibility: [],
         });
       }
     }
@@ -59,7 +65,7 @@ export default function ToolModal({
 
   const handleSaveTool = async (e) => {
     e.preventDefault();
-    const { icon, name, type, price, badge, badgeColor, url } = formData;
+    const { icon, name, type, price, badge, badgeColor, url, compatibility } = formData;
 
     if (!name.trim() || !price.trim() || !url.trim()) {
       showToast?.("Please fill in all required fields.", "error");
@@ -75,6 +81,7 @@ export default function ToolModal({
       badge: badge && badge.trim() ? badge.trim() : null,
       badgeColor: badge && badge.trim() ? badgeColor : null,
       url: url.trim(),
+      compatibility: compatibility || [],
     };
 
     try {
@@ -93,6 +100,7 @@ export default function ToolModal({
       setSubmitting(false);
     }
   };
+
 
   return (
     <Modal
@@ -231,6 +239,18 @@ export default function ToolModal({
               className={styles.formInput}
               placeholder="https://..."
               required
+            />
+          </div>
+
+          <div className={styles.formGroup}>
+            <label className={styles.formLabel}>
+              Platform Compatibility
+            </label>
+            <MultiSelectDropdown
+              options={COMPATIBILITY_OPTIONS}
+              value={formData.compatibility || []}
+              onChange={(newValue) => setFormData(prev => ({ ...prev, compatibility: newValue }))}
+              placeholder="Select compatible platforms..."
             />
           </div>
         </div>
