@@ -3,20 +3,23 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import { articlesApi } from 'api/client';
 import { SITE_NAME } from 'brand';
 import Container from 'components/common/Container/Container';
+import Interactions from 'components/Interactions';
 import styles from './Articles.module.css';
 
 export default function ArticleDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [article, setArticle] = useState(null);
+  const [userVote, setUserVote] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchArticle = async () => {
       try {
-        const { article: data } = await articlesApi.get(id);
+        const { article: data, userVote: uv } = await articlesApi.get(id);
         setArticle(data);
+        setUserVote(uv || 0);
         document.title = `${data.title} · ${SITE_NAME}`;
       } catch (err) {
         if (err.status === 404) {
@@ -58,6 +61,14 @@ export default function ArticleDetail() {
       <div 
         className={styles.contentHtml} 
         dangerouslySetInnerHTML={{ __html: article.content_html }} 
+      />
+
+      <Interactions 
+        id={article.id} 
+        type="article" 
+        api={articlesApi} 
+        initialVotes={article.votes || 0} 
+        initialUserVote={userVote} 
       />
     </Container>
   );
