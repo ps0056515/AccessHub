@@ -3,20 +3,23 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import { blogpostsApi } from 'api/client';
 import { SITE_NAME } from 'brand';
 import Container from 'components/common/Container/Container';
+import Interactions from 'components/Interactions';
 import styles from './Blog.module.css';
 
 export default function BlogpostDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [blogpost, setBlogpost] = useState(null);
+  const [userVote, setUserVote] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchBlogpost = async () => {
       try {
-        const { blogpost: data } = await blogpostsApi.get(id);
+        const { blogpost: data, userVote: uv } = await blogpostsApi.get(id);
         setBlogpost(data);
+        setUserVote(uv || 0);
         document.title = `${data.title} · ${SITE_NAME}`;
       } catch (err) {
         if (err.status === 404) {
@@ -58,6 +61,14 @@ export default function BlogpostDetail() {
       <div 
         className={styles.contentHtml} 
         dangerouslySetInnerHTML={{ __html: blogpost.content_html }} 
+      />
+
+      <Interactions 
+        id={blogpost.id} 
+        type="blogpost" 
+        api={blogpostsApi} 
+        initialVotes={blogpost.votes || 0} 
+        initialUserVote={userVote} 
       />
     </Container>
   );

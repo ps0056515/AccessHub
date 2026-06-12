@@ -251,6 +251,7 @@ export default function Portal({
   const [postError, setPostError] = useState("");
   const [posting, setPosting] = useState(false);
   const askBoxRef = useRef(null);
+  const askTitleRef = useRef(null);
   const askTextareaRef = useRef(null);
   const searchInputRef = useRef(null);
   const [topContributors, setTopContributors] = useState([]);
@@ -272,7 +273,7 @@ export default function Portal({
     };
     const onFocusAsk = () => {
       askBoxRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-      askTextareaRef.current?.focus();
+      askTitleRef.current?.focus();
     };
     window.addEventListener(
       "allcanaccess:focus-discussion-search",
@@ -299,7 +300,7 @@ export default function Portal({
           behavior: "smooth",
           block: "start",
         });
-        askTextareaRef.current?.focus();
+        askTitleRef.current?.focus();
       }
     } catch {
       /* ignore */
@@ -308,7 +309,7 @@ export default function Portal({
 
   const focusDiscussionBox = () => {
     askBoxRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-    askTextareaRef.current?.focus();
+    askTitleRef.current?.focus();
   };
 
   const applyHeroTopic = (topic) => {
@@ -625,6 +626,7 @@ export default function Portal({
               value={draftTitle}
               onChange={(e) => setDraftTitle(e.target.value)}
               aria-required="true"
+              ref={askTitleRef}
             />
 
             <label className={styles.fieldLabel}>Description (Optional)</label>
