@@ -133,6 +133,24 @@ export default function ToolsView({ showToast }) {
     { key: "type", label: "Type" },
     { key: "price", label: "Price" },
     {
+      key: "compatibility",
+      label: "Compatibility",
+      render: (t) => {
+        const list = Array.isArray(t.compatibility) ? t.compatibility : [];
+        return list.length > 0 ? (
+          <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
+            {list.map(c => (
+              <span key={c} style={{ fontSize: '11px', background: '#e2e8f0', color: '#1e293b', padding: '2px 6px', borderRadius: '4px', fontWeight: '500' }}>
+                {c}
+              </span>
+            ))}
+          </div>
+        ) : (
+          <span style={{ color: "var(--text-muted)" }}>—</span>
+        );
+      }
+    },
+    {
       key: "badge",
       label: "Badge",
       render: (t) => {
