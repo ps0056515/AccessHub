@@ -129,6 +129,7 @@ function publicUser(row) {
     designation: row.designation || null,
     role: row.role || null,
     bio: row.bio || null,
+    avatarUrl: row.avatar_url || null,
     authMethod: row.google_id ? 'google' : 'email',
     isAdmin: Boolean(row.is_admin) || isAdminEmail(row.email),
     isBlocked: Boolean(row.is_blocked),

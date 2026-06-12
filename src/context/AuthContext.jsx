@@ -113,6 +113,18 @@ export function AuthProvider({ children }) {
     return profile;
   }, []);
 
+  const uploadAvatar = useCallback(async (dataUri) => {
+    const { user: profile } = await authApi.uploadAvatar({ data: dataUri });
+    setUser(profile);
+    return profile;
+  }, []);
+
+  const removeAvatar = useCallback(async () => {
+    const { user: profile } = await authApi.removeAvatar();
+    setUser(profile);
+    return profile;
+  }, []);
+
   const signOut = useCallback(async () => {
     try {
       await authApi.signOut();
@@ -135,11 +147,13 @@ export function AuthProvider({ children }) {
       verifyOtp,
       resendOtp,
       updateProfile,
+      uploadAvatar,
+      removeAvatar,
       signOut,
       isAuthenticated: !!user,
       isAdmin: !!user?.isAdmin,
     }),
-    [user, loading, needsLocation, signUp, signIn, signInWithGoogle, verifyOtp, resendOtp, updateProfile, signOut]
+    [user, loading, needsLocation, signUp, signIn, signInWithGoogle, verifyOtp, resendOtp, updateProfile, uploadAvatar, removeAvatar, signOut]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
