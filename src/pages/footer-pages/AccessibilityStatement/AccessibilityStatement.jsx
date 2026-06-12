@@ -1,14 +1,5 @@
 import { useState, useEffect } from "react";
-
-const accent = "#074a9e";
-const accentLight = "#eff6ff";
-const accentBorder = "#bfdbfe";
-const textPrimary = "#0f172a";
-const textSecondary = "#334155";
-const textMuted = "#475569";
-const borderColor = "#e2e8f0";
-const bgPage = "#f8fafc";
-const bgWhite = "#ffffff";
+import styles from "./AccessibilityStatement.module.css";
 
 const COMMITMENTS = [
   { icon: "✓", title: "WCAG 2.2 AA Conformance", desc: "We design and develop our platform to meet Web Content Accessibility Guidelines (WCAG) 2.1 Level AA standards." },
@@ -68,10 +59,10 @@ const SECTIONS = [
 
 function BulletList({ items }) {
   return (
-    <ul style={{ listStyle: "none", padding: 0, margin: "12px 0 0 0", display: "flex", flexDirection: "column", gap: 8 }}>
+    <ul className={styles.bulletList}>
       {items.map((item, i) => (
-        <li key={i} style={{ display: "flex", alignItems: "flex-start", gap: 10, fontSize: 15, lineHeight: 1.7, color: "#334155" }}>
-          <span style={{ flexShrink: 0, width: 6, height: 6, borderRadius: "50%", background: accent, marginTop: 9, display: "inline-block" }} aria-hidden="true" />
+        <li key={i} className={styles.bulletItem}>
+          <span className={styles.bulletIcon} aria-hidden="true" />
           {item}
         </li>
       ))}
@@ -99,48 +90,48 @@ useEffect(() => {
 }, []);  
 
   return (
-    <div style={{ minHeight: "100vh", background: bgPage }}>
+    <div className={styles.container}>
      
-      <div style={{ maxWidth: 1100, margin: "0 auto", padding: "52px 24px 80px" }}>
+      <div className={styles.contentWrapper}>
 
         {/* Header */}
-        <header style={{ maxWidth: 660, marginBottom: 48 }}>
-          <span style={{ display: "inline-block", fontSize: 11, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: accent, background: accentLight, border: `1px solid ${accentBorder}`, borderRadius: 4, padding: "3px 10px", marginBottom: 16 }}>
+        <header className={styles.header}>
+          <span className={styles.tagline}>
             Accessibility
           </span>
-          <h1 style={{ fontSize: "clamp(28px, 4vw, 38px)", fontWeight: 800, color: textPrimary, letterSpacing: "-0.02em", lineHeight: 1.15, margin: "0 0 10px" }}>
+          <h1 className={styles.title}>
             Accessibility Statement
           </h1>
-          <p style={{ fontSize: 13, color: textMuted, margin: "0 0 18px" }}>Last updated: <time>June 2025</time></p>
-          <p style={{ fontSize: 17, lineHeight: 1.75, color: textSecondary, margin: 0 }}>
+          <p className={styles.lastUpdated}>Last updated: <time>June 2025</time></p>
+          <p className={styles.headerDesc}>
             AllCanAccess is built for everyone. Here is how we uphold that promise in the design, development, and maintenance of our platform.
           </p>
         </header>
 
         {/* Commitment cards */}
-        <div role="list" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16, marginBottom: 56 }}>
+        <div role="list" className={styles.commitmentsGrid}>
           {COMMITMENTS.map((c, i) => (
-            <div key={i} role="listitem" style={{ background: bgWhite, border: `1px solid ${borderColor}`, borderRadius: 12, padding: 24 }}>
-              <div style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: 40, height: 40, background: accentLight, borderRadius: 8, fontSize: 18, marginBottom: 14 }} aria-hidden="true">
+            <div key={i} role="listitem" className={styles.commitmentCard}>
+              <div className={styles.commitmentIcon} aria-hidden="true">
                 {c.icon}
               </div>
-              <h2 style={{ fontSize: 15, fontWeight: 700, color: textPrimary, margin: "0 0 8px", letterSpacing: "-0.01em" }}>{c.title}</h2>
-              <p style={{ fontSize: 13, lineHeight: 1.65, color: textMuted, margin: 0 }}>{c.desc}</p>
+              <h2 className={styles.commitmentTitle}>{c.title}</h2>
+              <p className={styles.commitmentDesc}>{c.desc}</p>
             </div>
           ))}
         </div>
 
         {/* Layout */}
-        <div style={{ display: "grid", gridTemplateColumns: "200px 1fr", gap: 48, alignItems: "start" }}>
+        <div className={styles.layoutGrid}>
 
-          <aside aria-label="Table of contents" style={{ position: "sticky", top: 80, background: bgWhite, border: `1px solid ${borderColor}`, borderRadius: 10, padding: 20 }}>
-            <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: "#94a3b8", margin: "0 0 12px" }}>On this page</p>
+          <aside aria-label="Table of contents" className={styles.sidebar}>
+            <p className={styles.sidebarTitle}>On this page</p>
             <nav>
-              <ol style={{ listStyle: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: 2 }}>
+              <ol className={styles.tocList}>
                 {SECTIONS.map((s) => (
                   <li key={s.id}>
                     <a href={`#${s.id}`}
-                      style={{ display: "block", fontSize: 13, color: activeSection === s.id ? accent : textMuted, textDecoration: "none", padding: "6px 8px", borderRadius: 6, background: activeSection === s.id ? accentLight : "transparent", lineHeight: 1.4, fontWeight: activeSection === s.id ? 600 : 400 }}
+                      className={`${styles.tocLink} ${activeSection === s.id ? styles.tocLinkActive : ''}`}
                       onClick={() => setActiveSection(s.id)}>
                       {s.title}
                     </a>
@@ -153,21 +144,21 @@ useEffect(() => {
           <main>
             {SECTIONS.map((section) => (
               <section key={section.id} id={section.id} aria-labelledby={`${section.id}-heading`}
-                style={{ padding: "32px 0", borderBottom: `1px solid ${borderColor}` }}>
-                <h2 id={`${section.id}-heading`} style={{ fontSize: 20, fontWeight: 700, color: textPrimary, margin: "0 0 12px", letterSpacing: "-0.01em" }}>
+                className={styles.section}>
+                <h2 id={`${section.id}-heading`} className={styles.sectionTitle}>
                   {section.title}
                 </h2>
-                {section.content && <p style={{ fontSize: 15, lineHeight: 1.75, color: textSecondary, margin: "0 0 12px" }}>{section.content}</p>}
+                {section.content && <p className={styles.sectionContent}>{section.content}</p>}
                 {section.list && <BulletList items={section.list} />}
               </section>
             ))}
 
-            <div style={{ marginTop: 48, padding: "36px 40px", background: "linear-gradient(135deg, #0f172a 0%, #1e3a5f 100%)", borderRadius: 16, color: "#fff" }}>
-              <h2 style={{ fontSize: 22, fontWeight: 800, margin: "0 0 14px", letterSpacing: "-0.01em" }}>Accessibility is Everyone's Responsibility</h2>
-              <p style={{ fontSize: 15, lineHeight: 1.75, color: "#cbd5e1", margin: "0 0 18px" }}>
+            <div className={styles.footerSection}>
+              <h2 className={styles.footerTitle}>Accessibility is Everyone's Responsibility</h2>
+              <p className={styles.footerDesc}>
                 AllCanAccess exists to bring people together around a shared goal: a more accessible digital world. We hold ourselves to the same standard we advocate for — because a community dedicated to accessibility must itself be accessible.
               </p>
-              <p style={{ fontSize: 14, fontWeight: 600, color: "#60a5fa", margin: 0 }}>Thank you for helping us do better.</p>
+              <p className={styles.footerThanks}>Thank you for helping us do better.</p>
             </div>
           </main>
         </div>

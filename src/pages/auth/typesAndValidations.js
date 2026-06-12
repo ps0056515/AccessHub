@@ -47,3 +47,21 @@ export const signUpValidationSchema = Yup.object({
     .min(8, 'Password must be at least 8 characters')
     .required('Password is required'),
 });
+
+
+// --- Complete Profile ---
+
+export const completeProfileInitialValues = {
+  company: '',
+  designation: '',
+  country: '',
+  city: '',
+};
+
+export const completeProfileValidationSchema = Yup.object({
+  company: Yup.string(),
+  designation: Yup.string(),
+  country: Yup.string().required('Country is required'),
+  city: Yup.string().required('City is required'),
+});
+

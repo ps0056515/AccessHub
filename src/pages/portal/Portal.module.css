@@ -276,6 +276,8 @@
 
 .feed {
   border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
 }
 
 /* ── Search ── */
@@ -497,11 +499,21 @@
   border-bottom-color: var(--text);
 }
 
+.postsWrapper {
+  flex: 1;
+  position: relative;
+  min-height: 200px;
+}
+
 .postsContainer {
-  height: 540px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
   overflow-y: auto;
   overflow-x: hidden;
-  margin-bottom: 20px;
+  padding-bottom: 20px;
 }
 
 /* ── Post card ── */
@@ -673,7 +685,7 @@
 }
 
 .sideSection {
-  padding: 20px;
+  padding: 20px 0 20px 20px;
   border-bottom: 1px solid var(--border);
 }
 
@@ -690,7 +702,66 @@
   margin-bottom: 14px;
 }
 
-/* Events */
+/* ── Recently Viewed ── */
+.recentList {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-height: 380px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+.recentList::-webkit-scrollbar {
+  width: 4px;
+}
+.recentList::-webkit-scrollbar-track {
+  background: transparent;
+}
+.recentList::-webkit-scrollbar-thumb {
+  background: var(--border-strong);
+  border-radius: 4px;
+}
+.recentItem {
+  list-style: none;
+}
+.recentLink {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  text-decoration: none;
+  transition: all var(--transition);
+}
+.recentLink:hover {
+  border-color: var(--border-strong);
+  background: var(--bg-secondary);
+}
+.recentTitle {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text);
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.recentMeta {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+.recentEmpty {
+  font-size: 13px;
+  color: var(--text-faint);
+  font-style: italic;
+  margin: 0;
+  padding: 8px 0;
+}
+
+/* ── Upcoming Events ── */
 .eventList {
   list-style: none;
   display: flex;
@@ -859,13 +930,21 @@
   color: var(--text);
   margin-bottom: 8px;
 }
-
 .checkerInput:focus {
   outline: none;
   border-color: var(--accent);
 }
 .checkerInput::placeholder {
   color: var(--text-faint);
+}
+
+.checkerError {
+  display: block;
+  color: var(--red-text);
+  font-size: 12px;
+  margin-top: -4px;
+  margin-bottom: 8px;
+  text-align: left;
 }
 
 .checkerBtn {

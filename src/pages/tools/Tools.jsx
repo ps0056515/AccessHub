@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { CERTS, COLOR_MAP } from 'data';
 import { toolsApi } from 'api/client';
 import Container from 'components/common/Container/Container';
@@ -13,9 +13,12 @@ function BadgePill({ label, color }) {
   );
 }
 
+const FILTERS = ['All', 'Web', 'Android', 'iOS', 'React', 'Angular', 'PDF'];
+
 export default function Tools() {
   const [toolsList, setToolsList] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [selectedFilter, setSelectedFilter] = useState('All');
 
   useEffect(() => {
     let cancelled = false;
@@ -37,6 +40,12 @@ export default function Tools() {
     };
   }, []);
 
+  const filteredTools = useMemo(() => {
+    if (selectedFilter === 'All') return toolsList;
+    return toolsList.filter(t => Array.isArray(t.compatibility) && t.compatibility.includes(selectedFilter));
+  }, [toolsList, selectedFilter]);
+
+
   return (
     <Container className={styles.page}>
       <header className={styles.pageHeader}>
@@ -54,11 +63,31 @@ export default function Tools() {
         <p className={styles.sectionSub}>
           Vetted by the community — from quick browser checks to deep CI/CD integration.
         </p>
+
+        <div className={styles.filterBar} role="tablist" aria-label="Filter tools by platform compatibility">
+          {FILTERS.map(f => (
+            <button
+              key={f}
+              type="button"
+              role="tab"
+              aria-selected={selectedFilter === f}
+              className={`${styles.filterBtn} ${selectedFilter === f ? styles.filterBtnActive : ''}`}
+              onClick={() => setSelectedFilter(f)}
+            >
+              {f}
+            </button>
+          ))}
+        </div>
+
         <div className={styles.toolGrid}>
           {loading ? (
             <p style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '40px', color: 'var(--text-muted)' }}>Loading tools...</p>
+          ) : filteredTools.length === 0 ? (
+            <p style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '40px', color: 'var(--text-muted)', fontSize: '15px' }}>
+              No tools match the selected platform.
+            </p>
           ) : (
-            toolsList.map((t, i) => (
+            filteredTools.map((t, i) => (
               <a
                 key={t.id || i}
                 href={t.url}
@@ -66,7 +95,7 @@ export default function Tools() {
                 rel="noopener noreferrer"
                 className={`${styles.toolCard} fade-up`}
                 style={{ animationDelay: `${i * 0.04}s` }}
-                aria-label={`${t.name} — ${t.type} — ${t.price}${t.badge ? ` — ${t.badge}` : ''}`}
+                aria-label={`${t.name} — ${t.type} — ${t.price}${t.badge ? ` — ${t.badge}` : ''}${Array.isArray(t.compatibility) && t.compatibility.length > 0 ? ` — Compatible with ${t.compatibility.join(', ')}` : ''}`}
               >
                 <div className={styles.toolTop}>
                   <div className={styles.toolIcon}>{t.icon}</div>
@@ -74,6 +103,13 @@ export default function Tools() {
                 </div>
                 <h3 className={styles.toolName}>{t.name}</h3>
                 <p className={styles.toolType}>{t.type}</p>
+                {Array.isArray(t.compatibility) && t.compatibility.length > 0 && (
+                  <div className={styles.toolTags}>
+                    {t.compatibility.map(c => (
+                      <span key={c} className={styles.toolTag}>{c}</span>
+                    ))}
+                  </div>
+                )}
                 <div className={styles.toolFooter}>
                   <span className={styles.toolPrice}>{t.price}</span>
                   <span className={styles.toolArrow} aria-hidden="true">↗</span>
