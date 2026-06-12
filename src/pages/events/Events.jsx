@@ -3,7 +3,8 @@ import { eventsApi } from 'api/client';
 import { useAuth } from 'context/AuthContext';
 import { useToast } from 'context/ToastContext';
 import { useAriaLive } from 'context/AriaLiveContext';
-import Modal from 'components/common/Modal/Modal';
+import RsvpModal from "./RsvpModal";
+import HostEventModal from "./HostEventModal";
 import Container from 'components/common/Container/Container';
 import styles from './Events.module.css';
 
@@ -53,16 +54,7 @@ export default function Events() {
   const [eventsLoading, setEventsLoading] = useState(true);
   const [filter, setFilter] = useState('All');
   const [rsvpEvent, setRsvpEvent] = useState(null);
-  const [rsvpEmail, setRsvpEmail] = useState('');
-  const [rsvpMsg, setRsvpMsg] = useState(null);
-  const [rsvpSubmitting, setRsvpSubmitting] = useState(false);
   const [hostOpen, setHostOpen] = useState(false);
-  const [hostTitle, setHostTitle] = useState('');
-  const [hostFormat, setHostFormat] = useState('webinar');
-  const [hostDate, setHostDate] = useState('');
-  const [hostEmail, setHostEmail] = useState('');
-  const [hostDetails, setHostDetails] = useState('');
-  const [hostMsg, setHostMsg] = useState(null);
 
   useEffect(() => {
     eventsApi.list()
@@ -117,63 +109,10 @@ export default function Events() {
 
   const closeHost = () => {
     setHostOpen(false);
-    setHostMsg(null);
   };
 
   const closeRsvp = () => {
     setRsvpEvent(null);
-    setRsvpEmail('');
-    setRsvpMsg(null);
-    setRsvpSubmitting(false);
-  };
-
-  const handleRsvpSubmit = async (e) => {
-    e.preventDefault();
-    const email = user ? user.email : rsvpEmail.trim();
-    if (!email) {
-      setRsvpMsg('Please enter your email address.');
-      return;
-    }
-    setRsvpSubmitting(true);
-    try {
-      await eventsApi.rsvp(rsvpEvent.id, {
-        email,
-        displayName: user?.displayName || null,
-      });
-      setRsvpMsg("✨ You're on the list! Check your email for a calendar invite.");
-      addToast("Successfully RSVP'd to the event!", "success");
-    } catch (err) {
-      setRsvpMsg(err.message || 'Something went wrong. Please try again.');
-    } finally {
-      setRsvpSubmitting(false);
-    }
-  };
-
-  const handleHostSubmit = async e => {
-    e.preventDefault();
-    const title = hostTitle.trim();
-    const email = hostEmail.trim();
-    if (!title || !email) {
-      setHostMsg('Please add an event title and a contact email.');
-      return;
-    }
-    try {
-      await eventsApi.submitProposal({
-        title,
-        format: hostFormat,
-        proposedDate: hostDate.trim() || null,
-        email,
-        details: hostDetails.trim() || null,
-      });
-      setHostMsg('Thanks — your proposal has been submitted! Our team will review it and get back to you.');
-      setHostTitle('');
-      setHostFormat('webinar');
-      setHostDate('');
-      setHostEmail('');
-      setHostDetails('');
-    } catch (err) {
-      setHostMsg(err.message || 'Failed to submit proposal. Please try again.');
-    }
   };
 
   return (
@@ -278,155 +217,8 @@ export default function Events() {
         </div>
       </div>
 
-      {rsvpEvent ? (
-        <Modal title={`RSVP: ${rsvpEvent.title}`} onClose={closeRsvp}>
-          <p style={{ marginBottom: 12 }}>{rsvpEvent.type}</p>
-          {rsvpMsg ? (
-            <p className={styles.rsvpHint} role="status" aria-live="polite">{rsvpMsg}</p>
-          ) : (
-            <form onSubmit={handleRsvpSubmit}>
-              {user ? (
-                <p style={{ fontSize: 14, marginBottom: 12 }}>
-                  Registering as <strong>{user.displayName}</strong> ({user.email})
-                </p>
-              ) : (
-                <label style={{ display: 'flex', flexDirection: 'column', gap: 6, marginBottom: 12 }}>
-                  <span style={{ fontSize: 13, fontWeight: 600 }}>Your email address *</span>
-                  <input
-                    type="email"
-                    className={styles.formInput}
-                    value={rsvpEmail}
-                    onChange={e => setRsvpEmail(e.target.value)}
-                    placeholder="you@example.com"
-                    required
-                    aria-required="true"
-                  />
-                </label>
-              )}
-              <div className={styles.submitFooter}>
-                <button type="button" className={styles.submitCancel} onClick={closeRsvp}>Cancel</button>
-                <button type="submit" className={styles.submitOk} disabled={rsvpSubmitting}>
-                  {rsvpSubmitting ? 'Registering…' : 'Confirm RSVP'}
-                </button>
-              </div>
-            </form>
-          )}
-        </Modal>
-      ) : null}
-
-      {hostOpen ? (
-        <Modal title="Host an event" onClose={closeHost}>
-          <p className={styles.hostModalIntro}>
-            Tell us about your session. We’ll review community fit, timing, and accessibility needs before it goes
-            live — same flow whether you’re on a preview build or production.
-          </p>
-          <form onSubmit={handleHostSubmit} noValidate aria-describedby="host-required-note">
-            <p id="host-required-note" className={styles.formRequiredNote}>
-              Required fields are marked with an asterisk (
-              <span className={styles.requiredMark} aria-hidden="true">
-                *
-              </span>
-              ).
-            </p>
-            <label className={styles.formLabel} htmlFor="host-title">
-              <span className={styles.formLabelText}>
-                Event title
-                <span className={styles.requiredMark} aria-hidden="true">
-                  *
-                </span>
-                <span className="sr-only"> (required)</span>
-              </span>
-              <input
-                id="host-title"
-                className={styles.formInput}
-                name="host-title"
-                autoComplete="off"
-                required
-                aria-required="true"
-                value={hostTitle}
-                onChange={e => setHostTitle(e.target.value)}
-              />
-            </label>
-            <label className={styles.formLabel} htmlFor="host-format">
-              <span className={styles.formLabelText}>Format</span>
-              <select
-                id="host-format"
-                className={styles.formInput}
-                name="host-format"
-                value={hostFormat}
-                onChange={e => setHostFormat(e.target.value)}
-              >
-                <option value="webinar">Webinar (online)</option>
-                <option value="workshop">Workshop (online)</option>
-                <option value="meetup">Local meetup (in person)</option>
-                <option value="hybrid">Hybrid</option>
-              </select>
-            </label>
-            <label className={styles.formLabel} htmlFor="host-date">
-              <span className={styles.formLabelText}>
-                Proposed date or window
-                <span className={styles.optionalMark}> (optional)</span>
-              </span>
-              <input
-                id="host-date"
-                className={styles.formInput}
-                name="host-date"
-                placeholder="e.g. July 2026, or 15 Sept afternoon"
-                value={hostDate}
-                onChange={e => setHostDate(e.target.value)}
-              />
-            </label>
-            <label className={styles.formLabel} htmlFor="host-email">
-              <span className={styles.formLabelText}>
-                Contact email
-                <span className={styles.requiredMark} aria-hidden="true">
-                  *
-                </span>
-                <span className="sr-only"> (required)</span>
-              </span>
-              <input
-                id="host-email"
-                className={styles.formInput}
-                name="host-email"
-                type="email"
-                autoComplete="email"
-                inputMode="email"
-                required
-                aria-required="true"
-                value={hostEmail}
-                onChange={e => setHostEmail(e.target.value)}
-              />
-            </label>
-            <label className={styles.formLabel} htmlFor="host-details">
-              <span className={styles.formLabelText}>
-                Details (audience, length, accessibility plans)
-                <span className={styles.optionalMark}> (optional)</span>
-              </span>
-              <textarea
-                id="host-details"
-                className={styles.formTextarea}
-                name="host-details"
-                rows={4}
-                value={hostDetails}
-                onChange={e => setHostDetails(e.target.value)}
-              />
-            </label>
-            {hostMsg ? (
-              <p className={styles.formMsg} role="status" aria-live="polite">
-                {hostMsg}
-              </p>
-            ) : null}
-            <div className={styles.submitFooter}>
-              <button type="button" className={styles.submitCancel} onClick={closeHost}>
-                Cancel
-              </button>
-              <button type="submit" className={styles.submitOk}>
-                Submit proposal
-              </button>
-            </div>
-          </form>
-        </Modal>
-      ) : null}
+      <RsvpModal event={rsvpEvent} onClose={closeRsvp} />
+      <HostEventModal isOpen={hostOpen} onClose={closeHost} />
     </Container>
   );
 }

@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { newsApi } from 'api/client';
 import { SITE_NAME } from 'brand';
+import styles from './News.module.css';
 
 function formatDate(raw) {
   if (!raw) return '';
@@ -42,14 +43,14 @@ export default function News() {
   }, []);
 
   return (
-    <div style={{ padding: '40px 24px', maxWidth: '800px', margin: '0 auto' }}>
+    <div className={styles.container}>
       <h1>News</h1>
-      <p style={{ lineHeight: 1.7, color: 'var(--text-muted)' }}>
+      <p className={styles.subtitle}>
         Latest updates from W3C and the {SITE_NAME} community.
       </p>
 
-      <section style={{ marginTop: '2rem' }} aria-labelledby="w3c-news-heading">
-        <h2 id="w3c-news-heading" style={{ fontSize: '1.25rem', marginBottom: '1rem' }}>
+      <section className={styles.section} aria-labelledby="w3c-news-heading">
+        <h2 id="w3c-news-heading" className={styles.heading}>
           W3C News
         </h2>
 
@@ -57,25 +58,20 @@ export default function News() {
         {error && <p role="alert">{error}</p>}
 
         {!loading && !error && items.length > 0 && (
-          <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'grid', gap: '1rem' }}>
+          <ul className={styles.feedList}>
             {items.map((item) => (
               <li
                 key={item.link}
-                style={{
-                  padding: '1rem',
-                  border: '1px solid var(--border)',
-                  borderRadius: '8px',
-                  background: 'var(--bg-card, #fff)',
-                }}
+                className={styles.feedItem}
               >
                 <a
                   href={item.link}
-                  style={{ fontWeight: 500, color: 'var(--accent, #074a9e)', textDecoration: 'none' }}
+                  className={styles.feedLink}
                 >
                   {item.title}
                 </a>
                 {item.pubDate && (
-                  <p style={{ margin: '0.35rem 0 0', fontSize: '0.875rem', color: 'var(--text-muted)' }}>
+                  <p className={styles.feedDate}>
                     {formatDate(item.pubDate)}
                   </p>
                 )}
@@ -85,18 +81,18 @@ export default function News() {
         )}
 
         {feedUrl && (
-          <p style={{ marginTop: '1.5rem', fontSize: '0.875rem', color: 'var(--text-muted)' }}>
+          <p className={styles.subscribeText}>
             Subscribe in your feed reader:{' '}
-            <code style={{ wordBreak: 'break-all' }}>{feedUrl}</code>
+            <code className={styles.codeUrl}>{feedUrl}</code>
           </p>
         )}
       </section>
 
-      <section style={{ marginTop: '2.5rem' }} aria-labelledby="community-news-heading">
-        <h2 id="community-news-heading" style={{ fontSize: '1.25rem', marginBottom: '1rem' }}>
+      <section className={styles.communitySection} aria-labelledby="community-news-heading">
+        <h2 id="community-news-heading" className={styles.heading}>
           Community
         </h2>
-        <ul style={{ lineHeight: 1.8 }}>
+        <ul className={styles.communityList}>
           <li>
             <strong>Discussions</strong> —{' '}
             <Link to="/">Join conversations on the community page</Link>.
