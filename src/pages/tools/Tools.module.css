@@ -130,3 +130,50 @@
   .certCard { flex-direction: column; }
   .certBtn { width: 100%; text-align: center; }
 }
+
+.filterBar {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+
+.filterBtn {
+  background: var(--bg-card);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-full);
+  padding: 6px 14px;
+  font-size: 13px;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all var(--transition);
+}
+
+.filterBtn:hover {
+  background: var(--bg-secondary);
+  color: var(--text);
+}
+
+.filterBtnActive {
+  background: var(--accent-bg);
+  border-color: var(--accent);
+  color: var(--accent-text);
+  font-weight: 500;
+}
+
+.toolTags {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+  margin-top: 4px;
+}
+
+.toolTag {
+  font-size: 10px;
+  color: var(--text-muted);
+  background: var(--bg-secondary);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-weight: 500;
+}
+

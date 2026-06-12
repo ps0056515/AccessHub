@@ -249,7 +249,8 @@ export default function Portal({
   const [topicFilter, setTopicFilter] = useState(null);
   const [recentViews, setRecentViews] = useState([]);
   const [draftQuestion, setDraftQuestion] = useState("");
-
+  const [waveUrl, setWaveUrl] = useState("");
+  const [waveError, setWaveError] = useState("");
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -932,23 +933,48 @@ export default function Portal({
               className={styles.checkerInput}
               type="url"
               placeholder="https://yoursite.com"
+              value={waveUrl}
+              onChange={(e) => {
+                setWaveUrl(e.target.value);
+                if (waveError) setWaveError("");
+              }}
             />
+            {waveError && (
+              <span className={styles.checkerError} role="alert">
+                {waveError}
+              </span>
+            )}
             <button
               type="button"
               className={styles.checkerBtn}
               onClick={() => {
-                const el = document.getElementById("wave-url");
-                const url = el?.value?.trim();
-                if (url)
-                  window.open(
-                    `https://wave.webaim.org/report#/${encodeURIComponent(url)}`,
-                    "_blank",
-                  );
+                const url = waveUrl.trim();
+                if (!url) {
+                  setWaveError("Please enter a URL.");
+                  return;
+                }
+                let isValid = false;
+                try {
+                  const parsed = new URL(url);
+                  isValid = parsed.protocol === "http:" || parsed.protocol === "https:";
+                } catch (_) {
+                  isValid = false;
+                }
+                if (!isValid) {
+                  setWaveError("Please enter a valid URL.");
+                  return;
+                }
+                setWaveError("");
+                window.open(
+                  `https://wave.webaim.org/report#/${encodeURIComponent(url)}`,
+                  "_blank",
+                );
               }}
             >
               Run scan →
             </button>
           </section>
+
         </aside>
       </Container>
     </div>
