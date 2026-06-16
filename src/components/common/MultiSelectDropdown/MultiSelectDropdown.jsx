@@ -1,7 +1,14 @@
 import { useState, useRef, useEffect } from 'react';
 import styles from './MultiSelectDropdown.module.css';
 
-export default function MultiSelectDropdown({ options, value, onChange, placeholder = 'Select options...' }) {
+export default function MultiSelectDropdown({ 
+  options, 
+  value, 
+  onChange, 
+  placeholder = 'Select options...', 
+  'aria-label': ariaLabel,
+  'aria-labelledby': ariaLabelledBy
+}) {
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef(null);
 
@@ -14,6 +21,13 @@ export default function MultiSelectDropdown({ options, value, onChange, placehol
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
+
+  const handleBlur = (e) => {
+    // e.relatedTarget is the element receiving focus
+    if (containerRef.current && !containerRef.current.contains(e.relatedTarget)) {
+      setIsOpen(false);
+    }
+  };
 
   const handleToggle = (option) => {
     if (value.includes(option)) {
@@ -38,7 +52,7 @@ export default function MultiSelectDropdown({ options, value, onChange, placehol
   };
 
   return (
-    <div className={styles.container} ref={containerRef}>
+    <div className={styles.container} ref={containerRef} onBlur={handleBlur}>
       <div 
         className={styles.inputArea} 
         onClick={() => setIsOpen(!isOpen)}
@@ -47,6 +61,8 @@ export default function MultiSelectDropdown({ options, value, onChange, placehol
         role="combobox"
         aria-expanded={isOpen}
         aria-haspopup="listbox"
+        aria-label={ariaLabel}
+        aria-labelledby={ariaLabelledBy}
       >
         <div className={styles.pillsContainer}>
           {value.length === 0 && <span className={styles.placeholder}>{placeholder}</span>}

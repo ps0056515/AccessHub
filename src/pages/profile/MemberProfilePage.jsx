@@ -182,15 +182,6 @@ export default function MemberProfilePage({ goToPortal }) {
               </div>
             </div>
           </div>
-          <div className={styles.cardRow}>
-            <Briefcase className={styles.cardRowIcon} />
-            <div>
-              <div className={styles.cardRowLabel}>Designation</div>
-              <div className={styles.cardRowValue}>
-                {member.designation || <span className={styles.cardRowEmpty}>Not set</span>}
-              </div>
-            </div>
-          </div>
         </div>
 
         {/* Location & Membership */}

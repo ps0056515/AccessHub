@@ -11,7 +11,9 @@ import { useAriaLive } from "context/AriaLiveContext";
 import Container from "components/common/Container/Container";
 import Pagination from "components/common/Pagination/Pagination";
 import RelativeTime from "components/common/RelativeTime/RelativeTime";
+import MultiSelectDropdown from "components/common/MultiSelectDropdown/MultiSelectDropdown";
 import { usersApi } from "api/client";
+import { CountryFlag } from "components/common/CountryFlag/CountryFlag";
 import styles from "./Portal.module.css";
 
 const TOPIC_FILTERS = ["WCAG 2.2", "Screen readers", "Legal"];
@@ -209,7 +211,10 @@ function PostCard({
       >
         <div className={styles.postBody}>
           <div className={styles.postMeta}>
-            <span className={styles.postAuthor}>{post.author}</span>
+            <span className={styles.postAuthor}>
+              {post.author}
+              <CountryFlag countryName={post.country} />
+            </span>
             <span className={styles.postDot}>·</span>
             <RelativeTime rawTime={post.raw_time} fallback={post.time} />
             <span className={styles.postDot}>·</span>
@@ -262,7 +267,7 @@ export default function Portal({
     }
   }, [isAuthenticated]);
   const [draftTitle, setDraftTitle] = useState("");
-  const [draftTags, setDraftTags] = useState([""]);
+  const [draftTags, setDraftTags] = useState([]);
   const [postError, setPostError] = useState("");
   const [posting, setPosting] = useState(false);
   const askBoxRef = useRef(null);
@@ -393,7 +398,7 @@ export default function Portal({
       return;
     }
 
-    if (!draftTags[0]) {
+    if (draftTags.length === 0) {
       setPostError("Please select a topic.");
       return;
     }
@@ -415,7 +420,7 @@ export default function Portal({
       setPosts((prevPosts) => [newPost, ...prevPosts]);
       setDraftTitle("");
       setDraftQuestion("");
-      setDraftTags([""]);
+      setDraftTags([]);
       setQuery("");
       setActiveTab("new");
       addToast("Discussion posted successfully!", "success");
@@ -661,24 +666,16 @@ export default function Portal({
               </p>
             )}
             <div className={styles.askFooter}>
-              <label className={styles.topicPicker} htmlFor="ask-topic">
-                <span className={styles.topicPickerLabel}>Choose topic</span>
-                <select
-                  id="ask-topic"
-                  className={styles.topicSelect}
-                  value={draftTags[0]}
-                  onChange={(e) => setDraftTags([e.target.value])}
-                  disabled={posting}
-                >
-                  <option value="">Select Topic</option>
-
-                  {(portalConfig.askTopics || []).map((topic) => (
-                    <option key={topic} value={topic}>
-                      {topic}
-                    </option>
-                  ))}
-                </select>
-              </label>
+              <div className={styles.topicPicker}>
+                <span className={styles.topicPickerLabel} id="ask-topic-label">Choose topic</span>
+                <MultiSelectDropdown
+                  options={portalConfig.askTopics || []}
+                  value={draftTags}
+                  onChange={setDraftTags}
+                  placeholder="Select Topic"
+                  aria-labelledby="ask-topic-label"
+                />
+              </div>
               <button
                 type="button"
                 className={styles.askPost}
@@ -900,7 +897,10 @@ export default function Portal({
                   >
                     <Avatar initials={m.initials} color={m.color} size={32} />
                     <div className={styles.memberInfo}>
-                      <span className={styles.memberName}>{m.name}</span>
+                      <span className={styles.memberName}>
+                        {m.name}
+                        <CountryFlag countryName={m.country} />
+                      </span>
                       <span className={styles.memberRole}>{m.role}</span>
                     </div>
                     {m.hot ? (

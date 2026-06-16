@@ -48,6 +48,7 @@ function formatPost(row, replyCount) {
     initials: row.author_initials,
     color: row.author_color,
     author: row.author_name,
+    country: row.country,
     role: row.author_role || 'Community member',
     time: relativeTime(row.created_at),
     raw_time: row.created_at,
@@ -65,6 +66,7 @@ function formatComment(row) {
   return {
     id: row.id,
     author: row.author_name,
+    country: row.country,
     initials: row.author_initials,
     color: row.author_color,
     time: relativeTime(row.created_at),
@@ -84,6 +86,7 @@ function authorFromUser(user) {
     author_initials: initials,
     author_color: 'blue',
     author_role: user.role || 'Community member',
+    country: user.country,
   };
 }
 

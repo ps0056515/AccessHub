@@ -7,6 +7,7 @@ import { useAuth } from 'context/AuthContext';
 import { useConfirm } from 'context/ConfirmContext';
 import { useToast } from 'context/ToastContext';
 import RelativeTime from 'components/common/RelativeTime/RelativeTime';
+import { CountryFlag } from 'components/common/CountryFlag/CountryFlag';
 import styles from './ThreadPage.module.css';
 import { SITE_NAME } from 'brand';
 
@@ -313,6 +314,7 @@ export default function ThreadPage({ posts, setPosts, refreshPosts, returnToComm
                 style={{ textDecoration: 'none', color: 'inherit' }}
               >
                 {post.author}
+                <CountryFlag countryName={post.country} />
               </Link>
               <span className={styles.dot}>·</span>
               <RelativeTime rawTime={post.raw_time} fallback={post.time} />
@@ -399,6 +401,7 @@ export default function ThreadPage({ posts, setPosts, refreshPosts, returnToComm
                     style={{ textDecoration: 'none', color: 'inherit' }}
                   >
                     {c.author}
+                    <CountryFlag countryName={c.country} />
                   </Link>
                   <span className={styles.dot}>·</span>
                   <RelativeTime rawTime={c.raw_time} fallback={c.time} />

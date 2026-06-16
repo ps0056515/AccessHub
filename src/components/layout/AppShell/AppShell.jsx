@@ -32,6 +32,7 @@ import Contact from "pages/footer-pages/Contact/Contact";
 import Contribute from "pages/footer-pages/Contribute/Contribute";
 import En301549 from "pages/footer-pages/En301549/En301549";
 import AboutUs from "pages/footer-pages/AboutUs/AboutUs";
+import AccessibilityJobs from "pages/footer-pages/AccessibilityJobs/AccessibilityJobs";
 import { SITE_NAME } from "brand";
 import { postsApi } from "api/client";
 import { useAriaLive } from "context/AriaLiveContext";
@@ -46,6 +47,7 @@ const FOOTER_PAGE_TITLES = {
   "/terms": `Terms · ${SITE_NAME}`,
   "/accessibility": `Accessibility statement · ${SITE_NAME}`,
   "/about-us": `About Us · ${SITE_NAME}`,
+  "/accessibility-jobs": `Accessibility Jobs · ${SITE_NAME}`,
 };
 
 const SECTION_PATHS = {
@@ -335,6 +337,7 @@ export default function AppShell() {
           <Route path="/blog/:id" element={<BlogDetail />} />
           <Route path="/en-301-549" element={<En301549 />} />
           <Route path="/about-us" element={<AboutUs />} />
+          <Route path="/accessibility-jobs" element={<AccessibilityJobs />} />
           <Route
             path="/join"
             element={
