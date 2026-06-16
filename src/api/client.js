@@ -398,3 +398,16 @@ export const usersApi = {
   getProfile: (id) => api(`/api/users/${id}/profile`),
   getRecentlyViewed: () => api('/api/users/me/recently-viewed'),
 };
+
+export const jobsApi = {
+  list: (params = {}) => {
+    const queryParams = new URLSearchParams();
+    if (params.query) queryParams.append('query', params.query);
+    if (params.location) queryParams.append('location', params.location);
+    if (params.page) queryParams.append('page', params.page);
+    if (params.remote_jobs_only) queryParams.append('remote_jobs_only', params.remote_jobs_only);
+    
+    const queryString = queryParams.toString();
+    return api(`/api/jobs${queryString ? `?${queryString}` : ''}`);
+  },
+};

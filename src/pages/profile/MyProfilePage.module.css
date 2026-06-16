@@ -234,34 +234,32 @@
   flex-shrink: 0;
 }
 
-.editBtnTop {
-  position: absolute;
-  top: 20px;
-  right: 24px;
-  display: inline-flex;
+.editBtnBottom {
+  display: flex;
   align-items: center;
-  gap: 6px;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  margin-top: 24px;
   background: var(--bg-card);
   border: 1px solid var(--border-strong);
   color: var(--text);
-  padding: 8px 16px;
-  border-radius: var(--radius-full);
-  font-size: 13px;
+  padding: 12px 16px;
+  border-radius: var(--radius-sm);
+  font-size: 14px;
   font-weight: 500;
   cursor: pointer;
   font-family: var(--sans);
   transition: all 0.2s;
-  box-shadow: var(--shadow-sm);
 }
 
-.editBtnTop:hover {
+.editBtnBottom:hover {
   background: var(--bg-secondary);
-  box-shadow: var(--shadow-md);
 }
 
-.editBtnTop svg {
-  width: 14px;
-  height: 14px;
+.editBtnBottom svg {
+  width: 16px;
+  height: 16px;
 }
 
 /* ── Info Cards ── */
@@ -421,6 +419,29 @@
 .completenessHint {
   font-size: 12px;
   color: var(--text-muted);
+}
+
+.completenessSuccess {
+  border-color: var(--green);
+  background: linear-gradient(to right, var(--bg-card), rgba(16, 185, 129, 0.05));
+}
+
+.completenessSuccessTitle {
+  color: var(--green);
+}
+
+.tada {
+  display: inline-flex;
+  align-items: center;
+  animation: tada 1s ease-in-out;
+}
+
+@keyframes tada {
+  0% { transform: scale(1); }
+  10%, 20% { transform: scale(0.9) rotate(-3deg); }
+  30%, 50%, 70%, 90% { transform: scale(1.1) rotate(3deg); }
+  40%, 60%, 80% { transform: scale(1.1) rotate(-3deg); }
+  100% { transform: scale(1) rotate(0); }
 }
 
 /* ── Edit Mode Form ── */
@@ -616,11 +637,9 @@
     grid-template-columns: 1fr;
   }
 
-  .editBtnTop {
-    top: 12px;
-    right: 16px;
-    padding: 6px 12px;
-    font-size: 12px;
+  .editBtnBottom {
+    padding: 10px 12px;
+    font-size: 13px;
   }
 
   .name {
@@ -643,6 +662,10 @@
     animation: none;
   }
   .infoCard:hover {
+    transform: none;
+  }
+  .tada {
+    animation: none;
     transform: none;
   }
 }

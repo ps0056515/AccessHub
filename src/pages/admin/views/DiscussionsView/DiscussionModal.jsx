@@ -150,13 +150,15 @@ export default function DiscussionModal({ post, onClose, onSave, isSaving }) {
         
         <form id="discussion-form" onSubmit={handleSubmit} style={{ flex: 1, display: 'flex', flexDirection: 'column',  }}>
           <div className={styles.formGroup}>
-            <label className={styles.label}>Title</label>
+            <label htmlFor="discussion-title" className={styles.label}>Title <span aria-hidden="true">*</span></label>
             <input
+              id="discussion-title"
               type="text"
               className={styles.input}
               value={formData.title}
               onChange={e => setFormData({ ...formData, title: e.target.value })}
               required
+              aria-required="true"
               minLength={5}
             />
           </div>
@@ -173,8 +175,9 @@ export default function DiscussionModal({ post, onClose, onSave, isSaving }) {
 
           <div style={{ display: 'flex', gap: '16px' }}>
             <div className={styles.formGroup} style={{ flex: 1 }}>
-              <label className={styles.label}>Votes</label>
+              <label htmlFor="discussion-votes" className={styles.label}>Votes</label>
               <input
+                id="discussion-votes"
                 type="number"
                 className={styles.input}
                 value={formData.votes}
@@ -183,8 +186,9 @@ export default function DiscussionModal({ post, onClose, onSave, isSaving }) {
               />
             </div>
             <div className={styles.formGroup} style={{ flex: 1 }}>
-              <label className={styles.label}>Date</label>
+              <label htmlFor="discussion-date" className={styles.label}>Date</label>
               <input
+                id="discussion-date"
                 type="datetime-local"
                 className={styles.input}
                 value={formData.created_at}
@@ -194,13 +198,12 @@ export default function DiscussionModal({ post, onClose, onSave, isSaving }) {
           </div>
 
           <div className={styles.formGroup} style={{ flex: 1 }}>
-            <label className={styles.label}>Body</label>
+            <label htmlFor="discussion-body" className={styles.label}>Body</label>
             <textarea
+              id="discussion-body"
               className={styles.textarea}
               value={formData.body}
               onChange={e => setFormData({ ...formData, body: e.target.value })}
-              required
-              minLength={10}
               style={{ minHeight: '200px', flex: 1 }}
             />
           </div>
@@ -276,12 +279,15 @@ export default function DiscussionModal({ post, onClose, onSave, isSaving }) {
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              <label htmlFor="add-reply" className="visually-hidden" style={{ display: 'none' }}>Add a reply</label>
               <textarea
+                id="add-reply"
                 className={styles.textarea}
                 placeholder="Add a reply..."
                 value={newReply}
                 onChange={e => setNewReply(e.target.value)}
                 style={{ minHeight: '80px' }}
+                aria-label="Add a reply"
               />
               {commentError && <div style={{ color: 'var(--error-color)', fontSize: '13px' }}>{commentError}</div>}
               <button type="button" className={styles.btnPrimary} onClick={handleAddReply} disabled={!newReply.trim()}>

@@ -16,7 +16,6 @@ const COMPLETENESS_FIELDS = [
   { key: 'bio', label: 'Bio' },
   { key: 'avatarUrl', label: 'Profile photo' },
   { key: 'company', label: 'Company' },
-  { key: 'designation', label: 'Designation' },
   { key: 'role', label: 'Role' },
   { key: 'country', label: 'Country' },
   { key: 'city', label: 'City' },
@@ -318,16 +317,6 @@ export default function MyProfilePage() {
                 />
               </div>
 
-              <div className={styles.formGroup}>
-                <label htmlFor="edit-designation" className={styles.formLabel}>Designation</label>
-                <input
-                  id="edit-designation"
-                  className={styles.formInput}
-                  value={formData.designation}
-                  onChange={e => setFormData({ ...formData, designation: e.target.value })}
-                  placeholder="e.g. Senior Engineer"
-                />
-              </div>
 
               <div className={styles.formGroup}>
                 <label htmlFor="edit-country" className={styles.formLabel}>Country</label>
@@ -408,13 +397,6 @@ export default function MyProfilePage() {
 
       {/* Profile card */}
       <div className={`${styles.profileCard} ${styles.fadeUp} ${styles.fadeUp1}`}>
-        <button
-          type="button"
-          className={styles.editBtnTop}
-          onClick={() => setIsEditing(true)}
-        >
-          <Edit3 /> Edit Profile
-        </button>
 
         <div className={styles.profileHeader}>
           {avatarElement}
@@ -446,10 +428,18 @@ export default function MyProfilePage() {
             </div>
           </div>
         </div>
+
+        <button
+          type="button"
+          className={styles.editBtnBottom}
+          onClick={() => setIsEditing(true)}
+        >
+          <Edit3 size={16} /> Edit Profile
+        </button>
       </div>
 
       {/* Profile Completeness */}
-      {completeness.percent < 100 && (
+      {completeness.percent < 100 ? (
         <div className={`${styles.completenessCard} ${styles.fadeUp} ${styles.fadeUp2}`}>
           <div className={styles.completenessHeader}>
             <span className={styles.completenessTitle}>
@@ -479,6 +469,18 @@ export default function MyProfilePage() {
             >
               Complete now <ChevronRight size={12} style={{ verticalAlign: -2 }} />
             </button>
+          </p>
+        </div>
+      ) : (
+        <div className={`${styles.completenessCard} ${styles.completenessSuccess} ${styles.fadeUp} ${styles.fadeUp2}`}>
+          <div className={styles.completenessHeader}>
+            <span className={`${styles.completenessTitle} ${styles.completenessSuccessTitle} ${styles.tada}`}>
+              <CheckCircle2 size={16} style={{ marginRight: 6, verticalAlign: -3 }} />
+              Profile 100% Complete!
+            </span>
+          </div>
+          <p className={styles.completenessHint}>
+            Your profile looks amazing. You're all set to connect with the community.
           </p>
         </div>
       )}
@@ -517,15 +519,6 @@ export default function MyProfilePage() {
               <div className={styles.cardRowLabel}>Company</div>
               <div className={styles.cardRowValue}>
                 {user.company || <span className={styles.cardRowEmpty}>Not set</span>}
-              </div>
-            </div>
-          </div>
-          <div className={styles.cardRow}>
-            <Briefcase className={styles.cardRowIcon} />
-            <div>
-              <div className={styles.cardRowLabel}>Designation</div>
-              <div className={styles.cardRowValue}>
-                {user.designation || <span className={styles.cardRowEmpty}>Not set</span>}
               </div>
             </div>
           </div>

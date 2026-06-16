@@ -266,7 +266,7 @@ export const CERTS = [
     title: 'CPACC — Certified Professional in Accessibility Core Competencies',
     body: 'IAAP · Foundation level · Best first certification for anyone entering the field',
     progress: 72,
-    members: '4,200+ holders',
+    members: '80+ holders',
     learnMoreUrl: 'https://www.accessibilityassociation.org/certification',
   },
   {
@@ -275,7 +275,7 @@ export const CERTS = [
     title: 'WAS — Web Accessibility Specialist',
     body: 'IAAP · Technical depth · Requires hands-on WCAG implementation experience',
     progress: 48,
-    members: '2,100+ holders',
+    members: '20+ holders',
     learnMoreUrl: 'https://www.accessibilityassociation.org/certification',
   },
   {
@@ -284,7 +284,7 @@ export const CERTS = [
     title: 'CPABE — Certified Professional in Accessible Built Environments',
     body: 'IAAP · Physical accessibility focus · ADA / IBC expertise required',
     progress: 31,
-    members: '780+ holders',
+    members: '15+ holders',
     learnMoreUrl: 'https://www.accessibilityassociation.org/certification',
   },
   {
@@ -293,7 +293,7 @@ export const CERTS = [
     title: 'WebAIM training courses',
     body: 'Self-paced · WCAG, screen readers, PDF accessibility, and more',
     progress: 88,
-    members: '12,000+ enrolled',
+    members: '1000+ enrolled',
     learnMoreUrl: 'https://webaim.org/training/',
   },
 ];

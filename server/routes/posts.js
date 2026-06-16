@@ -7,8 +7,10 @@ const router = express.Router();
 
 const POST_SELECT = `
   SELECT p.*,
+    u.country,
     (SELECT COUNT(*)::int FROM comments c WHERE c.post_id = p.id) AS reply_count
   FROM posts p
+  LEFT JOIN users u ON p.user_id = u.id
 `;
 
 router.get('/', optionalAuthMiddleware, async (req, res, next) => {
@@ -19,9 +21,11 @@ router.get('/', optionalAuthMiddleware, async (req, res, next) => {
     if (req.userId) {
       queryStr = `
         SELECT p.*,
+          u.country,
           (SELECT COUNT(*)::int FROM comments c WHERE c.post_id = p.id) AS reply_count,
           (SELECT direction FROM post_votes pv WHERE pv.post_id = p.id AND pv.voter_key = $1 LIMIT 1) AS user_vote_direction
         FROM posts p
+        LEFT JOIN users u ON p.user_id = u.id
         ORDER BY p.created_at DESC
       `;
       params.push(req.userId.toString());
@@ -40,6 +44,7 @@ router.get('/top-contributors', async (_req, res, next) => {
       SELECT 
         u.id AS user_id, 
         u.display_name,
+        u.country,
         (SELECT COUNT(*) FROM posts p WHERE p.user_id = u.id) + 
         (SELECT COUNT(*) FROM comments c WHERE c.user_id = u.id) AS total_contributions
       FROM users u
@@ -51,7 +56,7 @@ router.get('/top-contributors', async (_req, res, next) => {
     `);
 
     const contributors = rows.map((row, index) => {
-      const author = authorFromUser({ display_name: row.display_name });
+      const author = authorFromUser({ display_name: row.display_name, country: row.country });
       return {
         id: row.user_id,
         initials: author.author_initials,
@@ -259,9 +264,11 @@ router.get('/:id', optionalAuthMiddleware, async (req, res, next) => {
     if (req.userId) {
       queryStr = `
         SELECT p.*,
+          u.country,
           (SELECT COUNT(*)::int FROM comments c WHERE c.post_id = p.id) AS reply_count,
           (SELECT direction FROM post_votes pv WHERE pv.post_id = p.id AND pv.voter_key = $2 LIMIT 1) AS user_vote_direction
         FROM posts p
+        LEFT JOIN users u ON p.user_id = u.id
         WHERE p.id = $1
       `;
       params.push(req.userId.toString());
@@ -275,7 +282,11 @@ router.get('/:id', optionalAuthMiddleware, async (req, res, next) => {
     }
 
     const { rows: comments } = await query(
-      'SELECT * FROM comments WHERE post_id = $1 ORDER BY created_at ASC',
+      `SELECT c.*, u.country 
+       FROM comments c 
+       LEFT JOIN users u ON c.user_id = u.id 
+       WHERE c.post_id = $1 
+       ORDER BY c.created_at ASC`,
       [id],
     );
 
