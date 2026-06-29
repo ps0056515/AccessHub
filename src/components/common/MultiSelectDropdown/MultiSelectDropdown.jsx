@@ -7,10 +7,13 @@ export default function MultiSelectDropdown({
   onChange, 
   placeholder = 'Select options...', 
   'aria-label': ariaLabel,
-  'aria-labelledby': ariaLabelledBy
+  'aria-labelledby': ariaLabelledBy,
+  'aria-invalid': ariaInvalid,
+  'aria-describedby': ariaDescribedBy
 }) {
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef(null);
+  const inputAreaRef = useRef(null);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -43,6 +46,10 @@ export default function MultiSelectDropdown({
   };
 
   const handleKeyDown = (e) => {
+    // Only handle keydown if the event originated from the container itself,
+    // not from a focusable child element like the remove button.
+    if (e.target !== e.currentTarget) return;
+
     if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault();
       setIsOpen(!isOpen);
@@ -51,9 +58,19 @@ export default function MultiSelectDropdown({
     }
   };
 
+  const handleContainerKeyDown = (e) => {
+    if (e.key === 'Escape') {
+      setIsOpen(false);
+      if (inputAreaRef.current) {
+        inputAreaRef.current.focus();
+      }
+    }
+  };
+
   return (
-    <div className={styles.container} ref={containerRef} onBlur={handleBlur}>
+    <div className={styles.container} ref={containerRef} onBlur={handleBlur} onKeyDown={handleContainerKeyDown}>
       <div 
+        ref={inputAreaRef}
         className={styles.inputArea} 
         onClick={() => setIsOpen(!isOpen)}
         onKeyDown={handleKeyDown}
@@ -63,6 +80,8 @@ export default function MultiSelectDropdown({
         aria-haspopup="listbox"
         aria-label={ariaLabel}
         aria-labelledby={ariaLabelledBy}
+        aria-invalid={ariaInvalid}
+        aria-describedby={ariaDescribedBy}
       >
         <div className={styles.pillsContainer}>
           {value.length === 0 && <span className={styles.placeholder}>{placeholder}</span>}
