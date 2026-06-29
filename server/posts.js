@@ -65,6 +65,7 @@ function formatPost(row, replyCount) {
 function formatComment(row) {
   return {
     id: row.id,
+    userId: row.user_id,
     author: row.author_name,
     country: row.country,
     initials: row.author_initials,

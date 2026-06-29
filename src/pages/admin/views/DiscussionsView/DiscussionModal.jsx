@@ -24,7 +24,7 @@ function toDatetimeLocal(isoString) {
 export default function DiscussionModal({ post, onClose, onSave, isSaving }) {
   const { portalConfig } = useConfig();
   const confirm = useConfirm();
-  const { showToast } = useToast();
+  const { addToast } = useToast();
   const [formData, setFormData] = useState({
     title: '',
     body: '',
@@ -99,7 +99,7 @@ export default function DiscussionModal({ post, onClose, onSave, isSaving }) {
       await postsApi.deleteCommentAdmin(post.id, commentId);
       setComments(prev => prev.filter(c => c.id !== commentId));
     } catch (err) {
-      showToast(err.message || 'Failed to delete reply.', 'error');
+      addToast(err.message || 'Failed to delete reply.', 'error');
     }
   };
 
@@ -108,7 +108,7 @@ export default function DiscussionModal({ post, onClose, onSave, isSaving }) {
 
     if (editCommentDate && formData.created_at) {
       if (new Date(editCommentDate) < new Date(formData.created_at)) {
-        showToast('Reply date cannot be earlier than the original post date.', 'error');
+        addToast('Reply date cannot be earlier than the original post date.', 'error');
         return;
       }
     }
@@ -124,7 +124,7 @@ export default function DiscussionModal({ post, onClose, onSave, isSaving }) {
       setEditCommentBody('');
       setEditCommentDate('');
     } catch (err) {
-      showToast(err.message || 'Failed to update reply.', 'error');
+      addToast(err.message || 'Failed to update reply.', 'error');
     }
   };
 

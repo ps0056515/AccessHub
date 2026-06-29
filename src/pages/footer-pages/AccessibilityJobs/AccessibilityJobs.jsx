@@ -178,11 +178,11 @@ export default function AccessibilityJobs() {
   
   // Search state
   const [searchQuery, setSearchQuery] = useState('');
-  const [locationQuery, setLocationQuery] = useState('');
+  const [locationQuery, setLocationQuery] = useState('India');
   const [remoteOnly, setRemoteOnly] = useState(false);
   
   // Real API parameters (what is actually being fetched)
-  const [fetchParams, setFetchParams] = useState({ query: 'accessibility', location: '', remote_jobs_only: false });
+  const [fetchParams, setFetchParams] = useState({ query: 'accessibility', location: 'India', remote_jobs_only: false });
 
   const fetchJobs = useCallback(async (params) => {
     setLoading(true);
@@ -213,9 +213,9 @@ export default function AccessibilityJobs() {
 
   const clearFilters = () => {
     setSearchQuery('');
-    setLocationQuery('');
+    setLocationQuery('India');
     setRemoteOnly(false);
-    setFetchParams({ query: 'accessibility', location: '', remote_jobs_only: false });
+    setFetchParams({ query: 'accessibility', location: 'India', remote_jobs_only: false });
   };
 
   return (

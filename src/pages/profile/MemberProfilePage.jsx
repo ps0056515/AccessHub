@@ -117,9 +117,9 @@ export default function MemberProfilePage({ goToPortal }) {
               {member.email && (
                 <span className={styles.metaItem}>
                   <Mail className={styles.metaIcon} />
-                  <a href={`mailto:${member.email}`} style={{ color: 'inherit', textDecoration: 'none' }}>
+                  <span style={{ color: 'inherit' }}>
                     {member.email}
-                  </a>
+                  </span>
                 </span>
               )}
               {companyLine && (
@@ -166,7 +166,7 @@ export default function MemberProfilePage({ goToPortal }) {
               <div className={styles.cardRowLabel}>Email</div>
               <div className={styles.cardRowValue}>
                 {member.email ? (
-                  <a href={`mailto:${member.email}`} style={{ color: 'inherit' }}>{member.email}</a>
+                  <span style={{ color: 'inherit' }}>{member.email}</span>
                 ) : (
                   <span className={styles.cardRowEmpty}>Not set</span>
                 )}
