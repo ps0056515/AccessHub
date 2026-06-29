@@ -74,6 +74,10 @@ export default function ThreadPage({ posts, setPosts, refreshPosts, returnToComm
   const [editError, setEditError] = useState('');
   const [savingEdit, setSavingEdit] = useState(false);
 
+  const [editingCommentId, setEditingCommentId] = useState(null);
+  const [editingCommentBody, setEditingCommentBody] = useState('');
+  const [commentSaving, setCommentSaving] = useState(false);
+
   useEffect(() => {
     if (id == null) {
       setLoading(false);
@@ -195,6 +199,45 @@ export default function ThreadPage({ posts, setPosts, refreshPosts, returnToComm
       setCommentError(err.message || 'Could not post reply.');
     } finally {
       setSubmitting(false);
+    }
+  };
+
+  const startEditComment = (c) => {
+    setEditingCommentId(c.id);
+    setEditingCommentBody(c.body);
+  };
+
+  const handleCommentEditSave = async (e, commentId) => {
+    e.preventDefault();
+    if (!editingCommentBody.trim()) return;
+    setCommentSaving(true);
+    try {
+      const { comment } = await postsApi.updateComment(id, commentId, editingCommentBody.trim());
+      setComments((list) => list.map((c) => (c.id === commentId ? comment : c)));
+      setEditingCommentId(null);
+      addToast("Reply updated successfully!", "success");
+    } catch (err) {
+      addToast(err.message || 'Could not update reply.', "error");
+    } finally {
+      setCommentSaving(false);
+    }
+  };
+
+  const handleCommentDelete = async (commentId) => {
+    if (!(await confirm('Are you sure you want to delete this reply?'))) return;
+    try {
+      await postsApi.deleteComment(id, commentId);
+      setComments((list) => list.filter((c) => c.id !== commentId));
+      setPost(prev => {
+        if (!prev) return prev;
+        const updated = { ...prev, replies: Math.max(0, (prev.replies || 0) - 1) };
+        setPosts(list => list.map(p => (p.id === updated.id ? updated : p)));
+        return updated;
+      });
+      addToast("Reply deleted.", "success");
+      refreshPosts?.();
+    } catch (err) {
+      addToast(err.message || 'Could not delete reply.', "error");
     }
   };
 
@@ -338,7 +381,6 @@ export default function ThreadPage({ posts, setPosts, refreshPosts, returnToComm
                   className={styles.textarea}
                   rows={6}
                   disabled={savingEdit}
-                  required
                 />
                 <div className={styles.editActions}>
                   <button type="submit" className={styles.submit} disabled={savingEdit}>
@@ -394,19 +436,53 @@ export default function ThreadPage({ posts, setPosts, refreshPosts, returnToComm
                 <Avatar initials={c.initials} color={c.color} size={36} />
               </Link>
               <div className={styles.replyBody}>
-                <p className={styles.replyMeta}>
-                  <Link 
-                    to={`/profile/${c.userId}`} 
-                    className={styles.author} 
-                    style={{ textDecoration: 'none', color: 'inherit' }}
-                  >
-                    {c.author}
-                    <CountryFlag countryName={c.country} />
-                  </Link>
-                  <span className={styles.dot}>·</span>
-                  <RelativeTime rawTime={c.raw_time} fallback={c.time} />
-                </p>
-                <p className={styles.replyText}>{c.body}</p>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', width: '100%' }}>
+                  <p className={styles.replyMeta}>
+                    <Link 
+                      to={`/profile/${c.userId}`} 
+                      className={styles.author} 
+                      style={{ textDecoration: 'none', color: 'inherit' }}
+                    >
+                      {c.author}
+                      <CountryFlag countryName={c.country} />
+                    </Link>
+                    <span className={styles.dot}>·</span>
+                    <RelativeTime rawTime={c.raw_time} fallback={c.time} />
+                  </p>
+                  {isAuthenticated && user?.id === c.userId && (
+                    <div className={styles.ownerActions}>
+                      <button type="button" onClick={() => startEditComment(c)} className={styles.editBtn}>Edit</button>
+                      <button type="button" onClick={() => handleCommentDelete(c.id)} className={styles.deleteBtn}>Delete</button>
+                    </div>
+                  )}
+                </div>
+                {editingCommentId === c.id ? (
+                  <form onSubmit={(e) => handleCommentEditSave(e, c.id)} className={styles.editForm}>
+                    <textarea
+                      value={editingCommentBody}
+                      onChange={(e) => setEditingCommentBody(e.target.value)}
+                      className={styles.textarea}
+                      rows={3}
+                      disabled={commentSaving}
+                      required
+                    />
+                    <div className={styles.editActions}>
+                      <button type="submit" className={styles.submit} disabled={commentSaving}>
+                        {commentSaving ? 'Saving…' : 'Save'}
+                      </button>
+                      <button
+                        type="button"
+                        className={styles.cancelBtn}
+                        onClick={() => setEditingCommentId(null)}
+                        disabled={commentSaving}
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </form>
+                ) : (
+                  <p className={styles.replyText}>{c.body}</p>
+                )}
               </div>
             </li>
           ))}

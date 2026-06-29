@@ -14,7 +14,7 @@ export default function ScreenReaderDetail() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const [phase, setPhase] = useState(null);
+  const [phaseIndex, setPhaseIndex] = useState(0);
   const [checked, setChecked] = useState({});
 
   useEffect(() => {
@@ -27,7 +27,7 @@ export default function ScreenReaderDetail() {
       const res = await screenReadersApi.get(id);
       setGuide(res);
       if (res.content_json && res.content_json.length > 0) {
-        setPhase(res.content_json[0].id);
+        setPhaseIndex(0);
       }
       document.title = `${res.title} · Screen Readers · AllCanAccess`;
     } catch (err) {
@@ -41,14 +41,14 @@ export default function ScreenReaderDetail() {
   if (error || !guide) return <div className={styles.container}>{error || 'Guide not found'}</div>;
 
   const PHASES = guide.content_json || [];
-  const current = PHASES.find(p => p.id === phase) || PHASES[0];
-  const checklistPhase = PHASES.find(p => p.id === 'checklist');
- const checklist = checklistPhase?.checklist ?? [];
-  const checkedCount = Object.values(checked).filter(Boolean).length;
+  const current = PHASES[phaseIndex] || PHASES[0] || {};
 
-  const toggleCheck = (i) => setChecked(prev => ({ ...prev, [i]: !prev[i] }));
+  const toggleCheck = (phaseId, i) => setChecked(prev => ({ ...prev, [`${phaseId}_${i}`]: !prev[`${phaseId}_${i}`] }));
 
-  const groups = [...new Set(checklist.map(c => c.group))];
+  const getCheckedCount = (phaseId, phaseChecklist) => {
+    if (!phaseChecklist) return 0;
+    return phaseChecklist.reduce((count, _, i) => count + (checked[`${phaseId}_${i}`] ? 1 : 0), 0);
+  };
 
 
 
@@ -63,16 +63,18 @@ export default function ScreenReaderDetail() {
       <div className={styles.layout}>
         {/* Phase nav */}
         <nav className={styles.phaseNav} aria-label="Guide sections">
-          {PHASES.map(p => (
+          {PHASES.map((p, idx) => (
             <button
-              key={p.id}
-              className={`${styles.phaseBtn} ${phase === p.id ? styles.phaseBtnActive : ''}`}
-              onClick={() => setPhase(p.id)}
-              aria-current={phase === p.id ? 'step' : undefined}
+              key={idx}
+              className={`${styles.phaseBtn} ${phaseIndex === idx ? styles.phaseBtnActive : ''}`}
+              onClick={() => setPhaseIndex(idx)}
+              aria-current={phaseIndex === idx ? 'step' : undefined}
             >
               {p.label}
-              {p.id === 'checklist' && (
-                <span className={styles.checkCount}>{checkedCount}/{checklist.length}</span>
+              {p.checklist && p.checklist.length > 0 && (
+                <span className={styles.checkCount}>
+                  {getCheckedCount(p.id, p.checklist)}/{p.checklist.length}
+                </span>
               )}
             </button>
           ))}
@@ -101,7 +103,7 @@ export default function ScreenReaderDetail() {
                   <p>{current.tip}</p>
                 </div>
               )}
-              {phase === 'modes' && (
+              {current.id === 'modes' && (
                 <div className={styles.modeGrid}>
                   <div className={styles.modeCard} style={{ borderLeftColor: '#b03020' }}>
                     <h3 className={styles.modeTitle}>Browse mode</h3>
@@ -168,32 +170,32 @@ export default function ScreenReaderDetail() {
                 <div className={styles.progressBar}>
                   <div
                     className={styles.progressFill}
-                    style={{ width: `${Math.round(checkedCount / checklist.length * 100)}%` }}
+                    style={{ width: `${Math.round(getCheckedCount(current.id, current.checklist) / current.checklist.length * 100)}%` }}
                     role="progressbar"
-                    aria-valuenow={checkedCount}
+                    aria-valuenow={getCheckedCount(current.id, current.checklist)}
                     aria-valuemin={0}
-                    aria-valuemax={checklist.length}
-                    aria-label={`${checkedCount} of ${checklist.length} checks passed`}
+                    aria-valuemax={current.checklist.length}
+                    aria-label={`${getCheckedCount(current.id, current.checklist)} of ${current.checklist.length} checks passed`}
                   />
                 </div>
-                <span className={styles.progressLabel}>{checkedCount} / {checklist.length}</span>
+                <span className={styles.progressLabel}>{getCheckedCount(current.id, current.checklist)} / {current.checklist.length}</span>
               </div>
-              {groups.map(group => (
+              {[...new Set(current.checklist.map(c => c.group))].map(group => (
                 <div key={group} className={styles.checkGroup}>
                   <h3 className={styles.checkGroupTitle}>{group}</h3>
                   <ul className={styles.checkList}>
-                    {checklist.map((item, i) => item.group === group && (
+                    {current.checklist.map((item, i) => item.group === group && (
                       <li key={i} className={styles.checkItem}>
                         <button
-                          className={`${styles.checkBox} ${checked[i] ? styles.checkBoxChecked : ''}`}
-                          onClick={() => toggleCheck(i)}
-                          aria-pressed={!!checked[i]}
+                          className={`${styles.checkBox} ${checked[`${current.id}_${i}`] ? styles.checkBoxChecked : ''}`}
+                          onClick={() => toggleCheck(current.id, i)}
+                          aria-pressed={!!checked[`${current.id}_${i}`]}
                           aria-label={item.label}
                         >
-                          {checked[i] && <span aria-hidden="true">✓</span>}
+                          {checked[`${current.id}_${i}`] && <span aria-hidden="true">✓</span>}
                         </button>
                         <div>
-                          <p className={`${styles.checkLabel} ${checked[i] ? styles.checkLabelDone : ''}`}>{item.label}</p>
+                          <p className={`${styles.checkLabel} ${checked[`${current.id}_${i}`] ? styles.checkLabelDone : ''}`}>{item.label}</p>
                           <p className={styles.checkSub}>{item.sub}</p>
                         </div>
                       </li>

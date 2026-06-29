@@ -93,9 +93,6 @@ router.post('/admin', authMiddleware, adminMiddleware, async (req, res, next) =>
   if (!trimmedTitle || trimmedTitle.length < 5) {
     return res.status(400).json({ error: 'Title must be at least 5 characters.' });
   }
-  if (!trimmedBody || trimmedBody.length < 10) {
-    return res.status(400).json({ error: 'Please add more detail to your question.' });
-  }
 
   try {
     const { rows: users } = await query('SELECT id, display_name FROM users WHERE id = $1', [req.userId]);
@@ -107,7 +104,7 @@ router.post('/admin', authMiddleware, adminMiddleware, async (req, res, next) =>
 
     const author = authorFromUser(user);
     const tagList = Array.isArray(tags) ? tags.filter(Boolean) : ['WCAG 2.2'];
-    const excerpt = trimmedBody.length > 160 ? `${trimmedBody.slice(0, 157).trim()}…` : trimmedBody;
+    const excerpt = trimmedBody ? (trimmedBody.length > 160 ? `${trimmedBody.slice(0, 157).trim()}…` : trimmedBody) : "";
 
     const inserted = await query(
       `INSERT INTO posts (
@@ -151,12 +148,9 @@ router.put('/admin/:id', authMiddleware, adminMiddleware, async (req, res, next)
   if (!trimmedTitle || trimmedTitle.length < 5) {
     return res.status(400).json({ error: 'Title must be at least 5 characters.' });
   }
-  if (!trimmedBody || trimmedBody.length < 10) {
-    return res.status(400).json({ error: 'Please add more detail to your question.' });
-  }
 
   const tagList = Array.isArray(tags) ? tags.filter(Boolean) : ['WCAG 2.2'];
-  const excerpt = trimmedBody.length > 160 ? `${trimmedBody.slice(0, 157).trim()}…` : trimmedBody;
+  const excerpt = trimmedBody ? (trimmedBody.length > 160 ? `${trimmedBody.slice(0, 157).trim()}…` : trimmedBody) : "";
 
   try {
     const updateFields = [trimmedTitle, trimmedBody, excerpt, JSON.stringify(tagList), parsedVotes];
@@ -308,12 +302,9 @@ router.put('/:id', authMiddleware, async (req, res, next) => {
   if (!trimmedTitle || trimmedTitle.length < 5) {
     return res.status(400).json({ error: 'Title must be at least 5 characters.' });
   }
-  if (!trimmedBody || trimmedBody.length < 10) {
-    return res.status(400).json({ error: 'Please add more detail to your question.' });
-  }
 
   const tagList = Array.isArray(tags) ? tags.filter(Boolean) : ['WCAG 2.2'];
-  const excerpt = trimmedBody.length > 160 ? `${trimmedBody.slice(0, 157).trim()}…` : trimmedBody;
+  const excerpt = trimmedBody ? (trimmedBody.length > 160 ? `${trimmedBody.slice(0, 157).trim()}…` : trimmedBody) : "";
 
   try {
     const { rows } = await query('SELECT user_id FROM posts WHERE id = $1', [id]);
@@ -558,6 +549,58 @@ router.post('/:id/comments', authMiddleware, async (req, res, next) => {
     );
 
     res.status(201).json({ comment: formatComment(inserted.rows[0]) });
+  } catch (err) {
+    next(err);
+  }
+});
+
+router.put('/:postId/comments/:commentId', authMiddleware, async (req, res, next) => {
+  const commentId = Number(req.params.commentId);
+  const { body } = req.body || {};
+  const trimmedBody = body?.trim();
+
+  if (!Number.isFinite(commentId) || !trimmedBody) {
+    return res.status(400).json({ error: 'Invalid comment data.' });
+  }
+
+  try {
+    const { rows } = await query('SELECT user_id FROM comments WHERE id = $1', [commentId]);
+    if (rows.length === 0) {
+      return res.status(404).json({ error: 'Comment not found.' });
+    }
+    if (rows[0].user_id !== req.userId) {
+      return res.status(403).json({ error: 'You do not have permission to edit this comment.' });
+    }
+
+    await query(
+      'UPDATE comments SET body = $1, updated_at = CURRENT_TIMESTAMP WHERE id = $2',
+      [trimmedBody, commentId]
+    );
+
+    const updated = await query('SELECT c.*, u.country FROM comments c LEFT JOIN users u ON c.user_id = u.id WHERE c.id = $1', [commentId]);
+    res.json({ comment: formatComment(updated.rows[0]) });
+  } catch (err) {
+    next(err);
+  }
+});
+
+router.delete('/:postId/comments/:commentId', authMiddleware, async (req, res, next) => {
+  const commentId = Number(req.params.commentId);
+  if (!Number.isFinite(commentId)) {
+    return res.status(400).json({ error: 'Invalid comment id.' });
+  }
+
+  try {
+    const { rows } = await query('SELECT user_id FROM comments WHERE id = $1', [commentId]);
+    if (rows.length === 0) {
+      return res.status(404).json({ error: 'Comment not found.' });
+    }
+    if (rows[0].user_id !== req.userId) {
+      return res.status(403).json({ error: 'You do not have permission to delete this comment.' });
+    }
+
+    await query('DELETE FROM comments WHERE id = $1', [commentId]);
+    res.json({ ok: true });
   } catch (err) {
     next(err);
   }

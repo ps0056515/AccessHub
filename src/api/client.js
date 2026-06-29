@@ -173,8 +173,17 @@ export const postsApi = {
   delete: (id) => api(`/api/posts/${id}`, { method: "DELETE" }),
   addComment: (id, body) =>
     api(`/api/posts/${id}/comments`, {
-      method: "POST",
+      method: 'POST',
       body: JSON.stringify(body),
+    }),
+  updateComment: (postId, commentId, body) =>
+    api(`/api/posts/${postId}/comments/${commentId}`, {
+      method: 'PUT',
+      body: JSON.stringify({ body }),
+    }),
+  deleteComment: (postId, commentId) =>
+    api(`/api/posts/${postId}/comments/${commentId}`, {
+      method: 'DELETE',
     }),
   vote: (id, body) =>
     api(`/api/posts/${id}/vote`, {
