@@ -661,7 +661,7 @@ export default function Portal({
               onChange={(e) => setDraftQuestion(e.target.value)}
             />
             {postError && (
-              <p className={styles.askError} role="alert">
+              <p className={styles.askError} role="alert" id="post-error">
                 {postError}
               </p>
             )}
@@ -674,6 +674,8 @@ export default function Portal({
                   onChange={setDraftTags}
                   placeholder="Select Topic"
                   aria-labelledby="ask-topic-label"
+                  aria-invalid={postError === "Please select a topic."}
+                  aria-describedby={postError === "Please select a topic." ? "post-error" : undefined}
                 />
               </div>
               <button
