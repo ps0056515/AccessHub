@@ -394,6 +394,19 @@ router.get('/me', authMiddleware, async (req, res, next) => {
     }
 
     const profile = publicUser(user);
+
+    const { rows: statsRows } = await query(`
+      SELECT 
+        (SELECT COUNT(*) FROM posts p WHERE p.user_id = $1) as discussions_count,
+        (SELECT COUNT(*) FROM comments c WHERE c.user_id = $1) as comments_count,
+        (SELECT COALESCE(SUM(votes), 0) FROM posts p WHERE p.user_id = $1) as reputation
+    `, [req.userId]);
+    const stats = statsRows[0] || {};
+    
+    profile.discussionsCount = parseInt(stats.discussions_count || 0, 10);
+    profile.commentsCount = parseInt(stats.comments_count || 0, 10);
+    profile.reputation = parseInt(stats.reputation || 0, 10);
+
     res.json({
       user: profile,
       needsLocation: !profile.country || !profile.city,
@@ -428,7 +441,8 @@ router.post('/forgot-password', async (req, res, next) => {
         [tokenHash, expiresAt.toISOString(), user.id],
       );
 
-      const resetUrl = buildResetUrl(token);
+      const reqOrigin = req.headers.origin || (req.headers.referer ? new URL(req.headers.referer).origin : null);
+      const resetUrl = buildResetUrl(token, reqOrigin);
       try {
         await sendPasswordResetEmail({
           to: user.email,

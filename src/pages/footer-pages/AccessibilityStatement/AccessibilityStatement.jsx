@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import styles from "./AccessibilityStatement.module.css";
 
 const COMMITMENTS = [
@@ -53,6 +54,7 @@ const SECTIONS = [
     title: "Feedback & Contact",
     content:
       "We welcome feedback on the accessibility of AllCanAccess. If you experience any barrier, find content you cannot access, or have a suggestion that would improve your experience, please reach out through our official support channels. We aim to respond to accessibility concerns within 2 business days and to implement reasonable fixes within 10 business days.",
+    link: { to: "/contact", text: "Contact Us" }
   },
   
 ];
@@ -150,6 +152,11 @@ useEffect(() => {
                 </h2>
                 {section.content && <p className={styles.sectionContent}>{section.content}</p>}
                 {section.list && <BulletList items={section.list} />}
+                {section.link && (
+                  <Link to={section.link.to} className={styles.contactBtn}>
+                    {section.link.text}
+                  </Link>
+                )}
               </section>
             ))}
 

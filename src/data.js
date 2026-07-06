@@ -267,7 +267,7 @@ export const CERTS = [
     body: 'IAAP · Foundation level · Best first certification for anyone entering the field',
     progress: 72,
     members: '80+ holders',
-    learnMoreUrl: 'https://www.accessibilityassociation.org/certification',
+    learnMoreUrl: 'https://www.accessibilityassociation.org/s/certified-professional',
   },
   {
     icon: '🏅',
@@ -276,7 +276,7 @@ export const CERTS = [
     body: 'IAAP · Technical depth · Requires hands-on WCAG implementation experience',
     progress: 48,
     members: '20+ holders',
-    learnMoreUrl: 'https://www.accessibilityassociation.org/certification',
+    learnMoreUrl: 'https://www.accessibilityassociation.org/s/wascertification',
   },
   {
     icon: '🏅',
@@ -285,7 +285,7 @@ export const CERTS = [
     body: 'IAAP · Physical accessibility focus · ADA / IBC expertise required',
     progress: 31,
     members: '15+ holders',
-    learnMoreUrl: 'https://www.accessibilityassociation.org/certification',
+    learnMoreUrl: 'https://www.accessibilityassociation.org/cpabe',
   },
   {
     icon: '📚',

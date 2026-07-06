@@ -31,7 +31,7 @@ export default function BlogpostsList() {
   return (
     <Container className={styles.container}>
       <header className={styles.header}>
-        <h1 className={styles.title}>Blogposts & News</h1>
+        <h1 className={styles.title}>Blogposts</h1>
         <p className={styles.subtitle}>Latest updates, guides, and stories from the community.</p>
       </header>
 

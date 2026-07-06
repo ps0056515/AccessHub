@@ -67,7 +67,7 @@ router.post(
   async (req, res, next) => {
     const { id } = req.params;
     const { title, view_url, icon, desc, color, category } = req.body || {};
-    if (!title || !view_url || !icon || !desc || !category) {
+    if (!title || !view_url || !icon || !category) {
       return res.status(400).json({ error: "Missing required fields." });
     }
 
@@ -93,7 +93,7 @@ router.post(
           slug,
           icon,
           title.trim(),
-          desc.trim(),
+          (desc || '').trim(),
           color || "blue",
           category,
           view_url.trim(),
@@ -180,7 +180,7 @@ router.post(
   adminMiddleware,
   async (req, res, next) => {
     const { title, view_url, icon, desc, color, category } = req.body || {};
-    if (!title || !view_url || !icon || !desc || !category) {
+    if (!title || !view_url || !icon || !category) {
       return res.status(400).json({ error: "Missing required fields." });
     }
     try {
@@ -202,7 +202,7 @@ router.post(
           slug,
           icon,
           title.trim(),
-          desc.trim(),
+          (desc || '').trim(),
           color || "blue",
           category,
           view_url.trim(),
@@ -223,7 +223,7 @@ router.put(
   async (req, res, next) => {
     const { id } = req.params;
     const { title, view_url, icon, desc, color, category } = req.body || {};
-    if (!title || !view_url || !icon || !desc || !category) {
+    if (!title || !view_url || !icon || !category) {
       return res.status(400).json({ error: "Missing required fields." });
     }
     try {
@@ -233,7 +233,7 @@ router.put(
           title.trim(),
           view_url.trim(),
           icon,
-          desc.trim(),
+          (desc || '').trim(),
           color || "blue",
           category,
           id,

@@ -17,6 +17,7 @@ import ArticlesView from './views/ArticlesView/ArticlesView';
 import BlogpostsView from './views/BlogpostsView/BlogpostsView';
 import ScreenReadersView from './views/ScreenReadersView/ScreenReadersView';
 import SettingsView from './views/SettingsView/SettingsView';
+import AnalyticsView from './views/AnalyticsView/AnalyticsView';
 
 const VIEWS = {
   overview: OverviewView,
@@ -28,6 +29,7 @@ const VIEWS = {
   blogposts: BlogpostsView,
   screen_readers: ScreenReadersView,
   settings: SettingsView,
+  analytics: AnalyticsView,
 };
 
 export default function AdminDashboard({ goToPortal }) {
@@ -55,6 +57,7 @@ export default function AdminDashboard({ goToPortal }) {
 
   const tabs = [
     { id: 'overview', label: 'Overview', icon: '📊' },
+    { id: 'analytics', label: 'Analytics', icon: '📈' },
     { id: 'resources', label: 'Resources', icon: '📚' },
     { id: 'tools', label: 'Tools', icon: '🛠️' },
     { id: 'events', label: 'Events', icon: '📅' },
@@ -164,6 +167,7 @@ export default function AdminDashboard({ goToPortal }) {
 
         <main className={styles.frameContent} id="cms-main-content">
           {activeTab === 'overview' && <OverviewView showToast={addToast} />}
+          {activeTab === 'analytics' && <AnalyticsView showToast={addToast} />}
           {activeTab === 'resources' && <ResourcesView showToast={addToast} />}
           {activeTab === 'tools' && <ToolsView showToast={addToast} />}
           {activeTab === 'events' && <EventsView showToast={addToast} />}
