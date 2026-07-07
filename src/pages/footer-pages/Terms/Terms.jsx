@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import styles from "./Terms.module.css";
 
 const SECTIONS = [
@@ -112,6 +113,7 @@ const SECTIONS = [
     title: "Contact Us",
     content:
       "If you have questions regarding these Terms of Use, community guidelines, or platform policies, please contact the AllCanAccess team through our official communication channels.",
+    link: { to: "/contact", text: "Contact Us" }
   },
 ];
 
@@ -205,6 +207,11 @@ export default function Terms() {
                 )}
                 {section.footer && (
                   <p className={styles.footerText}>{section.footer}</p>
+                )}
+                {section.link && (
+                  <Link to={section.link.to} className={styles.contactBtn}>
+                    {section.link.text}
+                  </Link>
                 )}
               </section>
             ))}

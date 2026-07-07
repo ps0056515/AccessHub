@@ -243,10 +243,16 @@
   transition: all var(--transition);
 }
 
-.rsvpBtn:hover {
+.rsvpBtn:hover:not(:disabled) {
   background: var(--accent);
   color: #fff;
   border-color: var(--accent);
+}
+
+.rsvpBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background: var(--bg);
 }
 
 .hostBanner {

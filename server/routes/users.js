@@ -54,6 +54,15 @@ router.get('/:id/profile', async (req, res, next) => {
     
     const isHot = contribRows.some(row => row.id === id);
 
+    const { rows: statsRows } = await query(`
+      SELECT 
+        (SELECT COUNT(*) FROM posts p WHERE p.user_id = $1) as discussions_count,
+        (SELECT COUNT(*) FROM comments c WHERE c.user_id = $1) as comments_count,
+        (SELECT COALESCE(SUM(votes), 0) FROM posts p WHERE p.user_id = $1) as reputation
+    `, [id]);
+    
+    const stats = statsRows[0];
+
     res.json({
       profile: {
         id: user.id,
@@ -62,9 +71,11 @@ router.get('/:id/profile', async (req, res, next) => {
         role: user.role || author.author_role,
         color: author.author_color,
         hot: isHot,
+        discussionsCount: parseInt(stats.discussions_count || 0, 10),
+        commentsCount: parseInt(stats.comments_count || 0, 10),
+        reputation: parseInt(stats.reputation || 0, 10),
         bio: user.bio || 'Community member passionate about web accessibility. Joined to learn, connect with other practitioners, and share knowledge.',
         avatarUrl: user.avatar_url || null,
-        email: user.email,
         company: user.company || null,
         designation: user.designation || null,
         country: user.country || null,

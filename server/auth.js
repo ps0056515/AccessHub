@@ -57,8 +57,12 @@ async function authMiddleware(req, res, next) {
 
     req.userId = payload.sub;
     next();
-  } catch {
-    res.status(401).json({ error: 'Invalid or expired session.' });
+  } catch (error) {
+    if (error.name === 'JsonWebTokenError' || error.name === 'TokenExpiredError') {
+      res.status(401).json({ error: 'Invalid or expired session.' });
+    } else {
+      res.status(500).json({ error: 'Database connection failed. Please try again.' });
+    }
   }
 }
 
@@ -95,8 +99,12 @@ async function adminMiddleware(req, res, next) {
     try {
       const payload = verifyToken(token);
       req.userId = payload.sub;
-    } catch {
-      res.status(401).json({ error: 'Invalid or expired session.' });
+    } catch (error) {
+      if (error.name === 'JsonWebTokenError' || error.name === 'TokenExpiredError') {
+        res.status(401).json({ error: 'Invalid or expired session.' });
+      } else {
+        res.status(500).json({ error: 'Database connection failed. Please try again.' });
+      }
       return;
     }
   }
