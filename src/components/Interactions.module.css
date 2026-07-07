@@ -57,8 +57,8 @@
 }
 
 .voteBtn[aria-pressed="true"].upvote {
-  color: var(--green);
-  background: var(--green-bg);
+  color: var(--accent);
+  background: var(--accent-bg);
 }
 
 .voteBtn[aria-pressed="true"].downvote {
@@ -75,7 +75,7 @@
 }
 
 .voteCount.positive {
-  color: var(--green);
+  color: var(--accent);
 }
 
 .voteCount.negative {
@@ -105,8 +105,71 @@
 .commentHeader {
   display: flex;
   align-items: center;
-  gap: 12px;
+  justify-content: space-between;
   margin-bottom: 12px;
+}
+
+.authorInfo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.commentActions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.actionBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.actionBtn:hover {
+  background: var(--bg-secondary);
+  color: var(--text);
+}
+
+.actionBtnDelete:hover {
+  background: var(--red-bg);
+  color: var(--red);
+}
+
+.editCommentBox {
+  display: flex;
+  flex-direction: column;
+}
+
+.editActions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.cancelBtn {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-family: var(--sans);
+  font-weight: 500;
+  font-size: 14px;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.cancelBtn:hover:not(:disabled) {
+  color: var(--text);
 }
 
 .avatar {

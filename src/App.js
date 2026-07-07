@@ -9,6 +9,13 @@ import { ConfigProvider } from "context/ConfigContext";
 import { ToastProvider } from "context/ToastContext";
 import { ConfirmProvider } from "context/ConfirmContext";
 import { AriaLiveProvider } from "context/AriaLiveContext";
+import useTracker from "hooks/useTracker";
+
+/* Thin wrapper so useTracker runs inside BrowserRouter context */
+function TrackerMount({ children }) {
+  useTracker();
+  return children;
+}
 
 export default function App() {
   useEffect(() => {
@@ -25,27 +32,29 @@ export default function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
-        <ConfigProvider>
-          <ToastProvider>
-            <ConfirmProvider>
-              <AriaLiveProvider>
-                <Routes>
-                  <Route element={<RequireAuth />}>
-                    <Route
-                      path="/admin"
-                      element={
-                        <RequireAdmin>
-                          <AdminDashboard />
-                        </RequireAdmin>
-                      }
-                    />
-                  </Route>
-                  <Route path="*" element={<AppShell />} />
-                </Routes>
-              </AriaLiveProvider>
-            </ConfirmProvider>
-          </ToastProvider>
-        </ConfigProvider>
+        <TrackerMount>
+          <ConfigProvider>
+            <ToastProvider>
+              <ConfirmProvider>
+                <AriaLiveProvider>
+                  <Routes>
+                    <Route element={<RequireAuth />}>
+                      <Route
+                        path="/admin"
+                        element={
+                          <RequireAdmin>
+                            <AdminDashboard />
+                          </RequireAdmin>
+                        }
+                      />
+                    </Route>
+                    <Route path="*" element={<AppShell />} />
+                  </Routes>
+                </AriaLiveProvider>
+              </ConfirmProvider>
+            </ToastProvider>
+          </ConfigProvider>
+        </TrackerMount>
       </AuthProvider>
     </BrowserRouter>
   );

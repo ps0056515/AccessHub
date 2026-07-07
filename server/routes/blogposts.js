@@ -141,6 +141,54 @@ router.post("/:id/comments", authMiddleware, async (req, res, next) => {
   }
 });
 
+// PUT /api/blogposts/:id/comments/:commentId - Edit a comment
+router.put("/:id/comments/:commentId", authMiddleware, async (req, res, next) => {
+  const { body } = req.body || {};
+  if (!body || !body.trim()) return res.status(400).json({ error: 'Comment body is required.' });
+
+  try {
+    const userRes = await query("SELECT is_admin FROM users WHERE id = $1", [req.userId]);
+    const user = userRes.rows[0];
+    if (!user) return res.status(404).json({ error: 'User not found.' });
+
+    const commentRes = await query("SELECT user_id FROM blogpost_comments WHERE id = $1 AND blogpost_id = $2", [req.params.commentId, req.params.id]);
+    if (commentRes.rows.length === 0) return res.status(404).json({ error: 'Comment not found.' });
+
+    if (commentRes.rows[0].user_id !== req.userId && !user.is_admin) {
+      return res.status(403).json({ error: 'Not authorized to edit this comment.' });
+    }
+
+    const { rows } = await query(
+      "UPDATE blogpost_comments SET body = $1, updated_at = NOW() WHERE id = $2 RETURNING *",
+      [body.trim(), req.params.commentId]
+    );
+    res.json({ comment: rows[0] });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// DELETE /api/blogposts/:id/comments/:commentId - Delete a comment
+router.delete("/:id/comments/:commentId", authMiddleware, async (req, res, next) => {
+  try {
+    const userRes = await query("SELECT is_admin FROM users WHERE id = $1", [req.userId]);
+    const user = userRes.rows[0];
+    if (!user) return res.status(404).json({ error: 'User not found.' });
+
+    const commentRes = await query("SELECT user_id FROM blogpost_comments WHERE id = $1 AND blogpost_id = $2", [req.params.commentId, req.params.id]);
+    if (commentRes.rows.length === 0) return res.status(404).json({ error: 'Comment not found.' });
+
+    if (commentRes.rows[0].user_id !== req.userId && !user.is_admin) {
+      return res.status(403).json({ error: 'Not authorized to delete this comment.' });
+    }
+
+    await query("DELETE FROM blogpost_comments WHERE id = $1", [req.params.commentId]);
+    res.json({ ok: true });
+  } catch (err) {
+    next(err);
+  }
+});
+
 // POST /api/blogposts/:id/vote - Upvote/Downvote a blogpost
 router.post("/:id/vote", authMiddleware, async (req, res, next) => {
   const { direction } = req.body;
