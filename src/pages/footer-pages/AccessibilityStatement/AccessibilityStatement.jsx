@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import styles from "./AccessibilityStatement.module.css";
 
 const COMMITMENTS = [
-  { icon: "✓", title: "WCAG 2.2 AA Conformance", desc: "We design and develop our platform to meet Web Content Accessibility Guidelines (WCAG) 2.1 Level AA standards." },
+  { icon: "✓", title: "WCAG 2.2 AA Conformance", desc: "We design and develop our platform to meet Web Content Accessibility Guidelines (WCAG) 2.2 Level AA standards." },
   { icon: "⌨", title: "Keyboard Navigation", desc: "All functionality is accessible via keyboard. No keyboard traps. Focus is always visible and logical." },
   { icon: "🔊", title: "Screen Reader Support", desc: "AllCanAccess is tested with NVDA, JAWS, and VoiceOver to ensure a consistent and reliable experience." },
   { icon: "◑", title: "Colour Contrast", desc: "We maintain minimum contrast ratios of 4.5:1 for normal text and 3:1 for large text throughout the interface." },
@@ -15,14 +16,14 @@ const SECTIONS = [
     id: "our-commitment",
     title: "Our Commitment",
     content:
-      "AllCanAccess is committed to ensuring that our website, community platform, and all related services are accessible to people of all abilities. Accessibility is not an add-on or afterthought for us — it is central to everything we build and every decision we make. We continuously audit and improve our digital experiences to meet and exceed the Web Content Accessibility Guidelines (WCAG) 2.1 Level AA.",
+      "AllCanAccess is committed to ensuring that our website, community platform, and all related services are accessible to people of all abilities. Accessibility is not an add-on or afterthought for us — it is central to everything we build and every decision we make. We continuously audit and improve our digital experiences to meet and exceed the Web Content Accessibility Guidelines (WCAG) 2.2 Level AA.",
   },
   {
     id: "standards",
     title: "Standards We Follow",
     content: "Our accessibility work is guided by recognised international and national standards, including:",
     list: [
-      "Web Content Accessibility Guidelines (WCAG) 2. Level AA",
+      "Web Content Accessibility Guidelines (WCAG) 2.2 Level AA",
       "Section 508 of the US Rehabilitation Act",
       "EN 301 549 – European Accessibility Standard",
       "WAI-ARIA 1.2 for dynamic and interactive content",
@@ -53,6 +54,7 @@ const SECTIONS = [
     title: "Feedback & Contact",
     content:
       "We welcome feedback on the accessibility of AllCanAccess. If you experience any barrier, find content you cannot access, or have a suggestion that would improve your experience, please reach out through our official support channels. We aim to respond to accessibility concerns within 2 business days and to implement reasonable fixes within 10 business days.",
+    link: { to: "/contact", text: "Contact Us" }
   },
   
 ];
@@ -150,6 +152,11 @@ useEffect(() => {
                 </h2>
                 {section.content && <p className={styles.sectionContent}>{section.content}</p>}
                 {section.list && <BulletList items={section.list} />}
+                {section.link && (
+                  <Link to={section.link.to} className={styles.contactBtn}>
+                    {section.link.text}
+                  </Link>
+                )}
               </section>
             ))}
 

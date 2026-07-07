@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useLocation } from 'react-router-dom';
 import { usersApi } from 'api/client';
 import { COLOR_MAP } from 'data';
-import { Mail, MapPin, Building2, Calendar, Briefcase, User, ArrowLeft } from 'lucide-react';
+import { Mail, MapPin, Building2, Calendar, Briefcase, User, ArrowLeft, MessageSquare, FileText, Star } from 'lucide-react';
 import styles from './MemberProfilePage.module.css';
 
 function formatDate(dateStr) {
@@ -114,14 +114,6 @@ export default function MemberProfilePage({ goToPortal }) {
             </div>
 
             <div className={styles.metaRow}>
-              {member.email && (
-                <span className={styles.metaItem}>
-                  <Mail className={styles.metaIcon} />
-                  <span style={{ color: 'inherit' }}>
-                    {member.email}
-                  </span>
-                </span>
-              )}
               {companyLine && (
                 <span className={styles.metaItem}>
                   <Building2 className={styles.metaIcon} />
@@ -155,24 +147,45 @@ export default function MemberProfilePage({ goToPortal }) {
           )}
         </div>
 
-        {/* Contact & Details */}
+        {/* Community Stats */}
         <div className={styles.infoCard}>
           <h2 className={styles.cardTitle}>
-            <Mail size={14} /> Contact & Details
+            <Star size={14} /> Community Stats
           </h2>
           <div className={styles.cardRow}>
-            <Mail className={styles.cardRowIcon} />
+            <Star className={styles.cardRowIcon} style={{ color: 'var(--amber-500)' }} />
             <div>
-              <div className={styles.cardRowLabel}>Email</div>
+              <div className={styles.cardRowLabel}>Reputation</div>
               <div className={styles.cardRowValue}>
-                {member.email ? (
-                  <span style={{ color: 'inherit' }}>{member.email}</span>
-                ) : (
-                  <span className={styles.cardRowEmpty}>Not set</span>
-                )}
+                {member.reputation || 0} Upvotes
               </div>
             </div>
           </div>
+          <div className={styles.cardRow}>
+            <FileText className={styles.cardRowIcon} />
+            <div>
+              <div className={styles.cardRowLabel}>Discussions Started</div>
+              <div className={styles.cardRowValue}>
+                {member.discussionsCount || 0} Posts
+              </div>
+            </div>
+          </div>
+          <div className={styles.cardRow}>
+            <MessageSquare className={styles.cardRowIcon} />
+            <div>
+              <div className={styles.cardRowLabel}>Comments Made</div>
+              <div className={styles.cardRowValue}>
+                {member.commentsCount || 0} Comments
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Professional Details */}
+        <div className={styles.infoCard}>
+          <h2 className={styles.cardTitle}>
+            <Briefcase size={14} /> Professional Details
+          </h2>
           <div className={styles.cardRow}>
             <Building2 className={styles.cardRowIcon} />
             <div>
@@ -182,19 +195,12 @@ export default function MemberProfilePage({ goToPortal }) {
               </div>
             </div>
           </div>
-        </div>
-
-        {/* Location & Membership */}
-        <div className={styles.infoCard}>
-          <h2 className={styles.cardTitle}>
-            <MapPin size={14} /> Location
-          </h2>
           <div className={styles.cardRow}>
-            <MapPin className={styles.cardRowIcon} />
+            <Briefcase className={styles.cardRowIcon} />
             <div>
-              <div className={styles.cardRowLabel}>Location</div>
+              <div className={styles.cardRowLabel}>Designation</div>
               <div className={styles.cardRowValue}>
-                {locationStr || <span className={styles.cardRowEmpty}>Not set</span>}
+                {member.designation || <span className={styles.cardRowEmpty}>Not set</span>}
               </div>
             </div>
           </div>
@@ -202,11 +208,6 @@ export default function MemberProfilePage({ goToPortal }) {
       </div>
 
       <div className={`${styles.fadeUp} ${styles.fadeUp3}`}>
-        <p className={styles.urlHint}>
-          Public profile ·{' '}
-          <span className={styles.mono}>{location.pathname}</span>
-        </p>
-
         <button type="button" className={styles.primaryBtn} onClick={goToPortal} style={{ display: 'flex', margin: '0 auto' }}>
           <ArrowLeft size={16} /> Back to discussions
         </button>

@@ -7,9 +7,11 @@ import { Country, City } from 'country-state-city';
 import { COLOR_MAP } from 'data';
 import {
   Camera, Mail, MapPin, Building2, Calendar, Edit3,
-  Briefcase, User, CheckCircle2, ChevronRight,
+  Briefcase, User, CheckCircle2, ChevronRight, MessageSquare, FileText, Star
 } from 'lucide-react';
 import styles from './MyProfilePage.module.css';
+
+
 
 const COMPLETENESS_FIELDS = [
   { key: 'displayName', label: 'Display name' },
@@ -407,12 +409,6 @@ export default function MyProfilePage() {
             </div>
 
             <div className={styles.metaRow}>
-              {user.email && (
-                <span className={styles.metaItem}>
-                  <Mail className={styles.metaIcon} />
-                  {user.email}
-                </span>
-              )}
               {companyLine && (
                 <span className={styles.metaItem}>
                   <Building2 className={styles.metaIcon} />
@@ -501,18 +497,45 @@ export default function MyProfilePage() {
           )}
         </div>
 
-        {/* Contact & Details */}
+        {/* Community Stats */}
         <div className={styles.infoCard}>
           <h2 className={styles.cardTitle}>
-            <Mail size={14} /> Contact & Details
+            <Star size={14} /> Community Stats
           </h2>
           <div className={styles.cardRow}>
-            <Mail className={styles.cardRowIcon} />
+            <Star className={styles.cardRowIcon} style={{ color: 'var(--amber-500)' }} />
             <div>
-              <div className={styles.cardRowLabel}>Email</div>
-              <div className={styles.cardRowValue}>{user.email || <span className={styles.cardRowEmpty}>Not set</span>}</div>
+              <div className={styles.cardRowLabel}>Reputation</div>
+              <div className={styles.cardRowValue}>
+                {user.reputation || 0} Upvotes
+              </div>
             </div>
           </div>
+          <div className={styles.cardRow}>
+            <FileText className={styles.cardRowIcon} />
+            <div>
+              <div className={styles.cardRowLabel}>Discussions Started</div>
+              <div className={styles.cardRowValue}>
+                {user.discussionsCount || 0} Posts
+              </div>
+            </div>
+          </div>
+          <div className={styles.cardRow}>
+            <MessageSquare className={styles.cardRowIcon} />
+            <div>
+              <div className={styles.cardRowLabel}>Comments Made</div>
+              <div className={styles.cardRowValue}>
+                {user.commentsCount || 0} Comments
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Professional Details */}
+        <div className={styles.infoCard}>
+          <h2 className={styles.cardTitle}>
+            <Briefcase size={14} /> Professional Details
+          </h2>
           <div className={styles.cardRow}>
             <Building2 className={styles.cardRowIcon} />
             <div>
@@ -522,19 +545,12 @@ export default function MyProfilePage() {
               </div>
             </div>
           </div>
-        </div>
-
-        {/* Location & Membership */}
-        <div className={styles.infoCard}>
-          <h2 className={styles.cardTitle}>
-            <MapPin size={14} /> Location
-          </h2>
           <div className={styles.cardRow}>
-            <MapPin className={styles.cardRowIcon} />
+            <Briefcase className={styles.cardRowIcon} />
             <div>
-              <div className={styles.cardRowLabel}>Location</div>
+              <div className={styles.cardRowLabel}>Designation</div>
               <div className={styles.cardRowValue}>
-                {locationStr || <span className={styles.cardRowEmpty}>Not set</span>}
+                {user.designation || <span className={styles.cardRowEmpty}>Not set</span>}
               </div>
             </div>
           </div>

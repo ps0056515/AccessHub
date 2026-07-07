@@ -259,13 +259,14 @@ function EventCard({ ev, i, onRsvp, timing }) {
       <button
         type="button"
         className={styles.rsvpBtn}
+        disabled={timing === 'Past'}
         onClick={e => {
           e.preventDefault();
           e.stopPropagation();
-          onRsvp();
+          if (timing !== 'Past') onRsvp();
         }}
       >
-        RSVP →
+        {timing === 'Past' ? 'Event Completed' : 'RSVP →'}
       </button>
     </article>
   );

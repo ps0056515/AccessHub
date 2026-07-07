@@ -77,8 +77,9 @@ function escapeAttr(value) {
   return escapeHtml(value).replace(/'/g, '&#39;');
 }
 
-function buildResetUrl(token) {
-  return `${getAppOrigin()}/reset-password?token=${encodeURIComponent(token)}`;
+function buildResetUrl(token, origin) {
+  const base = origin || getAppOrigin();
+  return `${base.replace(/\/$/, '')}/reset-password?token=${encodeURIComponent(token)}`;
 }
 
 // ─── iCalendar helpers ────────────────────────────────────────────────────────

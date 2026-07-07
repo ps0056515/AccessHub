@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import styles from "./Privacy.module.css";
 
 const SECTIONS = [
@@ -99,6 +100,7 @@ const SECTIONS = [
     title: "Contact Us",
     content:
       "If you have any questions, concerns, or feedback regarding this Privacy Policy or the handling of your information, please contact the AllCanAccess team through our official support or community channels.",
+    link: { to: "/contact", text: "Contact Us" }
   },
 ];
 
@@ -180,6 +182,11 @@ export default function Privacy() {
                 )}
                 {section.list && <BulletList items={section.list} />}
                 {section.footer && <p className={styles.footerText}>{section.footer}</p>}
+                {section.link && (
+                  <Link to={section.link.to} className={styles.contactBtn}>
+                    {section.link.text}
+                  </Link>
+                )}
                 {section.subsections && section.subsections.map((sub, i) => (
                   <div key={i} className={styles.subsection}>
                     <h3 className={styles.subsectionTitle}>{sub.title}</h3>

@@ -121,6 +121,7 @@ export const authApi = {
 
 export const adminApi = {
   stats: () => api("/api/admin/stats"),
+  analytics: (timeframe) => api(`/api/admin/analytics?timeframe=${timeframe}`),
   users: () => api("/api/admin/users"),
   toggleAdminRole: (id, is_admin) =>
     api(`/api/admin/users/${id}/role`, {
@@ -298,6 +299,15 @@ export const articlesApi = {
       method: "POST",
       body: JSON.stringify({ body }),
     }),
+  updateComment: (id, commentId, body) =>
+    api(`/api/articles/${id}/comments/${commentId}`, {
+      method: "PUT",
+      body: JSON.stringify({ body }),
+    }),
+  deleteComment: (id, commentId) =>
+    api(`/api/articles/${id}/comments/${commentId}`, {
+      method: "DELETE",
+    }),
   vote: (id, direction) =>
     api(`/api/articles/${id}/vote`, {
       method: "POST",
@@ -330,6 +340,15 @@ export const blogpostsApi = {
     api(`/api/blogposts/${id}/comments`, {
       method: "POST",
       body: JSON.stringify({ body }),
+    }),
+  updateComment: (id, commentId, body) =>
+    api(`/api/blogposts/${id}/comments/${commentId}`, {
+      method: "PUT",
+      body: JSON.stringify({ body }),
+    }),
+  deleteComment: (id, commentId) =>
+    api(`/api/blogposts/${id}/comments/${commentId}`, {
+      method: "DELETE",
     }),
   vote: (id, direction) =>
     api(`/api/blogposts/${id}/vote`, {
