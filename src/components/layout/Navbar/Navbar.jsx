@@ -46,7 +46,7 @@ export default function Navbar({
       : () => setActivePage("portal");
 
   const goToJoin = () => {
-    navigate("/join", { state: { from: location.pathname } });
+    navigate("/sign-up", { state: { from: location.pathname } });
   };
 
   const getPageIdFromUrl = (url) => {

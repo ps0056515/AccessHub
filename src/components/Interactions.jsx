@@ -3,7 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from 'context/AuthContext';
 import { useAriaLive } from 'context/AriaLiveContext';
 import { useToast } from 'context/ToastContext';
-import { ThumbsUp, ThumbsDown } from 'lucide-react';
+import { ThumbsUp, ThumbsDown, Edit2, Trash2 } from 'lucide-react';
 import { COLOR_MAP } from 'data';
 import styles from './Interactions.module.css';
 
@@ -29,6 +29,11 @@ export default function Interactions({
   const [newComment, setNewComment] = useState("");
   const [submittingComment, setSubmittingComment] = useState(false);
   const [commentError, setCommentError] = useState("");
+
+  const [editingCommentId, setEditingCommentId] = useState(null);
+  const [editCommentBody, setEditCommentBody] = useState("");
+  const [savingComment, setSavingComment] = useState(false);
+  const [deletingCommentId, setDeletingCommentId] = useState(null);
 
   useEffect(() => {
     // Sync initial votes if they change from parent (e.g. after re-fetch)
@@ -124,6 +129,35 @@ export default function Interactions({
     }
   };
 
+  const handleEditComment = async (commentId) => {
+    if (!editCommentBody.trim()) return;
+    setSavingComment(true);
+    try {
+      await api.updateComment(id, commentId, editCommentBody);
+      setComments(comments.map(c => c.id === commentId ? { ...c, body: editCommentBody.trim() } : c));
+      setEditingCommentId(null);
+      announce("Comment updated successfully");
+    } catch (err) {
+      addToast(err.message || "Failed to update comment.", "error");
+    } finally {
+      setSavingComment(false);
+    }
+  };
+
+  const handleDeleteComment = async (commentId) => {
+    if (!window.confirm("Are you sure you want to delete this comment?")) return;
+    setDeletingCommentId(commentId);
+    try {
+      await api.deleteComment(id, commentId);
+      setComments(comments.filter(c => c.id !== commentId));
+      announce("Comment deleted successfully");
+    } catch (err) {
+      addToast(err.message || "Failed to delete comment.", "error");
+    } finally {
+      setDeletingCommentId(null);
+    }
+  };
+
   const countClass = votes > 0 ? styles.positive : votes < 0 ? styles.negative : "";
 
   return (
@@ -179,20 +213,77 @@ export default function Interactions({
           ) : (
             comments.map(comment => {
               const colors = COLOR_MAP[comment.author_color] || COLOR_MAP.blue;
+              const isAuthorOrAdmin = user?.id === comment.user_id || user?.is_admin;
+              const isEditing = editingCommentId === comment.id;
+
               return (
                 <article key={comment.id} className={styles.commentCard}>
                   <header className={styles.commentHeader}>
-                    <div 
-                      className={styles.avatar} 
-                      style={{ background: colors.bg, color: colors.text }}
-                      aria-hidden="true"
-                    >
-                      {comment.author_initials}
+                    <div className={styles.authorInfo}>
+                      <div 
+                        className={styles.avatar} 
+                        style={{ background: colors.bg, color: colors.text }}
+                        aria-hidden="true"
+                      >
+                        {comment.author_initials}
+                      </div>
+                      <h3 className={styles.authorName}>{comment.author_name}</h3>
                     </div>
-                    <h3 className={styles.authorName}>{comment.author_name}</h3>
-                    {/* Intentionally omitting date per requirements */}
+                    {isAuthorOrAdmin && !isEditing && (
+                      <div className={styles.commentActions}>
+                        <button 
+                          className={styles.actionBtn} 
+                          onClick={() => {
+                            setEditingCommentId(comment.id);
+                            setEditCommentBody(comment.body);
+                          }}
+                          aria-label="Edit comment"
+                          title="Edit"
+                        >
+                          <Edit2 size={16} />
+                        </button>
+                        <button 
+                          className={`${styles.actionBtn} ${styles.actionBtnDelete}`} 
+                          onClick={() => handleDeleteComment(comment.id)}
+                          disabled={deletingCommentId === comment.id}
+                          aria-label="Delete comment"
+                          title="Delete"
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                      </div>
+                    )}
                   </header>
-                  <p className={styles.commentBody}>{comment.body}</p>
+                  
+                  {isEditing ? (
+                    <div className={styles.editCommentBox}>
+                      <textarea
+                        className={styles.textarea}
+                        value={editCommentBody}
+                        onChange={(e) => setEditCommentBody(e.target.value)}
+                        disabled={savingComment}
+                        autoFocus
+                      />
+                      <div className={styles.editActions}>
+                        <button 
+                          className={styles.cancelBtn} 
+                          onClick={() => setEditingCommentId(null)}
+                          disabled={savingComment}
+                        >
+                          Cancel
+                        </button>
+                        <button 
+                          className={styles.submitBtn} 
+                          onClick={() => handleEditComment(comment.id)}
+                          disabled={savingComment || !editCommentBody.trim()}
+                        >
+                          {savingComment ? "Saving..." : "Save"}
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <p className={styles.commentBody}>{comment.body}</p>
+                  )}
                 </article>
               );
             })

@@ -16,6 +16,7 @@ const blogpostsRoutes = require('./routes/blogposts');
 const screenReadersRoutes = require('./routes/screen_readers');
 const usersRoutes = require('./routes/users');
 const jobsRoutes = require('./routes/jobs');
+const analyticsTrackerRoutes = require('./routes/analytics_tracker');
 const { query, closePool } = require('./db');
 
 const PORT = Number(process.env.API_PORT || process.env.PORT) || 3015;
@@ -33,6 +34,7 @@ app.get('/api/health', async (_req, res) => {
   }
 });
 
+app.use('/api/track', analyticsTrackerRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/posts', postsRoutes);

@@ -46,7 +46,7 @@ export default function ResourceModal({ isOpen, resource, existingResources = []
   const handleSave = async (e) => {
     e.preventDefault();
     const { title, view_url, icon, desc, color, category } = formData;
-    if (!title.trim() || !view_url.trim() || !icon.trim() || !desc.trim() || !category) {
+    if (!title.trim() || !view_url.trim() || !icon.trim() || !category) {
       showToast?.('Please fill in all required fields.', 'error');
       return;
     }
@@ -122,7 +122,7 @@ export default function ResourceModal({ isOpen, resource, existingResources = []
           </div>
           
           <div className={styles.formGroup}>
-            <label htmlFor="res-desc" className={styles.formLabel}>Description *</label>
+            <label htmlFor="res-desc" className={styles.formLabel}>Description (optional)</label>
             <textarea
               id="res-desc"
               name="desc"
@@ -130,7 +130,6 @@ export default function ResourceModal({ isOpen, resource, existingResources = []
               onChange={handleChange}
               className={styles.formInput}
               rows={3}
-              required
             />
           </div>
 
