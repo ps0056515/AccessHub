@@ -74,7 +74,7 @@ export default function ResetPasswordPage() {
         <p className={styles.lead}>Choose a new password for your account.</p>
 
         {error && (
-          <div className={styles.error} role="alert">
+          <div id="reset-error" className={styles.error} role="alert">
             {error}
           </div>
         )}
@@ -100,6 +100,8 @@ export default function ResetPasswordPage() {
               value={password}
               onChange={e => setPassword(e.target.value)}
               disabled={submitting}
+              aria-invalid={!!error}
+              aria-describedby={error ? "reset-error" : undefined}
             />
             <span className={styles.hint}>At least 8 characters</span>
           </div>
@@ -117,6 +119,8 @@ export default function ResetPasswordPage() {
               value={confirmPassword}
               onChange={e => setConfirmPassword(e.target.value)}
               disabled={submitting}
+              aria-invalid={!!error}
+              aria-describedby={error ? "reset-error" : undefined}
             />
           </div>
 

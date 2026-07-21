@@ -220,9 +220,11 @@ export default function SignUpPage({ goToPortal }) {
               onBlur={formik.handleBlur}
               disabled={formik.isSubmitting || submittingGoogle}
               required
+              aria-invalid={!!(formik.touched.displayName && formik.errors.displayName)}
+              aria-describedby={formik.touched.displayName && formik.errors.displayName ? "signup-name-error" : undefined}
             />
             {formik.touched.displayName && formik.errors.displayName && (
-              <div className={styles.errorText}>{formik.errors.displayName}</div>
+              <div id="signup-name-error" className={styles.errorText}>{formik.errors.displayName}</div>
             )}
           </div>
 
@@ -257,9 +259,11 @@ export default function SignUpPage({ goToPortal }) {
               }}
               disabled={formik.isSubmitting || submittingGoogle}
               required
+              aria-invalid={!!(formik.touched.email && formik.errors.email)}
+              aria-describedby={formik.touched.email && formik.errors.email ? "signup-email-error" : undefined}
             />
             {formik.touched.email && formik.errors.email && (
-              <div className={styles.errorText}>{formik.errors.email}</div>
+              <div id="signup-email-error" className={styles.errorText}>{formik.errors.email}</div>
             )}
           </div>
 
@@ -278,9 +282,11 @@ export default function SignUpPage({ goToPortal }) {
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}
               disabled={formik.isSubmitting || submittingGoogle}
+              aria-invalid={!!(formik.touched.company && formik.errors.company)}
+              aria-describedby={formik.touched.company && formik.errors.company ? "signup-company-error" : undefined}
             />
             {formik.touched.company && formik.errors.company && (
-              <div className={styles.errorText}>{formik.errors.company}</div>
+              <div id="signup-company-error" className={styles.errorText}>{formik.errors.company}</div>
             )}
           </div>
 
@@ -299,9 +305,11 @@ export default function SignUpPage({ goToPortal }) {
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}
               disabled={formik.isSubmitting || submittingGoogle}
+              aria-invalid={!!(formik.touched.designation && formik.errors.designation)}
+              aria-describedby={formik.touched.designation && formik.errors.designation ? "signup-designation-error" : undefined}
             />
             {formik.touched.designation && formik.errors.designation && (
-              <div className={styles.errorText}>{formik.errors.designation}</div>
+              <div id="signup-designation-error" className={styles.errorText}>{formik.errors.designation}</div>
             )}
           </div>
 
@@ -320,6 +328,8 @@ export default function SignUpPage({ goToPortal }) {
               onBlur={formik.handleBlur}
               disabled={formik.isSubmitting || submittingGoogle}
               required
+              aria-invalid={!!(formik.touched.countryCode && formik.errors.countryCode)}
+              aria-describedby={formik.touched.countryCode && formik.errors.countryCode ? "signup-country-error" : undefined}
             />
             <datalist id="signup-country-list">
               {countries.map(c => (
@@ -327,7 +337,7 @@ export default function SignUpPage({ goToPortal }) {
               ))}
             </datalist>
             {formik.touched.countryCode && formik.errors.countryCode && (
-              <div className={styles.errorText}>{formik.errors.countryCode}</div>
+              <div id="signup-country-error" className={styles.errorText}>{formik.errors.countryCode}</div>
             )}
           </div>
 
@@ -346,6 +356,8 @@ export default function SignUpPage({ goToPortal }) {
               onBlur={formik.handleBlur}
               disabled={formik.isSubmitting || submittingGoogle || !formik.values.countryCode || cities.length === 0}
               required
+              aria-invalid={!!(formik.touched.city && formik.errors.city)}
+              aria-describedby={formik.touched.city && formik.errors.city ? "signup-city-error" : undefined}
             />
             <datalist id="signup-city-list">
               {cities.map((c, i) => (
@@ -353,7 +365,7 @@ export default function SignUpPage({ goToPortal }) {
               ))}
             </datalist>
             {formik.touched.city && formik.errors.city && (
-              <div className={styles.errorText}>{formik.errors.city}</div>
+              <div id="signup-city-error" className={styles.errorText}>{formik.errors.city}</div>
             )}
           </div>
 
@@ -374,6 +386,8 @@ export default function SignUpPage({ goToPortal }) {
                 onBlur={formik.handleBlur}
                 disabled={formik.isSubmitting || submittingGoogle}
                 required
+                aria-invalid={!!(formik.touched.password && formik.errors.password)}
+                aria-describedby={formik.touched.password && formik.errors.password ? "signup-password-error" : "signup-password-hint"}
               />
               <button
                 type="button"
@@ -385,7 +399,7 @@ export default function SignUpPage({ goToPortal }) {
               </button>
             </div>
             {formik.touched.password && formik.errors.password ? (
-              <div className={styles.errorText}>{formik.errors.password}</div>
+              <div id="signup-password-error" className={styles.errorText}>{formik.errors.password}</div>
             ) : (
               <span className={styles.hint} id="signup-password-hint">
                 At least 8 characters

@@ -74,7 +74,7 @@
 
 .voteBtn {
   background: none;
-  border: 1px solid var(--border);
+  border: 1px solid var(--border-interactive);
   border-radius: 4px;
   width: 28px;
   height: 22px;
@@ -202,7 +202,7 @@
   width: 100%;
   font: inherit;
   padding: 12px 14px;
-  border: 1px solid var(--border);
+  border: 1px solid var(--text-faint);
   border-radius: var(--radius-md);
   margin-bottom: 12px;
   resize: vertical;
@@ -252,7 +252,7 @@
 
 .editBtn, .deleteBtn {
   background: none;
-  border: 1px solid var(--border);
+  border: 1px solid var(--border-interactive);
   border-radius: var(--radius-sm);
   padding: 4px 10px;
   font-size: 12px;
@@ -276,7 +276,7 @@
   font: inherit;
   font-size: 16px;
   padding: 10px 12px;
-  border: 1px solid var(--border);
+  border: 1px solid var(--text-faint);
   border-radius: var(--radius-md);
 }
 
@@ -293,7 +293,7 @@
 .cancelBtn {
   background: var(--bg-card);
   color: var(--text);
-  border: 1px solid var(--border);
+  border: 1px solid var(--border-interactive);
   border-radius: var(--radius-sm);
   padding: 10px 20px;
   font-size: 14px;

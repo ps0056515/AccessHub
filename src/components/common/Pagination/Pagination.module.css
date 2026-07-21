@@ -19,7 +19,7 @@
   width: 32px;
   height: 32px;
   border-radius: 6px;
-  border: 1px solid var(--border);
+  border: 1px solid var(--border-interactive);
   background: var(--bg-card);
   color: var(--text);
   cursor: pointer;
@@ -28,7 +28,7 @@
 
 .button:hover:not(:disabled) {
   background: var(--surface-color-alt);
-  border-color: var(--border-strong);
+  border-color: var(--border-interactive-strong);
 }
 
 .button:disabled {

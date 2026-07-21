@@ -6,7 +6,7 @@ export default function ContentCard({ to, image, title, author, date, typeIcon =
     <Link to={to} className={styles.card}>
       <div className={styles.imageWrapper}>
         {image ? (
-          <img src={image} alt={title} className={styles.cardImage} />
+          <img src={image} alt="" className={styles.cardImage} />
         ) : (
           <div className={styles.placeholderIcon}>{typeIcon}</div>
         )}

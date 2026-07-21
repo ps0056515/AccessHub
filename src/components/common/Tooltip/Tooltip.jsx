@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useId } from 'react';
 import { createPortal } from 'react-dom';
 import styles from './Tooltip.module.css';
 
@@ -14,6 +14,7 @@ export default function Tooltip({
   const [coords, setCoords] = useState({ top: 0, left: 0 });
   const timeoutRef = useRef(null);
   const wrapperRef = useRef(null);
+  const tooltipId = useId();
 
   const handleMouseEnter = () => {
     if (disabled || !content) return;
@@ -51,6 +52,13 @@ export default function Tooltip({
     setIsVisible(false);
   };
 
+  const handleKeyDown = (e) => {
+    if (e.key === 'Escape' && isVisible) {
+      e.stopPropagation();
+      handleMouseLeave();
+    }
+  };
+
   useEffect(() => {
     return () => {
       if (timeoutRef.current) {
@@ -58,6 +66,11 @@ export default function Tooltip({
       }
     };
   }, []);
+
+  const child = React.isValidElement(children) ? React.Children.only(children) : null;
+  const childProps = child ? {
+    'aria-describedby': isVisible && content ? tooltipId : undefined,
+  } : {};
 
   return (
     <div 
@@ -67,10 +80,12 @@ export default function Tooltip({
       onMouseLeave={handleMouseLeave}
       onFocus={handleMouseEnter}
       onBlur={handleMouseLeave}
+      onKeyDown={handleKeyDown}
     >
-      {children}
+      {child ? React.cloneElement(child, childProps) : children}
       {isVisible && createPortal(
         <div 
+          id={tooltipId}
           className={`${styles.tooltipBox} ${styles[position]}`} 
           role="tooltip"
           style={{ top: coords.top, left: coords.left }}

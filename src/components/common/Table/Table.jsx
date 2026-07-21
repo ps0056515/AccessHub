@@ -188,7 +188,18 @@ export default function Table({
                   onClick={
                     col.sortable ? () => requestSort(col.key) : undefined
                   }
+                  onKeyDown={
+                    col.sortable ? (e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        requestSort(col.key);
+                      }
+                    } : undefined
+                  }
                   title={col.sortable ? "Click to sort" : undefined}
+                  tabIndex={col.sortable ? 0 : undefined}
+                  role="columnheader"
+                  aria-sort={sortConfig?.key === col.key ? (sortConfig.direction === 'asc' ? 'ascending' : 'descending') : 'none'}
                 >
                   <div
                     style={{
@@ -225,6 +236,20 @@ export default function Table({
                               prev === col.key ? null : col.key,
                             );
                           }}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter' || e.key === ' ') {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              setOpenFilter((prev) =>
+                                prev === col.key ? null : col.key,
+                              );
+                            }
+                          }}
+                          role="button"
+                          tabIndex={0}
+                          aria-label={`Filter ${col.label}`}
+                          aria-haspopup="listbox"
+                          aria-expanded={openFilter === col.key}
                           style={{
                             display: "flex",
                             alignItems: "center",
@@ -253,6 +278,8 @@ export default function Table({
                         {openFilter === col.key && (
                           <div
                             onClick={(e) => e.stopPropagation()}
+                            role="listbox"
+                            aria-label={`Filter options for ${col.label}`}
                             style={{
                               position: "absolute",
                               top: "100%",
@@ -273,6 +300,9 @@ export default function Table({
                             }}
                           >
                             <div
+                              role="option"
+                              aria-selected={!filters[col.key]}
+                              tabIndex={0}
                               style={{
                                 padding: "8px 12px",
                                 cursor: "pointer",
@@ -286,6 +316,15 @@ export default function Table({
                               onClick={() => {
                                 handleFilterChange(col.key, "");
                                 setOpenFilter(null);
+                              }}
+                              onKeyDown={(e) => {
+                                if (e.key === 'Enter' || e.key === ' ') {
+                                  e.preventDefault();
+                                  handleFilterChange(col.key, "");
+                                  setOpenFilter(null);
+                                } else if (e.key === 'Escape') {
+                                  setOpenFilter(null);
+                                }
                               }}
                               onMouseEnter={(e) =>
                                 (e.currentTarget.style.background =
@@ -310,6 +349,9 @@ export default function Table({
                               return (
                                 <div
                                   key={val}
+                                  role="option"
+                                  aria-selected={isSelected}
+                                  tabIndex={0}
                                   style={{
                                     padding: "8px 12px",
                                     cursor: "pointer",
@@ -323,6 +365,15 @@ export default function Table({
                                   onClick={() => {
                                     handleFilterChange(col.key, val);
                                     setOpenFilter(null);
+                                  }}
+                                  onKeyDown={(e) => {
+                                    if (e.key === 'Enter' || e.key === ' ') {
+                                      e.preventDefault();
+                                      handleFilterChange(col.key, val);
+                                      setOpenFilter(null);
+                                    } else if (e.key === 'Escape') {
+                                      setOpenFilter(null);
+                                    }
                                   }}
                                   onMouseEnter={(e) =>
                                     (e.currentTarget.style.background =

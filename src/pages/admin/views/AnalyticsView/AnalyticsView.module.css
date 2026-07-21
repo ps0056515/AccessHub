@@ -40,7 +40,7 @@
 .filterBtn {
   padding: 9px 20px;
   border-radius: 24px;
-  border: 1px solid var(--border-strong);
+  border: 1px solid var(--border-interactive-strong);
   background: var(--bg-card);
   color: var(--text-muted);
   font-weight: 600;

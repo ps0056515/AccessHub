@@ -71,7 +71,7 @@
 .filterLabel:focus-within {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
-  box-shadow: 0 0 0 3px var(--accent-border);
+  box-shadow: 0 0 0 3px var(--accent-border-interactive);
   color: var(--text);
 }
 
@@ -234,7 +234,7 @@
 .rsvpBtn {
   flex-shrink: 0;
   background: var(--bg-secondary);
-  border: 1px solid var(--border-strong);
+  border: 1px solid var(--border-interactive-strong);
   border-radius: var(--radius-sm);
   padding: 8px 18px;
   font-size: 13px;
@@ -333,7 +333,7 @@
 .formTextarea {
   font: inherit;
   padding: 8px 10px;
-  border: 1px solid var(--border);
+  border: 1px solid var(--text-faint);
   border-radius: var(--radius-sm);
   background: var(--bg-card);
   color: var(--text);

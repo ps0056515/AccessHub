@@ -13,7 +13,7 @@
 .input, .textarea {
   width: 100%;
   padding: 10px 12px;
-  border: 1px solid var(--border);
+  border: 1px solid var(--text-faint);
   border-radius: 6px;
   font-size: 14px;
   font-family: inherit;
@@ -50,7 +50,7 @@
 
 .cancelBtn {
   background: transparent;
-  border: 1px solid var(--border);
+  border: 1px solid var(--border-interactive);
   padding: 8px 16px;
   border-radius: 6px;
   font-weight: 600;
@@ -204,7 +204,7 @@
 
 .typeBtn {
   background: #fff;
-  border: 1px solid var(--border);
+  border: 1px solid var(--border-interactive);
   padding: 6px 12px;
   border-radius: 4px;
   font-size: 13px;
@@ -221,7 +221,7 @@
 
 .addPhaseBtn, .addItemBtn {
   background: transparent;
-  border: 1px dashed var(--border);
+  border: 1px dashed var(--border-interactive);
   padding: 12px;
   border-radius: 6px;
   font-weight: 600;
