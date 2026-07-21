@@ -68,8 +68,11 @@ router.get('/', async (req, res, next) => {
       return res.json(cachedData.data);
     }
 
-    const rapidApiKey = process.env.RAPIDAPI_KEY;
-    if (!rapidApiKey) {
+    // Allow multiple keys from comma-separated RAPIDAPI_KEYS or a single RAPIDAPI_KEY
+    const apiKeysString = process.env.RAPIDAPI_KEYS || process.env.RAPIDAPI_KEY || '';
+    const apiKeys = apiKeysString.split(',').map(k => k.trim()).filter(Boolean);
+
+    if (apiKeys.length === 0) {
       return res.status(500).json({ error: 'RAPIDAPI_KEY is not configured on the server.' });
     }
 
@@ -79,18 +82,39 @@ router.get('/', async (req, res, next) => {
       jsearchQuery += ` in ${location}`;
     }
 
-    const response = await axios.get('https://jsearch.p.rapidapi.com/search', {
-      params: {
-        query: jsearchQuery,
-        page: page,
-        num_pages: '2', // Fetch 2 pages (up to 20 jobs) to prevent RapidAPI timeouts
-        remote_jobs_only: remoteOnly ? 'true' : 'false'
-      },
-      headers: {
-        'x-rapidapi-key': rapidApiKey,
-        'x-rapidapi-host': 'jsearch.p.rapidapi.com'
+    let response = null;
+    let lastError = null;
+
+    // Try each API key in order until one works or we run out of keys
+    for (let i = 0; i < apiKeys.length; i++) {
+      try {
+        const rapidApiKey = apiKeys[i];
+        response = await axios.get('https://jsearch.p.rapidapi.com/search', {
+          params: {
+            query: jsearchQuery,
+            page: page,
+            num_pages: '2', // Fetch 2 pages (up to 20 jobs) to prevent RapidAPI timeouts
+            remote_jobs_only: remoteOnly ? 'true' : 'false'
+          },
+          headers: {
+            'x-rapidapi-key': rapidApiKey,
+            'x-rapidapi-host': 'jsearch.p.rapidapi.com'
+          }
+        });
+        
+        // If successful, break out of the loop
+        break;
+      } catch (err) {
+        lastError = err;
+        // If it's a 429 Rate Limit error and we have more keys, continue to the next key
+        if (err.response && err.response.status === 429 && i < apiKeys.length - 1) {
+          console.log(`Rate limit exceeded for API key index ${i}. Switching to backup key...`);
+          continue;
+        }
+        // If it's another type of error or we are out of keys, throw the error
+        throw err;
       }
-    });
+    }
 
     // Normalize and clean up data format, filtering out fake/spam jobs
     const jobs = (response.data?.data || []).filter(job => {
@@ -157,7 +181,7 @@ router.get('/', async (req, res, next) => {
       if (err.response.status === 403) {
         return res.status(403).json({ error: 'API Error: Your RapidAPI account is not subscribed to the JSearch API. Please go to the Pricing tab on RapidAPI and subscribe to the free tier.' });
       } else if (err.response.status === 429) {
-        console.log('Rate limit exceeded. Returning fallback jobs.');
+        console.log('Rate limit exceeded on all available API keys. Returning fallback jobs.');
         return res.json(FALLBACK_JOBS);
       }
     }

@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { CERTS, COLOR_MAP } from 'data';
 import { toolsApi } from 'api/client';
 import Container from 'components/common/Container/Container';
+import SEO from 'components/common/SEO/SEO';
 import styles from './Tools.module.css';
 
 function BadgePill({ label, color }) {
@@ -48,6 +49,11 @@ export default function Tools() {
 
   return (
     <Container className={styles.page}>
+      <SEO 
+        title="Accessibility Tools & Certifications | AllCanAccess"
+        description="Discover industry-standard accessibility testing tools and professional certifications. Compare the best automated WCAG scanners, screen readers, and explore paths for IAAP CPACC and WAS certifications to advance your accessibility career."
+        keywords="accessibility testing tools, WCAG checker, automated accessibility scanners, screen readers, NVDA, JAWS, VoiceOver testing, IAAP certifications, CPACC certification, WAS certification, web accessibility evaluation tools, WAVE tool, axe DevTools, accessibility automation, CI/CD accessibility testing, PDF accessibility tools, color contrast analyzers, inclusive design tools, accessibility browser extensions, ADA compliance software, Section 508 testing tools, digital accessibility software, manual accessibility testing, accessibility testing software, a11y tools, enterprise accessibility platforms"
+      />
       <header className={styles.pageHeader}>
         <h1 className={styles.pageTitle}>Tools &amp; certifications</h1>
         <p className={styles.pageSub}>
@@ -134,7 +140,7 @@ export default function Tools() {
                 style={{ animationDelay: `${i * 0.06}s` }}
               >
                 <div className={styles.certLeft}>
-                  <div className={styles.certBadge} style={{ background: col.bg }}>
+                  <div className={styles.certBadge} style={{ background: col.bg, color: col.text }}>
                     <span role="img" aria-hidden="true">{c.icon}</span>
                   </div>
                 </div>

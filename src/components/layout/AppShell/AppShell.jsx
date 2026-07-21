@@ -337,7 +337,7 @@ export default function AppShell() {
           <Route path="/blog/:id" element={<BlogDetail />} />
           <Route path="/en-301-549" element={<En301549 />} />
           <Route path="/about-us" element={<AboutUs />} />
-          <Route path="/accessibility-jobs" element={<AccessibilityJobs />} />
+
           <Route
             path="/join"
             element={
@@ -348,6 +348,7 @@ export default function AppShell() {
             }
           />
           <Route element={<RequireAuth />}>
+            <Route path="/accessibility-jobs" element={<AccessibilityJobs />} />
             <Route
               path="/thread/:postId"
               element={

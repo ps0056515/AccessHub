@@ -12,12 +12,12 @@
 .title {
   font-size: 24px;
   font-weight: 700;
-  color: var(--text, #0f172a);
+  color: var(--text);
   margin: 0;
 }
 
 .addBtn {
-  background: var(--accent, #074a9e);
+  background: var(--accent);
   color: #fff;
   border: none;
   padding: 8px 16px;
@@ -45,8 +45,8 @@
 
 .btnSecondary {
   background: transparent;
-  color: var(--text-muted, #475569);
-  border: 1px solid var(--border-strong, #cbd5e1);
+  color: var(--text-muted);
+  border: 1px solid var(--border-strong);
   padding: 4px 8px;
   border-radius: var(--radius-sm, 6px);
   font-size: 13px;
@@ -55,8 +55,8 @@
   transition: all 0.15s ease;
 }
 .btnSecondary:hover {
-  background: var(--bg-secondary, #f8fafc);
-  color: var(--text, #0f172a);
+  background: var(--bg-secondary);
+  color: var(--text);
 }
 
 .btnDanger {

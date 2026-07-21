@@ -1,7 +1,7 @@
 .tabBar {
   display: flex;
   gap: 8px;
-  border-bottom: 1px solid var(--border, #cbd5e1);
+  border-bottom: 1px solid var(--border);
   padding-bottom: 12px;
   margin-bottom: 24px;
 }
@@ -14,12 +14,12 @@
   font-weight: 500;
   cursor: pointer;
   background: transparent;
-  color: var(--text-muted, #475569);
+  color: var(--text-muted);
   transition: background 0.2s, color 0.2s;
 }
 
 .tabBtnActive {
-  background: var(--accent, #074a9e);
+  background: var(--accent);
   color: #ffffff;
 }
 
@@ -45,8 +45,8 @@
 .textInput {
   padding: 8px 12px;
   border-radius: 6px;
-  border: 1px solid var(--border, #cbd5e1);
-  background: var(--bg-card, #ffffff);
+  border: 1px solid var(--border);
+  background: var(--bg-card);
   color: var(--text);
   font-size: 14px;
   max-width: 400px;
@@ -54,7 +54,7 @@
 }
 
 .saveBtn {
-  background: var(--accent, #074a9e);
+  background: var(--accent);
   color: #ffffff;
   border: none;
 }
@@ -70,7 +70,7 @@
 }
 
 .logoCard {
-  border: 1px solid var(--border, #cbd5e1);
+  border: 1px solid var(--border);
   border-radius: 8px;
   padding: 16px;
   display: flex;
@@ -128,7 +128,7 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 20px;
-  border-bottom: 1px dashed var(--border, #cbd5e1);
+  border-bottom: 1px dashed var(--border);
   padding-bottom: 16px;
   flex-wrap: wrap;
   gap: 12px;
@@ -137,8 +137,8 @@
 .addLinkBtn {
   padding: 6px 12px;
   border-radius: 6px;
-  border: 1px solid var(--border-strong, #cbd5e1);
-  background: var(--bg-card, #ffffff);
+  border: 1px solid var(--border-strong);
+  background: var(--bg-card);
   color: var(--text);
   font-size: 13px;
   cursor: pointer;
@@ -147,7 +147,7 @@
 }
 
 .addLinkBtn:hover {
-  background: var(--bg-secondary, #f8fafc);
+  background: var(--bg-secondary);
 }
 
 .linksList {
@@ -161,10 +161,10 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  background: var(--bg-secondary, #f8fafc);
+  background: var(--bg-secondary);
   padding: 12px;
   border-radius: 8px;
-  border: 1px solid var(--border, #cbd5e1);
+  border: 1px solid var(--border);
 }
 
 .sortButtons {
@@ -199,8 +199,8 @@
   min-width: 150px;
   padding: 6px 10px;
   border-radius: 4px;
-  border: 1px solid var(--border, #cbd5e1);
-  background: var(--bg-card, #ffffff);
+  border: 1px solid var(--border);
+  background: var(--bg-card);
   color: var(--text);
   font-size: 13px;
 }
@@ -210,8 +210,8 @@
   min-width: 220px;
   padding: 6px 10px;
   border-radius: 4px;
-  border: 1px solid var(--border, #cbd5e1);
-  background: var(--bg-card, #ffffff);
+  border: 1px solid var(--border);
+  background: var(--bg-card);
   color: var(--text);
   font-size: 13px;
 }
@@ -250,7 +250,7 @@
   font-size: 12px;
   color: var(--text-muted);
   font-family: monospace;
-  background: var(--border, #e2e8f0);
+  background: var(--border);
   padding: 4px 8px;
   border-radius: 4px;
 }
@@ -260,7 +260,7 @@
   gap: 12px;
   flex-wrap: wrap;
   align-items: flex-end;
-  border-top: 1px dashed var(--border, #cbd5e1);
+  border-top: 1px dashed var(--border);
   padding-top: 16px;
   margin-bottom: 16px;
 }
@@ -282,14 +282,14 @@
 .createInput {
   padding: 6px 12px;
   border-radius: 6px;
-  border: 1px solid var(--border, #cbd5e1);
-  background: var(--bg-card, #ffffff);
+  border: 1px solid var(--border);
+  background: var(--bg-card);
   color: var(--text);
   font-size: 13px;
 }
 
 .createBtn {
-  background: var(--accent, #074a9e);
+  background: var(--accent);
   color: #ffffff;
   border: none;
   height: 34px;
@@ -322,8 +322,8 @@
 .selectDropdown {
   padding: 6px 12px;
   border-radius: 6px;
-  border: 1px solid var(--border, #cbd5e1);
-  background: var(--bg-card, #ffffff);
+  border: 1px solid var(--border);
+  background: var(--bg-card);
   color: var(--text);
   font-size: 13px;
 }

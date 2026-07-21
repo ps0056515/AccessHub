@@ -12,6 +12,7 @@ import Container from "components/common/Container/Container";
 import Pagination from "components/common/Pagination/Pagination";
 import RelativeTime from "components/common/RelativeTime/RelativeTime";
 import MultiSelectDropdown from "components/common/MultiSelectDropdown/MultiSelectDropdown";
+import SEO from "components/common/SEO/SEO";
 import { usersApi } from "api/client";
 import { CountryFlag } from "components/common/CountryFlag/CountryFlag";
 import styles from "./Portal.module.css";
@@ -215,12 +216,12 @@ function PostCard({
               {post.author}
               <CountryFlag countryName={post.country} />
             </span>
-            <span className={styles.postDot}>·</span>
+            <span className={styles.postDot} aria-hidden="true">·</span>
             <RelativeTime rawTime={post.raw_time} fallback={post.time} />
-            <span className={styles.postDot}>·</span>
+            <span className={styles.postDot} aria-hidden="true">·</span>
             <span>{post.replies} replies</span>
           </div>
-          <h3 className={styles.postTitle}>{post.title}</h3>
+          <h2 className={styles.postTitle}>{post.title}</h2>
           <p className={styles.postExcerpt}>{post.excerpt}</p>
           <div className={styles.postTags}>
             {post.tags.map((t) => (
@@ -527,6 +528,11 @@ export default function Portal({
 
   return (
     <div className={styles.page}>
+      <SEO 
+        title="Community | AllCanAccess"
+        description="Join AllCanAccess, the world's leading digital accessibility community. Connect with WCAG experts, developers, and designers to learn inclusive design, share accessibility testing tools, and build ADA-compliant digital experiences for everyone."
+        keywords="digital accessibility community, web accessibility, WCAG 2.2 compliance, inclusive design, accessibility testing, ADA compliance for websites, Section 508 compliance, accessibility developers network, digital inclusion, ARIA implementation, screen reader testing, web accessibility guidelines, accessibility professionals, accessibility QA, inclusive UX design, European Accessibility Act, EAA compliance, accessibility audits, accessibility remediation, accessibility forum, accessibility advocates, assistive technology community, a11y community, accessible web development, web content accessibility guidelines"
+      />
       <section
         className={styles.hero}
         aria-labelledby="hero-heading"
@@ -632,14 +638,15 @@ export default function Portal({
       </Container>
 
       <Container className={styles.mainGrid}>
-        <main className={styles.feed}>
+        <section aria-label="Community feed" className={styles.feed}>
           <div className={styles.askBox} ref={askBoxRef}>
             <p className={styles.askLabel}>Ask the community</p>
-            <label className={styles.fieldLabel}>
+            <label htmlFor="ask-title" className={styles.fieldLabel}>
               Title <span aria-hidden="true">*</span>
             </label>
 
             <input
+              id="ask-title"
               type="text"
               className={styles.askTitleInput}
               placeholder="Ask the community a question..."
@@ -649,14 +656,14 @@ export default function Portal({
               ref={askTitleRef}
             />
 
-            <label className={styles.fieldLabel}>Description (Optional)</label>
+            <label htmlFor="ask-desc" className={styles.fieldLabel}>Description (Optional)</label>
 
             <textarea
+              id="ask-desc"
               className={styles.askTextarea}
               ref={askTextareaRef}
               placeholder="Provide additional details, context, or examples (optional)"
               rows={3}
-              aria-label="Question description"
               value={draftQuestion}
               onChange={(e) => setDraftQuestion(e.target.value)}
             />
@@ -818,7 +825,7 @@ export default function Portal({
               />
             </div>
           )}
-        </main>
+        </section>
 
         <aside className={styles.sidebar} aria-label="Community sidebar">
           <section className={styles.sideSection} aria-labelledby="recent-views-heading">

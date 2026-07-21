@@ -1,6 +1,6 @@
 .page { padding-bottom: 64px; }
 
-.backLink { display: inline-block; margin-bottom: 16px; color: var(--accent, #074a9e); font-weight: 600; text-decoration: none; }
+.backLink { display: inline-block; margin-bottom: 16px; color: var(--accent); font-weight: 600; text-decoration: none; }
 .backLink:hover { text-decoration: underline; }
 
 .pageHeader { padding: 48px 0 32px; }
@@ -196,7 +196,7 @@
   align-items: center;
   justify-content: center;
   font-size: 11px;
-  color: #fff;
+  color: var(--bg-card);
   margin-top: 1px;
   transition: all var(--transition);
 }
@@ -218,8 +218,8 @@
   border-left: 3px solid;
 }
 
-.issueHigh { border-left-color: #b03020; }
-.issueMedium { border-left-color: #92580a; }
+.issueHigh { border-left-color: var(--red); }
+.issueMedium { border-left-color: var(--amber); }
 
 .issueHeader { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
 

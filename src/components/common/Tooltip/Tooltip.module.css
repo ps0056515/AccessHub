@@ -9,8 +9,8 @@
 
 .tooltipBox {
   position: fixed;
-  background-color: var(--text, #0f172a);
-  color: #ffffff;
+  background-color: var(--text);
+  color: var(--tooltip-text);
   padding: 6px 10px;
   border-radius: var(--radius-sm, 6px);
   font-size: 12px;
@@ -22,15 +22,15 @@
   opacity: 0;
   animation: fadeIn 0.15s ease-in-out forwards;
   box-shadow:
-    0 4px 6px -1px rgba(0, 0, 0, 0.1),
-    0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    0 4px 6px -1px var(--shadow-md),
+    0 2px 4px -1px var(--shadow-md);
 }
 
 .tooltipArrow {
   position: absolute;
   width: 8px;
   height: 8px;
-  background-color: var(--text, #0f172a);
+  background-color: var(--text);
   transform: rotate(45deg);
 }
 

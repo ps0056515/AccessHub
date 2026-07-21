@@ -6,8 +6,8 @@
 }
 
 .addToolBtn {
-  background: var(--accent, #074a9e);
-  color: #ffffff;
+  background: var(--accent);
+  color: var(--bg-card);
   border: none;
   padding: 8px 16px;
   border-radius: 6px;
@@ -18,7 +18,7 @@
 }
 
 .addToolBtn:hover {
-  background: #063d82;
+  background: var(--accent-focus);
 }
 
 .sortButtons {
@@ -62,7 +62,7 @@
 
 .editBtn {
   background: transparent;
-  border: 1px solid var(--border-strong, #cbd5e1);
+  border: 1px solid var(--border-strong);
   color: var(--text);
   padding: 4px 8px;
   border-radius: 4px;
@@ -71,13 +71,13 @@
 }
 
 .editBtn:hover {
-  background: var(--bg-secondary, #f8fafc);
+  background: var(--bg-secondary);
 }
 
 .deleteBtn {
   background: transparent;
-  border: 1px solid #fecaca;
-  color: #ef4444;
+  border: 1px solid var(--red-border);
+  color: var(--red);
   padding: 4px 8px;
   border-radius: 4px;
   font-size: 12px;
@@ -85,7 +85,7 @@
 }
 
 .deleteBtn:hover {
-  background: #fef2f2;
+  background: var(--red-bg);
 }
 
 
@@ -112,8 +112,8 @@
 .formInput, .formSelect {
   padding: 8px 12px;
   border-radius: 6px;
-  border: 1px solid var(--border, #cbd5e1);
-  background: var(--bg-card, #ffffff);
+  border: 1px solid var(--border);
+  background: var(--bg-card);
   color: var(--text);
   font-size: 14px;
   width: 100%;
@@ -121,14 +121,14 @@
 }
 
 .formInput:focus, .formSelect:focus {
-  outline: 2px solid var(--accent, #074a9e);
+  outline: 2px solid var(--accent);
   outline-offset: -1px;
 }
 
 
 .cancelBtn {
   background: transparent;
-  border: 1px solid var(--border, #cbd5e1);
+  border: 1px solid var(--border);
   color: var(--text-muted);
   padding: 8px 16px;
   border-radius: 6px;
@@ -137,12 +137,12 @@
 }
 
 .cancelBtn:hover {
-  background: var(--bg-secondary, #f8fafc);
+  background: var(--bg-secondary);
 }
 
 .saveBtn {
-  background: var(--accent, #074a9e);
-  color: #ffffff;
+  background: var(--accent);
+  color: var(--bg-card);
   border: none;
   padding: 8px 16px;
   border-radius: 6px;
@@ -152,7 +152,7 @@
 }
 
 .saveBtn:hover {
-  background: #063d82;
+  background: var(--accent-focus);
 }
 
 .saveBtn:disabled {

@@ -17,7 +17,7 @@
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.12em;
-  color: var(--accent);
+  color: var(--accent-text);
   margin-bottom: 8px;
 }
 
@@ -117,16 +117,16 @@
 }
 
 .inputError {
-  border-color: #ef4444;
+  border-color: var(--red);
 }
 
 .inputError:focus {
-  border-color: #ef4444;
-  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.15);
+  border-color: var(--red);
+  box-shadow: 0 0 0 3px var(--red-border);
 }
 
 .errorText {
-  color: #ef4444;
+  color: var(--red);
   font-size: 12px;
   margin-top: 4px;
 }
@@ -134,7 +134,7 @@
 .error {
   background: var(--red-bg);
   color: var(--red-text);
-  border: 1px solid rgba(176, 48, 32, 0.2);
+  border: 1px solid var(--red-border);
   border-radius: var(--radius-sm);
   padding: 10px 12px;
   font-size: 14px;
@@ -153,7 +153,7 @@
 
 .submit {
   background: var(--accent);
-  color: #fff;
+  color: var(--text-on-accent);
   border: none;
   border-radius: var(--radius-sm);
   padding: 12px 18px;

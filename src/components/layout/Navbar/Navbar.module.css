@@ -2,7 +2,7 @@
     position: sticky;
     top: 0;
     z-index: 100;
-    background: rgba(250, 249, 247, 0.92);
+    background: var(--navbar-bg);
     backdrop-filter: blur(12px);
     border-bottom: 1px solid var(--border);
   }
@@ -62,6 +62,25 @@
     color: var(--text-muted);
     border-radius: var(--radius-sm);
     transition: background var(--transition), color var(--transition);
+    position: relative;
+  }
+
+  .navLink::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    width: 0;
+    height: 2px;
+    background: var(--accent);
+    transition: width 0.25s ease, left 0.25s ease;
+    border-radius: 1px;
+  }
+
+  .navLink:hover::after,
+  .navLink:focus-visible::after {
+    width: 60%;
+    left: 20%;
   }
 
   .navLink:hover { background: var(--bg-secondary); color: var(--text); }
@@ -70,6 +89,11 @@
     color: var(--text);
     font-weight: 500;
     background: var(--bg-tertiary);
+  }
+
+  .navLink.active::after {
+    width: 60%;
+    left: 20%;
   }
 
   .actions {
@@ -114,10 +138,31 @@
     padding: 7px 16px;
     font-size: 13px;
     font-weight: 500;
-    transition: opacity var(--transition);
+    transition: opacity var(--transition), transform 180ms ease, box-shadow 180ms ease;
   }
 
-  .joinBtn:hover { opacity: 0.88; }
+  .joinBtn:hover { opacity: 0.88; transform: translateY(-1px); }
+  .joinBtn:active { transform: translateY(0); }
+
+  /* ── Theme toggle ── */
+  .themeToggle {
+    background: none;
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-sm);
+    width: 34px;
+    height: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-muted);
+    transition: background var(--transition), color var(--transition), border-color var(--transition);
+  }
+
+  .themeToggle:hover {
+    background: var(--bg-secondary);
+    color: var(--text);
+    border-color: var(--accent);
+  }
 
   .communityBtn {
     background: none;
@@ -166,7 +211,7 @@
     transition: background var(--transition);
   }
 
-  .adminBtn:hover { background: #e4dff8; }
+  .adminBtn:hover { background: var(--purple-bg); }
 
   .menuBtn {
     display: none;
@@ -267,7 +312,7 @@
   
   .avatarBtn {
     background: none;
-    border: 1px solid var(--border-strong, #cbd5e1);
+    border: 1px solid var(--border-strong);
     border-radius: 50%;
     width: 34px;
     height: 34px;
@@ -275,13 +320,13 @@
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    color: var(--text-muted, #475569);
+    color: var(--text-muted);
     padding: 0;
     transition: background 0.2s;
   }
   
   .avatarBtn:hover {
-    background: var(--bg-secondary, #f8fafc);
+    background: var(--bg-secondary);
   }
   
   .profileDropdown {
@@ -289,8 +334,8 @@
     top: 100%;
     right: 0;
     margin-top: 8px;
-    background: var(--bg-card, #ffffff);
-    border: 1px solid var(--border, #e2e8f0);
+    background: var(--bg-card);
+    border: 1px solid var(--border);
     border-radius: var(--radius-sm, 6px);
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
     min-width: 220px;
@@ -303,20 +348,20 @@
   
   .dropdownHeader {
     padding: 12px 16px;
-    border-bottom: 1px solid var(--border, #e2e8f0);
+    border-bottom: 1px solid var(--border);
   }
   
   .dropdownName {
     display: block;
     font-size: 14px;
     font-weight: 600;
-    color: var(--text, #0f172a);
+    color: var(--text);
   }
   
   .dropdownEmail {
     display: block;
     font-size: 12px;
-    color: var(--text-muted, #475569);
+    color: var(--text-muted);
     overflow: hidden;
     text-overflow: ellipsis;
   }
@@ -334,11 +379,11 @@
     font-size: 14px;
     cursor: pointer;
     border-radius: 4px;
-    color: var(--text, #0f172a);
+    color: var(--text);
   }
   
   .dropdownItem:hover {
-    background: var(--bg-secondary, #f8fafc);
+    background: var(--bg-secondary);
   }
 
   @media (max-width: 768px) {

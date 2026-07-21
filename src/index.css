@@ -50,6 +50,10 @@
   --purple-bg: #f0edfd;
   --purple-text: #3a2580;
 
+  --green: #16a34a;
+  --green-bg: #dcfce7;
+  --green-text: #166534;
+
   --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
   --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.07), 0 2px 4px rgba(0, 0, 0, 0.04);
   --radius-sm: 6px;
@@ -59,6 +63,131 @@
   --radius-full: 9999px;
 
   --transition: 0.18s ease;
+
+  /* Focus ring variables */
+  --focus-ring-color: rgba(59, 130, 246, 0.55);
+  --focus-ring-offset: 2px;
+  --focus-ring-width: 2px;
+  --focus-border-color: #3b82f6;
+
+  /* Navbar background (light) */
+  --navbar-bg: rgba(250, 249, 247, 0.92);
+
+  /* Overlay for modals / backdrops */
+  --overlay-bg: rgba(0, 0, 0, 0.4);
+  --backdrop: rgba(26, 25, 22, 0.45);
+  --overlay-dark: rgba(0, 0, 0, 0.5);
+  --overlay-light: rgba(255, 255, 255, 0.08);
+
+  /* Scrollbar */
+  --scrollbar-thumb: var(--border-strong);
+
+  /* Component specific & Missing Semantic */
+  --text-on-accent: #ffffff;
+  --text-on-dark: #ffffff;
+  --text-on-dark-muted: #cbd5e1;
+  --text-on-dark-accent: #60a5fa;
+  --text-on-dark-faint: #94a3b8;
+  
+  --footer-text: rgba(250,249,247,0.7);
+  --footer-text-bright: #faf9f7;
+  --footer-text-muted: rgba(250,249,247,0.5);
+  --footer-heading: rgba(250,249,247,0.85);
+  --footer-border: rgba(250,249,247,0.1);
+  --footer-border-hover: rgba(250,249,247,0.4);
+  
+  --purple-border: rgba(90, 61, 184, 0.2);
+  --purple-bg-hover: #e4dff8;
+  --accent-border: rgba(7, 74, 158, 0.1);
+  --red-border: #fca5a5;
+  
+  --tooltip-text: #ffffff;
+  --tooltip-bg: var(--text);
+  
+  --accent-light: #eff6ff;
+  --accent-mid: #3b82f6;
+  --accent-dark: #1e40af;
+  --accent-focus: #38bdf8;
+  
+  --brand-navy-light: #1e3a5f;
+  --text-secondary: #334155;
+  --bg-subtle: #f1f5f9;
+  
+  /* Sidebar */
+  --sidebar-text: #f8fafc;
+  --sidebar-text-muted: #94a3b8;
+  --sidebar-text-faint: #64748b;
+  --sidebar-border: rgba(255, 255, 255, 0.2);
+  --sidebar-hover: rgba(255, 255, 255, 0.1);
+  --sidebar-hover-subtle: rgba(255, 255, 255, 0.05);
+  --sidebar-card-bg: rgba(255, 255, 255, 0.03);
+  --sidebar-card-border: rgba(255, 255, 255, 0.05);
+}
+
+/* ═══════════════════════════════════════════════════════════
+   DARK MODE
+   ═══════════════════════════════════════════════════════════ */
+[data-theme="dark"] {
+  --bg: #0F172A;
+  --bg-card: #1E293B;
+  --bg-secondary: #1E293B;
+  --bg-tertiary: #334155;
+
+  --text: #F8FAFC;
+  --text-muted: #CBD5E1;
+  --text-faint: #94A3B8;
+
+  --border: rgba(248, 250, 252, 0.08);
+  --border-strong: rgba(248, 250, 252, 0.14);
+
+  --accent: #2563EB;
+  --accent-bg: rgba(37, 99, 235, 0.15);
+  --accent-text: #93C5FD;
+  --accent-rgb: 37, 99, 235;
+
+  --blue: #60A5FA;
+  --blue-bg: rgba(96, 165, 250, 0.12);
+  --blue-text: #93C5FD;
+
+  --amber: #FBBF24;
+  --amber-bg: rgba(251, 191, 36, 0.12);
+  --amber-text: #FCD34D;
+
+  --red: #F87171;
+  --red-bg: rgba(248, 113, 113, 0.12);
+  --red-text: #FCA5A5;
+
+  --purple: #A78BFA;
+  --purple-bg: rgba(167, 139, 250, 0.12);
+  --purple-text: #C4B5FD;
+
+  --green: #22C55E;
+  --green-bg: rgba(34, 197, 94, 0.12);
+  --green-text: #86EFAC;
+
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.25), 0 1px 2px rgba(0, 0, 0, 0.2);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.3), 0 2px 4px rgba(0, 0, 0, 0.2);
+
+  --focus-ring-color: rgba(59, 130, 246, 0.5);
+  --focus-border-color: #60A5FA;
+
+  --navbar-bg: rgba(15, 23, 42, 0.92);
+
+  --overlay-bg: rgba(0, 0, 0, 0.6);
+  --backdrop: rgba(15, 23, 42, 0.6);
+
+  --scrollbar-thumb: rgba(248, 250, 252, 0.14);
+  
+  /* Component specific override for dark mode */
+  --text-on-accent: #ffffff;
+  --text-secondary: #cbd5e1;
+  --bg-subtle: #1e293b;
+  --accent-light: #1e293b;
+  --accent-border: rgba(59, 130, 246, 0.2);
+  --purple-bg-hover: rgba(167, 139, 250, 0.18);
+  --red-border: rgba(248, 113, 113, 0.2);
+
+  color-scheme: dark;
 }
 
 html {
@@ -73,6 +202,7 @@ body {
   font-size: 15px;
   -webkit-font-smoothing: antialiased;
   min-height: 100vh;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 a {
@@ -89,11 +219,40 @@ select {
   font-family: var(--sans);
 }
 
-*:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 2px;
+/* ═══════════════════════════════════════════════════════════
+   PREMIUM FOCUS RING
+   Replaces the default outline with a smooth animated
+   box-shadow glow.  Meets WCAG 2.2 SC 2.4.11 (≥ 3:1
+   contrast).  Uses :focus-visible so mouse-clickers
+   don't see the ring.
+   ═══════════════════════════════════════════════════════════ */
+body:not(.has-flying-focus) *:focus-visible {
+  outline: none;
+  box-shadow:
+    0 0 0 var(--focus-ring-offset) var(--bg),
+    0 0 0 calc(var(--focus-ring-offset) + var(--focus-ring-width)) var(--focus-border-color),
+    0 0 8px var(--focus-ring-color);
+  border-radius: var(--radius-sm);
+  transition:
+    box-shadow 180ms ease,
+    border-color 180ms ease;
 }
 
+body.has-flying-focus *:focus-visible {
+  outline: none;
+}
+
+/* Inputs and textareas get a border glow instead of a ring */
+body:not(.has-flying-focus) input:focus-visible,
+body:not(.has-flying-focus) textarea:focus-visible,
+body:not(.has-flying-focus) select:focus-visible {
+  box-shadow:
+    0 0 0 1px var(--focus-border-color),
+    0 0 6px var(--focus-ring-color);
+  border-color: var(--focus-border-color);
+}
+
+/* ── Scrollbar ── */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
@@ -102,7 +261,7 @@ select {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: var(--border-strong);
+  background: var(--scrollbar-thumb);
   border-radius: 3px;
 }
 
@@ -171,7 +330,19 @@ kbd {
   animation-delay: 0.28s;
 }
 
+/* ═══════════════════════════════════════════════════════════
+   REDUCED MOTION
+   ═══════════════════════════════════════════════════════════ */
 @media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
   .fade-up,
   .fade-up-1,
   .fade-up-2,
@@ -180,5 +351,12 @@ kbd {
     animation: none;
     opacity: 1;
     transform: none;
+  }
+
+  *:focus-visible {
+    transition: none;
+    box-shadow:
+      0 0 0 var(--focus-ring-offset) var(--bg),
+      0 0 0 calc(var(--focus-ring-offset) + var(--focus-ring-width)) var(--focus-border-color);
   }
 }

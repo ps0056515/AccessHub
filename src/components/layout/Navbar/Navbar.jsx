@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "context/AuthContext";
 import { useConfig } from "context/ConfigContext";
+import { useTheme } from "context/ThemeContext";
 import Container from "components/common/Container/Container";
 import styles from "./Navbar.module.css";
 
@@ -22,6 +23,8 @@ export default function Navbar({
   const [menuOpen, setMenuOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
   const profileRef = useRef(null);
+  const profileBtnRef = useRef(null);
+  const { theme, toggleTheme } = useTheme();
 
   useEffect(() => {
     function handleClickOutside(event) {
@@ -29,11 +32,19 @@ export default function Navbar({
         setProfileOpen(false);
       }
     }
+    function handleEscape(event) {
+      if (event.key === "Escape" && profileOpen) {
+        setProfileOpen(false);
+        profileBtnRef.current?.focus();
+      }
+    }
     document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener("keydown", handleEscape);
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("keydown", handleEscape);
     };
-  }, []);
+  }, [profileOpen]);
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -79,10 +90,15 @@ export default function Navbar({
     }
   };
 
+  const exactMatchLink = links.find((l) => location.pathname === l.url);
+
   const isLinkActive = (l) => {
+    if (location.pathname === l.url) return true;
+    if (exactMatchLink) return false;
+
     const pageId = getPageIdFromUrl(l.url);
     if (pageId) return activePage === pageId;
-    return location.pathname === l.url;
+    return false;
   };
 
   return (
@@ -116,6 +132,31 @@ export default function Navbar({
         </nav>
 
         <div className={styles.actions}>
+          <button
+            type="button"
+            className={styles.themeToggle}
+            onClick={toggleTheme}
+            aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
+            title={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
+          >
+            {theme === "dark" ? (
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <circle cx="12" cy="12" r="5" />
+                <line x1="12" y1="1" x2="12" y2="3" />
+                <line x1="12" y1="21" x2="12" y2="23" />
+                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+                <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+                <line x1="1" y1="12" x2="3" y2="12" />
+                <line x1="21" y1="12" x2="23" y2="12" />
+                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
+                <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+              </svg>
+            ) : (
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+              </svg>
+            )}
+          </button>
           <button
             type="button"
             className={styles.searchBtn}
@@ -157,9 +198,12 @@ export default function Navbar({
             <div ref={profileRef} className={styles.profileWrapper}>
               <button
                 type="button"
+                ref={profileBtnRef}
                 className={styles.avatarBtn}
                 onClick={() => setProfileOpen(!profileOpen)}
                 aria-label="User Profile"
+                aria-expanded={profileOpen}
+                aria-haspopup="true"
               >
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>

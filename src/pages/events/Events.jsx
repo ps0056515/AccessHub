@@ -6,6 +6,7 @@ import { useAriaLive } from 'context/AriaLiveContext';
 import RsvpModal from "./RsvpModal";
 import HostEventModal from "./HostEventModal";
 import Container from 'components/common/Container/Container';
+import SEO from 'components/common/SEO/SEO';
 import styles from './Events.module.css';
 
 const TYPES = ['All', 'Free', 'Members only', 'In-person'];
@@ -117,6 +118,11 @@ export default function Events() {
 
   return (
     <Container className={styles.page}>
+      <SEO 
+        title="Accessibility Events & Workshops | AllCanAccess"
+        description="Attend live digital accessibility events, interactive WCAG workshops, and inclusive design webinars. Network with global a11y experts and learn practical accessibility implementation from industry leaders."
+        keywords="accessibility events, WCAG workshops, digital accessibility webinars, inclusive design meetups, a11y conferences, web accessibility training, accessibility community events, ADA compliance webinars, Section 508 workshops, screen reader demonstrations, accessibility networking, IAAP study groups, accessibility professional development, inclusive UX seminars, digital inclusion events, accessibility testing workshops, ARIA implementation training, global accessibility awareness day, GAAD events, accessibility panel discussions, accessibility masterclasses, accessible tech events, accessibility developer meetups, accessibility conferences 2026, web accessibility summits"
+      />
       <header className={styles.pageHeader}>
         <h1 className={styles.pageTitle}>Events &amp; workshops</h1>
         <p className={styles.pageSub}>

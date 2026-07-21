@@ -7,7 +7,7 @@
 }
 
 .addEventBtn {
-  background: var(--accent, #074a9e);
+  background: var(--accent);
   color: #ffffff;
   border: none;
   padding: 8px 16px;
@@ -23,7 +23,7 @@
 .tabs {
   display: flex;
   gap: 4px;
-  border-bottom: 2px solid var(--border, #e2e8f0);
+  border-bottom: 2px solid var(--border);
   margin-bottom: 20px;
 }
 
@@ -41,16 +41,16 @@
 }
 .tab:hover { color: var(--text); }
 .tabActive {
-  color: var(--accent, #074a9e);
-  border-bottom-color: var(--accent, #074a9e);
+  color: var(--accent);
+  border-bottom-color: var(--accent);
 }
 
 .dateBadge {
   display: inline-flex;
   flex-direction: column;
   align-items: center;
-  background: var(--accent-subtle, #eff6ff);
-  color: var(--accent, #074a9e);
+  background: var(--accent-subtle);
+  color: var(--accent);
   border-radius: 6px;
   padding: 4px 8px;
   font-size: 11px;
@@ -75,8 +75,8 @@
 .rsvpCount {
   font-size: 12px;
   font-weight: 600;
-  background: var(--bg-secondary, #f8fafc);
-  border: 1px solid var(--border, #e2e8f0);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
   border-radius: 9999px;
   padding: 2px 8px;
 }
@@ -97,14 +97,14 @@
 .actionBtnGroup { display: flex; gap: 8px; }
 .editBtn {
   background: transparent;
-  border: 1px solid var(--border-strong, #cbd5e1);
+  border: 1px solid var(--border-strong);
   color: var(--text);
   padding: 4px 8px;
   border-radius: 4px;
   font-size: 12px;
   cursor: pointer;
 }
-.editBtn:hover { background: var(--bg-secondary, #f8fafc); }
+.editBtn:hover { background: var(--bg-secondary); }
 .approveBtn {
   background: transparent;
   border: 1px solid #bbf7d0;
@@ -130,7 +130,7 @@
 .rsvpBtn {
   background: none;
   border: none;
-  color: var(--accent, #074a9e);
+  color: var(--accent);
   cursor: pointer;
   padding: 0;
   font-family: inherit;
@@ -159,7 +159,7 @@
 .searchInput {
   padding: 8px 12px;
   border-radius: var(--radius-sm, 6px);
-  border: 1px solid var(--border-strong, #cbd5e1);
+  border: 1px solid var(--border-strong);
   min-width: 250px;
   outline: none;
 }

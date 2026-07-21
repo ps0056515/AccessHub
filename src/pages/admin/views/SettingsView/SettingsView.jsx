@@ -18,6 +18,7 @@ export default function SettingsView({ showToast }) {
   const [logoLoading, setLogoLoading] = useState(null); // 'navbar' or 'footer'
 
   // Link manager states
+  const [navSaving, setNavSaving] = useState(false);
   const [localNavbarLinks, setLocalNavbarLinks] = useState([]);
   const [footerColSelect, setFooterColSelect] = useState('footer_community');
   const [localFooterLinks, setLocalFooterLinks] = useState([]);
@@ -228,6 +229,7 @@ export default function SettingsView({ showToast }) {
       return;
     }
 
+    setNavSaving(true);
     try {
       await settingsApi.updateNavigation({
         menu_type: menuType,
@@ -241,6 +243,8 @@ export default function SettingsView({ showToast }) {
       showToast?.('Navigation updated successfully!', 'success');
     } catch (err) {
       showToast?.(err.message || 'Failed to save navigation.', 'error');
+    } finally {
+      setNavSaving(false);
     }
   };
 
@@ -688,10 +692,11 @@ export default function SettingsView({ showToast }) {
 
           <button
             type="button"
+            disabled={navSaving}
             onClick={() => handleSaveNavigation('navbar')}
             className={`${dashboardStyles.backBtn} ${styles.saveBtn}`}
           >
-            Save Navbar Navigation
+            {navSaving ? 'Saving Navbar Navigation...' : 'Save Navbar Navigation'}
           </button>
         </section>
       )}
@@ -834,10 +839,11 @@ export default function SettingsView({ showToast }) {
 
             <button
               type="button"
+              disabled={navSaving}
               onClick={() => handleSaveNavigation('footer')}
               className={`${dashboardStyles.backBtn} ${styles.saveBtn}`}
             >
-              Save Footer Column Links
+              {navSaving ? 'Saving Column Links...' : 'Save Column Links'}
             </button>
           </section>
         </div>
