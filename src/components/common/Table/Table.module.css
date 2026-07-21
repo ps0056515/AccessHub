@@ -10,8 +10,8 @@
   position: relative;
   max-height: 500px;
   border-radius: var(--radius-sm, 6px);
-  border: 1px solid var(--border-strong, #cbd5e1);
-  background: var(--bg-card, #ffffff);
+  border: 1px solid var(--border-strong);
+  background: var(--bg-card);
 }
 
 .table {
@@ -31,19 +31,19 @@
   position: sticky !important;
   top: 0;
   z-index: 99;
-  background-color: var(--bg-secondary, #f8fafc);
-  border-bottom: 2px solid var(--border-strong, #cbd5e1);
+  background-color: var(--bg-secondary);
+  border-bottom: 2px solid var(--border-strong);
 }
 
 .table td {
   position: relative;
-  border-bottom: 1px solid var(--border, #e2e8f0);
+  border-bottom: 1px solid var(--border);
   vertical-align: middle;
-  color: var(--text-color, #1e293b);
+  color: var(--text-color);
 }
 
 .table tbody tr:hover td {
-  background-color: var(--bg-secondary, #f8fafc);
+  background-color: var(--bg-secondary);
 }
 
 .noDataContent {
@@ -52,5 +52,5 @@
   justify-content: center;
   align-items: center;
   padding: 32px;
-  color: var(--text-muted, #64748b);
+  color: var(--text-muted);
 }

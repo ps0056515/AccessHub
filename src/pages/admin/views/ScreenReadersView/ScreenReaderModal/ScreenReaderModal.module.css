@@ -7,13 +7,13 @@
   font-size: 14px;
   font-weight: 600;
   margin-bottom: 8px;
-  color: var(--text, #0f172a);
+  color: var(--text);
 }
 
 .input, .textarea {
   width: 100%;
   padding: 10px 12px;
-  border: 1px solid var(--border, #e2e8f0);
+  border: 1px solid var(--border);
   border-radius: 6px;
   font-size: 14px;
   font-family: inherit;
@@ -21,7 +21,7 @@
 
 .input:focus, .textarea:focus {
   outline: none;
-  border-color: var(--accent, #074a9e);
+  border-color: var(--accent);
   box-shadow: 0 0 0 3px rgba(7, 74, 158, 0.1);
 }
 
@@ -36,7 +36,7 @@
   padding: 12px;
   font-family: monospace;
   font-size: 13px;
-  border: 1px solid var(--border, #e2e8f0);
+  border: 1px solid var(--border);
   border-radius: 6px;
   background: #f8fafc;
   resize: vertical;
@@ -44,19 +44,19 @@
 
 .jsonEditor:focus {
   outline: none;
-  border-color: var(--accent, #074a9e);
+  border-color: var(--accent);
   background: #fff;
 }
 
 .cancelBtn {
   background: transparent;
-  border: 1px solid var(--border, #e2e8f0);
+  border: 1px solid var(--border);
   padding: 8px 16px;
   border-radius: 6px;
   font-weight: 600;
   font-size: 14px;
   cursor: pointer;
-  color: var(--text, #0f172a);
+  color: var(--text);
 }
 
 .cancelBtn:hover {
@@ -64,7 +64,7 @@
 }
 
 .saveBtn {
-  background: var(--accent, #074a9e);
+  background: var(--accent);
   color: #fff;
   border: none;
   padding: 8px 24px;
@@ -106,7 +106,7 @@
 /* Phase Editor Styles */
 .topSection {
   padding-bottom: 24px;
-  border-bottom: 1px solid var(--border, #e2e8f0);
+  border-bottom: 1px solid var(--border);
   margin-bottom: 24px;
 }
 
@@ -120,7 +120,7 @@
   font-size: 18px;
   font-weight: 600;
   margin: 0;
-  color: var(--text, #0f172a);
+  color: var(--text);
 }
 
 .phasesList {
@@ -131,7 +131,7 @@
 
 .phaseCard {
   background: #f8fafc;
-  border: 1px solid var(--border, #e2e8f0);
+  border: 1px solid var(--border);
   border-radius: 8px;
   overflow: hidden;
 }
@@ -142,13 +142,13 @@
   align-items: center;
   padding: 12px 16px;
   background: #f1f5f9;
-  border-bottom: 1px solid var(--border, #e2e8f0);
+  border-bottom: 1px solid var(--border);
 }
 
 .phaseTitle {
   font-weight: 600;
   font-size: 14px;
-  color: var(--text, #0f172a);
+  color: var(--text);
   margin: 0;
 }
 
@@ -204,7 +204,7 @@
 
 .typeBtn {
   background: #fff;
-  border: 1px solid var(--border, #e2e8f0);
+  border: 1px solid var(--border);
   padding: 6px 12px;
   border-radius: 4px;
   font-size: 13px;
@@ -214,19 +214,19 @@
 
 .typeBtn.active {
   background: #eef2ff;
-  border-color: var(--accent, #074a9e);
-  color: var(--accent, #074a9e);
+  border-color: var(--accent);
+  color: var(--accent);
   font-weight: 600;
 }
 
 .addPhaseBtn, .addItemBtn {
   background: transparent;
-  border: 1px dashed var(--border, #e2e8f0);
+  border: 1px dashed var(--border);
   padding: 12px;
   border-radius: 6px;
   font-weight: 600;
   font-size: 14px;
-  color: var(--accent, #074a9e);
+  color: var(--accent);
   cursor: pointer;
   width: 100%;
   transition: all 0.2s;
@@ -234,7 +234,7 @@
 
 .addPhaseBtn:hover, .addItemBtn:hover {
   background: #f8fafc;
-  border-color: var(--accent, #074a9e);
+  border-color: var(--accent);
 }
 
 .nestedList {
@@ -250,7 +250,7 @@
   align-items: flex-start;
   background: #fff;
   padding: 12px;
-  border: 1px solid var(--border, #e2e8f0);
+  border: 1px solid var(--border);
   border-radius: 6px;
 }
 

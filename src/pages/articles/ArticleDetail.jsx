@@ -3,6 +3,7 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import { articlesApi } from 'api/client';
 import { SITE_NAME } from 'brand';
 import Container from 'components/common/Container/Container';
+import SEO from 'components/common/SEO/SEO';
 import Interactions from 'components/Interactions';
 import styles from './Articles.module.css';
 
@@ -41,6 +42,12 @@ export default function ArticleDetail() {
 
   return (
     <Container className={styles.detailContainer} style={{ display: 'block' }}>
+      <SEO 
+        title={`${article.title} | ${SITE_NAME}`}
+        description={`Read "${article.title}" by ${article.author} on AllCanAccess.`}
+        ogImage={article.cover_image || '/og-image.png'}
+        ogType="article"
+      />
       <Link to="/articles" className={styles.backBtn}>
         ← Back to Articles
       </Link>

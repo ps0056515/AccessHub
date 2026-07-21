@@ -5,7 +5,7 @@
 
 .gradientBar {
   height: 4px;
-  background: linear-gradient(90deg, var(--accent) 0%, #3b82f6 60%, #60a5fa 100%);
+  background: linear-gradient(90deg, var(--accent) 0%, var(--accent-mid) 60%, var(--accent-light) 100%);
 }
 
 .content {

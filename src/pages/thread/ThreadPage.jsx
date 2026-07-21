@@ -359,9 +359,9 @@ export default function ThreadPage({ posts, setPosts, refreshPosts, returnToComm
                 {post.author}
                 <CountryFlag countryName={post.country} />
               </Link>
-              <span className={styles.dot}>·</span>
+              <span className={styles.dot} aria-hidden="true">·</span>
               <RelativeTime rawTime={post.raw_time} fallback={post.time} />
-              <span className={styles.dot}>·</span>
+              <span className={styles.dot} aria-hidden="true">·</span>
               <span>{post.replies} replies</span>
             </p>
             {isEditing ? (
@@ -446,7 +446,7 @@ export default function ThreadPage({ posts, setPosts, refreshPosts, returnToComm
                       {c.author}
                       <CountryFlag countryName={c.country} />
                     </Link>
-                    <span className={styles.dot}>·</span>
+                    <span className={styles.dot} aria-hidden="true">·</span>
                     <RelativeTime rawTime={c.raw_time} fallback={c.time} />
                   </p>
                   {isAuthenticated && user?.id === c.userId && (

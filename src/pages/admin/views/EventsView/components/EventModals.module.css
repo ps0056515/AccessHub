@@ -16,8 +16,8 @@
 .formInput, .formSelect, .formTextarea {
   padding: 8px 12px;
   border-radius: 6px;
-  border: 1px solid var(--border, #cbd5e1);
-  background: var(--bg-card, #ffffff);
+  border: 1px solid var(--border);
+  background: var(--bg-card);
   color: var(--text);
   font-size: 14px;
   width: 100%;
@@ -28,23 +28,23 @@
   resize: vertical;
 }
 .formInput:focus, .formSelect:focus, .formTextarea:focus {
-  outline: 2px solid var(--accent, #074a9e);
+  outline: 2px solid var(--accent);
   outline-offset: -1px;
 }
 
 .cancelBtn {
   background: transparent;
-  border: 1px solid var(--border, #cbd5e1);
+  border: 1px solid var(--border);
   color: var(--text-muted);
   padding: 8px 16px;
   border-radius: 6px;
   font-size: 14px;
   cursor: pointer;
 }
-.cancelBtn:hover { background: var(--bg-secondary, #f8fafc); }
+.cancelBtn:hover { background: var(--bg-secondary); }
 
 .saveBtn {
-  background: var(--accent, #074a9e);
+  background: var(--accent);
   color: #ffffff;
   border: none;
   padding: 8px 16px;

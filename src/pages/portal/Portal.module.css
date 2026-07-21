@@ -6,7 +6,7 @@
 .hero {
   position: relative;
   overflow: hidden;
-  background: linear-gradient(160deg, #f5f8fd 0%, #e8f1fb 100%);
+  background: linear-gradient(160deg, var(--bg) 0%, var(--bg-secondary) 100%);
   padding: 64px 24px 56px;
   min-height: clamp(90dvh, 65vh, 700px);
   display: flex;
@@ -84,8 +84,8 @@
 }
 
 .heroCta {
-  background: var(--text);
-  color: var(--bg);
+  background: var(--accent);
+  color: var(--text-on-accent);
   border: none;
   border-radius: var(--radius-sm);
   padding: 11px 22px;
@@ -136,7 +136,7 @@
   border-radius: var(--radius-full);
   border: 1px solid var(--border-strong);
   color: var(--text);
-  background: rgba(255, 255, 255, 0.6);
+  background: var(--bg-card);
   cursor: pointer;
   transition:
     background var(--transition),
@@ -145,7 +145,7 @@
 }
 
 .heroChipBtn:hover {
-  background: rgba(255, 255, 255, 0.85);
+  background: var(--bg-card);
   border-color: var(--accent);
   color: var(--text);
 }
@@ -226,15 +226,15 @@
   left: 0;
   width: 100%;
   height: 3px;
-  background: #245FA9;
+  background: var(--accent);
   transform: scaleX(0);
   transition: transform 0.3s ease;
 }
 
 .statItem:hover {
-  background: #ffffff;
+  background: var(--bg-card);
   transform: translateY(-4px);
-  box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+  box-shadow: 0 8px 20px var(--shadow-md);
 }
 
 .statItem:hover::before {
@@ -400,7 +400,7 @@
 }
 .communityHint {
   font-size: 12px;
-  color: #2563eb;
+  color: var(--accent-text);
   font-weight: 500;
   margin-bottom: 12px;
 }
@@ -455,7 +455,7 @@
 
 .askPost {
   background: var(--accent);
-  color: #fff;
+  color: var(--text-on-accent);
   border: none;
   border-radius: var(--radius-sm);
   padding: 7px 16px;
@@ -621,7 +621,7 @@
   font-weight: 500;
 }
 .postDot {
-  color: var(--border-strong);
+  color: var(--text-faint);
 }
 
 .postTitle {
@@ -638,6 +638,10 @@
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
+  font-size: 14px;
+  color: var(--text-muted);
+  line-height: 1.5;
+  margin-top: 4px;
 }
 
 .postTags {
@@ -669,7 +673,7 @@
 .retryBtn {
   margin-top: 12px;
   background: var(--accent);
-  color: #fff;
+  color: var(--bg-card);
   border: none;
   border-radius: var(--radius-sm);
   padding: 8px 16px;
@@ -839,7 +843,7 @@
   background: none;
   border: none;
   font-size: 13px;
-  color: var(--accent);
+  color: var(--blue);
   padding: 10px 0;
   margin-top: 8px;
   display: block;
@@ -949,8 +953,8 @@
 
 .checkerBtn {
   width: 100%;
-  background: var(--text);
-  color: var(--bg);
+  background: var(--accent);
+  color: var(--text-on-accent);
   border: none;
   border-radius: var(--radius-sm);
   padding: 9px;
@@ -975,8 +979,8 @@
   font-style: italic;
 }
 .modalCloseFooter {
-  background: var(--text);
-  color: var(--bg);
+  background: var(--accent);
+  color: var(--bg-card);
   border: none;
   border-radius: var(--radius-sm);
   padding: 8px 18px;
@@ -1020,11 +1024,11 @@
   padding: 0 14px;
   margin-bottom: 12px;
 
-  border: 1px solid #d0d7de;
+  border: 1px solid var(--border-strong);
   border-radius: 8px;
 
-  background: #fff;
-  color: #24292f;
+  background: var(--bg-card);
+  color: var(--text);
 
   font-size: 14px;
   font-family: inherit;
@@ -1032,8 +1036,8 @@
 
 .askTitleInput:focus {
   outline: none;
-  border-color: #245FA9;
-  box-shadow: 0 0 0 3px rgba(36,95,169,0.15);
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-border);
 }
 .fieldLabel {
   display: block;
@@ -1041,7 +1045,7 @@
 
   font-size: 13px;
   font-weight: 600;
-  color: #344054;
+  color: var(--text-muted);
 }
 @media (max-width: 400px) {
   .statsBar {

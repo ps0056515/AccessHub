@@ -17,8 +17,8 @@
   position: absolute;
   top: -9999px;
   left: 16px;
-  background: var(--accent, #074a9e);
-  color: #ffffff !important;
+  background: var(--accent);
+  color: var(--text-on-accent) !important;
   padding: 10px 16px;
   z-index: 1000;
   text-decoration: none;
@@ -28,15 +28,15 @@
 
 .skipLink:focus {
   top: 16px;
-  outline: 2px solid var(--accent-focus, #38bdf8);
+  outline: 2px solid var(--accent-focus);
 }
 
 /* ── Sidebar Styling ── */
 .sidebar {
   display: flex;
   flex-direction: column;
-  background: #0f172a; /* Slate 900 for modern premium dark vibe */
-  color: #f8fafc;
+  background: var(--brand-navy); /* Slate 900 for modern premium dark vibe */
+  color: var(--sidebar-text);
   padding: 24px 16px;
   position: sticky;
   top: 0;
@@ -61,20 +61,20 @@
   font-size: 16px;
   font-weight: 600;
   margin: 0;
-  color: #ffffff;
+  color: var(--text-on-dark);
   letter-spacing: -0.01em;
 }
 
 .brandRole {
   font-size: 11px;
-  color: #94a3b8;
+  color: var(--sidebar-text-muted);
   display: block;
 }
 
 .collapseToggle {
   background: transparent;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  color: #94a3b8;
+  border: 1px solid var(--sidebar-border);
+  color: var(--sidebar-text-muted);
   cursor: pointer;
   border-radius: 4px;
   width: 24px;
@@ -87,8 +87,8 @@
 }
 
 .collapseToggle:hover {
-  background: rgba(255, 255, 255, 0.1);
-  color: #fff;
+  background: var(--sidebar-hover);
+  color: var(--text-on-dark);
 }
 
 .cmsCollapsed .brandText,
@@ -146,7 +146,7 @@
   border-radius: var(--radius-sm, 6px);
   border: none;
   background: transparent;
-  color: #94a3b8;
+  color: var(--sidebar-text-muted);
   font-size: 14px;
   font-weight: 500;
   text-align: left;
@@ -155,18 +155,18 @@
 }
 
 .tabItem:hover {
-  background: rgba(255, 255, 255, 0.05);
-  color: #f8fafc;
+  background: var(--sidebar-hover-subtle);
+  color: var(--sidebar-text);
 }
 
 .tabItem:focus-visible {
-  outline: 2px solid #38bdf8;
+  outline: 2px solid var(--accent-focus);
   outline-offset: 2px;
 }
 
 .tabItemActive {
-  background: var(--accent, #074a9e);
-  color: #ffffff !important;
+  background: var(--accent);
+  color: var(--text-on-accent) !important;
 }
 
 .tabIcon {
@@ -184,17 +184,17 @@
   gap: 10px;
   padding: 12px;
   border-radius: var(--radius-sm, 6px);
-  background: rgba(255, 255, 255, 0.03);
+  background: var(--sidebar-card-bg);
   margin-top: auto;
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--sidebar-hover-subtle);
 }
 
 .profileAvatar {
   width: 32px;
   height: 32px;
   border-radius: 50%;
-  background: #38bdf8;
-  color: #0f172a;
+  background: var(--accent-focus);
+  color: var(--brand-navy);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -212,7 +212,7 @@
   font-size: 13px;
   font-weight: 600;
   margin: 0;
-  color: #ffffff;
+  color: var(--text-on-dark);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -230,7 +230,7 @@
 .logoutBtn {
   background: transparent;
   border: none;
-  color: #94a3b8;
+  color: var(--sidebar-text-muted);
   cursor: pointer;
   padding: 4px;
   border-radius: 4px;
@@ -239,14 +239,14 @@
 
 .logoutBtn:hover {
   background: rgba(255, 255, 255, 0.08);
-  color: #ef4444;
+  color: var(--red);
 }
 
 /* ── Right-Side Main CMS Display Frame ── */
 .mainFrame {
   display: flex;
   flex-direction: column;
-  background: var(--bg-secondary, #f8fafc);
+  background: var(--bg-secondary);
   min-width: 0;
 }
 
@@ -256,7 +256,7 @@
   align-items: center;
   padding: 16px 32px;
   border-bottom: 1px solid var(--border);
-  background: var(--bg-card, #ffffff);
+  background: var(--bg-card);
   position: sticky;
   top: 0;
   z-index: 100;
@@ -267,24 +267,24 @@
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  color: var(--text-faint, #64748b);
+  color: var(--text-faint);
 }
 
 .backBtn {
   background: transparent;
-  border: 1px solid var(--border-strong, #cbd5e1);
+  border: 1px solid var(--border-strong);
   border-radius: var(--radius-sm, 6px);
   padding: 6px 12px;
   font-size: 13px;
   font-weight: 500;
-  color: var(--text-muted, #475569);
+  color: var(--text-muted);
   cursor: pointer;
   transition: all var(--transition, 0.15s ease);
 }
 
 .backBtn:hover {
-  background: var(--bg-secondary, #f8fafc);
-  color: var(--text, #0f172a);
+  background: var(--bg-secondary);
+  color: var(--text);
 }
 
 .frameContent {
@@ -306,21 +306,21 @@
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  color: var(--accent, #074a9e);
+  color: var(--accent);
   margin: 0 0 6px;
 }
 
 .title {
   font-size: 28px;
   font-weight: 700;
-  color: var(--text, #0f172a);
+  color: var(--text);
   margin: 0 0 8px;
   letter-spacing: -0.02em;
 }
 
 .lead {
   font-size: 15px;
-  color: var(--text-muted, #475569);
+  color: var(--text-muted);
   margin: 0;
   line-height: 1.5;
 }
@@ -328,15 +328,15 @@
 /* ── Loader & Alert states ── */
 .loading {
   font-size: 14px;
-  color: var(--text-muted, #475569);
+  color: var(--text-muted);
   padding: 24px;
   text-align: center;
 }
 
 .error {
-  background: var(--red-bg, #fef2f2);
-  color: var(--red-text, #b91c1c);
-  border: 1px solid var(--red-border, #fca5a5);
+  background: var(--red-bg);
+  color: var(--red-text);
+  border: 1px solid var(--red-border);
   border-radius: var(--radius-sm, 6px);
   padding: 16px;
   margin-bottom: 24px;
@@ -352,31 +352,31 @@
 }
 
 .statCard {
-  background: var(--bg-card, #ffffff);
-  border: 1px solid var(--border, #e2e8f0);
+  background: var(--bg-card);
+  border: 1px solid var(--border);
   border-radius: var(--radius-md, 8px);
   padding: 20px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 1px 3px var(--shadow-sm);
 }
 
 .statLabel {
   font-size: 12px;
   font-weight: 500;
-  color: var(--text-faint, #64748b);
+  color: var(--text-faint);
   margin: 0 0 8px;
 }
 
 .statValue {
   font-size: 24px;
   font-weight: 700;
-  color: var(--text, #0f172a);
+  color: var(--text);
   margin: 0;
   letter-spacing: -0.01em;
 }
 
 .statHint {
   font-size: 11px;
-  color: var(--text-muted, #475569);
+  color: var(--text-muted);
   margin: 4px 0 0;
 }
 
@@ -389,18 +389,18 @@
 }
 
 .panel {
-  background: var(--bg-card, #ffffff);
-  border: 1px solid var(--border, #e2e8f0);
+  background: var(--bg-card);
+  border: 1px solid var(--border);
   border-radius: var(--radius-md, 8px);
   padding: 24px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 1px 3px var(--shadow-sm);
   min-width: 0;
 }
 
 .panelTitle {
   font-size: 16px;
   font-weight: 600;
-  color: var(--text, #0f172a);
+  color: var(--text);
   margin: 0 0 16px;
   letter-spacing: -0.01em;
 }

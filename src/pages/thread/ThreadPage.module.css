@@ -113,7 +113,7 @@
 }
 
 .author { color: var(--text-muted); font-weight: 500; }
-.dot { color: var(--border-strong); margin: 0 4px; }
+.dot { color: var(--text-faint); margin: 0 4px; }
 
 .title {
   font-family: var(--serif);

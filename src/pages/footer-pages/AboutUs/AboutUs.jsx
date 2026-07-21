@@ -1,5 +1,63 @@
 import { Link } from 'react-router-dom';
+import SEO from 'components/common/SEO/SEO';
 import styles from './AboutUs.module.css';
+
+const SEO_FAQS = [
+  {
+    q: "What is AllCanAccess accessibility community?",
+    a: "AllCanAccess is a global digital accessibility community focused on creating inclusive digital experiences for everyone, including people with disabilities. The community brings together accessibility professionals, developers, QA engineers, designers, compliance experts, assistive technology users, and learners to collaborate on WCAG compliance, accessibility testing, inclusive UX design, assistive technologies, and accessibility best practices. AllCanAccess helps organizations and individuals learn, discuss, and implement accessibility standards across websites, mobile apps, documents, and digital platforms."
+  },
+  {
+    q: "Why is joining an accessibility community important?",
+    a: "Joining an accessibility community helps professionals stay updated with evolving standards such as WCAG 2.2, ADA, Section 508, and the European Accessibility Act (EAA). Accessibility is constantly evolving with new assistive technologies, legal regulations, and design practices. Communities like AllCanAccess provide opportunities to learn from experts, share real-world accessibility challenges, participate in discussions, attend webinars, collaborate on solutions, and improve accessibility implementation skills across digital products."
+  },
+  {
+    q: "Who can join the AllCanAccess community?",
+    a: "AllCanAccess is open to everyone interested in accessibility and inclusive technology. This includes accessibility testers, developers, designers, QA engineers, product managers, compliance teams, educators, students, assistive technology users, business owners, and organizations working toward digital inclusion. Whether someone is a beginner learning accessibility fundamentals or an experienced accessibility consultant, the community provides resources and discussions suitable for all skill levels."
+  },
+  {
+    q: "What topics are discussed in accessibility communities?",
+    a: "Accessibility communities discuss a wide range of topics related to digital inclusion and accessibility compliance. Common topics include WCAG 2.2 guidelines, screen reader testing, keyboard accessibility, ARIA implementation, color contrast compliance, mobile accessibility, PDF accessibility, accessibility automation, inclusive UX design, assistive technologies, ADA compliance, accessibility audits, accessibility testing tools, semantic HTML, accessibility in CI/CD pipelines, and accessibility remediation strategies."
+  },
+  {
+    q: "How does an accessibility community help organizations improve compliance?",
+    a: "Accessibility communities help organizations improve compliance by sharing practical implementation knowledge, accessibility testing strategies, remediation techniques, and industry best practices. Organizations can learn how to identify accessibility barriers early, integrate accessibility into development workflows, conduct audits, automate testing, and maintain WCAG compliance over time. Communities also help teams stay informed about accessibility lawsuits, legal requirements, and emerging accessibility technologies."
+  },
+  {
+    q: "What is WCAG and why is it important for accessibility communities?",
+    a: "WCAG (Web Content Accessibility Guidelines) is the internationally recognized standard for digital accessibility created by the W3C. Accessibility communities heavily focus on WCAG because it provides the foundation for creating accessible websites, applications, and digital content. WCAG is built on four principles — Perceivable, Operable, Understandable, and Robust (POUR). Communities like AllCanAccess help members understand WCAG success criteria, accessibility testing methods, and real-world implementation practices."
+  },
+  {
+    q: "How do accessibility communities support accessibility testing learning?",
+    a: "Accessibility communities provide educational resources, expert guidance, live discussions, webinars, workshops, and real-world examples to help members learn accessibility testing. Members can understand automated testing tools, manual accessibility audits, keyboard navigation testing, screen reader testing, color contrast validation, and accessibility issue remediation. Communities also allow learners to ask questions, share challenges, and receive support from experienced accessibility professionals."
+  },
+  {
+    q: "What are the benefits of accessibility networking communities?",
+    a: "Accessibility networking communities help professionals connect with industry experts, recruiters, organizations, accessibility advocates, and assistive technology users. These communities create opportunities for collaboration, career growth, knowledge sharing, mentorship, accessibility events, and partnerships. Networking within accessibility communities also helps organizations build stronger accessibility programs by learning from industry experiences and accessibility success stories."
+  },
+  {
+    q: "How does accessibility improve user experience for everyone?",
+    a: "Accessibility improves usability for all users, not only people with disabilities. Features such as proper headings, keyboard navigation, captions, responsive layouts, readable content, and clear navigation improve overall user experience, SEO performance, mobile usability, and customer satisfaction. Accessibility communities help spread awareness that inclusive design benefits every user, including older adults, users in temporary impairments, and users in challenging environments."
+  },
+  {
+    q: "Why is digital accessibility becoming increasingly important worldwide?",
+    a: "Digital accessibility is becoming increasingly important because governments and organizations worldwide are strengthening accessibility laws and compliance requirements. Regulations such as ADA in the United States, Section 508, EN 301 549 in Europe, and the European Accessibility Act require accessible digital experiences. Additionally, over 1.3 billion people globally live with disabilities, making accessibility essential for equal access to information, services, education, healthcare, and employment. Accessibility communities like AllCanAccess play a major role in spreading awareness and helping organizations adopt inclusive digital experiences."
+  }
+];
+
+// Generate structured data for Google
+const faqStructuredData = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": SEO_FAQS.map(faq => ({
+    "@type": "Question",
+    "name": faq.q,
+    "acceptedAnswer": {
+      "@type": "Answer",
+      "text": faq.a
+    }
+  }))
+};
 
 const MISSION_LIST = [
   "Promote accessibility awareness and education.",
@@ -42,6 +100,12 @@ function BulletList({ items }) {
 export default function AboutUs() {
   return (
     <div className={styles.container}>
+      <SEO 
+        title="AllCanAccess | Global Accessibility Community for Inclusive Digital Experiences"
+        description="Join AllCanAccess, a global accessibility community focused on WCAG compliance, inclusive design, assistive technologies, accessibility testing, ADA compliance, and digital inclusion."
+        keywords="accessibility community, digital accessibility community, WCAG community, accessibility testing community, inclusive design community, ADA compliance community, web accessibility community, accessibility professionals network, accessibility learning platform, assistive technology community, accessibility forum, accessibility knowledge sharing platform, accessibility QA community, accessibility experts community, WCAG 2.2 community, accessibility awareness platform, inclusive UX community, accessibility automation community, accessibility discussions, AllCanAccess"
+        structuredData={faqStructuredData}
+      />
       <div className={styles.gradientBar} aria-hidden="true" />
 
       <div className={styles.contentWrapper}>
@@ -151,6 +215,20 @@ export default function AboutUs() {
           <Link to="/join" className={styles.joinBtn}>
             Join the community →
           </Link>
+        </div>
+
+        {/* SEO FAQs */}
+        <div className={styles.faqSection} aria-labelledby="faq-title">
+          <h2 id="faq-title" className={styles.valuesTitle}>Frequently Asked Questions</h2>
+          <p className={styles.valuesSubtitle}>Learn more about our community and digital accessibility.</p>
+          <div className={styles.faqList}>
+            {SEO_FAQS.map((faq, index) => (
+              <div key={index} className={styles.faqItem}>
+                <h3 className={styles.faqQuestion}>{faq.q}</h3>
+                <p className={styles.faqAnswer}>{faq.a}</p>
+              </div>
+            ))}
+          </div>
         </div>
 
       </div>

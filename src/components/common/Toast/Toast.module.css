@@ -13,14 +13,14 @@
   pointer-events: auto;
   min-width: 280px;
   max-width: 380px;
-  background: var(--bg-card, #ffffff);
-  border-left: 4px solid var(--accent, #074a9e);
-  color: var(--text, #0f172a);
+  background: var(--bg-card);
+  border-left: 4px solid var(--accent);
+  color: var(--text);
   padding: 14px 18px;
   border-radius: var(--radius-sm, 6px);
   box-shadow:
-    0 10px 15px -3px rgba(0, 0, 0, 0.1),
-    0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    0 10px 15px -3px var(--shadow-md),
+    0 4px 6px -2px var(--shadow-md);
   display: flex;
   align-items: center;
   gap: 12px;
@@ -29,11 +29,11 @@
 }
 
 .toastSuccess {
-  border-left-color: #10b981; /* Green */
+  border-left-color: var(--green); /* Green */
 }
 
 .toastError {
-  border-left-color: #ef4444; /* Red */
+  border-left-color: var(--red); /* Red */
 }
 
 .toastIcon {
@@ -46,13 +46,13 @@
   font-size: 13px;
   font-weight: 500;
   line-height: 1.4;
-  color: var(--text, #0f172a);
+  color: var(--text);
 }
 
 .toastCloseBtn {
   background: transparent;
   border: none;
-  color: var(--text-faint, #94a3b8);
+  color: var(--text-faint);
   cursor: pointer;
   padding: 2px;
   flex-shrink: 0;
@@ -62,7 +62,7 @@
 }
 
 .toastCloseBtn:hover {
-  color: var(--text, #0f172a);
+  color: var(--text);
 }
 
 @keyframes slideIn {

@@ -2,7 +2,7 @@
   position: fixed;
   inset: 0;
   z-index: 10000;
-  background: rgba(26, 25, 22, 0.45);
+  background: var(--backdrop);
   display: flex;
   align-items: center;
   justify-content: center;

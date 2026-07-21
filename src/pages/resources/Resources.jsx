@@ -5,6 +5,7 @@ import { COLOR_MAP } from "data";
 import { resourcesApi } from "api/client";
 import SuggestResourceModal from "./SuggestResourceModal";
 import Container from "components/common/Container/Container";
+import SEO from "components/common/SEO/SEO";
 import styles from "./Resources.module.css";
 
 const SAVED_KEY = "allcanaccess-saved-resources";
@@ -110,6 +111,11 @@ export default function Resources({ setActivePage }) {
 
   return (
     <Container className={styles.page}>
+      <SEO 
+        title="Resources | AllCanAccess"
+        description="Access the ultimate library of digital accessibility resources. Download free WCAG checklists, inclusive design templates, ARIA pattern guides, and step-by-step accessibility tutorials curated by top industry professionals."
+        keywords="accessibility resources, WCAG checklists, inclusive design templates, ARIA tutorials, web accessibility guides, accessibility best practices, digital accessibility learning, accessibility testing templates, ADA compliance checklist, Section 508 guides, screen reader guides, accessibility documentation, accessible HTML templates, CSS accessibility, accessible UI patterns, accessibility cheat sheets, accessible color contrast guides, a11y resources, mobile accessibility guidelines, iOS accessibility resources, Android accessibility guides, accessibility training materials, accessibility code snippets, WCAG 2.2 tutorials, accessible design systems"
+      />
       <header className={styles.pageHeader}>
         <h1 className={styles.pageTitle}>Community resources</h1>
         <p className={styles.pageSub}>

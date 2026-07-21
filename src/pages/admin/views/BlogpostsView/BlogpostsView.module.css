@@ -13,12 +13,12 @@
 .title {
   font-size: 24px;
   font-weight: 700;
-  color: var(--text, #0f172a);
+  color: var(--text);
   margin: 0;
 }
 
 .createBtn {
-  background: var(--accent, #074a9e);
+  background: var(--accent);
   color: #ffffff;
   border: none;
   border-radius: 6px;
@@ -45,8 +45,8 @@
 
 .btnSecondary {
   background: transparent;
-  color: var(--text-muted, #475569);
-  border: 1px solid var(--border-strong, #cbd5e1);
+  color: var(--text-muted);
+  border: 1px solid var(--border-strong);
   padding: 4px 8px;
   border-radius: var(--radius-sm, 6px);
   font-size: 13px;
@@ -55,8 +55,8 @@
   transition: all 0.15s ease;
 }
 .btnSecondary:hover {
-  background: var(--bg-secondary, #f8fafc);
-  color: var(--text, #0f172a);
+  background: var(--bg-secondary);
+  color: var(--text);
 }
 
 .btnDanger {
@@ -96,7 +96,7 @@
   gap: 16px;
   background: #ffffff;
   padding: 24px;
-  border: 1px solid var(--border, #e2e8f0);
+  border: 1px solid var(--border);
   border-radius: 8px;
 }
 
@@ -115,13 +115,13 @@
 .label {
   font-size: 13px;
   font-weight: 600;
-  color: var(--text, #0f172a);
+  color: var(--text);
 }
 
 .input, .textarea {
   padding: 10px 12px;
   border-radius: 6px;
-  border: 1px solid var(--border, #cbd5e1);
+  border: 1px solid var(--border);
   font-size: 14px;
   color: var(--text);
   font-family: inherit;
@@ -152,21 +152,21 @@
 
 .cancelBtn {
   background: transparent;
-  border: 1px solid var(--border-strong, #cbd5e1);
+  border: 1px solid var(--border-strong);
   border-radius: 6px;
   padding: 8px 16px;
   font-size: 14px;
   font-weight: 500;
-  color: var(--text-muted, #475569);
+  color: var(--text-muted);
   cursor: pointer;
 }
 
 .cancelBtn:hover {
-  background: var(--bg-secondary, #f8fafc);
+  background: var(--bg-secondary);
 }
 
 .saveBtn {
-  background: var(--accent, #074a9e);
+  background: var(--accent);
   color: #ffffff;
   border: none;
   border-radius: 6px;
