@@ -11,7 +11,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-  gap: 5px;
+    gap: 5px;
     height: 60px;
   }
 
@@ -32,7 +32,7 @@
     width: auto;
     max-width: 500px;
     object-fit: contain;
-    
+
   }
 
   .logoBadge {
@@ -83,7 +83,10 @@
     left: 20%;
   }
 
-  .navLink:hover { background: var(--bg-secondary); color: var(--text); }
+  .navLink:hover {
+    background: var(--bg-secondary);
+    color: var(--text);
+  }
 
   .navLink.active {
     color: var(--text);
@@ -104,7 +107,7 @@
 
   .searchBtn {
     background: none;
-    border: 1px solid var(--border-strong);
+    border: 1px solid var(--text-faint);
     border-radius: var(--radius-sm);
     width: 34px;
     height: 34px;
@@ -115,12 +118,15 @@
     transition: all var(--transition);
   }
 
-  .searchBtn:hover { background: var(--bg-secondary); color: var(--text); }
+  .searchBtn:hover {
+    background: var(--bg-secondary);
+    color: var(--text);
+  }
 
   .signInBtn {
     background: none;
     color: var(--accent-text);
-    border: 1px solid var(--border-strong);
+    border: 1px solid var(--border-interactive-strong);
     border-radius: var(--radius-sm);
     padding: 7px 14px;
     font-size: 13px;
@@ -128,7 +134,9 @@
     transition: background var(--transition);
   }
 
-  .signInBtn:hover { background: var(--bg-secondary); }
+  .signInBtn:hover {
+    background: var(--bg-secondary);
+  }
 
   .joinBtn {
     background: var(--accent);
@@ -141,13 +149,19 @@
     transition: opacity var(--transition), transform 180ms ease, box-shadow 180ms ease;
   }
 
-  .joinBtn:hover { opacity: 0.88; transform: translateY(-1px); }
-  .joinBtn:active { transform: translateY(0); }
+  .joinBtn:hover {
+    opacity: 0.88;
+    transform: translateY(-1px);
+  }
+
+  .joinBtn:active {
+    transform: translateY(0);
+  }
 
   /* ── Theme toggle ── */
   .themeToggle {
     background: none;
-    border: 1px solid var(--border-strong);
+    border: 1px solid var(--border-interactive-strong);
     border-radius: var(--radius-sm);
     width: 34px;
     height: 34px;
@@ -167,7 +181,7 @@
   .communityBtn {
     background: none;
     color: var(--accent-text);
-    border: 1px solid var(--border-strong);
+    border: 1px solid var(--border-interactive-strong);
     border-radius: var(--radius-sm);
     padding: 7px 14px;
     font-size: 13px;
@@ -175,7 +189,9 @@
     transition: background var(--transition);
   }
 
-  .communityBtn:hover { background: var(--bg-secondary); }
+  .communityBtn:hover {
+    background: var(--bg-secondary);
+  }
 
   .userLabel {
     font-size: 13px;
@@ -190,7 +206,7 @@
   .signOutBtn {
     background: none;
     color: var(--text-muted);
-    border: 1px solid var(--border-strong);
+    border: 1px solid var(--border-interactive-strong);
     border-radius: var(--radius-sm);
     padding: 7px 12px;
     font-size: 13px;
@@ -198,7 +214,10 @@
     transition: background var(--transition);
   }
 
-  .signOutBtn:hover { background: var(--bg-secondary); color: var(--text); }
+  .signOutBtn:hover {
+    background: var(--bg-secondary);
+    color: var(--text);
+  }
 
   .adminBtn {
     background: var(--purple-bg);
@@ -211,7 +230,9 @@
     transition: background var(--transition);
   }
 
-  .adminBtn:hover { background: var(--purple-bg); }
+  .adminBtn:hover {
+    background: var(--purple-bg);
+  }
 
   .menuBtn {
     display: none;
@@ -231,8 +252,13 @@
     transition: transform 0.2s, opacity 0.2s;
   }
 
-  .barOpen1 { transform: translateY(3px) rotate(45deg); }
-  .barOpen2 { transform: translateY(-3px) rotate(-45deg); }
+  .barOpen1 {
+    transform: translateY(3px) rotate(45deg);
+  }
+
+  .barOpen2 {
+    transform: translateY(-3px) rotate(-45deg);
+  }
 
   .mobileNav {
     display: none;
@@ -279,17 +305,19 @@
     margin-top: 8px;
   }
 
-  .logoName{
+  .logoName {
     position: static;
     width: auto;
     height: auto;
     font-size: 16px;
     font-weight: 700;
-    margin:0;
+    margin: 0;
 
   }
 
-  .mobileJoin:hover { opacity: 0.9; }
+  .mobileJoin:hover {
+    opacity: 0.9;
+  }
 
   .mobileJoinGhost {
     background: none;
@@ -302,17 +330,19 @@
     margin-top: 8px;
   }
 
-  .mobileJoinGhost:hover { background: var(--bg-secondary); }
+  .mobileJoinGhost:hover {
+    background: var(--bg-secondary);
+  }
 
   .profileWrapper {
     position: relative;
     display: flex;
     align-items: center;
   }
-  
+
   .avatarBtn {
     background: none;
-    border: 1px solid var(--border-strong);
+    border: 1px solid var(--border-interactive-strong);
     border-radius: 50%;
     width: 34px;
     height: 34px;
@@ -324,18 +354,18 @@
     padding: 0;
     transition: background 0.2s;
   }
-  
+
   .avatarBtn:hover {
     background: var(--bg-secondary);
   }
-  
+
   .profileDropdown {
     position: absolute;
     top: 100%;
     right: 0;
     margin-top: 8px;
     background: var(--bg-card);
-    border: 1px solid var(--border);
+    border: 1px solid var(--text-faint);
     border-radius: var(--radius-sm, 6px);
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
     min-width: 220px;
@@ -345,19 +375,19 @@
     max-height: calc(100vh - 80px);
     overflow-y: auto;
   }
-  
+
   .dropdownHeader {
     padding: 12px 16px;
     border-bottom: 1px solid var(--border);
   }
-  
+
   .dropdownName {
     display: block;
     font-size: 14px;
     font-weight: 600;
     color: var(--text);
   }
-  
+
   .dropdownEmail {
     display: block;
     font-size: 12px;
@@ -365,11 +395,11 @@
     overflow: hidden;
     text-overflow: ellipsis;
   }
-  
+
   .dropdownBody {
     padding: 8px;
   }
-  
+
   .dropdownItem {
     width: 100%;
     text-align: left;
@@ -381,24 +411,48 @@
     border-radius: 4px;
     color: var(--text);
   }
-  
+
   .dropdownItem:hover {
     background: var(--bg-secondary);
   }
 
   @media (max-width: 768px) {
-    .nav { display: none; }
-    .signInBtn { display: none; }
-    .userLabel { display: none; }
-    .signOutBtn { display: none; }
-    .adminBtn { display: none; }
-    .communityBtn { display: none; }
+    .nav {
+      display: none;
+    }
+
+    .signInBtn {
+      display: none;
+    }
+
+    .userLabel {
+      display: none;
+    }
+
+    .signOutBtn {
+      display: none;
+    }
+
+    .adminBtn {
+      display: none;
+    }
+
+    .communityBtn {
+      display: none;
+    }
+
     .joinBtn {
       padding: 7px 10px;
       font-size: 12px;
     }
-    .menuBtn { display: flex; }
-    .mobileNav { display: flex; }
+
+    .menuBtn {
+      display: flex;
+    }
+
+    .mobileNav {
+      display: flex;
+    }
   }
 
   @media (max-width: 400px) {
@@ -406,6 +460,7 @@
       max-width: min(140px, 42vw);
       height: 34px;
     }
+
     .joinBtn {
       display: none;
     }

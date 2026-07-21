@@ -189,7 +189,7 @@
   flex-shrink: 0;
   width: 18px;
   height: 18px;
-  border: 1.5px solid var(--border-strong);
+  border: 1.5px solid var(--border-interactive-strong);
   border-radius: 4px;
   background: transparent;
   display: flex;

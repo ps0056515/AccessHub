@@ -102,9 +102,11 @@ export default function SignInPage({ goToPortal }) {
               onBlur={formik.handleBlur}
               disabled={formik.isSubmitting || submittingGoogle}
               required
+              aria-invalid={!!(formik.touched.email && formik.errors.email)}
+              aria-describedby={formik.touched.email && formik.errors.email ? "signin-email-error" : undefined}
             />
             {formik.touched.email && formik.errors.email && (
-              <div className={styles.errorText}>{formik.errors.email}</div>
+              <div id="signin-email-error" className={styles.errorText}>{formik.errors.email}</div>
             )}
           </div>
 
@@ -130,6 +132,8 @@ export default function SignInPage({ goToPortal }) {
                 onBlur={formik.handleBlur}
                 disabled={formik.isSubmitting || submittingGoogle}
                 required
+                aria-invalid={!!(formik.touched.password && formik.errors.password)}
+                aria-describedby={formik.touched.password && formik.errors.password ? "signin-password-error" : undefined}
               />
               <button
                 type="button"
@@ -141,7 +145,7 @@ export default function SignInPage({ goToPortal }) {
               </button>
             </div>
             {formik.touched.password && formik.errors.password && (
-              <div className={styles.errorText}>{formik.errors.password}</div>
+              <div id="signin-password-error" className={styles.errorText}>{formik.errors.password}</div>
             )}
           </div>
 

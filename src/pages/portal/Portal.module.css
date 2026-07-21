@@ -134,7 +134,7 @@
   font-size: 12px;
   padding: 6px 12px;
   border-radius: var(--radius-full);
-  border: 1px solid var(--border-strong);
+  border: 1px solid var(--border-interactive-strong);
   color: var(--text);
   background: var(--bg-card);
   cursor: pointer;
@@ -309,7 +309,7 @@
 .searchInput {
   width: 100%;
   background: var(--bg-secondary);
-  border: 1px solid var(--border);
+  border: 1px solid var(--text-faint);
   border-radius: var(--radius-sm);
   padding: 8px 12px 8px 34px;
   font-size: 13px;
@@ -379,7 +379,7 @@
 .askTextarea {
   width: 100%;
   background: var(--bg-card);
-  border: 1px solid var(--border);
+  border: 1px solid var(--text-faint);
   border-radius: var(--radius-sm);
   padding: 10px 12px;
   font-size: 14px;
@@ -429,7 +429,7 @@
 .topicSelect {
   appearance: auto;
   background: var(--bg-card);
-  border: 1px solid var(--border-strong);
+  border: 1px solid var(--text-faint);
   border-radius: var(--radius-sm);
   padding: 7px 28px 7px 12px;
   font-size: 13px;
@@ -568,7 +568,7 @@
 
 .voteBtn {
   background: none;
-  border: 1px solid var(--border);
+  border: 1px solid var(--border-interactive);
   border-radius: 4px;
   width: 24px;
   height: 20px;
@@ -927,7 +927,7 @@
 .checkerInput {
   width: 100%;
   background: var(--bg-secondary);
-  border: 1px solid var(--border);
+  border: 1px solid var(--text-faint);
   border-radius: var(--radius-sm);
   padding: 8px 10px;
   font-size: 13px;
@@ -1024,7 +1024,7 @@
   padding: 0 14px;
   margin-bottom: 12px;
 
-  border: 1px solid var(--border-strong);
+  border: 1px solid var(--text-faint);
   border-radius: 8px;
 
   background: var(--bg-card);
@@ -1037,7 +1037,7 @@
 .askTitleInput:focus {
   outline: none;
   border-color: var(--accent);
-  box-shadow: 0 0 0 3px var(--accent-border);
+  box-shadow: 0 0 0 3px var(--accent-border-interactive);
 }
 .fieldLabel {
   display: block;

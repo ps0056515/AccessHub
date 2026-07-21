@@ -86,7 +86,7 @@ export default function AdminDashboard({ goToPortal }) {
         <div className={styles.sidebarBrand}>
           <span className={styles.brandEmoji} aria-hidden="true">🛡️</span>
           <div className={styles.brandText}>
-            <h2 className={styles.brandTitle}>AllCanAccess</h2>
+            <h1 className={styles.brandTitle}>AllCanAccess</h1>
             <span className={styles.brandRole}>Admin Portal</span>
           </div>
           <Tooltip content={isCollapsed ? "Expand sidebar" : "Collapse sidebar"} position="right">

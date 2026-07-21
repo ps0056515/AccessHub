@@ -41,7 +41,7 @@ export default function ForgotPasswordPage() {
         </p>
 
         {error && (
-          <div className={styles.error} role="alert">
+          <div id="forgot-error" className={styles.error} role="alert">
             {error}
           </div>
         )}
@@ -66,6 +66,8 @@ export default function ForgotPasswordPage() {
               value={email}
               onChange={e => setEmail(e.target.value)}
               disabled={submitting}
+              aria-invalid={!!error}
+              aria-describedby={error ? "forgot-error" : undefined}
             />
           </div>
 

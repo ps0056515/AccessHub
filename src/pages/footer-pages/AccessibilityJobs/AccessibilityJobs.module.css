@@ -55,7 +55,7 @@
   padding: 10px 20px;
   background: var(--bg-card);
   color: var(--text);
-  border: 1px solid var(--border);
+  border: 1px solid var(--border-interactive);
   border-radius: 999px;
   font-size: 14px;
   font-weight: 600;
@@ -81,7 +81,7 @@
 /* ── Search Form ── */
 .searchForm {
   background: var(--bg-card);
-  border: 1px solid var(--border);
+  border: 1px solid var(--text-faint);
   border-radius: 16px;
   padding: 24px;
   margin-bottom: 24px;
@@ -116,7 +116,7 @@
   max-height: 250px;
   overflow-y: auto;
   background: var(--bg-card);
-  border: 1px solid var(--border);
+  border: 1px solid var(--text-faint);
   border-radius: 12px;
   box-shadow: 0 10px 25px -5px var(--shadow-md), 0 8px 10px -6px var(--shadow-md);
   z-index: 50;
@@ -158,7 +158,7 @@
 .input {
   width: 100%;
   padding: 14px 16px 14px 44px;
-  border: 1px solid var(--border);
+  border: 1px solid var(--text-faint);
   border-radius: 12px;
   color: var(--text);
   background: var(--bg-secondary);
@@ -270,7 +270,7 @@
 .activeFilterTag {
   background: var(--accent-bg);
   color: var(--accent);
-  border-color: var(--accent-border);
+  border-color: var(--accent-border-interactive);
 }
 
 .filterTag:focus-visible {
@@ -324,7 +324,7 @@
 .spinner {
   width: 40px;
   height: 40px;
-  border: 3px solid var(--accent-border);
+  border: 3px solid var(--accent-border-interactive);
   border-top-color: var(--accent);
   border-radius: 50%;
   animation: spin 1s linear infinite;
@@ -379,7 +379,7 @@
 }
 
 .jobCard:hover {
-  border-color: var(--accent-border);
+  border-color: var(--accent-border-interactive);
   box-shadow: 0 12px 32px rgba(0, 0, 0, 0.04);
   transform: translateY(-2px);
 }

@@ -118,8 +118,9 @@ export default function ScreenReaderModal({ isOpen, onClose, onSuccess, editingG
       <form id="guide-form" onSubmit={handleSave}>
         <div className={styles.topSection}>
           <div className={styles.formGroup}>
-            <label className={styles.label}>Title (e.g. NVDA, JAWS)</label>
+            <label className={styles.label} htmlFor="screen-reader-title">Title (e.g. NVDA, JAWS)</label>
             <input 
+              id="screen-reader-title"
               type="text" 
               className={styles.input} 
               value={title}
@@ -129,8 +130,9 @@ export default function ScreenReaderModal({ isOpen, onClose, onSuccess, editingG
           </div>
           
           <div className={styles.formGroup}>
-            <label className={styles.label}>Description (For the list view)</label>
+            <label className={styles.label} htmlFor="screen-reader-description">Description (For the list view)</label>
             <textarea 
+              id="screen-reader-description"
               className={styles.textarea} 
               value={description}
               onChange={e => setDescription(e.target.value)}
@@ -139,8 +141,9 @@ export default function ScreenReaderModal({ isOpen, onClose, onSuccess, editingG
           </div>
 
           <div className={styles.formGroup}>
-            <label className={styles.toggleLabel}>
+            <label className={styles.toggleLabel} htmlFor="screen-reader-publish">
               <input 
+                id="screen-reader-publish"
                 type="checkbox" 
                 checked={isPublished}
                 onChange={e => setIsPublished(e.target.checked)}

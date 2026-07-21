@@ -44,13 +44,13 @@ export default function Modal({ title, children, onClose, footer, width= "50%", 
 
         if (e.shiftKey) {
           // Shift + Tab
-          if (document.activeElement === firstElement || document.activeElement === dialogRef.current) {
+          if (!dialogRef.current.contains(document.activeElement) || document.activeElement === firstElement || document.activeElement === dialogRef.current) {
             e.preventDefault();
             lastElement.focus();
           }
         } else {
           // Tab
-          if (document.activeElement === lastElement) {
+          if (!dialogRef.current.contains(document.activeElement) || document.activeElement === lastElement) {
             e.preventDefault();
             firstElement.focus();
           }

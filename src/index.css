@@ -101,6 +101,14 @@
   --accent-border: rgba(7, 74, 158, 0.1);
   --red-border: #fca5a5;
   
+  /* Interactive borders (WCAG 1.4.11 3:1 contrast requirement) */
+  --border-interactive: rgba(12, 25, 41, 0.5);
+  --border-interactive-strong: rgba(12, 25, 41, 0.65);
+  --accent-border-interactive: rgba(7, 74, 158, 0.5);
+  --purple-border-interactive: rgba(90, 61, 184, 0.6);
+  --red-border-interactive: rgba(176, 48, 32, 0.5);
+  --footer-border-interactive: rgba(250, 249, 247, 0.35);
+  
   --tooltip-text: #ffffff;
   --tooltip-bg: var(--text);
   
@@ -115,8 +123,8 @@
   
   /* Sidebar */
   --sidebar-text: #f8fafc;
-  --sidebar-text-muted: #94a3b8;
-  --sidebar-text-faint: #64748b;
+  --sidebar-text-muted: #cbd5e1;
+  --sidebar-text-faint: #94a3b8;
   --sidebar-border: rgba(255, 255, 255, 0.2);
   --sidebar-hover: rgba(255, 255, 255, 0.1);
   --sidebar-hover-subtle: rgba(255, 255, 255, 0.05);
@@ -140,10 +148,10 @@
   --border: rgba(248, 250, 252, 0.08);
   --border-strong: rgba(248, 250, 252, 0.14);
 
-  --accent: #2563EB;
-  --accent-bg: rgba(37, 99, 235, 0.15);
+  --accent: #3B82F6;
+  --accent-bg: rgba(59, 130, 246, 0.15);
   --accent-text: #93C5FD;
-  --accent-rgb: 37, 99, 235;
+  --accent-rgb: 59, 130, 246;
 
   --blue: #60A5FA;
   --blue-bg: rgba(96, 165, 250, 0.12);
@@ -187,6 +195,13 @@
   --purple-bg-hover: rgba(167, 139, 250, 0.18);
   --red-border: rgba(248, 113, 113, 0.2);
 
+  /* Interactive borders (WCAG 1.4.11 3:1 contrast requirement) */
+  --border-interactive: rgba(248, 250, 252, 0.35);
+  --border-interactive-strong: rgba(248, 250, 252, 0.45);
+  --accent-border-interactive: rgba(59, 130, 246, 0.6);
+  --purple-border-interactive: rgba(167, 139, 250, 0.5);
+  --red-border-interactive: rgba(248, 113, 113, 0.5);
+
   color-scheme: dark;
 }
 
@@ -212,6 +227,8 @@ a {
 button {
   cursor: pointer;
   font-family: var(--sans);
+  min-height: 24px;
+  min-width: 24px;
 }
 input,
 textarea,
