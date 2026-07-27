@@ -217,6 +217,7 @@ export default function MultiSelectDropdown({
                     readOnly
                     tabIndex={-1}
                     className={styles.checkbox}
+                    aria-label={`Select ${opt}`}
                     aria-hidden="true"
                   />
                   <span className={styles.optionText}>

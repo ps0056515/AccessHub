@@ -140,7 +140,7 @@ export default function SignUpPage({ goToPortal }) {
         <h1 className={styles.title}>Join community</h1>
         <p className={styles.lead}>
           {verificationEmail 
-            ? `We've sent a 6-digit code to ${verificationEmail}. Please enter it below to verify your account.`
+            ? `We've sent a 6-digit code to ${verificationEmail}. Please enter it to verify your account.`
             : 'Create your free account to take part in discussions and connect with accessibility practitioners.'}
         </p>
 
@@ -164,6 +164,8 @@ export default function SignUpPage({ goToPortal }) {
                 name="otp"
                 className={styles.input}
                 type="text"
+                inputMode="numeric"
+                pattern="[0-9]*"
                 autoComplete="one-time-code"
                 placeholder="123456"
                 value={otp}

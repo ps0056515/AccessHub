@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styles from './AccessibleChartWrapper.module.css';
 
 /**
@@ -13,11 +13,37 @@ import styles from './AccessibleChartWrapper.module.css';
  */
 export default function AccessibleChartWrapper({ title, data, columns, children }) {
   const [showTable, setShowTable] = useState(false);
+  const [tooltipDismissed, setTooltipDismissed] = useState(false);
+  const [isHovering, setIsHovering] = useState(false);
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape' && isHovering) {
+        setTooltipDismissed(true);
+      }
+    };
+    
+    if (isHovering) {
+      document.addEventListener('keydown', handleKeyDown);
+    }
+    
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [isHovering]);
 
   if (!data || data.length === 0) return children;
 
   return (
-    <div className={styles.wrapper}>
+    <div 
+      className={styles.wrapper}
+      onMouseEnter={() => {
+        setIsHovering(true);
+        setTooltipDismissed(false);
+      }}
+      onMouseLeave={() => {
+        setIsHovering(false);
+        setTooltipDismissed(false);
+      }}
+    >
       <div className={styles.headerControls}>
         <button
           type="button"
@@ -30,32 +56,45 @@ export default function AccessibleChartWrapper({ title, data, columns, children 
       </div>
 
       {/* Hide the visual SVG chart from screen readers and toggle display for keyboard users */}
-      <div aria-hidden="true" style={{ width: '100%', height: '100%', display: showTable ? 'none' : 'block' }}>
+      <div 
+        aria-hidden="true" 
+        style={{ width: '100%', height: '100%', display: showTable ? 'none' : 'block' }}
+        className={tooltipDismissed ? 'hide-recharts-tooltip' : ''}
+      >
         {children}
+        {tooltipDismissed && (
+          <style>{`
+            .recharts-tooltip-wrapper {
+              display: none !important;
+            }
+          `}</style>
+        )}
       </div>
 
       {/* Data table */}
-      <table className={showTable ? styles.visibleTable : styles.srOnly} aria-label={`Data table for ${title}`}>
-        <thead>
-          <tr>
-            {columns.map((col) => (
-              <th key={col.key} scope="col">{col.label}</th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {data.map((row, i) => (
-            <tr key={i}>
-              {columns.map((col, colIndex) => {
-                if (colIndex === 0) {
-                  return <th key={col.key} scope="row">{row[col.key]}</th>;
-                }
-                return <td key={col.key}>{row[col.key]}</td>;
-              })}
+      <div style={{ width: '100%', overflowX: 'auto' }}>
+        <table className={showTable ? styles.visibleTable : styles.srOnly} aria-label={`Data table for ${title}`}>
+          <thead>
+            <tr>
+              {columns.map((col) => (
+                <th key={col.key} scope="col">{col.label}</th>
+              ))}
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {data.map((row, i) => (
+              <tr key={i}>
+                {columns.map((col, colIndex) => {
+                  if (colIndex === 0) {
+                    return <th key={col.key} scope="row">{row[col.key]}</th>;
+                  }
+                  return <td key={col.key}>{row[col.key]}</td>;
+                })}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }

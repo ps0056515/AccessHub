@@ -127,6 +127,7 @@
   padding: 10px 14px;
   border-radius: var(--radius-sm, 6px);
   border: none;
+  border-left: 3px solid transparent;
   background: transparent;
   color: var(--sidebar-text-muted);
   font-size: 14px;
@@ -142,13 +143,14 @@
 }
 
 .tabItem:focus-visible {
-  outline: 2px solid var(--accent-focus);
+  outline: 2px solid var(--focus-border-color);
   outline-offset: 2px;
 }
 
-.tabItemActive {
-  background: var(--accent);
-  color: var(--text-on-accent) !important;
+.tabItemActive { 
+  border-left-color: var(--accent); 
+  color: var(--text-on-dark) !important; 
+  font-weight: 600; 
 }
 
 .tabIcon {
@@ -196,17 +198,13 @@
   margin: 0;
   color: var(--text-on-dark);
   overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
 .profileEmail {
   font-size: 11px;
-  color: #64748b;
+  color: #334155;
   margin: 0;
   overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
 .logoutBtn {
@@ -328,7 +326,7 @@
 /* ── Stats Summary Grid ── */
 .statsGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 180px), 1fr));
   gap: 16px;
   margin-bottom: 32px;
 }
@@ -365,7 +363,7 @@
 /* ── Content Panels ── */
 .panels {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 360px), 1fr));
   gap: 24px;
   margin-bottom: 32px;
 }
@@ -425,4 +423,7 @@
     grid-template-columns: 1fr;
   }
 }
+
+
+
 

@@ -125,14 +125,14 @@ export default function Contribute() {
         </h2>
         <ul className={styles.otherWaysList}>
           <li>
-            <Link to="/events">Suggest an event or workshop</Link> the community should know about.
+            <Link to="/events" className={styles.textLink}>Suggest an event or workshop</Link> the community should know about.
           </li>
           <li>
             Report accessibility issues via our{' '}
-            <Link to="/accessibility">accessibility statement</Link>.
+            <Link to="/accessibility" className={styles.textLink}>accessibility statement</Link>.
           </li>
           <li>
-            Reach out directly on the <Link to="/contact">contact page</Link> for partnerships or
+            Reach out directly on the <Link to="/contact" className={styles.textLink}>contact page</Link> for partnerships or
             moderation questions.
           </li>
         </ul>

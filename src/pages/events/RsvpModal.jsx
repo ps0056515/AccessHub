@@ -72,6 +72,7 @@ export default function RsvpModal({ event, onClose }) {
               </span>
               <input
                 type="email"
+                autoComplete="email"
                 className={styles.formInput}
                 value={rsvpEmail}
                 onChange={(e) => setRsvpEmail(e.target.value)}

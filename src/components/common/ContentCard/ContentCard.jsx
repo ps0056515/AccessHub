@@ -8,7 +8,7 @@ export default function ContentCard({ to, image, title, author, date, typeIcon =
         {image ? (
           <img src={image} alt="" className={styles.cardImage} />
         ) : (
-          <div className={styles.placeholderIcon}>{typeIcon}</div>
+          <div aria-hidden="true" className={styles.placeholderIcon}>{typeIcon}</div>
         )}
       </div>
       <div className={styles.cardContent}>
@@ -21,3 +21,4 @@ export default function ContentCard({ to, image, title, author, date, typeIcon =
     </Link>
   );
 }
+

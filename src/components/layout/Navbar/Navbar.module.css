@@ -5,6 +5,7 @@
     background: var(--navbar-bg);
     backdrop-filter: blur(12px);
     border-bottom: 1px solid var(--border);
+    padding-top: env(safe-area-inset-top);
   }
 
   .inner {
@@ -283,7 +284,7 @@
   .mobileLink:hover,
   .mobileLink:focus-visible {
     background: var(--surface-secondary);
-    outline: 2px solid var(--accent-text);
+    outline: 2px solid var(--focus-border-color);
     outline-offset: -2px;
   }
 
@@ -399,7 +400,6 @@
     font-size: 12px;
     color: var(--text-secondary);
     overflow: hidden;
-    text-overflow: ellipsis;
   }
 
   .dropdownBody {
@@ -421,7 +421,7 @@
   .dropdownItem:hover,
   .dropdownItem:focus-visible {
     background: var(--surface-tertiary);
-    outline: 2px solid var(--accent-text);
+    outline: 2px solid var(--focus-border-color);
     outline-offset: -2px;
   }
 
@@ -474,3 +474,5 @@
       display: none;
     }
   }
+
+

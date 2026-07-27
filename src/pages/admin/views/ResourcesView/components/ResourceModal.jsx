@@ -83,7 +83,7 @@ export default function ResourceModal({ isOpen, resource, existingResources = []
       width="46%"
       footer={
         <>
-          <button type="button" onClick={onClose} className={styles.cancelBtn}>
+          <button type="button" onClick={onClose} className={styles.cancelBtn} aria-label="Cancel resource edit">
             Cancel
           </button>
           <button type="submit" form="resource-form" disabled={submitting} className={styles.saveBtn}>
@@ -96,7 +96,9 @@ export default function ResourceModal({ isOpen, resource, existingResources = []
         <div className={styles.formFields}>
           
           <div className={styles.formGroup}>
-            <label htmlFor="res-title" className={styles.formLabel}>Title *</label>
+            <label htmlFor="res-title" className={styles.formLabel}>
+              Title<span className="required-asterisk" aria-hidden="true"> *</span>
+            </label>
             <input
               id="res-title"
               name="title"

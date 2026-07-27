@@ -90,7 +90,7 @@ export default function EventModal({ isOpen, event, onClose, onSave, showToast }
       width="46%"
       footer={
         <>
-          <button type="button" onClick={onClose} className={styles.cancelBtn}>
+          <button type="button" onClick={onClose} className={styles.cancelBtn} aria-label="Cancel event edit">
             Cancel
           </button>
           <button type="submit" form="event-form" disabled={submitting} className={styles.saveBtn}>
@@ -102,7 +102,9 @@ export default function EventModal({ isOpen, event, onClose, onSave, showToast }
       <form id="event-form" onSubmit={handleSave}>
         <div className={styles.formFields}>
           <div className={styles.formGroup}>
-            <label htmlFor="event-date" className={styles.formLabel}>Date & Time (UTC) *</label>
+            <label htmlFor="event-date" className={styles.formLabel}>
+              Date & Time (UTC)<span className="required-asterisk" aria-hidden="true"> *</span>
+            </label>
             <input
               id="event-date"
               name="event_date"
@@ -115,7 +117,9 @@ export default function EventModal({ isOpen, event, onClose, onSave, showToast }
           </div>
 
           <div className={styles.formGroup}>
-            <label htmlFor="event-title" className={styles.formLabel}>Event Title *</label>
+            <label htmlFor="event-title" className={styles.formLabel}>
+              Event Title<span className="required-asterisk" aria-hidden="true"> *</span>
+            </label>
             <input
               id="event-title"
               name="title"
@@ -129,7 +133,9 @@ export default function EventModal({ isOpen, event, onClose, onSave, showToast }
           </div>
 
           <div className={styles.formGroup}>
-            <label htmlFor="event-type" className={styles.formLabel}>Type / Description *</label>
+            <label htmlFor="event-type" className={styles.formLabel}>
+              Type / Description<span className="required-asterisk" aria-hidden="true"> *</span>
+            </label>
             <input
               id="event-type"
               name="type"
@@ -143,7 +149,9 @@ export default function EventModal({ isOpen, event, onClose, onSave, showToast }
           </div>
 
           <div className={styles.formGroup}>
-            <label htmlFor="event-band" className={styles.formLabel}>Band *</label>
+            <label htmlFor="event-band" className={styles.formLabel}>
+              Band<span className="required-asterisk" aria-hidden="true"> *</span>
+            </label>
             <select
               id="event-band"
               name="band"

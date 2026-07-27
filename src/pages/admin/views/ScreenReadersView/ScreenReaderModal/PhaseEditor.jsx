@@ -30,7 +30,7 @@ export default function PhaseEditor({ phase, onChange, onDelete, onMoveUp, onMov
   return (
     <div className={styles.phaseCard}>
       <div className={styles.phaseHeader}>
-        <h4 className={styles.phaseTitle}>Phase {index + 1}: {phase.label || 'Untitled'}</h4>
+        <h4 className={styles.phaseTitle}>Phase {index + 1}: {phase.label || 'New Phase'}</h4>
         <div className={styles.phaseActions}>
           <button type="button" onClick={onMoveUp} disabled={isFirst} className={styles.iconBtn} title="Move Up">↑</button>
           <button type="button" onClick={onMoveDown} disabled={isLast} className={styles.iconBtn} title="Move Down">↓</button>

@@ -237,7 +237,7 @@ export default function Interactions({
                             setEditingCommentId(comment.id);
                             setEditCommentBody(comment.body);
                           }}
-                          aria-label="Edit comment"
+                          aria-label={`Edit comment by ${comment.author_name}`}
                           title="Edit"
                         >
                           <Edit2 aria-hidden="true" size={16} />
@@ -246,7 +246,7 @@ export default function Interactions({
                           className={`${styles.actionBtn} ${styles.actionBtnDelete}`} 
                           onClick={() => handleDeleteComment(comment.id)}
                           disabled={deletingCommentId === comment.id}
-                          aria-label="Delete comment"
+                          aria-label={`Delete comment by ${comment.author_name}`}
                           title="Delete"
                         >
                           <Trash2 aria-hidden="true" size={16} />
@@ -335,3 +335,5 @@ export default function Interactions({
     </section>
   );
 }
+
+

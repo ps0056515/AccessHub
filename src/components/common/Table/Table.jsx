@@ -170,13 +170,17 @@ export default function Table({
       <div aria-live="polite" style={{ position: 'absolute', width: 1, height: 1, overflow: 'hidden', clip: 'rect(0,0,0,0)' }}>
         {announcement}
       </div>
-      <div className={styles.scrollContainer}>
+      <div 
+        className={styles.scrollContainer} 
+        role="region" 
+        aria-label={tableLabel} 
+        tabIndex="0"
+      >
         <table
           ref={tableRef}
           tabIndex={-1}
           className={styles.table}
           style={{ ...(minWidth ? { minWidth } : {}), outline: 'none' }}
-          aria-label={tableLabel}
         >
           <thead>
             <tr>
@@ -185,6 +189,7 @@ export default function Table({
                   <input
                     type="checkbox"
                     style={{ cursor: 'pointer' }}
+                    aria-label="Select all rows"
                     checked={isAllPageSelected}
                     ref={input => {
                       if (input) {
@@ -281,6 +286,7 @@ export default function Table({
                           aria-label={`Filter ${col.label}`}
                           aria-haspopup="listbox"
                           aria-expanded={openFilter === col.key}
+                          aria-controls={`filter-listbox-${col.key}`}
                           style={{
                             display: "flex",
                             alignItems: "center",
@@ -310,6 +316,7 @@ export default function Table({
 
                         {openFilter === col.key && (
                           <div
+                            id={`filter-listbox-${col.key}`}
                             ref={activeFilterRef}
                             onClick={(e) => e.stopPropagation()}
                             role="listbox"
@@ -421,7 +428,7 @@ export default function Table({
             {loading ? (
               <tr>
                 <td colSpan={columns.length + (selectable ? 1 : 0)} style={{ padding: 0 }}>
-                  <div className={styles.noDataContent}>
+                  <div className={styles.noDataContent} role="status">
                     Loading...
                   </div>
                 </td>
@@ -445,6 +452,7 @@ export default function Table({
                       <input
                         type="checkbox"
                         style={{ cursor: 'pointer' }}
+                        aria-label={`Select row`}
                         checked={selectedRowIds.includes(row.id)}
                         onChange={(e) => {
                           if (!onSelectChange) return;

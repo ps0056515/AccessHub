@@ -9,6 +9,11 @@ const quillModules = {
     ["link"],
     ["clean"],
   ],
+  keyboard: {
+    bindings: {
+      tab: false,
+    },
+  },
 };
 
 export default function StepsEditor({ items, onChange }) {

@@ -209,6 +209,7 @@ export default function OverviewView({ showToast }) {
             className={`${styles.actionBtn} ${u.isAdmin ? styles.actionBtnDanger : ""}`}
             onClick={() => toggleRole(u)}
             disabled={u.id === currentUser?.id}
+            aria-label={`${u.isAdmin ? "Revoke Admin" : "Make Admin"} for ${u.displayName}`}
           >
             {u.isAdmin ? "Revoke Admin" : "Make Admin"}
           </button>
@@ -216,6 +217,7 @@ export default function OverviewView({ showToast }) {
             className={`${styles.actionBtn} ${u.isBlocked ? "" : styles.actionBtnDanger}`}
             onClick={() => toggleBlock(u)}
             disabled={u.id === currentUser?.id}
+            aria-label={`${u.isBlocked ? "Unblock" : "Block"} ${u.displayName}`}
           >
             {u.isBlocked ? "Unblock" : "Block"}
           </button>
@@ -276,11 +278,11 @@ export default function OverviewView({ showToast }) {
                   style={{ padding: '8px', borderRadius: '6px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
                   aria-label="Export to Excel"
                 >
-                  <Download size={16} />
+                  <Download aria-hidden="true" size={16} />
                 </button>
               </Tooltip>
               <input 
-                type="text" 
+                type="search" 
                 placeholder="Search..." 
                 value={countrySearch}
                 onChange={(e) => setCountrySearch(e.target.value)}
@@ -323,11 +325,11 @@ export default function OverviewView({ showToast }) {
                   style={{ padding: '8px', borderRadius: '6px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
                   aria-label="Export to Excel"
                 >
-                  <Download size={16} />
+                  <Download aria-hidden="true" size={16} />
                 </button>
               </Tooltip>
               <input 
-                type="text" 
+                type="search" 
                 placeholder="Search..." 
                 value={citySearch}
                 onChange={(e) => setCitySearch(e.target.value)}
@@ -383,11 +385,11 @@ export default function OverviewView({ showToast }) {
                 style={{ padding: '8px', borderRadius: '6px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
                 aria-label="Export to Excel"
               >
-                <Download size={16} />
+                <Download aria-hidden="true" size={16} />
               </button>
             </Tooltip>
             <input 
-              type="text" 
+              type="search" 
               placeholder="Search members..." 
               value={memberSearch}
               onChange={(e) => setMemberSearch(e.target.value)}
@@ -414,3 +416,4 @@ export default function OverviewView({ showToast }) {
     </>
   );
 }
+

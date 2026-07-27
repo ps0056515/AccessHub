@@ -39,8 +39,15 @@
 
 .feedLink {
   font-weight: 500;
-  color: var(--accent-text);
-  text-decoration: none;
+  color: var(--text-link);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.textLink {
+  color: var(--text-link);
+  text-decoration: underline;
+  text-underline-offset: 4px;
 }
 
 .feedDate {

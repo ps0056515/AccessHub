@@ -35,7 +35,7 @@ export default function BlogpostDetail() {
     fetchBlogpost();
   }, [id, navigate]);
 
-  if (loading) return <Container className={styles.detailContainer}>Loading blogpost...</Container>;
+  if (loading) return <Container className={styles.detailContainer} role="status">Loading blogpost...</Container>;
   if (error) return <Container className={styles.detailContainer} style={{ color: 'var(--error)' }}>{error}</Container>;
   if (!blogpost) return null;
 
@@ -73,3 +73,4 @@ export default function BlogpostDetail() {
     </Container>
   );
 }
+

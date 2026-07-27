@@ -23,9 +23,10 @@
 }
 
 .input:focus, .textarea:focus {
-  outline: none;
+  outline: 2px solid var(--focus-border-color);
+  outline-offset: 2px;
+  box-shadow: none;
   border-color: var(--accent-focus);
-  box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.1);
 }
 
 .textarea {
@@ -125,4 +126,5 @@
   color: var(--accent);
   border-bottom-color: var(--accent);
 }
+
 

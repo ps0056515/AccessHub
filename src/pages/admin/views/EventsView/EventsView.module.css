@@ -89,7 +89,11 @@
   cursor: pointer;
   font-size: 11px;
   color: var(--text-muted);
-  padding: 2px;
+  min-width: 24px;
+  min-height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 .sortBtn:disabled { cursor: not-allowed; opacity: 0.4; }
 
@@ -103,6 +107,9 @@
   border-radius: 4px;
   font-size: 12px;
   cursor: pointer;
+  min-height: 24px;
+  display: inline-flex;
+  align-items: center;
 }
 .editBtn:hover { background: var(--bg-secondary); }
 .approveBtn {
@@ -113,6 +120,9 @@
   border-radius: 4px;
   font-size: 12px;
   cursor: pointer;
+  min-height: 24px;
+  display: inline-flex;
+  align-items: center;
 }
 .approveBtn:hover { background: #f0fdf4; }
 .deleteBtn {
@@ -123,6 +133,9 @@
   border-radius: 4px;
   font-size: 12px;
   cursor: pointer;
+  min-height: 24px;
+  display: inline-flex;
+  align-items: center;
 }
 .deleteBtn:hover { background: #fef2f2; }
 
@@ -132,8 +145,11 @@
   border: none;
   color: var(--accent);
   cursor: pointer;
-  padding: 0;
+  padding: 0 4px;
   font-family: inherit;
+  min-height: 24px;
+  display: inline-flex;
+  align-items: center;
 }
 
 .proposalDetails {

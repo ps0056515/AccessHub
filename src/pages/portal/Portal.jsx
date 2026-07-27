@@ -642,7 +642,7 @@ export default function Portal({
           <div className={styles.askBox} ref={askBoxRef}>
             <p className={styles.askLabel}>Ask the community</p>
             <label htmlFor="ask-title" className={styles.fieldLabel}>
-              Title <span aria-hidden="true">*</span>
+              Title <span className="required-asterisk" aria-hidden="true">*</span>
             </label>
 
             <input
@@ -792,9 +792,9 @@ export default function Portal({
               aria-label={`${activeTab} discussions`}
             >
             {postsLoading ? (
-              <p className={styles.empty}>Loading discussions…</p>
+              <p className={styles.empty} role="status">Loading discussions…</p>
             ) : postsError ? (
-              <div className={styles.empty}>
+                <div className={styles.empty} role="alert">
                 <p>{postsError}</p>
                 <button
                   type="button"
@@ -1001,3 +1001,4 @@ export default function Portal({
     </div>
   );
 }
+

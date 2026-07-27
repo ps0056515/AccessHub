@@ -48,7 +48,7 @@
   border: 1px solid var(--text-faint);
   background: var(--bg-card);
   color: var(--text);
-  font-size: 14px;
+  font-size: 16px;
   max-width: 400px;
   width: 100%;
 }
@@ -65,7 +65,7 @@
 
 .logosGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
   gap: 24px;
 }
 
@@ -179,7 +179,11 @@
   cursor: pointer;
   font-size: 11px;
   color: var(--text-muted);
-  padding: 2px;
+  min-width: 24px;
+  min-height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .sortBtn:disabled {
@@ -202,7 +206,7 @@
   border: 1px solid var(--text-faint);
   background: var(--bg-card);
   color: var(--text);
-  font-size: 13px;
+  font-size: 16px;
 }
 
 .linkUrlInput {
@@ -213,7 +217,7 @@
   border: 1px solid var(--text-faint);
   background: var(--bg-card);
   color: var(--text);
-  font-size: 13px;
+  font-size: 16px;
 }
 
 .checkboxLabel {
@@ -285,7 +289,7 @@
   border: 1px solid var(--text-faint);
   background: var(--bg-card);
   color: var(--text);
-  font-size: 13px;
+  font-size: 16px;
 }
 
 .createBtn {
@@ -325,7 +329,7 @@
   border: 1px solid var(--text-faint);
   background: var(--bg-card);
   color: var(--text);
-  font-size: 13px;
+  font-size: 16px;
 }
 
 .visuallyHidden {

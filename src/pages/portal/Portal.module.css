@@ -151,7 +151,7 @@
 }
 
 .heroChipBtn:focus-visible {
-  outline: 2px solid var(--accent);
+  outline: 2px solid var(--focus-border-color);
   outline-offset: 2px;
 }
 
@@ -347,7 +347,7 @@
 .searchInput:focus {
   outline: none;
   border-color: var(--accent-text);
-  outline: 2px solid var(--accent); outline-offset: 2px; box-shadow: none;
+  outline: 2px solid var(--focus-border-color); outline-offset: 2px; box-shadow: none;
   background: var(--surface-secondary);
 }
 
@@ -418,7 +418,7 @@
 .askTextarea:focus {
   outline: none;
   border-color: var(--accent-text);
-  outline: 2px solid var(--accent); outline-offset: 2px; box-shadow: none;
+  outline: 2px solid var(--focus-border-color); outline-offset: 2px; box-shadow: none;
 }
 .askTitleInput::placeholder,
 .askTextarea::placeholder {
@@ -471,7 +471,7 @@
 }
 
 .topicSelect:focus {
-  outline: 2px solid var(--accent);
+  outline: 2px solid var(--focus-border-color);
   outline-offset: 2px;
 }
 
@@ -571,7 +571,7 @@
 }
 
 .postOpen:focus-visible {
-  outline: 2px solid var(--accent);
+  outline: 2px solid var(--focus-border-color);
   outline-offset: 2px;
   border-radius: var(--radius-sm);
 }
@@ -613,18 +613,18 @@
   color: var(--accent-text);
 }
 .voteBtn:focus-visible {
-  outline: 3px solid var(--accent);
+  outline: 3px solid var(--focus-border-color);
   outline-offset: 2px;
 }
 .votedUp {
-  background: var(--green-bg);
+  border-width: 2px;
   border-color: var(--success);
-  color: var(--green-text);
+  color: var(--success);
 }
 .votedDown {
-  background: var(--red-bg);
+  border-width: 2px;
   border-color: var(--error);
-  color: var(--red-text);
+  color: var(--error);
 }
 
 .voteCount {
@@ -665,11 +665,6 @@
 }
 
 .postExcerpt {
-  display: -webkit-box;
-  line-clamp: 2;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
   font-size: 14px;
   color: var(--text-secondary);
   line-height: 1.5;
@@ -780,10 +775,7 @@
   font-weight: 500;
   color: var(--text-primary);
   line-height: 1.4;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
+  display: block;
 }
 .recentMeta {
   font-size: 11px;
@@ -969,7 +961,7 @@
 .checkerInput:focus {
   outline: none;
   border-color: var(--accent-text);
-  outline: 2px solid var(--accent); outline-offset: 2px; box-shadow: none;
+  outline: 2px solid var(--focus-border-color); outline-offset: 2px; box-shadow: none;
 }
 .checkerInput::placeholder {
   color: var(--text-faint);
@@ -1053,7 +1045,7 @@
 }
 .askTitleInput {
   width: 100%;
-  height: 44px;
+  min-height: 44px;
   padding: 0 14px;
   margin-bottom: 12px;
 
@@ -1070,7 +1062,7 @@
 .askTitleInput:focus {
   outline: none;
   border-color: var(--accent-text);
-  outline: 2px solid var(--accent); outline-offset: 2px; box-shadow: none;
+  outline: 2px solid var(--focus-border-color); outline-offset: 2px; box-shadow: none;
 }
 .fieldLabel {
   display: block;
@@ -1092,3 +1084,4 @@
     border-bottom: none;
   }
 }
+

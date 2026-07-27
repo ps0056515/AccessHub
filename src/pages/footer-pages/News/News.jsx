@@ -54,7 +54,7 @@ export default function News() {
           W3C News
         </h2>
 
-        {loading && <p>Loading news…</p>}
+        {loading && <p role="status">Loading news…</p>}
         {error && <p role="alert">{error}</p>}
 
         {!loading && !error && items.length > 0 && (
@@ -94,15 +94,16 @@ export default function News() {
         </h2>
         <ul className={styles.communityList}>
           <li>
-            <strong>Discussions</strong> —{' '}
-            <Link to="/">Join conversations on the community page</Link>.
+            <Link to="/" className={styles.textLink}><strong>Discussions</strong></Link> —{' '}
+            Join conversations on the community page.
           </li>
           <li>
-            <strong>Events</strong> —{' '}
-            <Link to="/events">See upcoming workshops and office hours</Link>.
+            <Link to="/events" className={styles.textLink}><strong>Events</strong></Link> —{' '}
+            See upcoming workshops and office hours.
           </li>
         </ul>
       </section>
     </div>
   );
 }
+

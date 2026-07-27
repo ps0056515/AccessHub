@@ -252,6 +252,11 @@ export default function ArticlesView({ showToast }) {
       ["link", "image", "video"],
       ["clean"],
     ],
+    keyboard: {
+      bindings: {
+        tab: false, // Prevents keyboard trap (SC 2.1.2)
+      },
+    },
     imageResize: {
       parchment: Quill.import("parchment"),
       modules: ["Resize", "DisplaySize", "Toolbar"],
@@ -318,6 +323,7 @@ export default function ArticlesView({ showToast }) {
               article.is_published ? styles.btnSecondary : styles.btnSuccess
             }
             onClick={() => togglePublish(article)}
+            aria-label={`${article.is_published ? "Unpublish" : "Publish"} ${article.title}`}
           >
             {article.is_published ? "Unpublish" : "Publish"}
           </button>
@@ -325,6 +331,7 @@ export default function ArticlesView({ showToast }) {
             type="button"
             className={styles.btnSecondary}
             onClick={() => openEditor(article)}
+            aria-label={`Edit ${article.title}`}
           >
             Edit
           </button>
@@ -332,6 +339,7 @@ export default function ArticlesView({ showToast }) {
             type="button"
             className={styles.btnDanger}
             onClick={() => handleDelete(article.id, article.title)}
+            aria-label={`Delete ${article.title}`}
           >
             Delete
           </button>
@@ -359,7 +367,7 @@ export default function ArticlesView({ showToast }) {
             <div style={{ display: "flex", gap: "16px", alignItems: "center" }}>
               <input
                 id="admin-search-input"
-                type="text"
+                type="search"
                 placeholder="Search articles..."
                 value={articleSearch}
                 onChange={(e) => setArticleSearch(e.target.value)}
@@ -440,7 +448,9 @@ export default function ArticlesView({ showToast }) {
           </h2>
 
           <div className={styles.formGroup}>
-            <label className={styles.label}>Title *</label>
+            <label className={styles.label}>
+              Title<span className="required-asterisk" aria-hidden="true"> *</span>
+            </label>
             <input
               type="text"
               value={formData.title}
@@ -457,7 +467,9 @@ export default function ArticlesView({ showToast }) {
               className={styles.formGroup}
               style={{ flex: 1, minWidth: "200px" }}
             >
-              <label className={styles.label}>Author *</label>
+              <label className={styles.label}>
+                Author<span className="required-asterisk" aria-hidden="true"> *</span>
+              </label>
               <input
                 type="text"
                 value={formData.author}
@@ -544,7 +556,9 @@ export default function ArticlesView({ showToast }) {
           </div>
 
           <div className={styles.formGroup}>
-            <label className={styles.label}>Content *</label>
+            <label className={styles.label}>
+              Content<span className="required-asterisk" aria-hidden="true"> *</span>
+            </label>
             <div className={styles.quillWrapper}>
               <ReactQuill
                 theme="snow"

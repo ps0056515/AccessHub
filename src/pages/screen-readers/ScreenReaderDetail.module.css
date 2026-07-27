@@ -160,7 +160,7 @@
 .progressBar { flex: 1; height: 6px; background: var(--surface-tertiary); border-radius: 3px; overflow: hidden; }
 .progressFill { height: 100%; background: var(--button-primary); border-radius: 3px; transition: width 0.4s ease; }
 
-.progressLabel { font-size: 13px; font-weight: 500; color: var(--text-secondary); white-space: nowrap; }
+.progressLabel { font-size: 13px; font-weight: 500; color: var(--text-secondary); }
 
 .checkGroup { margin-bottom: 24px; }
 
@@ -248,3 +248,4 @@
   .page { padding: 0 16px 48px; }
   .pageTitle { font-size: 1.8rem; }
 }
+

@@ -51,7 +51,7 @@ export default function MemberProfilePage({ goToPortal }) {
   if (loading) {
     return (
       <div className={styles.page}>
-        <p className={styles.missing}>Loading profile...</p>
+        <p className={styles.missing} role="status">Loading profile...</p>
       </div>
     );
   }
@@ -61,7 +61,7 @@ export default function MemberProfilePage({ goToPortal }) {
       <div className={styles.page}>
         <p className={styles.missing}>{error || "This profile could not be found."}</p>
         <button type="button" className={styles.primaryBtn} onClick={goToPortal}>
-          <ArrowLeft size={16} /> Back to community
+          <ArrowLeft aria-hidden="true" size={16} /> Back to community
         </button>
       </div>
     );
@@ -113,13 +113,13 @@ export default function MemberProfilePage({ goToPortal }) {
             <div className={styles.metaRow}>
               {companyLine && (
                 <span className={styles.metaItem}>
-                  <Building2 className={styles.metaIcon} />
+                  <Building2 aria-hidden="true" className={styles.metaIcon} />
                   {companyLine}
                 </span>
               )}
               {locationStr && (
                 <span className={styles.metaItem}>
-                  <MapPin className={styles.metaIcon} />
+                  <MapPin aria-hidden="true" className={styles.metaIcon} />
                   {locationStr}
                 </span>
               )}
@@ -133,7 +133,7 @@ export default function MemberProfilePage({ goToPortal }) {
         {/* About */}
         <div className={`${styles.infoCard} ${styles.infoCardFull}`}>
           <h2 className={styles.cardTitle}>
-            <User size={14} /> About
+            <User aria-hidden="true" size={14} /> About
           </h2>
           {member.bio ? (
             <p className={styles.bio}>{member.bio}</p>
@@ -147,10 +147,10 @@ export default function MemberProfilePage({ goToPortal }) {
         {/* Community Stats */}
         <div className={styles.infoCard}>
           <h2 className={styles.cardTitle}>
-            <Star size={14} /> Community Stats
+            <Star aria-hidden="true" size={14} /> Community Stats
           </h2>
           <div className={styles.cardRow}>
-            <Star className={styles.cardRowIcon} style={{ color: 'var(--amber-500)' }} />
+            <Star aria-hidden="true" className={styles.cardRowIcon} style={{ color: 'var(--amber-500)' }} />
             <div>
               <div className={styles.cardRowLabel}>Reputation</div>
               <div className={styles.cardRowValue}>
@@ -159,7 +159,7 @@ export default function MemberProfilePage({ goToPortal }) {
             </div>
           </div>
           <div className={styles.cardRow}>
-            <FileText className={styles.cardRowIcon} />
+            <FileText aria-hidden="true" className={styles.cardRowIcon} />
             <div>
               <div className={styles.cardRowLabel}>Discussions Started</div>
               <div className={styles.cardRowValue}>
@@ -168,7 +168,7 @@ export default function MemberProfilePage({ goToPortal }) {
             </div>
           </div>
           <div className={styles.cardRow}>
-            <MessageSquare className={styles.cardRowIcon} />
+            <MessageSquare aria-hidden="true" className={styles.cardRowIcon} />
             <div>
               <div className={styles.cardRowLabel}>Comments Made</div>
               <div className={styles.cardRowValue}>
@@ -181,10 +181,10 @@ export default function MemberProfilePage({ goToPortal }) {
         {/* Professional Details */}
         <div className={styles.infoCard}>
           <h2 className={styles.cardTitle}>
-            <Briefcase size={14} /> Professional Details
+            <Briefcase aria-hidden="true" size={14} /> Professional Details
           </h2>
           <div className={styles.cardRow}>
-            <Building2 className={styles.cardRowIcon} />
+            <Building2 aria-hidden="true" className={styles.cardRowIcon} />
             <div>
               <div className={styles.cardRowLabel}>Company</div>
               <div className={styles.cardRowValue}>
@@ -193,7 +193,7 @@ export default function MemberProfilePage({ goToPortal }) {
             </div>
           </div>
           <div className={styles.cardRow}>
-            <Briefcase className={styles.cardRowIcon} />
+            <Briefcase aria-hidden="true" className={styles.cardRowIcon} />
             <div>
               <div className={styles.cardRowLabel}>Designation</div>
               <div className={styles.cardRowValue}>
@@ -206,9 +206,11 @@ export default function MemberProfilePage({ goToPortal }) {
 
       <div className={`${styles.fadeUp} ${styles.fadeUp3}`}>
         <button type="button" className={styles.primaryBtn} onClick={goToPortal} style={{ display: 'flex', margin: '0 auto' }}>
-          <ArrowLeft size={16} /> Back to discussions
+          <ArrowLeft aria-hidden="true" size={16} /> Back to discussions
         </button>
       </div>
     </div>
   );
 }
+
+

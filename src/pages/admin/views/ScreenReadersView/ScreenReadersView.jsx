@@ -155,6 +155,7 @@ export default function ScreenReadersView({ showToast }) {
           <button
             onClick={() => openModal(guide)}
             className={styles.btnSecondary}
+            aria-label={`Edit ${guide.title}`}
           >
             Edit
           </button>
@@ -163,12 +164,14 @@ export default function ScreenReadersView({ showToast }) {
             className={
               guide.is_published ? styles.btnSecondary : styles.btnSuccess
             }
+            aria-label={`${guide.is_published ? "Unpublish" : "Publish"} ${guide.title}`}
           >
             {guide.is_published ? "Unpublish" : "Publish"}
           </button>
           <button
             onClick={() => handleDelete(guide.id)}
             className={styles.btnDanger}
+            aria-label={`Delete ${guide.title}`}
           >
             Delete
           </button>
@@ -194,7 +197,7 @@ export default function ScreenReadersView({ showToast }) {
         <div style={{ display: "flex", gap: "16px", alignItems: "center" }}>
           <input
             id="admin-search-input"
-            type="text"
+            type="search"
             placeholder="Search guides..."
             value={screenReaderSearch}
             onChange={(e) => setScreenReaderSearch(e.target.value)}

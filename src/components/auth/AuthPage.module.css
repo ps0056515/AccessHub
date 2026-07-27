@@ -81,7 +81,7 @@
   border: 1px solid var(--border-interactive);
   border-radius: var(--radius-sm);
   padding: 10px 12px;
-  font-size: 15px;
+  font-size: 16px;
   background: var(--surface-primary);
   color: var(--text-primary);
   transition: border-color var(--transition), box-shadow var(--transition);
@@ -90,7 +90,7 @@
 .input:focus {
   outline: none;
   border-color: var(--accent-text);
-  outline: 2px solid var(--accent); outline-offset: 2px; box-shadow: none;
+  outline: 2px solid var(--focus-border-color); outline-offset: 2px; box-shadow: none;
 }
 
 .passwordWrapper {
@@ -116,9 +116,7 @@
   color: var(--text-primary);
 }
 
-.inputError {
-  border-color: var(--error);
-}
+.inputError { border-color: var(--error); box-shadow: inset 0 0 0 1px var(--error); }
 
 .inputError:focus {
   border-color: var(--error);
@@ -277,3 +275,5 @@
   height: 1px;
   background: var(--border-strong);
 }
+
+

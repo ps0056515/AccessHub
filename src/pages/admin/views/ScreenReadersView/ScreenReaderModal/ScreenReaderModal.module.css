@@ -20,9 +20,10 @@
 }
 
 .input:focus, .textarea:focus {
-  outline: none;
+  outline: 2px solid var(--focus-border-color);
+  outline-offset: 2px;
+  box-shadow: none;
   border-color: var(--accent);
-  box-shadow: 0 0 0 3px rgba(7, 74, 158, 0.1);
 }
 
 .textarea {
@@ -43,7 +44,9 @@
 }
 
 .jsonEditor:focus {
-  outline: none;
+  outline: 2px solid var(--focus-border-color);
+  outline-offset: 2px;
+  box-shadow: none;
   border-color: var(--accent);
   background: #fff;
 }
@@ -99,7 +102,7 @@
 .helperText {
   display: block;
   font-size: 12px;
-  color: #64748b;
+  color: #334155;
   margin-top: 4px;
 }
 
@@ -164,7 +167,7 @@
   cursor: pointer;
   padding: 4px 8px;
   border-radius: 4px;
-  color: #64748b;
+  color: #334155;
 }
 
 .iconBtn:hover:not(:disabled) {
@@ -209,12 +212,13 @@
   border-radius: 4px;
   font-size: 13px;
   cursor: pointer;
-  color: #64748b;
+  color: #334155;
 }
 
 .typeBtn.active {
-  background: #eef2ff;
-  border-color: var(--accent);
+  background: transparent;
+  border: 2px solid var(--accent);
+  padding: 5px 11px;
   color: var(--accent);
   font-weight: 600;
 }
@@ -273,3 +277,4 @@
 .removeBtn:hover {
   color: #dc2626;
 }
+

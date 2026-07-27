@@ -216,6 +216,11 @@ export default function BlogpostsView({ showToast }) {
       ['link', 'image', 'video'],
       ['clean']
     ],
+    keyboard: {
+      bindings: {
+        tab: false, // Prevents keyboard trap (SC 2.1.2)
+      },
+    },
     imageResize: {
       parchment: Quill.import('parchment'),
       modules: ['Resize', 'DisplaySize', 'Toolbar']
@@ -245,6 +250,7 @@ export default function BlogpostsView({ showToast }) {
           type="button"
           className={blogpost.is_published ? styles.btnSecondary : styles.btnSuccess}
           onClick={() => togglePublish(blogpost)}
+          aria-label={`${blogpost.is_published ? 'Unpublish' : 'Publish'} ${blogpost.title}`}
         >
           {blogpost.is_published ? 'Unpublish' : 'Publish'}
         </button>
@@ -252,6 +258,7 @@ export default function BlogpostsView({ showToast }) {
           type="button"
           className={styles.btnSecondary}
           onClick={() => openEditor(blogpost)}
+          aria-label={`Edit ${blogpost.title}`}
         >
           Edit
         </button>
@@ -259,6 +266,7 @@ export default function BlogpostsView({ showToast }) {
           type="button"
           className={styles.btnDanger}
           onClick={() => handleDelete(blogpost.id, blogpost.title)}
+          aria-label={`Delete ${blogpost.title}`}
         >
           Delete
         </button>
@@ -275,7 +283,7 @@ export default function BlogpostsView({ showToast }) {
             <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
               <input
                 id="admin-search-input"
-                type="text"
+                type="search"
                 placeholder="Search blogposts..."
                 value={blogpostSearch}
                 onChange={(e) => setBlogpostSearch(e.target.value)}
@@ -338,7 +346,9 @@ export default function BlogpostsView({ showToast }) {
           <h2 className={styles.formTitle}>{formData.id ? 'Edit Blogpost' : 'Create Blogpost'}</h2>
           
           <div className={styles.formGroup}>
-            <label className={styles.label}>Title *</label>
+            <label className={styles.label}>
+              Title<span className="required-asterisk" aria-hidden="true"> *</span>
+            </label>
             <input
               type="text"
               value={formData.title}
@@ -350,7 +360,9 @@ export default function BlogpostsView({ showToast }) {
 
           <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
             <div className={styles.formGroup} style={{ flex: 1, minWidth: '200px' }}>
-              <label className={styles.label}>Author *</label>
+              <label className={styles.label}>
+                Author<span className="required-asterisk" aria-hidden="true"> *</span>
+              </label>
               <input
                 type="text"
                 value={formData.author}
@@ -405,7 +417,9 @@ export default function BlogpostsView({ showToast }) {
           </div>
 
           <div className={styles.formGroup}>
-            <label className={styles.label}>Content *</label>
+            <label className={styles.label}>
+              Content<span className="required-asterisk" aria-hidden="true"> *</span>
+            </label>
             <div className={styles.quillWrapper}>
               <ReactQuill 
                 theme="snow" 

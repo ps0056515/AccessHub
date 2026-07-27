@@ -9,7 +9,7 @@
 
 .toolGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 200px), 1fr));
   gap: 14px;
   margin-bottom: 56px;
 }
@@ -113,7 +113,6 @@
   color: var(--text-secondary);
   align-self: center;
   transition: all var(--transition);
-  white-space: nowrap;
   text-decoration: none;
   display: inline-flex;
   align-items: center;
@@ -176,4 +175,5 @@
   border-radius: 4px;
   font-weight: 500;
 }
+
 
