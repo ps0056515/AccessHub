@@ -443,13 +443,13 @@ export default function MyProfilePage() {
             <div className={styles.metaRow}>
               {companyLine && (
                 <span className={styles.metaItem}>
-                  <Building2 className={styles.metaIcon} />
+                  <Building2 aria-hidden="true" className={styles.metaIcon} />
                   {companyLine}
                 </span>
               )}
               {locationStr && (
                 <span className={styles.metaItem}>
-                  <MapPin className={styles.metaIcon} />
+                  <MapPin aria-hidden="true" className={styles.metaIcon} />
                   {locationStr}
                 </span>
               )}
@@ -496,7 +496,7 @@ export default function MyProfilePage() {
             <button
               type="button"
               className={styles.crumbBtn}
-              aria-label="Complete your profile now"
+              aria-label="Complete now: your profile"
               onClick={(e) => {
                 lastFocusRef.current = e.currentTarget;
                 setIsEditing(true);
@@ -600,3 +600,4 @@ export default function MyProfilePage() {
     </div>
   );
 }
+

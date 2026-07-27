@@ -51,8 +51,11 @@
   border-radius: var(--radius-sm, 6px);
   font-size: 13px;
   font-weight: 500;
-  cursor: pointer;
   transition: all 0.15s ease;
+  min-height: 24px;
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
 }
 .btnSecondary:hover {
   background: var(--bg-secondary);
@@ -67,8 +70,11 @@
   border-radius: var(--radius-sm, 6px);
   font-size: 13px;
   font-weight: 500;
-  cursor: pointer;
   transition: all 0.15s ease;
+  min-height: 24px;
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
 }
 .btnDanger:hover {
   background: #fef2f2;
@@ -82,8 +88,11 @@
   border-radius: var(--radius-sm, 6px);
   font-size: 13px;
   font-weight: 500;
-  cursor: pointer;
   transition: all 0.15s ease;
+  min-height: 24px;
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
 }
 .btnSuccess:hover {
   background: #f0fdf4;
@@ -101,12 +110,12 @@
 
 .statusDraft {
   background: #fef3c7;
-  color: #b45309;
+  color: #78350f;
 }
 
 .statusPublished {
   background: #dcfce7;
-  color: #15803d;
+  color: #14532d;
 }
 
 .editorWrapper {

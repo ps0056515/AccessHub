@@ -162,6 +162,9 @@ export default function Footer({ goToSection, goToPortal }) {
             <FooterRouteLink className={styles.bottomLink} to="/accessibility">
               Accessibility statement
             </FooterRouteLink>
+            <FooterRouteLink className={styles.bottomLink} to="/sitemap">
+              Sitemap
+            </FooterRouteLink>
           </div>
         </div>
       </Container>

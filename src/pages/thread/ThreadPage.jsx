@@ -242,7 +242,7 @@ export default function ThreadPage({ posts, setPosts, refreshPosts, returnToComm
   if (loading) {
     return (
       <div className={styles.page}>
-        <p className={styles.notFound}>Loading discussion…</p>
+        <p className={styles.notFound} role="status">Loading discussion…</p>
       </div>
     );
   }
@@ -475,8 +475,8 @@ export default function ThreadPage({ posts, setPosts, refreshPosts, returnToComm
                   </p>
                   {isAuthenticated && user?.id === c.userId && (
                     <div className={styles.ownerActions}>
-                      <button id={`edit-comment-btn-${c.id}`} type="button" onClick={() => startEditComment(c)} className={styles.editBtn}>Edit</button>
-                      <button type="button" onClick={() => handleCommentDelete(c.id)} className={styles.deleteBtn}>Delete</button>
+                      <button id={`edit-comment-btn-${c.id}`} type="button" onClick={() => startEditComment(c)} className={styles.editBtn} aria-label={`Edit your reply from ${new Date(c.raw_time || c.time).toLocaleDateString()}`}>Edit</button>
+                      <button type="button" onClick={() => handleCommentDelete(c.id)} className={styles.deleteBtn} aria-label={`Delete your reply from ${new Date(c.raw_time || c.time).toLocaleDateString()}`}>Delete</button>
                     </div>
                   )}
                 </div>
@@ -556,3 +556,4 @@ export default function ThreadPage({ posts, setPosts, refreshPosts, returnToComm
     </div>
   );
 }
+

@@ -16,7 +16,6 @@
   font-size: 12px;
   font-weight: 500;
   line-height: 1.4;
-  white-space: nowrap;
   z-index: 9999;
   pointer-events: none;
   opacity: 0;
@@ -84,3 +83,4 @@
     transform: translate(var(--tx, 0), var(--ty, 0)) scale(1);
   }
 }
+

@@ -67,15 +67,25 @@ export default function Tooltip({
   };
 
   useEffect(() => {
-    return () => {
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
-      }
-      if (closeTimeoutRef.current) {
-        clearTimeout(closeTimeoutRef.current);
+    const handleGlobalKeyDown = (e) => {
+      if (e.key === 'Escape' && isVisible) {
+        e.preventDefault();
+        e.stopPropagation();
+        handleMouseLeave();
       }
     };
-  }, []);
+
+    if (isVisible) {
+      // Use capture phase to intercept the Escape key before it reaches Modals or other containers
+      document.addEventListener('keydown', handleGlobalKeyDown, true);
+    }
+
+    return () => {
+      document.removeEventListener('keydown', handleGlobalKeyDown, true);
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+      if (closeTimeoutRef.current) clearTimeout(closeTimeoutRef.current);
+    };
+  }, [isVisible]);
 
   const child = React.isValidElement(children) ? React.Children.only(children) : null;
   const childProps = child ? {

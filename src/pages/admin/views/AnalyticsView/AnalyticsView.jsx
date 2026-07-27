@@ -9,20 +9,20 @@ import dashboardStyles from "../../AdminDashboard.module.css";
 import styles from "./AnalyticsView.module.css";
 import AccessibleChartWrapper from "components/common/AccessibleChartWrapper/AccessibleChartWrapper";
 
-// High contrast, WCAG AA compliant color palette
-const COLORS = ['#005A9C', '#B52A00', '#007A33', '#5E35B1', '#C66A00'];
+// High contrast, WCAG AA compliant color palette (responsive to theme)
+const COLORS = ['var(--chart-1)', 'var(--chart-2)', 'var(--chart-3)', 'var(--chart-4)', 'var(--chart-5)'];
 
 const SOURCE_COLORS = {
-  Direct: '#005A9C',
-  Social: '#B52A00',
-  Search: '#007A33',
-  Referral: '#5E35B1'
+  Direct: 'var(--chart-1)',
+  Social: 'var(--chart-2)',
+  Search: 'var(--chart-3)',
+  Referral: 'var(--chart-4)'
 };
 
 const DEVICE_COLORS = {
-  Desktop: '#005A9C',
-  Mobile: '#B52A00',
-  Tablet: '#007A33'
+  Desktop: 'var(--chart-1)',
+  Mobile: 'var(--chart-2)',
+  Tablet: 'var(--chart-3)'
 };
 
 const TIMEFRAMES = [

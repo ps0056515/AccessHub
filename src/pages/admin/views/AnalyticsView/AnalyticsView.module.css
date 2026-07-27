@@ -56,16 +56,17 @@
 }
 
 .filterBtn[aria-pressed="true"] {
-  background: var(--accent);
-  color: #ffffff;
-  border-color: var(--accent);
+  background: transparent;
+  color: var(--accent);
+  border: 2px solid var(--accent);
   box-shadow: var(--shadow-sm);
+  padding: 8px 19px; /* offset the 1px thicker border to prevent layout shift */
 }
 
 /* --- KPI Cards Grid --- */
 .kpiGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 180px), 1fr));
   gap: 22px;
   margin-bottom: 32px;
 }
@@ -178,8 +179,6 @@
 .tablePath {
   max-width: 250px;
   overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
   font-family: 'Courier New', Courier, monospace;
   font-weight: 500;
   color: var(--accent);
@@ -303,3 +302,4 @@
     text-align: center;
   }
 }
+

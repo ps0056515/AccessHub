@@ -48,7 +48,7 @@ export default function DiscussionsSettings({ showToast }) {
 
   return (
     <section className={dashboardStyles.panel} aria-labelledby="discussions-cms-title">
-      <h2 id="discussions-cms-title" className={dashboardStyles.panelTitle}>Configuration</h2>
+      <h2 id="discussions-cms-title" className={dashboardStyles.panelTitle}>Discussion Configuration</h2>
       <form onSubmit={handleSave} style={{ marginTop: '24px' }}>
         
         <div className={styles.formGroup}>

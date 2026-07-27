@@ -466,7 +466,7 @@ export default function SettingsView({ showToast }) {
                 />
               </div>
               <div className={styles.formGroup}>
-                <label className={styles.formLabel}>Heading</label>
+                <label className={styles.formLabel}>Hero Heading</label>
                 <textarea
                   value={localPortalConfig.heading}
                   onChange={(e) => setLocalPortalConfig({...localPortalConfig, heading: e.target.value})}
@@ -475,7 +475,7 @@ export default function SettingsView({ showToast }) {
                 />
               </div>
               <div className={styles.formGroup}>
-                <label className={styles.formLabel}>Subheading</label>
+                <label className={styles.formLabel}>Hero Subheading</label>
                 <textarea
                   value={localPortalConfig.subheading}
                   onChange={(e) => setLocalPortalConfig({...localPortalConfig, subheading: e.target.value})}

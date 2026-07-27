@@ -45,6 +45,12 @@ export default function Navbar({
     if (menuOpen && mobileNavRef.current) {
       const firstItem = mobileNavRef.current.querySelector('button');
       if (firstItem) firstItem.focus({ preventScroll: true });
+      
+      const prevOverflow = document.body.style.overflow;
+      document.body.style.overflow = "hidden";
+      return () => {
+        document.body.style.overflow = prevOverflow;
+      };
     }
   }, [menuOpen]);
 
@@ -246,13 +252,13 @@ export default function Navbar({
                 onClick={() => setProfileOpen(!profileOpen)}
                 aria-label="User Profile"
                 aria-expanded={profileOpen}
-                aria-haspopup="true"
+                aria-haspopup="dialog"
               >
                 <Avatar src={user.avatarUrl} initials={user.initials || (user.displayName ? user.displayName[0] : "U")} color={user.color || "blue"} size={32} />
               </button>
 
               {profileOpen && (
-                <div ref={profileMenuRef} className={styles.profileDropdown}>
+                <div ref={profileMenuRef} className={styles.profileDropdown} role="dialog" aria-label="User menu">
                   <div className={styles.dropdownHeader}>
                     <span className={styles.dropdownName}>
                       {user.displayName}
@@ -317,7 +323,13 @@ export default function Navbar({
       </Container>
 
       {menuOpen && (
-        <nav ref={mobileNavRef} className={styles.mobileNav} aria-label="Mobile navigation">
+        <div 
+          role="dialog" 
+          aria-modal="true" 
+          aria-label="Mobile navigation"
+          ref={mobileNavRef} 
+          className={styles.mobileNav}
+        >
           {links.map((l) => (
             <button
               key={l.id}
@@ -392,7 +404,7 @@ export default function Navbar({
               Join community
             </button>
           )}
-        </nav>
+        </div>
       )}
     </header>
   );

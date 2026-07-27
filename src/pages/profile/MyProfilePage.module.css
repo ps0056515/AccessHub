@@ -509,7 +509,7 @@
 .formTextarea:focus {
   outline: none;
   border-color: var(--accent-text);
-  outline: 2px solid var(--accent); outline-offset: 2px; box-shadow: none;
+  outline: 2px solid var(--focus-border-color); outline-offset: 2px; box-shadow: none;
   background: var(--surface-secondary);
 }
 
@@ -673,3 +673,4 @@
     transform: none;
   }
 }
+

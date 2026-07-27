@@ -177,6 +177,8 @@ function AccessibleCombobox({ id, label, placeholder, value, onChange, options, 
                 aria-selected={isSelected}
                 onMouseDown={(e) => {
                   e.preventDefault(); // Prevent input blur
+                }}
+                onClick={() => {
                   onChange(option);
                   setIsOpen(false);
                   setActiveIndex(-1);
@@ -423,7 +425,7 @@ export default function AccessibilityJobs() {
                       target="_blank"
                       rel="noopener noreferrer"
                       className={styles.applyBtn}
-                      aria-label={`Apply for ${job.title} at ${job.company} (opens in new window)`}
+                      aria-label={`Apply on ${job.source} for ${job.title} at ${job.company} (opens in new window)`}
                     >
                       Apply on {job.source} <span aria-hidden="true">↗</span>
                     </a>

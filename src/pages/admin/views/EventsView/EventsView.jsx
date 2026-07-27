@@ -309,6 +309,7 @@ export default function EventsView({ showToast }) {
               setIsModalOpen(true);
             }}
             className={styles.editBtn}
+            aria-label={`Edit ${ev.title}`}
           >
             Edit
           </button>
@@ -316,6 +317,7 @@ export default function EventsView({ showToast }) {
             type="button"
             onClick={() => handleDeleteEvent(ev.id, ev.title)}
             className={styles.deleteBtn}
+            aria-label={`Delete ${ev.title}`}
           >
             Delete
           </button>
@@ -396,6 +398,7 @@ export default function EventsView({ showToast }) {
               type="button"
               onClick={() => handleApproveProposal(p)}
               className={styles.approveBtn}
+              aria-label={`Approve ${p.title}`}
             >
               Approve
             </button>
@@ -403,6 +406,7 @@ export default function EventsView({ showToast }) {
               type="button"
               onClick={() => handleRejectProposal(p.id, p.title)}
               className={styles.deleteBtn}
+              aria-label={`Reject ${p.title}`}
             >
               Reject
             </button>
@@ -413,6 +417,7 @@ export default function EventsView({ showToast }) {
               type="button"
               className={styles.deleteBtn}
               onClick={() => handleDeleteProposal(p.id, p.title)}
+              aria-label={`Delete ${p.title}`}
             >
               Delete
             </button>
@@ -449,7 +454,7 @@ export default function EventsView({ showToast }) {
           <div className={styles.searchWrapper}>
             <input
               id="admin-search-input"
-              type="text"
+              type="search"
               placeholder="Search events..."
               value={eventSearch}
               onChange={(e) => setEventSearch(e.target.value)}

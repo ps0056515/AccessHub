@@ -33,7 +33,11 @@
   cursor: pointer;
   font-size: 11px;
   color: var(--text-muted);
-  padding: 2px;
+  min-width: 24px;
+  min-height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .sortBtn:disabled {
@@ -68,6 +72,9 @@
   border-radius: 4px;
   font-size: 12px;
   cursor: pointer;
+  min-height: 24px;
+  display: inline-flex;
+  align-items: center;
 }
 
 .editBtn:hover {
@@ -82,6 +89,9 @@
   border-radius: 4px;
   font-size: 12px;
   cursor: pointer;
+  min-height: 24px;
+  display: inline-flex;
+  align-items: center;
 }
 
 .deleteBtn:hover {
@@ -121,7 +131,7 @@
 }
 
 .formInput:focus, .formSelect:focus {
-  outline: 2px solid var(--accent);
+  outline: 2px solid var(--focus-border-color);
   outline-offset: -1px;
 }
 
@@ -170,3 +180,4 @@
   clip: rect(0, 0, 0, 0);
   border: 0;
 }
+

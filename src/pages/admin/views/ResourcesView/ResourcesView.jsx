@@ -196,6 +196,7 @@ export default function ResourcesView({ showToast }) {
               setEditingResource(res);
               setIsModalOpen(true);
             }}
+            aria-label={`Edit ${res.title}`}
           >
             Edit
           </button>
@@ -203,6 +204,7 @@ export default function ResourcesView({ showToast }) {
             type="button"
             className={styles.deleteBtn}
             onClick={() => handleDeleteResource(res.id, res.title)}
+            aria-label={`Delete ${res.title}`}
           >
             Delete
           </button>
@@ -288,6 +290,7 @@ export default function ResourcesView({ showToast }) {
                   _proposalId: p.id,
                 });
               }}
+              aria-label={`Approve ${p.title}`}
             >
               Approve
             </button>
@@ -295,6 +298,7 @@ export default function ResourcesView({ showToast }) {
               type="button"
               className={styles.deleteBtn}
               onClick={() => handleRejectProposal(p.id)}
+              aria-label={`Reject ${p.title}`}
             >
               Reject
             </button>
@@ -307,6 +311,7 @@ export default function ResourcesView({ showToast }) {
               type="button"
               className={styles.deleteBtn}
               onClick={() => handleDeleteProposal(p.id)}
+              aria-label={`Delete ${p.title}`}
             >
               Delete
             </button>
@@ -341,7 +346,7 @@ export default function ResourcesView({ showToast }) {
           <div className={styles.headerActions}>
             <input
               id="admin-search-input"
-              type="text"
+              type="search"
               placeholder="Search resources..."
               value={resourceSearch}
               onChange={(e) => setResourceSearch(e.target.value)}
@@ -353,7 +358,7 @@ export default function ResourcesView({ showToast }) {
                 onClick={handleBulkDelete}
                 className={`${styles.deleteBtn} ${styles.bulkDeleteBtn}`}
               >
-                <Trash size={16} /> Delete ({selectedIds.length})
+                <Trash aria-hidden="true" size={16} /> Delete ({selectedIds.length})
               </button>
             )}
             {activeTab === "Active Resources" && (
@@ -436,3 +441,4 @@ export default function ResourcesView({ showToast }) {
     </>
   );
 }
+

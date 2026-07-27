@@ -125,6 +125,7 @@ export default function DiscussionsModeration({ showToast }) {
           className={styles.btnSecondary} 
           style={{ padding: '4px 8px', fontSize: '13px' }}
           onClick={() => handleEdit(post)}
+          aria-label={`Edit ${post.title}`}
         >
           Edit
         </button>
@@ -132,6 +133,7 @@ export default function DiscussionsModeration({ showToast }) {
           className={styles.btnDanger} 
           style={{ padding: '4px 8px', fontSize: '13px' }}
           onClick={() => handleDelete(post.id)}
+          aria-label={`Delete ${post.title}`}
         >
           Delete
         </button>
@@ -146,7 +148,7 @@ export default function DiscussionsModeration({ showToast }) {
         <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
           <input
             id="admin-search-input"
-            type="text"
+            type="search"
             placeholder="Search discussions..."
             value={discussionSearch}
             onChange={(e) => setDiscussionSearch(e.target.value)}

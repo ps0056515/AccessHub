@@ -36,7 +36,7 @@ export default function ArticleDetail() {
     fetchArticle();
   }, [id, navigate]);
 
-  if (loading) return <Container className={styles.detailContainer}>Loading article...</Container>;
+  if (loading) return <Container className={styles.detailContainer} role="status">Loading article...</Container>;
   if (error) return <Container className={styles.detailContainer} style={{ color: 'var(--error)' }}>{error}</Container>;
   if (!article) return null;
 
@@ -80,3 +80,4 @@ export default function ArticleDetail() {
     </Container>
   );
 }
+

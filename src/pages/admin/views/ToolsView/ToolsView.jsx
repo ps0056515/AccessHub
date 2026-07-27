@@ -195,6 +195,7 @@ export default function ToolsView({ showToast }) {
             type="button"
             onClick={() => handleOpenEditModal(t)}
             className={styles.editBtn}
+            aria-label={`Edit ${t.name}`}
           >
             Edit
           </button>
@@ -202,6 +203,7 @@ export default function ToolsView({ showToast }) {
             type="button"
             onClick={() => handleDeleteTool(t.id, t.name)}
             className={styles.deleteBtn}
+            aria-label={`Delete ${t.name}`}
           >
             Delete
           </button>
@@ -234,7 +236,7 @@ export default function ToolsView({ showToast }) {
           <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
             <input
               id="admin-search-input"
-              type="text"
+              type="search"
               placeholder="Search tools..."
               value={toolSearch}
               onChange={(e) => setToolSearch(e.target.value)}
@@ -267,7 +269,7 @@ export default function ToolsView({ showToast }) {
         </div>
 
         {loading && toolsList.length === 0 ? (
-          <p className={dashboardStyles.loading}>Loading tools list…</p>
+          <p className={dashboardStyles.loading} role="status">Loading tools list…</p>
         ) : (
           <Table
             columns={columns}
@@ -293,3 +295,4 @@ export default function ToolsView({ showToast }) {
     </>
   );
 }
+

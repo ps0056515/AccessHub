@@ -136,7 +136,7 @@ export default function Resources({ setActivePage }) {
           </h2>
           <p className={styles.certDesc}>
             IAAP credentials, WAS, and structured training tracks — pair these
-            with the checklist resources below.
+            with these checklist resources.
           </p>
         </div>
         <button
@@ -257,7 +257,7 @@ export default function Resources({ setActivePage }) {
       </div>
 
       {loading && resources.length === 0 ? (
-        <p className={styles.loading}>Loading resources...</p>
+        <p className={styles.loading} role="status">Loading resources...</p>
       ) : filtered.length === 0 ? (
         <p className={styles.empty}>
           {query.trim()
@@ -286,3 +286,4 @@ export default function Resources({ setActivePage }) {
     </Container>
   );
 }
+

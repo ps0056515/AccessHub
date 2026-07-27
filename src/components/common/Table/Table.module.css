@@ -7,6 +7,7 @@
 .scrollContainer {
   overflow-y: auto;
   overflow-x: auto;
+  scroll-padding-top: 56px;
   position: relative;
   max-height: 500px;
   border-radius: var(--radius-sm, 6px);
@@ -24,7 +25,6 @@
   text-align: left;
   font-size: 13px;
   padding: 8px 12px;
-  white-space: nowrap;
 }
 
 .fixedHeader {
@@ -65,3 +65,4 @@
   cursor: pointer;
   text-align: inherit;
 }
+

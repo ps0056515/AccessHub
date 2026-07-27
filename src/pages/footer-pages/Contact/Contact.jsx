@@ -60,7 +60,7 @@ export default function Contact() {
             Get in touch
           </h1>
           <p className={styles.subtitle}>
-            We welcome feedback, accessibility questions, and partnership ideas. Choose the best way to reach the {SITE_NAME} team below.
+            We welcome feedback, accessibility questions, and partnership ideas. Choose the best way to reach the {SITE_NAME} team.
           </p>
         </header>
 

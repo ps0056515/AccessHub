@@ -28,7 +28,7 @@
   resize: vertical;
 }
 .formInput:focus, .formSelect:focus, .formTextarea:focus {
-  outline: 2px solid var(--accent);
+  outline: 2px solid var(--focus-border-color);
   outline-offset: -1px;
 }
 
@@ -102,7 +102,7 @@
 }
 
 .emptyText {
-  color: #64748b;
+  color: #334155;
 }
 
 .list {
@@ -122,6 +122,7 @@
 }
 
 .itemEmail {
-  color: #64748b;
+  color: #334155;
   font-size: 14px;
 }
+

@@ -109,7 +109,7 @@ export default function ToolModal({
       width="50%"
       footer={
         <>
-          <button type="button" onClick={onClose} className={styles.cancelBtn}>
+          <button type="button" onClick={onClose} className={styles.cancelBtn} aria-label="Cancel tool edit">
             Cancel
           </button>
           <button
@@ -143,7 +143,7 @@ export default function ToolModal({
 
           <div className={styles.formGroup}>
             <label htmlFor="tool-name" className={styles.formLabel}>
-              Tool Name *
+              Tool Name<span className="required-asterisk" aria-hidden="true"> *</span>
             </label>
             <input
               id="tool-name"
@@ -159,7 +159,7 @@ export default function ToolModal({
 
           <div className={styles.formGroup}>
             <label htmlFor="tool-type" className={styles.formLabel}>
-              Classification Type *
+              Classification Type<span className="required-asterisk" aria-hidden="true"> *</span>
             </label>
             <input
               id="tool-type"
@@ -175,7 +175,7 @@ export default function ToolModal({
 
           <div className={styles.formGroup}>
             <label htmlFor="tool-price" className={styles.formLabel}>
-              Pricing/License *
+              Pricing/License<span className="required-asterisk" aria-hidden="true"> *</span>
             </label>
             <input
               id="tool-price"
@@ -228,7 +228,7 @@ export default function ToolModal({
 
           <div className={styles.formGroup}>
             <label htmlFor="tool-url" className={styles.formLabel}>
-              Link URL *
+              Link URL<span className="required-asterisk" aria-hidden="true"> *</span>
             </label>
             <input
               id="tool-url"
