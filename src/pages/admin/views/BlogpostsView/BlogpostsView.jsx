@@ -174,6 +174,7 @@ export default function BlogpostsView({ showToast }) {
       await blogpostsApi.delete(id);
       showToast?.('Blogpost deleted successfully!', 'success');
       await loadBlogposts();
+      setTimeout(() => document.getElementById("admin-search-input")?.focus(), 0);
     } catch (err) {
       showToast?.(err.message || 'Failed to delete blogpost.', 'error');
     }
@@ -186,6 +187,7 @@ export default function BlogpostsView({ showToast }) {
       showToast?.(`Successfully deleted ${selectedIds.length} blogposts.`, "success");
       setSelectedIds([]);
       await loadBlogposts();
+      setTimeout(() => document.getElementById("admin-search-input")?.focus(), 0);
     } catch (err) {
       showToast?.(err.message || "Failed to bulk delete blogposts.", "error");
     }
@@ -198,6 +200,7 @@ export default function BlogpostsView({ showToast }) {
       showToast?.(`Successfully ${publishState ? "published" : "unpublished"} ${selectedIds.length} blogposts.`, "success");
       setSelectedIds([]);
       await loadBlogposts();
+      setTimeout(() => document.getElementById("admin-search-input")?.focus(), 0);
     } catch (err) {
       showToast?.(err.message || `Failed to bulk ${publishState ? "publish" : "unpublish"} blogposts.`, "error");
     }
@@ -271,6 +274,7 @@ export default function BlogpostsView({ showToast }) {
             <h2 className={styles.title} style={{ margin: 0 }}>Blogposts & News</h2>
             <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
               <input
+                id="admin-search-input"
                 type="text"
                 placeholder="Search blogposts..."
                 value={blogpostSearch}

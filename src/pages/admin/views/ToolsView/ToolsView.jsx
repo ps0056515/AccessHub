@@ -54,6 +54,7 @@ export default function ToolsView({ showToast }) {
       await toolsApi.delete(id);
       showToast?.(`Tool "${toolName}" deleted successfully!`, "success");
       loadTools();
+      setTimeout(() => document.getElementById("admin-search-input")?.focus(), 0);
     } catch (err) {
       showToast?.(err.message || "Failed to delete tool.", "error");
     }
@@ -66,6 +67,7 @@ export default function ToolsView({ showToast }) {
       showToast?.(`Successfully deleted ${selectedIds.length} tools.`, "success");
       setSelectedIds([]);
       loadTools();
+      setTimeout(() => document.getElementById("admin-search-input")?.focus(), 0);
     } catch (err) {
       showToast?.(err.message || "Failed to bulk delete tools.", "error");
     }
@@ -231,6 +233,7 @@ export default function ToolsView({ showToast }) {
           </h2>
           <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
             <input
+              id="admin-search-input"
               type="text"
               placeholder="Search tools..."
               value={toolSearch}

@@ -59,7 +59,7 @@ export default function SuggestResourceModal({ isOpen, onClose }) {
     <Modal title="Suggest a resource" onClose={handleClose}>
       <form id="resource-submit-form" onSubmit={handleSubmit} noValidate>
         <label className={styles.formLabel} htmlFor="suggest-title">
-          Title
+          Title<span className="required-asterisk" aria-hidden="true"> *</span>
           <input
             id="suggest-title"
             className={styles.formInput}
@@ -67,10 +67,12 @@ export default function SuggestResourceModal({ isOpen, onClose }) {
             autoComplete="off"
             value={submitTitle}
             onChange={(e) => setSubmitTitle(e.target.value)}
+            required
+            aria-required="true"
           />
         </label>
         <label className={styles.formLabel} htmlFor="suggest-url">
-          Link
+          Link<span className="required-asterisk" aria-hidden="true"> *</span>
           <input
             id="suggest-url"
             className={styles.formInput}
@@ -80,6 +82,8 @@ export default function SuggestResourceModal({ isOpen, onClose }) {
             placeholder="https://"
             value={submitUrl}
             onChange={(e) => setSubmitUrl(e.target.value)}
+            required
+            aria-required="true"
           />
         </label>
         <label className={styles.formLabel} htmlFor="suggest-notes">

@@ -11,7 +11,7 @@
   max-height: 500px;
   border-radius: var(--radius-sm, 6px);
   border: 1px solid var(--border-strong);
-  background: var(--bg-card);
+  background: var(--surface-secondary);
 }
 
 .table {
@@ -31,7 +31,7 @@
   position: sticky !important;
   top: 0;
   z-index: 99;
-  background-color: var(--bg-secondary);
+  background-color: var(--surface-secondary);
   border-bottom: 2px solid var(--border-strong);
 }
 
@@ -43,7 +43,7 @@
 }
 
 .table tbody tr:hover td {
-  background-color: var(--bg-secondary);
+  background-color: var(--surface-secondary);
 }
 
 .noDataContent {
@@ -52,5 +52,16 @@
   justify-content: center;
   align-items: center;
   padding: 32px;
-  color: var(--text-muted);
+  color: var(--text-secondary);
+}
+
+.filterBtn {
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  text-align: inherit;
 }

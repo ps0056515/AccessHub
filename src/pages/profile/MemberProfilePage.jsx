@@ -3,6 +3,7 @@ import { useParams, useLocation } from 'react-router-dom';
 import { usersApi } from 'api/client';
 import { COLOR_MAP } from 'data';
 import { Mail, MapPin, Building2, Calendar, Briefcase, User, ArrowLeft, MessageSquare, FileText, Star } from 'lucide-react';
+import Avatar from 'components/common/Avatar/Avatar';
 import styles from './MemberProfilePage.module.css';
 
 function formatDate(dateStr) {
@@ -93,17 +94,13 @@ export default function MemberProfilePage({ goToPortal }) {
       <div className={`${styles.profileCard} ${styles.fadeUp} ${styles.fadeUp1}`}>
         <div className={styles.profileHeader}>
           <div className={styles.avatarWrapper}>
-            <div
-              className={styles.avatar}
-              style={!hasAvatar ? { background: colors.bg, color: colors.text } : undefined}
-              aria-hidden="true"
-            >
-              {hasAvatar ? (
-                <img src={member.avatarUrl} alt="" className={styles.avatarImg} />
-              ) : (
-                member.initials
-              )}
-            </div>
+            <Avatar 
+              src={member.avatarUrl} 
+              initials={member.initials} 
+              color={member.color} 
+              size={120} 
+              className={styles.avatarOverride} 
+            />
           </div>
           
           <div className={styles.profileHeaderInfo}>

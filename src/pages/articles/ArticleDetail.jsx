@@ -37,7 +37,7 @@ export default function ArticleDetail() {
   }, [id, navigate]);
 
   if (loading) return <Container className={styles.detailContainer}>Loading article...</Container>;
-  if (error) return <Container className={styles.detailContainer} style={{ color: 'red' }}>{error}</Container>;
+  if (error) return <Container className={styles.detailContainer} style={{ color: 'var(--error)' }}>{error}</Container>;
   if (!article) return null;
 
   return (
@@ -53,7 +53,7 @@ export default function ArticleDetail() {
       </Link>
 
       {article.cover_image && (
-        <img src={article.cover_image} alt="" className={styles.detailImage} />
+        <img src={article.cover_image} alt={article.cover_image_alt || ""} className={styles.detailImage} />
       )}
 
       <header className={styles.detailHeader}>

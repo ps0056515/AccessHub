@@ -188,6 +188,7 @@ export default function ArticlesView({ showToast }) {
       await articlesApi.delete(id);
       showToast?.("Article deleted successfully!", "success");
       await loadArticles();
+      setTimeout(() => document.getElementById("admin-search-input")?.focus(), 0);
     } catch (err) {
       showToast?.(err.message || "Failed to delete article.", "error");
     }
@@ -208,6 +209,7 @@ export default function ArticlesView({ showToast }) {
       );
       setSelectedIds([]);
       await loadArticles();
+      setTimeout(() => document.getElementById("admin-search-input")?.focus(), 0);
     } catch (err) {
       showToast?.(err.message || "Failed to bulk delete articles.", "error");
     }
@@ -230,6 +232,7 @@ export default function ArticlesView({ showToast }) {
       );
       setSelectedIds([]);
       await loadArticles();
+      setTimeout(() => document.getElementById("admin-search-input")?.focus(), 0);
     } catch (err) {
       showToast?.(
         err.message ||
@@ -355,6 +358,7 @@ export default function ArticlesView({ showToast }) {
             </h2>
             <div style={{ display: "flex", gap: "16px", alignItems: "center" }}>
               <input
+                id="admin-search-input"
                 type="text"
                 placeholder="Search articles..."
                 value={articleSearch}

@@ -25,7 +25,7 @@
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.12em;
-  color: var(--accent);
+  color: var(--accent-text);
   margin-bottom: 10px;
 }
 
@@ -34,14 +34,14 @@
   font-size: clamp(28px, 4vw, 36px);
   font-weight: 400;
   line-height: 1.2;
-  color: var(--text);
+  color: var(--text-primary);
   margin-bottom: 14px;
 }
 
 .lead {
   font-size: 16px;
   line-height: 1.65;
-  color: var(--text-muted);
+  color: var(--text-secondary);
   max-width: 62ch;
 }
 
@@ -54,8 +54,8 @@
 }
 
 .btnPrimary {
-  background: var(--accent);
-  color: #fff;
+  background: var(--button-primary);
+  color: var(--text-on-accent);
   border: none;
   border-radius: var(--radius-sm);
   padding: 12px 22px;
@@ -81,7 +81,7 @@
 }
 
 .btnSecondary:hover {
-  color: var(--accent);
+  color: var(--accent-text);
 }
 
 .stats {
@@ -102,7 +102,7 @@
 }
 
 .statCard {
-  background: var(--bg-card);
+  background: var(--surface-secondary);
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
   padding: 16px 14px;
@@ -122,7 +122,7 @@
   font-size: 11px;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  color: var(--text-muted);
+  color: var(--text-secondary);
   line-height: 1.35;
 }
 
@@ -135,11 +135,11 @@
   font-size: 26px;
   font-weight: 400;
   margin-bottom: 10px;
-  color: var(--text);
+  color: var(--text-primary);
 }
 
 .sectionIntro {
-  color: var(--text-muted);
+  color: var(--text-secondary);
   font-size: 15px;
   line-height: 1.6;
   margin-bottom: 22px;
@@ -159,7 +159,7 @@
 }
 
 .infoCard {
-  background: var(--bg-card);
+  background: var(--surface-secondary);
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
   padding: 18px 18px 16px;
@@ -173,12 +173,12 @@
   font-size: 16px;
   font-weight: 600;
   margin-bottom: 8px;
-  color: var(--text);
+  color: var(--text-primary);
 }
 
 .cardBody {
   font-size: 13px;
-  color: var(--text-muted);
+  color: var(--text-secondary);
   line-height: 1.55;
   flex: 1;
   margin-bottom: 14px;
@@ -186,17 +186,17 @@
 
 .cardBtn {
   align-self: flex-start;
-  background: var(--bg-secondary);
+  background: var(--surface-secondary);
   border: 1px solid var(--border-interactive-strong);
   border-radius: var(--radius-sm);
   padding: 8px 14px;
   font-size: 13px;
   font-weight: 500;
-  color: var(--text);
+  color: var(--text-primary);
 }
 
 .cardBtn:hover {
-  background: var(--bg-tertiary);
+  background: var(--surface-tertiary);
 }
 
 .cardBtnRow {
@@ -212,16 +212,16 @@
   padding: 8px 14px;
   font-size: 13px;
   font-weight: 500;
-  color: var(--text-muted);
+  color: var(--text-secondary);
 }
 
 .cardBtnGhost:hover {
-  border-color: var(--accent);
+  border-color: var(--accent-text);
   color: var(--accent-text);
 }
 
 .hub {
-  background: var(--bg-card);
+  background: var(--surface-secondary);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   padding: 22px 22px 20px;
@@ -239,25 +239,25 @@
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.07em;
-  color: var(--text-muted);
+  color: var(--text-secondary);
   margin-bottom: 6px;
 }
 
 .hubTitle {
   font-size: 18px;
   font-weight: 600;
-  color: var(--text);
+  color: var(--text-primary);
 }
 
 .hubDesc {
   font-size: 14px;
   line-height: 1.6;
-  color: var(--text-muted);
+  color: var(--text-secondary);
   margin-bottom: 12px;
 }
 
 .extLink {
-  color: var(--accent);
+  color: var(--accent-text);
   font-weight: 500;
   text-decoration: none;
 }

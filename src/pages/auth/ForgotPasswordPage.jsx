@@ -55,14 +55,16 @@ export default function ForgotPasswordPage() {
         <form className={styles.form} onSubmit={handleSubmit} noValidate>
           <div className={styles.field}>
             <label className={styles.label} htmlFor="forgot-email">
-              Email
+              Email<span className="required-asterisk" aria-hidden="true"> *</span>
             </label>
             <input
               id="forgot-email"
               className={styles.input}
               type="email"
               autoComplete="email"
+              autoFocus
               required
+              aria-required="true"
               value={email}
               onChange={e => setEmail(e.target.value)}
               disabled={submitting}

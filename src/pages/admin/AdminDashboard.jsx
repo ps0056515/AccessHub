@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from 'context/AuthContext';
 import { SITE_NAME } from 'brand';
@@ -42,6 +42,18 @@ export default function AdminDashboard({ goToPortal }) {
   const [isCollapsed, setIsCollapsed] = useState(() => {
     return localStorage.getItem('adminDashboardCollapsed') === 'true';
   });
+  const isInitialMount = useRef(true);
+  const mainContentRef = useRef(null);
+
+  useEffect(() => {
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      return;
+    }
+    if (mainContentRef.current) {
+      mainContentRef.current.focus({ preventScroll: true });
+    }
+  }, [activeTab]);
 
   useEffect(() => {
     document.title = `Admin · ${SITE_NAME}`;
@@ -77,7 +89,7 @@ export default function AdminDashboard({ goToPortal }) {
 
   return (
     <div className={`${styles.cmsContainer} ${isCollapsed ? styles.cmsCollapsed : ''}`}>
-      <a href="#cms-main-content" className={styles.skipLink}>
+      <a href="#cms-main-content" className="global-skip-link">
         Skip to main content
       </a>
 
@@ -86,7 +98,7 @@ export default function AdminDashboard({ goToPortal }) {
         <div className={styles.sidebarBrand}>
           <span className={styles.brandEmoji} aria-hidden="true">🛡️</span>
           <div className={styles.brandText}>
-            <h1 className={styles.brandTitle}>AllCanAccess</h1>
+            <span className={styles.brandTitle}>AllCanAccess</span>
             <span className={styles.brandRole}>Admin Portal</span>
           </div>
           <Tooltip content={isCollapsed ? "Expand sidebar" : "Collapse sidebar"} position="right">
@@ -96,7 +108,7 @@ export default function AdminDashboard({ goToPortal }) {
               className={styles.collapseToggle}
               aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
             >
-              {isCollapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
+              {isCollapsed ? <ChevronRight aria-hidden="true" size={16} /> : <ChevronLeft aria-hidden="true" size={16} />}
             </button>
           </Tooltip>
         </div>
@@ -165,7 +177,13 @@ export default function AdminDashboard({ goToPortal }) {
           </button>
         </header>
 
-        <main className={styles.frameContent} id="cms-main-content">
+        <main 
+          ref={mainContentRef}
+          className={styles.frameContent} 
+          id="cms-main-content"
+          tabIndex={-1}
+          style={{ outline: 'none' }}
+        >
           {activeTab === 'overview' && <OverviewView showToast={addToast} />}
           {activeTab === 'analytics' && <AnalyticsView showToast={addToast} />}
           {activeTab === 'resources' && <ResourcesView showToast={addToast} />}

@@ -3,7 +3,9 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "context/AuthContext";
 import { useConfig } from "context/ConfigContext";
 import { useTheme } from "context/ThemeContext";
+import useFocusTrap from "hooks/useFocusTrap";
 import Container from "components/common/Container/Container";
+import Avatar from "components/common/Avatar/Avatar";
 import styles from "./Navbar.module.css";
 
 const SECTION_PATHS = {
@@ -24,7 +26,27 @@ export default function Navbar({
   const [profileOpen, setProfileOpen] = useState(false);
   const profileRef = useRef(null);
   const profileBtnRef = useRef(null);
+  const menuBtnRef = useRef(null);
+  const profileMenuRef = useRef(null);
+  const mobileNavRef = useRef(null);
   const { theme, toggleTheme } = useTheme();
+
+  useFocusTrap(profileMenuRef, profileOpen);
+  useFocusTrap(mobileNavRef, menuOpen);
+
+  useEffect(() => {
+    if (profileOpen && profileMenuRef.current) {
+      const firstItem = profileMenuRef.current.querySelector('button');
+      if (firstItem) firstItem.focus({ preventScroll: true });
+    }
+  }, [profileOpen]);
+
+  useEffect(() => {
+    if (menuOpen && mobileNavRef.current) {
+      const firstItem = mobileNavRef.current.querySelector('button');
+      if (firstItem) firstItem.focus({ preventScroll: true });
+    }
+  }, [menuOpen]);
 
   useEffect(() => {
     function handleClickOutside(event) {
@@ -33,9 +55,15 @@ export default function Navbar({
       }
     }
     function handleEscape(event) {
-      if (event.key === "Escape" && profileOpen) {
-        setProfileOpen(false);
-        profileBtnRef.current?.focus();
+      if (event.key === "Escape") {
+        if (profileOpen) {
+          setProfileOpen(false);
+          profileBtnRef.current?.focus();
+        }
+        if (menuOpen) {
+          setMenuOpen(false);
+          menuBtnRef.current?.focus();
+        }
       }
     }
     document.addEventListener("mousedown", handleClickOutside);
@@ -44,7 +72,7 @@ export default function Navbar({
       document.removeEventListener("mousedown", handleClickOutside);
       document.removeEventListener("keydown", handleEscape);
     };
-  }, [profileOpen]);
+  }, [profileOpen, menuOpen]);
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -102,7 +130,14 @@ export default function Navbar({
   };
 
   return (
-    <header className={styles.header} role="banner">
+    <header 
+      className={styles.header}
+      onBlur={(e) => {
+        if (!e.currentTarget.contains(e.relatedTarget)) {
+          setMenuOpen(false);
+        }
+      }}
+    >
       <Container className={styles.inner}>
         <button
           type="button"
@@ -112,7 +147,7 @@ export default function Navbar({
         >
           <img
             src={navbarLogoUrl}
-            alt="AllCanAccess"
+            alt=""
             className={styles.logoImg}
           />
 
@@ -195,7 +230,15 @@ export default function Navbar({
             </button>
           )}
           {!authLoading && user && (
-            <div ref={profileRef} className={styles.profileWrapper}>
+            <div 
+              ref={profileRef} 
+              className={styles.profileWrapper}
+              onBlur={(e) => {
+                if (!e.currentTarget.contains(e.relatedTarget)) {
+                  setProfileOpen(false);
+                }
+              }}
+            >
               <button
                 type="button"
                 ref={profileBtnRef}
@@ -205,14 +248,11 @@ export default function Navbar({
                 aria-expanded={profileOpen}
                 aria-haspopup="true"
               >
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                  <circle cx="12" cy="7" r="4"></circle>
-                </svg>
+                <Avatar src={user.avatarUrl} initials={user.initials || (user.displayName ? user.displayName[0] : "U")} color={user.color || "blue"} size={32} />
               </button>
 
               {profileOpen && (
-                <div className={styles.profileDropdown}>
+                <div ref={profileMenuRef} className={styles.profileDropdown}>
                   <div className={styles.dropdownHeader}>
                     <span className={styles.dropdownName}>
                       {user.displayName}
@@ -260,6 +300,7 @@ export default function Navbar({
             </button>
           )}
           <button
+            ref={menuBtnRef}
             className={styles.menuBtn}
             aria-label={menuOpen ? "Close menu" : "Open menu"}
             aria-expanded={menuOpen}
@@ -276,7 +317,7 @@ export default function Navbar({
       </Container>
 
       {menuOpen && (
-        <nav className={styles.mobileNav} aria-label="Mobile navigation">
+        <nav ref={mobileNavRef} className={styles.mobileNav} aria-label="Mobile navigation">
           {links.map((l) => (
             <button
               key={l.id}

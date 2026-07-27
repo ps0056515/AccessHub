@@ -88,14 +88,16 @@ export default function ResetPasswordPage() {
         <form className={styles.form} onSubmit={handleSubmit} noValidate>
           <div className={styles.field}>
             <label className={styles.label} htmlFor="reset-password">
-              New password
+              New password<span className="required-asterisk" aria-hidden="true"> *</span>
             </label>
             <input
               id="reset-password"
               className={styles.input}
               type="password"
               autoComplete="new-password"
+              autoFocus
               required
+              aria-required="true"
               minLength={8}
               value={password}
               onChange={e => setPassword(e.target.value)}
@@ -108,7 +110,7 @@ export default function ResetPasswordPage() {
 
           <div className={styles.field}>
             <label className={styles.label} htmlFor="reset-confirm">
-              Confirm password
+              Confirm password<span className="required-asterisk" aria-hidden="true"> *</span>
             </label>
             <input
               id="reset-confirm"
@@ -116,6 +118,7 @@ export default function ResetPasswordPage() {
               type="password"
               autoComplete="new-password"
               required
+              aria-required="true"
               value={confirmPassword}
               onChange={e => setConfirmPassword(e.target.value)}
               disabled={submitting}

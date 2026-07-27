@@ -1,4 +1,4 @@
-import { useState, useLayoutEffect, useCallback, useEffect } from "react";
+import { useState, useLayoutEffect, useCallback, useEffect, useRef } from "react";
 import { Routes, Route, useNavigate, useLocation } from "react-router-dom";
 import Navbar from "components/layout/Navbar/Navbar";
 import Footer from "components/layout/Footer/Footer";
@@ -101,6 +101,22 @@ export default function AppShell() {
       setPostsLoading(false);
     }
   }, []);
+
+  // WCAG Focus Management: On route change, reset focus to the main content
+  // so screen readers naturally read from the start of the new page.
+  // We track the previous pathname to prevent focusing on the initial page load
+  // or on StrictMode remounts, which would trap users and skip the navigation bar.
+  const prevPathname = useRef(location.pathname);
+  useEffect(() => {
+    if (prevPathname.current === location.pathname) {
+      return;
+    }
+    prevPathname.current = location.pathname;
+    const mainContent = document.getElementById("main-content");
+    if (mainContent) {
+      mainContent.focus({ preventScroll: true });
+    }
+  }, [location.pathname]);
 
   useEffect(() => {
     loadPosts();
@@ -245,29 +261,7 @@ export default function AppShell() {
     <div
       style={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}
     >
-      <a
-        href="#main-content"
-        style={{
-          position: "absolute",
-          top: "-100%",
-          left: 16,
-          background: "#074a9e",
-          color: "#fff",
-          padding: "10px 18px",
-          borderRadius: 6,
-          fontSize: 14,
-          fontWeight: 500,
-          zIndex: 9999,
-          textDecoration: "none",
-          transition: "top 0.1s",
-        }}
-        onFocus={(e) => {
-          e.target.style.top = "16px";
-        }}
-        onBlur={(e) => {
-          e.target.style.top = "-100%";
-        }}
-      >
+      <a href="#main-content" className="global-skip-link">
         Skip to main content
       </a>
       <Navbar
@@ -276,7 +270,7 @@ export default function AppShell() {
         goToPortal={goToPortal}
         onSearch={focusPortalDiscussionSearch}
       />
-      <main id="main-content" style={{ flex: 1 }}>
+      <main id="main-content" style={{ flex: 1, outline: "none" }} tabIndex={-1}>
         <Routes>
           <Route
             path="/sign-in"

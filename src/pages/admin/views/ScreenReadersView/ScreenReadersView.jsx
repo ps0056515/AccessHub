@@ -70,6 +70,7 @@ export default function ScreenReadersView({ showToast }) {
       await screenReadersApi.delete(id);
       showToast?.("Guide deleted", "success");
       loadGuides();
+      setTimeout(() => document.getElementById("admin-search-input")?.focus(), 0);
     } catch (err) {
       showToast?.("Failed to delete guide", "error");
     }
@@ -82,6 +83,7 @@ export default function ScreenReadersView({ showToast }) {
       showToast?.(`Successfully deleted ${selectedIds.length} guides.`, "success");
       setSelectedIds([]);
       loadGuides();
+      setTimeout(() => document.getElementById("admin-search-input")?.focus(), 0);
     } catch (err) {
       showToast?.(err.message || "Failed to bulk delete guides.", "error");
     }
@@ -94,6 +96,7 @@ export default function ScreenReadersView({ showToast }) {
       showToast?.(`Successfully ${publishState ? "published" : "unpublished"} ${selectedIds.length} guides.`, "success");
       setSelectedIds([]);
       loadGuides();
+      setTimeout(() => document.getElementById("admin-search-input")?.focus(), 0);
     } catch (err) {
       showToast?.(err.message || `Failed to bulk ${publishState ? "publish" : "unpublish"} guides.`, "error");
     }
@@ -190,6 +193,7 @@ export default function ScreenReadersView({ showToast }) {
         </h1>
         <div style={{ display: "flex", gap: "16px", alignItems: "center" }}>
           <input
+            id="admin-search-input"
             type="text"
             placeholder="Search guides..."
             value={screenReaderSearch}

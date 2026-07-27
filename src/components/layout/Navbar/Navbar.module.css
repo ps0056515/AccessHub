@@ -11,8 +11,9 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
+    flex-wrap: wrap;
     gap: 5px;
-    height: 60px;
+    min-height: 60px;
   }
 
   .logo {
@@ -59,7 +60,7 @@
     border: none;
     padding: 6px 12px;
     font-size: 14px;
-    color: var(--text-muted);
+    color: var(--text-secondary);
     border-radius: var(--radius-sm);
     transition: background var(--transition), color var(--transition);
     position: relative;
@@ -72,7 +73,7 @@
     left: 50%;
     width: 0;
     height: 2px;
-    background: var(--accent);
+    background: var(--button-primary);
     transition: width 0.25s ease, left 0.25s ease;
     border-radius: 1px;
   }
@@ -84,14 +85,14 @@
   }
 
   .navLink:hover {
-    background: var(--bg-secondary);
-    color: var(--text);
+    background: var(--surface-secondary);
+    color: var(--text-primary);
   }
 
   .navLink.active {
-    color: var(--text);
+    color: var(--text-primary);
     font-weight: 500;
-    background: var(--bg-tertiary);
+    background: var(--surface-tertiary);
   }
 
   .navLink.active::after {
@@ -114,13 +115,13 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    color: var(--text-muted);
+    color: var(--text-secondary);
     transition: all var(--transition);
   }
 
   .searchBtn:hover {
-    background: var(--bg-secondary);
-    color: var(--text);
+    background: var(--surface-secondary);
+    color: var(--text-primary);
   }
 
   .signInBtn {
@@ -135,13 +136,13 @@
   }
 
   .signInBtn:hover {
-    background: var(--bg-secondary);
+    background: var(--surface-secondary);
   }
 
   .joinBtn {
-    background: var(--accent);
-    color: #fff;
-    border: none;
+    background: var(--button-primary);
+    color: var(--text-on-accent);
+    border: 1px solid transparent;
     border-radius: var(--radius-sm);
     padding: 7px 16px;
     font-size: 13px;
@@ -168,14 +169,14 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    color: var(--text-muted);
+    color: var(--text-secondary);
     transition: background var(--transition), color var(--transition), border-color var(--transition);
   }
 
   .themeToggle:hover {
-    background: var(--bg-secondary);
-    color: var(--text);
-    border-color: var(--accent);
+    background: var(--surface-secondary);
+    color: var(--text-primary);
+    border-color: var(--accent-text);
   }
 
   .communityBtn {
@@ -190,22 +191,20 @@
   }
 
   .communityBtn:hover {
-    background: var(--bg-secondary);
+    background: var(--surface-secondary);
   }
 
   .userLabel {
     font-size: 13px;
     font-weight: 500;
-    color: var(--text);
+    color: var(--text-primary);
     max-width: 120px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    word-break: break-word;
   }
 
   .signOutBtn {
     background: none;
-    color: var(--text-muted);
+    color: var(--text-secondary);
     border: 1px solid var(--border-interactive-strong);
     border-radius: var(--radius-sm);
     padding: 7px 12px;
@@ -215,8 +214,8 @@
   }
 
   .signOutBtn:hover {
-    background: var(--bg-secondary);
-    color: var(--text);
+    background: var(--surface-secondary);
+    color: var(--text-primary);
   }
 
   .adminBtn {
@@ -265,7 +264,7 @@
     flex-direction: column;
     padding: 12px 16px 20px;
     border-top: 1px solid var(--border);
-    background: var(--bg-card);
+    background: var(--surface-secondary);
     gap: 4px;
     max-height: calc(100vh - 60px);
     overflow-y: auto;
@@ -276,27 +275,34 @@
     border: none;
     padding: 10px 12px;
     font-size: 15px;
-    color: var(--text-muted);
+    color: var(--text-secondary);
     border-radius: var(--radius-sm);
     text-align: left;
   }
 
+  .mobileLink:hover,
+  .mobileLink:focus-visible {
+    background: var(--surface-secondary);
+    outline: 2px solid var(--accent-text);
+    outline-offset: -2px;
+  }
+
   .mobileActive {
-    color: var(--text);
+    color: var(--text-primary);
     font-weight: 500;
-    background: var(--bg-secondary);
+    background: var(--surface-secondary);
   }
 
   .mobileUser {
     padding: 10px 12px;
     font-size: 14px;
     font-weight: 500;
-    color: var(--text);
+    color: var(--text-primary);
   }
 
   .mobileJoin {
-    background: var(--accent);
-    color: #fff;
+    background: var(--button-primary);
+    color: var(--text-on-accent);
     border: none;
     border-radius: var(--radius-sm);
     padding: 12px;
@@ -331,7 +337,7 @@
   }
 
   .mobileJoinGhost:hover {
-    background: var(--bg-secondary);
+    background: var(--surface-secondary);
   }
 
   .profileWrapper {
@@ -350,13 +356,13 @@
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    color: var(--text-muted);
+    color: var(--text-secondary);
     padding: 0;
     transition: background 0.2s;
   }
 
   .avatarBtn:hover {
-    background: var(--bg-secondary);
+    background: var(--surface-secondary);
   }
 
   .profileDropdown {
@@ -364,10 +370,10 @@
     top: 100%;
     right: 0;
     margin-top: 8px;
-    background: var(--bg-card);
+    background: var(--surface-secondary);
     border: 1px solid var(--text-faint);
     border-radius: var(--radius-sm, 6px);
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    box-shadow: 0 4px 6px -1px var(--border-primary), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
     min-width: 220px;
     display: flex;
     flex-direction: column;
@@ -385,13 +391,13 @@
     display: block;
     font-size: 14px;
     font-weight: 600;
-    color: var(--text);
+    color: var(--text-primary);
   }
 
   .dropdownEmail {
     display: block;
     font-size: 12px;
-    color: var(--text-muted);
+    color: var(--text-secondary);
     overflow: hidden;
     text-overflow: ellipsis;
   }
@@ -409,11 +415,14 @@
     font-size: 14px;
     cursor: pointer;
     border-radius: 4px;
-    color: var(--text);
+    color: var(--text-primary);
   }
 
-  .dropdownItem:hover {
-    background: var(--bg-secondary);
+  .dropdownItem:hover,
+  .dropdownItem:focus-visible {
+    background: var(--surface-tertiary);
+    outline: 2px solid var(--accent-text);
+    outline-offset: -2px;
   }
 
   @media (max-width: 768px) {

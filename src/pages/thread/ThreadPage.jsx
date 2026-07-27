@@ -7,37 +7,22 @@ import { useAuth } from 'context/AuthContext';
 import { useConfirm } from 'context/ConfirmContext';
 import { useToast } from 'context/ToastContext';
 import RelativeTime from 'components/common/RelativeTime/RelativeTime';
+import Badge from 'components/common/Badge/Badge';
 import { CountryFlag } from 'components/common/CountryFlag/CountryFlag';
+import Avatar from 'components/common/Avatar/Avatar';
 import styles from './ThreadPage.module.css';
 import { SITE_NAME } from 'brand';
 
 function Tag({ label }) {
   const c = TAG_COLORS[label] || { bg: '#f3f2ef', text: '#4a4840' };
   return (
-    <span className={styles.tag} style={{ background: c.bg, color: c.text }}>
+    <Badge className={styles.tag} bg={c.bg}>
       {label}
-    </span>
+    </Badge>
   );
 }
 
-function Avatar({ initials, color, size = 40 }) {
-  const c = COLOR_MAP[color] || COLOR_MAP.blue;
-  return (
-    <div
-      className={styles.avatar}
-      style={{
-        width: size,
-        height: size,
-        fontSize: size * 0.36,
-        background: c.bg,
-        color: c.text,
-      }}
-      aria-hidden="true"
-    >
-      {initials}
-    </div>
-  );
-}
+
 
 export default function ThreadPage({ posts, setPosts, refreshPosts, returnToCommunity }) {
   const { postId } = useParams();
@@ -63,6 +48,7 @@ export default function ThreadPage({ posts, setPosts, refreshPosts, returnToComm
   const [voted, setVoted] = useState(cachedPost?.userVote || null);
   const [voting, setVoting] = useState(false);
   const [voteError, setVoteError] = useState('');
+  const [announcement, setAnnouncement] = useState('');
   const [commentBody, setCommentBody] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [commentError, setCommentError] = useState('');
@@ -134,6 +120,9 @@ export default function ThreadPage({ posts, setPosts, refreshPosts, returnToComm
     setEditTags(post.tags || []);
     setEditError('');
     setIsEditing(true);
+    setTimeout(() => {
+      document.getElementById('edit-post-title')?.focus();
+    }, 0);
   };
 
   const handleEditSave = async (e) => {
@@ -149,6 +138,9 @@ export default function ThreadPage({ posts, setPosts, refreshPosts, returnToComm
       setPost(updatedPost);
       setPosts((list) => list.map((p) => (p.id === id ? updatedPost : p)));
       setIsEditing(false);
+      setTimeout(() => {
+        document.getElementById('edit-post-btn')?.focus();
+      }, 0);
       addToast("Discussion updated successfully!", "success");
       refreshPosts?.();
     } catch (err) {
@@ -205,6 +197,9 @@ export default function ThreadPage({ posts, setPosts, refreshPosts, returnToComm
   const startEditComment = (c) => {
     setEditingCommentId(c.id);
     setEditingCommentBody(c.body);
+    setTimeout(() => {
+      document.getElementById(`edit-comment-${c.id}`)?.focus();
+    }, 0);
   };
 
   const handleCommentEditSave = async (e, commentId) => {
@@ -215,6 +210,9 @@ export default function ThreadPage({ posts, setPosts, refreshPosts, returnToComm
       const { comment } = await postsApi.updateComment(id, commentId, editingCommentBody.trim());
       setComments((list) => list.map((c) => (c.id === commentId ? comment : c)));
       setEditingCommentId(null);
+      setTimeout(() => {
+        document.getElementById(`edit-comment-btn-${commentId}`)?.focus();
+      }, 0);
       addToast("Reply updated successfully!", "success");
     } catch (err) {
       addToast(err.message || 'Could not update reply.', "error");
@@ -285,6 +283,11 @@ export default function ThreadPage({ posts, setPosts, refreshPosts, returnToComm
       setVoted(userVote);
       setPost((prev) => (prev ? { ...prev, votes: newVotes, userVote } : prev));
       setPosts((list) => list.map((p) => (p.id === id ? { ...p, votes: newVotes, userVote } : p)));
+
+      let msg = "Vote removed.";
+      if (userVote === 'up') msg = `Upvoted. Total votes ${newVotes}.`;
+      else if (userVote === 'down') msg = `Downvoted. Total votes ${newVotes}.`;
+      setAnnouncement(msg);
     } catch (err) {
       setVotes(prevVotes);
       setVoted(prevVoted);
@@ -313,13 +316,19 @@ export default function ThreadPage({ posts, setPosts, refreshPosts, returnToComm
       <article className={styles.rootPost}>
         <div className={styles.rootTop}>
           <div className={styles.voteCol}>
+            <div aria-live="polite" aria-atomic="true" className="sr-only">
+              {announcement}
+            </div>
             <button
               type="button"
               className={`${styles.voteBtn} ${voted === 'up' ? styles.votedUp : ''}`}
-              onClick={() => vote('up')}
-              aria-label="Upvote"
-              aria-pressed={voted === 'up'}
-              disabled={voting}
+              onClick={(e) => {
+                if (voting) { e.preventDefault(); e.stopPropagation(); return; }
+                vote('up', e);
+              }}
+              aria-label={`Upvote ${post.title}. Current score ${votes}`}
+              aria-pressed={voted === 'up' ? "true" : "false"}
+              aria-disabled={voting ? "true" : "false"}
             >
               ▲
             </button>
@@ -329,10 +338,13 @@ export default function ThreadPage({ posts, setPosts, refreshPosts, returnToComm
             <button
               type="button"
               className={`${styles.voteBtn} ${voted === 'down' ? styles.votedDown : ''}`}
-              onClick={() => vote('down')}
-              aria-label="Downvote"
-              aria-pressed={voted === 'down'}
-              disabled={voting}
+              onClick={(e) => {
+                if (voting) { e.preventDefault(); e.stopPropagation(); return; }
+                vote('down', e);
+              }}
+              aria-label={`Downvote ${post.title}. Current score ${votes}`}
+              aria-pressed={voted === 'down' ? "true" : "false"}
+              aria-disabled={voting ? "true" : "false"}
             >
               ▼
             </button>
@@ -347,7 +359,7 @@ export default function ThreadPage({ posts, setPosts, refreshPosts, returnToComm
             aria-label={`View ${post.author}'s profile`}
             style={{ textDecoration: 'none', display: 'flex' }}
           >
-            <Avatar initials={post.initials} color={post.color} size={44} />
+            <Avatar src={post.avatarUrl} initials={post.initials} color={post.color} size={44} />
           </Link>
           <div className={styles.rootBody}>
             <p className={styles.meta}>
@@ -367,20 +379,27 @@ export default function ThreadPage({ posts, setPosts, refreshPosts, returnToComm
             {isEditing ? (
               <form onSubmit={handleEditSave} className={styles.editForm}>
                 {editError && <p className={styles.commentError}>{editError}</p>}
+                <label htmlFor="edit-post-title" className="sr-only">Edit title</label>
                 <input
+                  id="edit-post-title"
                   type="text"
                   value={editTitle}
                   onChange={(e) => setEditTitle(e.target.value)}
                   className={styles.editInput}
                   disabled={savingEdit}
                   required
+                  aria-required="true"
                 />
+                <label htmlFor="edit-post-body" className="sr-only">Edit post</label>
                 <textarea
+                  id="edit-post-body"
                   value={editBody}
                   onChange={(e) => setEditBody(e.target.value)}
                   className={styles.textarea}
                   rows={6}
                   disabled={savingEdit}
+                  required
+                  aria-required="true"
                 />
                 <div className={styles.editActions}>
                   <button type="submit" className={styles.submit} disabled={savingEdit}>
@@ -389,7 +408,12 @@ export default function ThreadPage({ posts, setPosts, refreshPosts, returnToComm
                   <button
                     type="button"
                     className={styles.cancelBtn}
-                    onClick={() => setIsEditing(false)}
+                    onClick={() => {
+                      setIsEditing(false);
+                      setTimeout(() => {
+                        document.getElementById('edit-post-btn')?.focus();
+                      }, 0);
+                    }}
                     disabled={savingEdit}
                   >
                     Cancel
@@ -402,7 +426,7 @@ export default function ThreadPage({ posts, setPosts, refreshPosts, returnToComm
                   <h1 className={styles.title}>{post.title}</h1>
                   {isOwner && (
                     <div className={styles.ownerActions}>
-                      <button type="button" onClick={startEdit} className={styles.editBtn}>Edit</button>
+                      <button id="edit-post-btn" type="button" onClick={startEdit} className={styles.editBtn}>Edit</button>
                       <button type="button" onClick={handleDelete} className={styles.deleteBtn}>Delete</button>
                     </div>
                   )}
@@ -433,7 +457,7 @@ export default function ThreadPage({ posts, setPosts, refreshPosts, returnToComm
                 aria-label={`View ${c.author}'s profile`}
                 style={{ textDecoration: 'none', display: 'flex' }}
               >
-                <Avatar initials={c.initials} color={c.color} size={36} />
+                <Avatar src={c.avatarUrl} initials={c.initials} color={c.color} size={36} />
               </Link>
               <div className={styles.replyBody}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', width: '100%' }}>
@@ -451,20 +475,23 @@ export default function ThreadPage({ posts, setPosts, refreshPosts, returnToComm
                   </p>
                   {isAuthenticated && user?.id === c.userId && (
                     <div className={styles.ownerActions}>
-                      <button type="button" onClick={() => startEditComment(c)} className={styles.editBtn}>Edit</button>
+                      <button id={`edit-comment-btn-${c.id}`} type="button" onClick={() => startEditComment(c)} className={styles.editBtn}>Edit</button>
                       <button type="button" onClick={() => handleCommentDelete(c.id)} className={styles.deleteBtn}>Delete</button>
                     </div>
                   )}
                 </div>
                 {editingCommentId === c.id ? (
                   <form onSubmit={(e) => handleCommentEditSave(e, c.id)} className={styles.editForm}>
+                    <label htmlFor={`edit-comment-${c.id}`} className="sr-only">Edit comment</label>
                     <textarea
+                      id={`edit-comment-${c.id}`}
                       value={editingCommentBody}
                       onChange={(e) => setEditingCommentBody(e.target.value)}
                       className={styles.textarea}
                       rows={3}
                       disabled={commentSaving}
                       required
+                      aria-required="true"
                     />
                     <div className={styles.editActions}>
                       <button type="submit" className={styles.submit} disabled={commentSaving}>
@@ -473,7 +500,12 @@ export default function ThreadPage({ posts, setPosts, refreshPosts, returnToComm
                       <button
                         type="button"
                         className={styles.cancelBtn}
-                        onClick={() => setEditingCommentId(null)}
+                        onClick={() => {
+                          setEditingCommentId(null);
+                          setTimeout(() => {
+                            document.getElementById(`edit-comment-btn-${c.id}`)?.focus();
+                          }, 0);
+                        }}
                         disabled={commentSaving}
                       >
                         Cancel
@@ -513,6 +545,8 @@ export default function ThreadPage({ posts, setPosts, refreshPosts, returnToComm
             onChange={e => setCommentBody(e.target.value)}
             placeholder="Share context, examples, or questions…"
             disabled={submitting}
+            required
+            aria-required="true"
           />
           <button type="submit" className={styles.submit} disabled={!commentBody.trim() || submitting}>
             {submitting ? 'Posting…' : 'Post reply'}

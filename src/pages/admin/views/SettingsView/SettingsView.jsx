@@ -296,6 +296,7 @@ export default function SettingsView({ showToast }) {
       await settingsApi.deleteFooterColumn(key);
       await refreshConfig();
       showToast?.('Footer column deleted successfully!', 'success');
+      setTimeout(() => document.getElementById("new-column-title")?.focus(), 0);
     } catch (err) {
       showToast?.(err.message || 'Failed to delete footer column.', 'error');
     }

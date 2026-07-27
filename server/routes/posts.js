@@ -8,6 +8,7 @@ const router = express.Router();
 const POST_SELECT = `
   SELECT p.*,
     u.country,
+    u.avatar_url,
     (SELECT COUNT(*)::int FROM comments c WHERE c.post_id = p.id) AS reply_count
   FROM posts p
   LEFT JOIN users u ON p.user_id = u.id
@@ -22,6 +23,7 @@ router.get('/', optionalAuthMiddleware, async (req, res, next) => {
       queryStr = `
         SELECT p.*,
           u.country,
+          u.avatar_url,
           (SELECT COUNT(*)::int FROM comments c WHERE c.post_id = p.id) AS reply_count,
           (SELECT direction FROM post_votes pv WHERE pv.post_id = p.id AND pv.voter_key = $1 LIMIT 1) AS user_vote_direction
         FROM posts p
@@ -45,6 +47,7 @@ router.get('/top-contributors', async (_req, res, next) => {
         u.id AS user_id, 
         u.display_name,
         u.country,
+        u.avatar_url,
         (SELECT COUNT(*) FROM posts p WHERE p.user_id = u.id) + 
         (SELECT COUNT(*) FROM comments c WHERE c.user_id = u.id) AS total_contributions
       FROM users u
@@ -56,7 +59,7 @@ router.get('/top-contributors', async (_req, res, next) => {
     `);
 
     const contributors = rows.map((row, index) => {
-      const author = authorFromUser({ display_name: row.display_name, country: row.country });
+      const author = authorFromUser({ display_name: row.display_name, country: row.country, avatar_url: row.avatar_url });
       return {
         id: row.user_id,
         initials: author.author_initials,
@@ -95,7 +98,7 @@ router.post('/admin', authMiddleware, adminMiddleware, async (req, res, next) =>
   }
 
   try {
-    const { rows: users } = await query('SELECT id, display_name FROM users WHERE id = $1', [req.userId]);
+    const { rows: users } = await query('SELECT id, display_name, country, avatar_url FROM users WHERE id = $1', [req.userId]);
     const user = users[0];
 
     if (!user) {
@@ -124,9 +127,7 @@ router.post('/admin', authMiddleware, adminMiddleware, async (req, res, next) =>
         parsedVotes,
         JSON.stringify(tagList),
         parsedDate
-      ]
-    );
-
+      ]);
     const { rows } = await query(`${POST_SELECT} WHERE p.id = $1`, [inserted.rows[0].id]);
     res.status(201).json({ post: formatPost(rows[0]) });
   } catch (err) {
@@ -259,6 +260,7 @@ router.get('/:id', optionalAuthMiddleware, async (req, res, next) => {
       queryStr = `
         SELECT p.*,
           u.country,
+          u.avatar_url,
           (SELECT COUNT(*)::int FROM comments c WHERE c.post_id = p.id) AS reply_count,
           (SELECT direction FROM post_votes pv WHERE pv.post_id = p.id AND pv.voter_key = $2 LIMIT 1) AS user_vote_direction
         FROM posts p
@@ -276,14 +278,13 @@ router.get('/:id', optionalAuthMiddleware, async (req, res, next) => {
     }
 
     const { rows: comments } = await query(
-      `SELECT c.*, u.country 
+      `SELECT c.*, u.country, u.avatar_url 
        FROM comments c 
        LEFT JOIN users u ON c.user_id = u.id 
        WHERE c.post_id = $1 
        ORDER BY c.created_at ASC`,
-      [id],
+      [id]
     );
-
     res.json({ post: formatPost(row), comments: comments.map(formatComment) });
   } catch (err) {
     next(err);
@@ -319,7 +320,6 @@ router.put('/:id', authMiddleware, async (req, res, next) => {
       `UPDATE posts SET title = $1, body = $2, excerpt = $3, tags = $4, updated_at = CURRENT_TIMESTAMP WHERE id = $5`,
       [trimmedTitle, trimmedBody, excerpt, JSON.stringify(tagList), id]
     );
-
     const updated = await query(`${POST_SELECT} WHERE p.id = $1`, [id]);
     res.json({ post: formatPost(updated.rows[0]) });
   } catch (err) {
@@ -362,8 +362,8 @@ router.post('/', authMiddleware, async (req, res, next) => {
 
   try {
     const { rows: users } = await query(
-      'SELECT id, display_name FROM users WHERE id = $1',
-      [req.userId],
+      'SELECT id, display_name, country, avatar_url FROM users WHERE id = $1',
+      [req.userId]
     );
     const user = users[0];
 
@@ -396,9 +396,8 @@ router.post('/', authMiddleware, async (req, res, next) => {
         author.author_color,
         author.author_role,
         JSON.stringify(tagList),
-      ],
+      ]
     );
-
     const { rows } = await query(`${POST_SELECT} WHERE p.id = $1`, [inserted.rows[0].id]);
     res.status(201).json({ post: formatPost(rows[0]) });
   } catch (err) {
@@ -431,9 +430,8 @@ router.post('/:id/vote', authMiddleware, async (req, res, next) => {
 
     const { rows: existing } = await query(
       'SELECT direction FROM post_votes WHERE post_id = $1 AND voter_key = $2',
-      [id, key],
+      [id, key]
     );
-
     let userVote = null;
     let delta = 0;
 
@@ -445,7 +443,7 @@ router.post('/:id/vote', authMiddleware, async (req, res, next) => {
       } else {
         await query(
           'UPDATE post_votes SET direction = $1 WHERE post_id = $2 AND voter_key = $3',
-          [voteValue, id, key],
+          [voteValue, id, key]
         );
         delta = voteValue === 1 ? 2 : -2; // Switching from -1 to 1 is +2, switching from 1 to -1 is -2.
         userVote = direction;
@@ -453,7 +451,7 @@ router.post('/:id/vote', authMiddleware, async (req, res, next) => {
     } else {
       await query(
         'INSERT INTO post_votes (post_id, voter_key, direction) VALUES ($1, $2, $3)',
-        [id, key, voteValue],
+        [id, key, voteValue]
       );
       delta = voteValue;
       userVote = direction;
@@ -461,7 +459,7 @@ router.post('/:id/vote', authMiddleware, async (req, res, next) => {
 
     const { rows: totals } = await query(
       'UPDATE posts SET votes = votes + $1 WHERE id = $2 RETURNING votes',
-      [delta, id],
+      [delta, id]
     );
 
     res.json({ votes: totals[0].votes, userVote });
@@ -488,7 +486,6 @@ router.post('/:id/view', authMiddleware, async (req, res, next) => {
        ON CONFLICT (user_id, post_id) DO UPDATE SET viewed_at = NOW()`,
       [req.userId, id]
     );
-
     await query(
       `DELETE FROM user_recently_viewed
        WHERE user_id = $1
@@ -500,7 +497,6 @@ router.post('/:id/view', authMiddleware, async (req, res, next) => {
        )`,
       [req.userId]
     );
-
     res.json({ ok: true });
   } catch (err) {
     next(err);
@@ -529,8 +525,8 @@ router.post('/:id/comments', authMiddleware, async (req, res, next) => {
     }
 
     const { rows: users } = await query(
-      'SELECT id, display_name FROM users WHERE id = $1',
-      [req.userId],
+      'SELECT id, display_name, country, avatar_url FROM users WHERE id = $1',
+      [req.userId]
     );
     const user = users[0];
 
@@ -545,10 +541,14 @@ router.post('/:id/comments', authMiddleware, async (req, res, next) => {
         post_id, user_id, author_name, author_initials, author_color, body
       ) VALUES ($1, $2, $3, $4, $5, $6)
       RETURNING *`,
-      [id, user.id, author.author_name, author.author_initials, author.author_color, trimmedBody],
+      [id, user.id, author.author_name, author.author_initials, author.author_color, trimmedBody]
     );
 
-    res.status(201).json({ comment: formatComment(inserted.rows[0]) });
+    const newComment = inserted.rows[0];
+    newComment.country = user.country;
+    newComment.avatar_url = user.avatar_url;
+
+    res.status(201).json({ comment: formatComment(newComment) });
   } catch (err) {
     next(err);
   }
@@ -577,7 +577,7 @@ router.put('/:postId/comments/:commentId', authMiddleware, async (req, res, next
       [trimmedBody, commentId]
     );
 
-    const updated = await query('SELECT c.*, u.country FROM comments c LEFT JOIN users u ON c.user_id = u.id WHERE c.id = $1', [commentId]);
+    const updated = await query('SELECT c.*, u.country, u.avatar_url FROM comments c LEFT JOIN users u ON c.user_id = u.id WHERE c.id = $1', [commentId]);
     res.json({ comment: formatComment(updated.rows[0]) });
   } catch (err) {
     next(err);

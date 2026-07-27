@@ -6,7 +6,7 @@ export default function FooterLogo({ className, width = 200, height = 60 }) {
   return (
     <img
       src={footerLogoUrl || '/allcanaccess_footer.png'}
-      alt="AllCanAccess logo"
+      alt={siteName || "AllCanAccess"}
       className={className}
       width={width}
       height={height}

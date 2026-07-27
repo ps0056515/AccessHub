@@ -15,6 +15,8 @@ import MultiSelectDropdown from "components/common/MultiSelectDropdown/MultiSele
 import SEO from "components/common/SEO/SEO";
 import { usersApi } from "api/client";
 import { CountryFlag } from "components/common/CountryFlag/CountryFlag";
+import Avatar from "components/common/Avatar/Avatar";
+import Badge from "components/common/Badge/Badge";
 import styles from "./Portal.module.css";
 
 const TOPIC_FILTERS = ["WCAG 2.2", "Screen readers", "Legal"];
@@ -89,31 +91,14 @@ function postMatchesQuery(post, rawQuery) {
   return tokens.every((word) => haystack.includes(word));
 }
 
-function Avatar({ initials, color, size = 36 }) {
-  const c = COLOR_MAP[color] || COLOR_MAP.blue;
-  return (
-    <div
-      className={styles.avatar}
-      style={{
-        width: size,
-        height: size,
-        fontSize: size * 0.36,
-        background: c.bg,
-        color: c.text,
-      }}
-      aria-hidden="true"
-    >
-      {initials}
-    </div>
-  );
-}
+
 
 function Tag({ label }) {
   const c = TAG_COLORS[label] || { bg: "#f3f2ef", text: "#4a4840" };
   return (
-    <span className={styles.tag} style={{ background: c.bg, color: c.text }}>
+    <Badge className={styles.tag} bg={c.bg}>
       {label}
-    </span>
+    </Badge>
   );
 }
 
@@ -128,6 +113,7 @@ function PostCard({
   const [voted, setVoted] = useState(post.userVote || null);
   const [voting, setVoting] = useState(false);
   const [voteError, setVoteError] = useState("");
+  const [announcement, setAnnouncement] = useState("");
 
   useEffect(() => {
     setVotes(post.votes);
@@ -158,6 +144,11 @@ function PostCard({
       setVotes(newVotes);
       setVoted(userVote);
       onVotesChange?.(post.id, newVotes, userVote);
+
+      let msg = "Vote removed.";
+      if (userVote === 'up') msg = `Upvoted. Total votes ${newVotes}.`;
+      else if (userVote === 'down') msg = `Downvoted. Total votes ${newVotes}.`;
+      setAnnouncement(msg);
     } catch (err) {
       setVotes(prevVotes);
       setVoted(prevVoted);
@@ -170,13 +161,19 @@ function PostCard({
   return (
     <article className={styles.postCard}>
       <div className={styles.voteCol}>
+        <div aria-live="polite" aria-atomic="true" className="sr-only">
+          {announcement}
+        </div>
         <button
           type="button"
           className={`${styles.voteBtn} ${voted === "up" ? styles.votedUp : ""}`}
-          onClick={(e) => vote("up", e)}
-          aria-label={`Upvote: ${post.title}`}
-          aria-pressed={voted === "up"}
-          disabled={voting}
+          onClick={(e) => {
+            if (voting) { e.preventDefault(); e.stopPropagation(); return; }
+            vote("up", e);
+          }}
+          aria-label={`Upvote ${post.title}. Current score ${votes}`}
+          aria-pressed={voted === "up" ? "true" : "false"}
+          aria-disabled={voting ? "true" : "false"}
         >
           ▲
         </button>
@@ -190,10 +187,13 @@ function PostCard({
         <button
           type="button"
           className={`${styles.voteBtn} ${voted === "down" ? styles.votedDown : ""}`}
-          onClick={(e) => vote("down", e)}
-          aria-label={`Downvote: ${post.title}`}
-          aria-pressed={voted === "down"}
-          disabled={voting}
+          onClick={(e) => {
+            if (voting) { e.preventDefault(); e.stopPropagation(); return; }
+            vote("down", e);
+          }}
+          aria-label={`Downvote ${post.title}. Current score ${votes}`}
+          aria-pressed={voted === "down" ? "true" : "false"}
+          aria-disabled={voting ? "true" : "false"}
         >
           ▼
         </button>
@@ -203,7 +203,7 @@ function PostCard({
           </span>
         ) : null}
       </div>
-      <Avatar initials={post.initials} color={post.color} />
+      <Avatar src={post.avatarUrl} initials={post.initials} color={post.color} />
       <button
         type="button"
         className={styles.postOpen}
@@ -517,13 +517,13 @@ export default function Portal({
 
   if (portalConfig.contentPosition === "center") {
     heroAlignStyle.margin = "0 auto";
-    overlayBackground = `radial-gradient(circle at center, rgba(255,255,255,${opacity}) 0%, rgba(255,255,255,0) 75%)`;
+    overlayBackground = `radial-gradient(circle at center, color-mix(in srgb, var(--surface-primary) ${opacity * 100}%, transparent) 0%, transparent 75%)`;
   } else if (portalConfig.contentPosition === "right") {
     heroAlignStyle.margin = "0 0 0 auto";
-    overlayBackground = `linear-gradient(to left, rgba(255,255,255,${opacity}) 0%, rgba(255,255,255,0) 100%)`;
+    overlayBackground = `linear-gradient(to left, color-mix(in srgb, var(--surface-primary) ${opacity * 100}%, transparent) 0%, transparent 100%)`;
   } else {
     heroAlignStyle.margin = "0 auto 0 0";
-    overlayBackground = `linear-gradient(to right, rgba(255,255,255,${opacity}) 0%, rgba(255,255,255,0) 100%)`;
+    overlayBackground = `linear-gradient(to right, color-mix(in srgb, var(--surface-primary) ${opacity * 100}%, transparent) 0%, transparent 100%)`;
   }
 
   return (
@@ -737,6 +737,19 @@ export default function Portal({
                   setTopicFilter(null);
                 }}
               />
+              {query && (
+                <button
+                  type="button"
+                  className={styles.searchClearBtn}
+                  onClick={() => {
+                    setQuery("");
+                    searchInputRef.current?.focus();
+                  }}
+                  aria-label="Clear search"
+                >
+                  ✕
+                </button>
+              )}
             </div>
             <div
               className={styles.filterPills}
@@ -758,15 +771,13 @@ export default function Portal({
           </div>
           <div
             className={styles.tabBar}
-            role="tablist"
             aria-label="Discussion filter"
           >
             {tabs.map((t) => (
               <button
                 key={t.id}
                 type="button"
-                role="tab"
-                aria-selected={activeTab === t.id}
+                aria-pressed={activeTab === t.id}
                 className={`${styles.tabBtn} ${activeTab === t.id ? styles.tabActive : ""}`}
                 onClick={() => setActiveTab(t.id)}
               >
@@ -778,7 +789,6 @@ export default function Portal({
           <div className={styles.postsWrapper}>
             <div
               className={styles.postsContainer}
-              role="tabpanel"
               aria-label={`${activeTab} discussions`}
             >
             {postsLoading ? (
@@ -904,7 +914,7 @@ export default function Portal({
                     onClick={() => navigate(`/profile/${m.id}`)}
                     aria-label={`View public profile: ${m.name}`}
                   >
-                    <Avatar initials={m.initials} color={m.color} size={32} />
+                    <Avatar src={m.avatarUrl} initials={m.initials} color={m.color} size={32} />
                     <div className={styles.memberInfo}>
                       <span className={styles.memberName}>
                         {m.name}

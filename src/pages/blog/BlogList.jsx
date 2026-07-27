@@ -38,7 +38,7 @@ export default function BlogpostsList() {
       {loading ? (
         <p>Loading blogposts...</p>
       ) : error ? (
-        <p style={{ color: 'red' }}>{error}</p>
+        <p style={{ color: 'var(--error)' }}>{error}</p>
       ) : blogposts.length > 0 ? (
         <div className={styles.grid}>
           {blogposts.map(blogpost => (

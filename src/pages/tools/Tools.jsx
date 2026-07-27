@@ -3,14 +3,15 @@ import { CERTS, COLOR_MAP } from 'data';
 import { toolsApi } from 'api/client';
 import Container from 'components/common/Container/Container';
 import SEO from 'components/common/SEO/SEO';
+import Badge from 'components/common/Badge/Badge';
 import styles from './Tools.module.css';
 
 function BadgePill({ label, color }) {
   const c = COLOR_MAP[color] || COLOR_MAP.blue;
   return (
-    <span className={styles.badge} style={{ background: c.bg, color: c.text }}>
+    <Badge className={styles.badge} bg={c.bg}>
       {label}
-    </span>
+    </Badge>
   );
 }
 
@@ -165,9 +166,10 @@ export default function Tools() {
                   href={c.learnMoreUrl}
                   target="_blank"
                   rel="noopener noreferrer"
+                  aria-label={`Learn more about ${c.title} (opens in new tab)`}
                   onClick={e => e.stopPropagation()}
                 >
-                  Learn more →
+                  Learn more <span aria-hidden="true">→</span>
                 </a>
               </article>
             );

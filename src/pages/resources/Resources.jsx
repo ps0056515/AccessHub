@@ -6,6 +6,7 @@ import { resourcesApi } from "api/client";
 import SuggestResourceModal from "./SuggestResourceModal";
 import Container from "components/common/Container/Container";
 import SEO from "components/common/SEO/SEO";
+import Badge from "components/common/Badge/Badge";
 import styles from "./Resources.module.css";
 
 const SAVED_KEY = "allcanaccess-saved-resources";
@@ -192,17 +193,17 @@ export default function Resources({ setActivePage }) {
             <article
               key={r.slug}
               className={`${styles.card} fade-up`}
-              style={{ animationDelay: `${i * 0.05}s`, cursor: 'pointer' }}
-              onClick={() => window.open(r.view_url, '_blank')}
+              style={{ animationDelay: `${i * 0.05}s` }}
             >
-              <div
+              <Badge
+                as="div"
                 className={styles.cardIcon}
-                style={{ background: c.bg, color: c.text }}
+                bg={c.bg}
               >
                 <span role="img" aria-hidden="true" style={{ fontSize: 20 }}>
                   {r.icon}
                 </span>
-              </div>
+              </Badge>
               <div className={styles.cardBody}>
                 <p className={styles.cardCat}>{r.category}</p>
                 <h2 className={styles.cardTitle}>{r.title}</h2>
@@ -216,7 +217,7 @@ export default function Resources({ setActivePage }) {
                   rel="noopener noreferrer"
                   onClick={(e) => e.stopPropagation()}
                 >
-                  View →
+                  View <span className="sr-only">{r.title}</span> <span aria-hidden="true">→</span>
                 </a>
                 <button
                   type="button"
@@ -226,7 +227,7 @@ export default function Resources({ setActivePage }) {
                       ? `Remove from saved: ${r.title}`
                       : `Save for later: ${r.title}`
                   }
-                  title={isSaved ? "Remove from saved" : "Save for later"}
+                  title={isSaved ? `Remove from saved: ${r.title}` : `Save for later: ${r.title}`}
                   aria-pressed={isSaved}
                   onClick={(e) => {
                     e.preventDefault();

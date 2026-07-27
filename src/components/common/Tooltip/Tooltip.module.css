@@ -9,7 +9,7 @@
 
 .tooltipBox {
   position: fixed;
-  background-color: var(--text);
+  background-color: var(--tooltip-bg);
   color: var(--tooltip-text);
   padding: 6px 10px;
   border-radius: var(--radius-sm, 6px);
@@ -30,7 +30,7 @@
   position: absolute;
   width: 8px;
   height: 8px;
-  background-color: var(--text);
+  background-color: var(--tooltip-bg);
   transform: rotate(45deg);
 }
 

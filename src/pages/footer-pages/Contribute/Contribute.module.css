@@ -6,7 +6,7 @@
 
 .intro {
   line-height: 1.7;
-  color: var(--text-muted);
+  color: var(--text-secondary);
 }
 
 .section {
@@ -30,7 +30,7 @@
   padding: 1rem;
   border: 1px solid var(--border);
   border-radius: 8px;
-  background: var(--bg-card);
+  background: var(--surface-secondary);
 }
 
 .workflowCard {
@@ -47,7 +47,7 @@
 .cardBody {
   margin: 0.5rem 0 0;
   line-height: 1.65;
-  color: var(--text-muted);
+  color: var(--text-secondary);
 }
 
 .cardAction {
@@ -55,7 +55,7 @@
 }
 
 .link {
-  color: var(--accent);
+  color: var(--accent-text);
   font-weight: 500;
 }
 

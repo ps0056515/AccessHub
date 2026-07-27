@@ -126,9 +126,9 @@ useEffect(() => {
         {/* Layout */}
         <div className={styles.layoutGrid}>
 
-          <aside aria-label="Table of contents" className={styles.sidebar}>
+          <div className={styles.sidebar}>
             <p className={styles.sidebarTitle}>On this page</p>
-            <nav>
+            <nav aria-label="Table of contents">
               <ol className={styles.tocList}>
                 {SECTIONS.map((s) => (
                   <li key={s.id}>
@@ -141,9 +141,9 @@ useEffect(() => {
                 ))}
               </ol>
             </nav>
-          </aside>
+          </div>
 
-          <main>
+          <div className={styles.mainContent}>
             {SECTIONS.map((section) => (
               <section key={section.id} id={section.id} aria-labelledby={`${section.id}-heading`}
                 className={styles.section}>
@@ -167,7 +167,7 @@ useEffect(() => {
               </p>
               <p className={styles.footerThanks}>Thank you for helping us do better.</p>
             </div>
-          </main>
+          </div>
         </div>
       </div>
     </div>

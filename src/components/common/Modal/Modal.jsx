@@ -20,11 +20,24 @@ export default function Modal({ title, children, onClose, footer, width= "50%", 
     // Use a small timeout to ensure the portal is fully mounted before focusing
     const focusTimeout = setTimeout(() => {
       if (dialogRef.current) {
-        dialogRef.current.focus();
+        const focusableElements = dialogRef.current.querySelectorAll(
+          'input:not([type="hidden"]):not([disabled]), select:not([disabled]), textarea:not([disabled])'
+        );
+        if (focusableElements.length > 0) {
+          focusableElements[0].focus();
+        } else {
+          dialogRef.current.focus();
+        }
       }
     }, 10);
 
     const onKey = e => {
+      // Only process keys for the top-most dialog to support nested dialogs safely
+      const dialogs = document.querySelectorAll('[role="dialog"]');
+      if (dialogs.length > 0 && dialogs[dialogs.length - 1] !== dialogRef.current) {
+        return;
+      }
+
       if (e.key === 'Escape') {
         onCloseRef.current?.();
         return;
@@ -33,9 +46,12 @@ export default function Modal({ title, children, onClose, footer, width= "50%", 
       if (e.key === 'Tab') {
         if (!dialogRef.current) return;
         
-        const focusableElements = dialogRef.current.querySelectorAll(
-          'a[href], button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])'
-        );
+        const focusableElements = Array.from(dialogRef.current.querySelectorAll(
+          'a[href], button:not([disabled]), textarea:not([disabled]), input:not([type="hidden"]):not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])'
+        )).filter(el => {
+          return (el.offsetWidth > 0 || el.offsetHeight > 0 || el.getClientRects().length > 0) &&
+                 !el.closest('[aria-hidden="true"]');
+        });
         
         if (focusableElements.length === 0) return;
         

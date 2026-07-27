@@ -59,6 +59,7 @@ function formatPost(row, replyCount) {
     body: row.body,
     tags,
     tagColors: tags.map(() => row.author_color || 'blue'),
+    avatarUrl: row.avatar_url,
   };
 }
 
@@ -73,6 +74,7 @@ function formatComment(row) {
     time: relativeTime(row.created_at),
     raw_time: row.created_at,
     body: row.body,
+    avatarUrl: row.avatar_url,
   };
 }
 
@@ -88,6 +90,7 @@ function authorFromUser(user) {
     author_color: 'blue',
     author_role: user.role || 'Community member',
     country: user.country,
+    avatar_url: user.avatar_url,
   };
 }
 

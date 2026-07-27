@@ -105,11 +105,11 @@ export default function ScreenReaderDetail() {
               )}
               {current.id === 'modes' && (
                 <div className={styles.modeGrid}>
-                  <div className={styles.modeCard} style={{ borderLeftColor: '#b03020' }}>
+                  <div className={styles.modeCard} style={{ borderLeftColor: 'var(--red)' }}>
                     <h3 className={styles.modeTitle}>Browse mode</h3>
                     <p className={styles.modeDesc}>Red highlight. Single-key navigation shortcuts active. Use for reading and scanning.</p>
                   </div>
-                  <div className={styles.modeCard} style={{ borderLeftColor: '#1a4f8a' }}>
+                  <div className={styles.modeCard} style={{ borderLeftColor: 'var(--blue)' }}>
                     <h3 className={styles.modeTitle}>Focus mode</h3>
                     <p className={styles.modeDesc}>Blue highlight. Key shortcuts disabled. Use for forms, inputs, and interactive widgets.</p>
                   </div>
@@ -134,7 +134,7 @@ export default function ScreenReaderDetail() {
                     <tbody>
                       {s.rows.map((r, ri) => (
                         <tr key={ri} className={styles.tr}>
-                          <td className={styles.tdAction}>{r.action}</td>
+                          <th scope="row" className={styles.tdAction}>{r.action}</th>
                           <td className={styles.tdCmd}>
                             {r.cmd.split(' / ').map((part, pi) => (
                               <span key={pi}>
