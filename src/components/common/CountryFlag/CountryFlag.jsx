@@ -37,7 +37,7 @@ export function CountryFlag({ countryName }) {
       src={`https://flagcdn.com/w20/${isoCode}.png`}
       srcSet={`https://flagcdn.com/w40/${isoCode}.png 2x`}
       width="16"
-      alt={`${displayTitle} flag`}
+      alt={`Nationality: ${displayTitle}`}
       style={{ marginLeft: '4px', verticalAlign: 'middle', borderRadius: '2px', display: 'inline-block' }}
       title={displayTitle}
     />

@@ -27,8 +27,8 @@
   --text-muted: #3d4f66;
   --text-faint: #2d3f52;
 
-  --border: rgba(12, 25, 41, 0.1);
-  --border-strong: rgba(12, 25, 41, 0.18);
+  --border: rgba(12, 25, 41, 0.45);
+  --border-strong: rgba(12, 25, 41, 0.55);
 
   --accent: #074a9e;
   --accent-bg: #e8f2ff;
@@ -47,12 +47,17 @@
   --red-text: #7a1f12;
 
   --purple: #5a3db8;
+  --purple: #5a3db8;
   --purple-bg: #f0edfd;
   --purple-text: #3a2580;
 
-  --green: #16a34a;
+  --pink: #db2777;
+  --pink-bg: #fce7f3;
+  --pink-text: #9d174d;
+
+  --green: #166534;
   --green-bg: #dcfce7;
-  --green-text: #166534;
+  --green-text: #14532d;
 
   --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
   --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.07), 0 2px 4px rgba(0, 0, 0, 0.04);
@@ -65,10 +70,10 @@
   --transition: 0.18s ease;
 
   /* Focus ring variables */
-  --focus-ring-color: rgba(59, 130, 246, 0.55);
+  --focus-ring-color: #0c1929;
   --focus-ring-offset: 2px;
   --focus-ring-width: 2px;
-  --focus-border-color: #3b82f6;
+  --focus-border-color: #0c1929;
 
   /* Navbar background (light) */
   --navbar-bg: rgba(250, 249, 247, 0.92);
@@ -89,12 +94,12 @@
   --text-on-dark-accent: #60a5fa;
   --text-on-dark-faint: #94a3b8;
   
-  --footer-text: rgba(250,249,247,0.7);
-  --footer-text-bright: #faf9f7;
-  --footer-text-muted: rgba(250,249,247,0.5);
-  --footer-heading: rgba(250,249,247,0.85);
-  --footer-border: rgba(250,249,247,0.1);
-  --footer-border-hover: rgba(250,249,247,0.4);
+  --footer-text: rgba(250,249,247,0.9);
+  --footer-text-bright: #ffffff;
+  --footer-text-muted: rgba(250,249,247,0.8);
+  --footer-heading: #ffffff;
+  --footer-border: rgba(250,249,247,0.2);
+  --footer-border-hover: rgba(250,249,247,0.5);
   
   --purple-border: rgba(90, 61, 184, 0.2);
   --purple-bg-hover: #e4dff8;
@@ -102,7 +107,7 @@
   --red-border: #fca5a5;
   
   /* Interactive borders (WCAG 1.4.11 3:1 contrast requirement) */
-  --border-interactive: rgba(12, 25, 41, 0.5);
+  --border-interactive: rgba(12, 25, 41, 0.65);
   --border-interactive-strong: rgba(12, 25, 41, 0.65);
   --accent-border-interactive: rgba(7, 74, 158, 0.5);
   --purple-border-interactive: rgba(90, 61, 184, 0.6);
@@ -130,6 +135,49 @@
   --sidebar-hover-subtle: rgba(255, 255, 255, 0.05);
   --sidebar-card-bg: rgba(255, 255, 255, 0.03);
   --sidebar-card-border: rgba(255, 255, 255, 0.05);
+
+  /* ═══════════════════════════════════════════════════════════
+     SEMANTIC TOKENS
+     ═══════════════════════════════════════════════════════════ */
+  /* SURFACES */
+  --surface-primary: var(--bg);
+  --surface-secondary: var(--bg-secondary);
+  --surface-tertiary: var(--bg-tertiary);
+
+  /* TEXT */
+  --text-primary: var(--text);
+  --text-secondary: var(--text-muted);
+  --text-disabled: rgba(12, 25, 41, 0.38);
+  --text-link: var(--brand-blue);
+
+  /* BORDERS */
+  --border-primary: var(--border-strong);
+  --border-secondary: var(--border);
+  --border-focus: var(--focus-border-color);
+
+  /* ICONS */
+  --icon-primary: var(--text);
+  --icon-secondary: var(--text-muted);
+
+  /* BUTTONS */
+  --button-primary: var(--accent);
+  --button-primary-hover: var(--brand-blue);
+  --button-primary-active: var(--blue);
+  --button-secondary: transparent;
+  --button-secondary-hover: var(--accent-bg);
+  --button-secondary-active: var(--blue-bg);
+
+  /* STATUS */
+  --success: var(--green);
+  --warning: var(--amber);
+  --amber-500: var(--amber);
+  --error: var(--red);
+  --info: var(--accent);
+
+  /* LEGACY ALIASES for inline JSX */
+  --border-color: var(--border-secondary);
+  --surface-color-alt: var(--surface-secondary);
+  --error-color: var(--error);
 }
 
 /* ═══════════════════════════════════════════════════════════
@@ -145,13 +193,13 @@
   --text-muted: #CBD5E1;
   --text-faint: #94A3B8;
 
-  --border: rgba(248, 250, 252, 0.08);
-  --border-strong: rgba(248, 250, 252, 0.14);
+  --border: rgba(248, 250, 252, 0.3); /* Increased from 0.08 for 3:1 contrast */
+  --border-strong: rgba(248, 250, 252, 0.4); /* Increased from 0.14 */
 
-  --accent: #3B82F6;
-  --accent-bg: rgba(59, 130, 246, 0.15);
-  --accent-text: #93C5FD;
-  --accent-rgb: 59, 130, 246;
+  --accent: #2563eb;
+  --accent-bg: rgba(37, 99, 235, 0.15);
+  --accent-text: #93c5fd;
+  --accent-rgb: 37, 99, 235;
 
   --blue: #60A5FA;
   --blue-bg: rgba(96, 165, 250, 0.12);
@@ -170,14 +218,19 @@
   --purple-text: #C4B5FD;
 
   --green: #22C55E;
+  --green: #22C55E;
   --green-bg: rgba(34, 197, 94, 0.12);
   --green-text: #86EFAC;
+
+  --pink: #f472b6;
+  --pink-bg: rgba(219, 39, 119, 0.12);
+  --pink-text: #fbcfe8;
 
   --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.25), 0 1px 2px rgba(0, 0, 0, 0.2);
   --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.3), 0 2px 4px rgba(0, 0, 0, 0.2);
 
-  --focus-ring-color: rgba(59, 130, 246, 0.5);
-  --focus-border-color: #60A5FA;
+  --focus-ring-color: #F8FAFC;
+  --focus-border-color: #F8FAFC;
 
   --navbar-bg: rgba(15, 23, 42, 0.92);
 
@@ -187,6 +240,8 @@
   --scrollbar-thumb: rgba(248, 250, 252, 0.14);
   
   /* Component specific override for dark mode */
+  --tooltip-text: var(--bg);
+  --tooltip-bg: var(--text);
   --text-on-accent: #ffffff;
   --text-secondary: #cbd5e1;
   --bg-subtle: #1e293b;
@@ -196,11 +251,22 @@
   --red-border: rgba(248, 113, 113, 0.2);
 
   /* Interactive borders (WCAG 1.4.11 3:1 contrast requirement) */
-  --border-interactive: rgba(248, 250, 252, 0.35);
+  --border-interactive: rgba(248, 250, 252, 0.65);
   --border-interactive-strong: rgba(248, 250, 252, 0.45);
   --accent-border-interactive: rgba(59, 130, 246, 0.6);
   --purple-border-interactive: rgba(167, 139, 250, 0.5);
   --red-border-interactive: rgba(248, 113, 113, 0.5);
+
+  /* SEMANTIC TOKENS DARK MODE OVERRIDES */
+  --text-disabled: rgba(248, 250, 252, 0.38);
+  --text-link: var(--blue);
+
+  --button-primary: var(--accent);
+  --button-primary-hover: #1d4ed8;
+  --button-primary-active: #1e3a8a;
+  --button-secondary: transparent;
+  --button-secondary-hover: rgba(59, 130, 246, 0.2);
+  --button-secondary-active: rgba(59, 130, 246, 0.3);
 
   color-scheme: dark;
 }
@@ -376,4 +442,26 @@ kbd {
       0 0 0 var(--focus-ring-offset) var(--bg),
       0 0 0 calc(var(--focus-ring-offset) + var(--focus-ring-width)) var(--focus-border-color);
   }
+}
+
+/* Skip Link Global Pattern */
+.global-skip-link {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  transform: translateY(-200%);
+  background: var(--button-primary, var(--brand-blue));
+  color: #fff !important;
+  padding: 10px 18px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  z-index: 9999;
+  text-decoration: none;
+  transition: transform 0.2s cubic-bezier(0.2, 0, 0, 1);
+}
+
+.global-skip-link:focus {
+  transform: translateY(0);
+  outline: none;
 }

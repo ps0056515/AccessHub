@@ -13,11 +13,16 @@ export default function Tooltip({
   const [isVisible, setIsVisible] = useState(false);
   const [coords, setCoords] = useState({ top: 0, left: 0 });
   const timeoutRef = useRef(null);
+  const closeTimeoutRef = useRef(null);
   const wrapperRef = useRef(null);
   const tooltipId = useId();
 
   const handleMouseEnter = () => {
     if (disabled || !content) return;
+    
+    if (closeTimeoutRef.current) {
+      clearTimeout(closeTimeoutRef.current);
+    }
     
     if (wrapperRef.current) {
       const rect = wrapperRef.current.getBoundingClientRect();
@@ -49,7 +54,9 @@ export default function Tooltip({
     if (timeoutRef.current) {
       clearTimeout(timeoutRef.current);
     }
-    setIsVisible(false);
+    closeTimeoutRef.current = setTimeout(() => {
+      setIsVisible(false);
+    }, 200);
   };
 
   const handleKeyDown = (e) => {
@@ -63,6 +70,9 @@ export default function Tooltip({
     return () => {
       if (timeoutRef.current) {
         clearTimeout(timeoutRef.current);
+      }
+      if (closeTimeoutRef.current) {
+        clearTimeout(closeTimeoutRef.current);
       }
     };
   }, []);
@@ -89,6 +99,8 @@ export default function Tooltip({
           className={`${styles.tooltipBox} ${styles[position]}`} 
           role="tooltip"
           style={{ top: coords.top, left: coords.left }}
+          onMouseEnter={handleMouseEnter}
+          onMouseLeave={handleMouseLeave}
         >
           {content}
           <div className={styles.tooltipArrow} />

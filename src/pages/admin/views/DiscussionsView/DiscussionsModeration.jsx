@@ -47,6 +47,7 @@ export default function DiscussionsModeration({ showToast }) {
       await postsApi.deleteAdmin(id);
       setPosts(prev => prev.filter(p => p.id !== id));
       showToast?.('Discussion deleted.', 'success');
+      setTimeout(() => document.getElementById("admin-search-input")?.focus(), 0);
     } catch (err) {
       showToast?.(err.message || 'Failed to delete discussion.', 'error');
     }
@@ -59,6 +60,7 @@ export default function DiscussionsModeration({ showToast }) {
       setPosts(prev => prev.filter(p => !selectedIds.includes(p.id)));
       showToast?.(`Successfully deleted ${selectedIds.length} discussions.`, "success");
       setSelectedIds([]);
+      setTimeout(() => document.getElementById("admin-search-input")?.focus(), 0);
     } catch (err) {
       showToast?.(err.message || "Failed to bulk delete discussions.", "error");
     }
@@ -143,6 +145,7 @@ export default function DiscussionsModeration({ showToast }) {
         <h2 id="discussions-mod-title" className={dashboardStyles.panelTitle} style={{ margin: 0 }}>Discussions</h2>
         <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
           <input
+            id="admin-search-input"
             type="text"
             placeholder="Search discussions..."
             value={discussionSearch}

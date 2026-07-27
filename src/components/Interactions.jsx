@@ -178,7 +178,7 @@ export default function Interactions({
             aria-pressed={userVote === 1}
             aria-label="Upvote"
           >
-            <ThumbsUp size={18} />
+            <ThumbsUp aria-hidden="true" size={18} />
           </button>
           
           <span 
@@ -198,7 +198,7 @@ export default function Interactions({
             aria-pressed={userVote === -1}
             aria-label="Downvote"
           >
-            <ThumbsDown size={18} />
+            <ThumbsDown aria-hidden="true" size={18} />
           </button>
         </div>
       </div>
@@ -212,7 +212,7 @@ export default function Interactions({
             <p className={styles.emptyState}>No comments yet. Be the first to share your thoughts!</p>
           ) : (
             comments.map(comment => {
-              const colors = COLOR_MAP[comment.author_color] || COLOR_MAP.blue;
+              const authorColor = comment.author_color || 'blue';
               const isAuthorOrAdmin = user?.id === comment.user_id || user?.is_admin;
               const isEditing = editingCommentId === comment.id;
 
@@ -222,7 +222,7 @@ export default function Interactions({
                     <div className={styles.authorInfo}>
                       <div 
                         className={styles.avatar} 
-                        style={{ background: colors.bg, color: colors.text }}
+                        style={{ background: `var(--${authorColor}-bg, var(--surface-secondary))`, color: `var(--${authorColor}-text, var(--text-primary))` }}
                         aria-hidden="true"
                       >
                         {comment.author_initials}
@@ -240,7 +240,7 @@ export default function Interactions({
                           aria-label="Edit comment"
                           title="Edit"
                         >
-                          <Edit2 size={16} />
+                          <Edit2 aria-hidden="true" size={16} />
                         </button>
                         <button 
                           className={`${styles.actionBtn} ${styles.actionBtnDelete}`} 
@@ -249,7 +249,7 @@ export default function Interactions({
                           aria-label="Delete comment"
                           title="Delete"
                         >
-                          <Trash2 size={16} />
+                          <Trash2 aria-hidden="true" size={16} />
                         </button>
                       </div>
                     )}
@@ -257,12 +257,16 @@ export default function Interactions({
                   
                   {isEditing ? (
                     <div className={styles.editCommentBox}>
+                      <label htmlFor={`edit-comment-${comment.id}`} className="sr-only">Edit comment</label>
                       <textarea
+                        id={`edit-comment-${comment.id}`}
                         className={styles.textarea}
                         value={editCommentBody}
                         onChange={(e) => setEditCommentBody(e.target.value)}
                         disabled={savingComment}
                         autoFocus
+                        required
+                        aria-required="true"
                       />
                       <div className={styles.editActions}>
                         <button 
@@ -299,13 +303,15 @@ export default function Interactions({
                 {commentError}
               </div>
             )}
+            <label htmlFor="new-comment" className="sr-only">Comment body</label>
             <textarea
+              id="new-comment"
               className={styles.textarea}
               placeholder="What are your thoughts?"
               value={newComment}
               onChange={(e) => setNewComment(e.target.value)}
               required
-              aria-label="Comment body"
+              aria-required="true"
             />
             <div className={styles.actions}>
               <button 

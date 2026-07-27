@@ -217,7 +217,7 @@ export default function Events() {
           <p className={styles.hostSub}>
             Running a workshop, webinar, or local meetup? Reach thousands of practitioners through AllCanAccess.
           </p>
-          <button type="button" className={styles.hostBtn} onClick={() => setHostOpen(true)}>
+          <button type="button" className={styles.hostBtn} onClick={() => setHostOpen(true)} aria-haspopup="dialog">
             Submit your event →
           </button>
         </div>

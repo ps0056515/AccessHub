@@ -246,7 +246,7 @@ router.post('/google', async (req, res, next) => {
 });
 
 router.patch('/profile', authMiddleware, async (req, res, next) => {
-  const { displayName, role, bio, company, designation, country, city } = req.body || {};
+  const { displayName, bio, company, designation, country, city } = req.body || {};
 
   const updates = [];
   const values = [];
@@ -258,10 +258,6 @@ router.patch('/profile', authMiddleware, async (req, res, next) => {
     }
     updates.push(`display_name = $${paramCount++}`);
     values.push(displayName.trim());
-  }
-  if (role !== undefined) {
-    updates.push(`role = $${paramCount++}`);
-    values.push(role.trim());
   }
   if (bio !== undefined) {
     updates.push(`bio = $${paramCount++}`);

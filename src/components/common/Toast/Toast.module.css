@@ -13,9 +13,9 @@
   pointer-events: auto;
   min-width: 280px;
   max-width: 380px;
-  background: var(--bg-card);
+  background: var(--surface-secondary);
   border-left: 4px solid var(--accent);
-  color: var(--text);
+  color: var(--text-primary);
   padding: 14px 18px;
   border-radius: var(--radius-sm, 6px);
   box-shadow:
@@ -29,11 +29,11 @@
 }
 
 .toastSuccess {
-  border-left-color: var(--green); /* Green */
+  border-left-color: var(--success); /* Green */
 }
 
 .toastError {
-  border-left-color: var(--red); /* Red */
+  border-left-color: var(--error); /* Red */
 }
 
 .toastIcon {
@@ -46,7 +46,7 @@
   font-size: 13px;
   font-weight: 500;
   line-height: 1.4;
-  color: var(--text);
+  color: var(--text-primary);
 }
 
 .toastCloseBtn {
@@ -62,7 +62,7 @@
 }
 
 .toastCloseBtn:hover {
-  color: var(--text);
+  color: var(--text-primary);
 }
 
 @keyframes slideIn {

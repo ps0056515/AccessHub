@@ -8,7 +8,7 @@
 
 .info {
   font-size: 14px;
-  color: var(--text-muted);
+  color: var(--text-secondary);
   font-weight: 500;
 }
 
@@ -20,19 +20,19 @@
   height: 32px;
   border-radius: 6px;
   border: 1px solid var(--border-interactive);
-  background: var(--bg-card);
-  color: var(--text);
+  background: var(--surface-secondary);
+  color: var(--text-primary);
   cursor: pointer;
   transition: all 0.2s;
 }
 
-.button:hover:not(:disabled) {
+.button:hover:not(:disabled):not([aria-disabled="true"]) {
   background: var(--surface-color-alt);
   border-color: var(--border-interactive-strong);
 }
 
-.button:disabled {
+.button:disabled, .button[aria-disabled="true"] {
   opacity: 0.5;
   cursor: not-allowed;
-  background: var(--bg-secondary);
+  background: var(--surface-secondary);
 }

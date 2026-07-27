@@ -221,14 +221,14 @@ export default function AboutUs() {
         <div className={styles.faqSection} aria-labelledby="faq-title">
           <h2 id="faq-title" className={styles.valuesTitle}>Frequently Asked Questions</h2>
           <p className={styles.valuesSubtitle}>Learn more about our community and digital accessibility.</p>
-          <div className={styles.faqList}>
+          <dl className={styles.faqList}>
             {SEO_FAQS.map((faq, index) => (
               <div key={index} className={styles.faqItem}>
-                <h3 className={styles.faqQuestion}>{faq.q}</h3>
-                <p className={styles.faqAnswer}>{faq.a}</p>
+                <dt className={styles.faqQuestion}>{faq.q}</dt>
+                <dd className={styles.faqAnswer}>{faq.a}</dd>
               </div>
             ))}
-          </div>
+          </dl>
         </div>
 
       </div>

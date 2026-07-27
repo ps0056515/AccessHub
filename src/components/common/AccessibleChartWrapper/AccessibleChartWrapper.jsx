@@ -1,3 +1,4 @@
+import React, { useState } from 'react';
 import styles from './AccessibleChartWrapper.module.css';
 
 /**
@@ -11,18 +12,30 @@ import styles from './AccessibleChartWrapper.module.css';
  * @param {React.ReactNode} props.children - The visual chart component
  */
 export default function AccessibleChartWrapper({ title, data, columns, children }) {
+  const [showTable, setShowTable] = useState(false);
+
   if (!data || data.length === 0) return children;
 
   return (
     <div className={styles.wrapper}>
-      {/* Hide the visual SVG chart from screen readers */}
-      <div aria-hidden="true" style={{ width: '100%', height: '100%' }}>
+      <div className={styles.headerControls}>
+        <button
+          type="button"
+          onClick={() => setShowTable((prev) => !prev)}
+          className={styles.toggleBtn}
+          aria-expanded={showTable}
+        >
+          {showTable ? `Hide data table for ${title}` : `Show data table for ${title}`}
+        </button>
+      </div>
+
+      {/* Hide the visual SVG chart from screen readers and toggle display for keyboard users */}
+      <div aria-hidden="true" style={{ width: '100%', height: '100%', display: showTable ? 'none' : 'block' }}>
         {children}
       </div>
 
-      {/* Screen-reader-only data table */}
-      <table className={styles.srOnly} aria-label={`Data table for ${title}`}>
-        <caption>Data table for {title}</caption>
+      {/* Data table */}
+      <table className={showTable ? styles.visibleTable : styles.srOnly} aria-label={`Data table for ${title}`}>
         <thead>
           <tr>
             {columns.map((col) => (
@@ -33,9 +46,12 @@ export default function AccessibleChartWrapper({ title, data, columns, children 
         <tbody>
           {data.map((row, i) => (
             <tr key={i}>
-              {columns.map((col) => (
-                <td key={col.key}>{row[col.key]}</td>
-              ))}
+              {columns.map((col, colIndex) => {
+                if (colIndex === 0) {
+                  return <th key={col.key} scope="row">{row[col.key]}</th>;
+                }
+                return <td key={col.key}>{row[col.key]}</td>;
+              })}
             </tr>
           ))}
         </tbody>

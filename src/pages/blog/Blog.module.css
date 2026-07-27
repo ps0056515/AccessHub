@@ -9,7 +9,7 @@
 .title {
   font-size: 32px;
   font-weight: 800;
-  color: var(--text);
+  color: var(--text-primary);
   margin: 0 0 8px;
 }
 
@@ -37,7 +37,7 @@
   align-items: center;
   gap: 8px;
   text-decoration: none;
-  color: var(--accent);
+  color: var(--accent-text);
   font-weight: 600;
   margin-bottom: 32px;
   transition: color 0.2s;
@@ -65,7 +65,7 @@
 }
 
 .detailTitle {
-  color: var(--text);
+  color: var(--text-primary);
   margin: 0 0 16px;
   line-height: 1.2;
 }
@@ -80,16 +80,16 @@
 }
 
 .detailMeta .author {
-  color: var(--accent);
+  color: var(--accent-text);
 }
 
 .contentHtml {
   font-size: 16px;
-  color: var(--text-muted);
+  color: var(--text-secondary);
 }
 
 .contentHtml h1, .contentHtml h2, .contentHtml h3 {
-  color: var(--text);
+  color: var(--text-primary);
  
 }
 
@@ -98,7 +98,7 @@
 } */
 
 .contentHtml a {
-  color: var(--accent);
+  color: var(--accent-text);
   text-decoration: underline;
 }
 

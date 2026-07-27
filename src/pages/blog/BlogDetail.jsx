@@ -36,7 +36,7 @@ export default function BlogpostDetail() {
   }, [id, navigate]);
 
   if (loading) return <Container className={styles.detailContainer}>Loading blogpost...</Container>;
-  if (error) return <Container className={styles.detailContainer} style={{ color: 'red' }}>{error}</Container>;
+  if (error) return <Container className={styles.detailContainer} style={{ color: 'var(--error)' }}>{error}</Container>;
   if (!blogpost) return null;
 
   return (
@@ -46,7 +46,7 @@ export default function BlogpostDetail() {
       </Link>
 
       {blogpost.cover_image && (
-        <img src={blogpost.cover_image} alt="" className={styles.detailImage} />
+        <img src={blogpost.cover_image} alt={blogpost.cover_image_alt || ""} className={styles.detailImage} />
       )}
 
       <header className={styles.detailHeader}>

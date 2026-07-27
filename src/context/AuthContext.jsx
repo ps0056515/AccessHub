@@ -108,20 +108,20 @@ export function AuthProvider({ children }) {
 
   const updateProfile = useCallback(async (updates) => {
     const { user: profile } = await authApi.updateProfile(updates);
-    setUser(profile);
+    setUser(prev => ({ ...prev, ...profile }));
     setNeedsLocation(!profile.country || !profile.city);
     return profile;
   }, []);
 
   const uploadAvatar = useCallback(async (dataUri) => {
     const { user: profile } = await authApi.uploadAvatar({ data: dataUri });
-    setUser(profile);
+    setUser(prev => ({ ...prev, ...profile }));
     return profile;
   }, []);
 
   const removeAvatar = useCallback(async () => {
     const { user: profile } = await authApi.removeAvatar();
-    setUser(profile);
+    setUser(prev => ({ ...prev, ...profile }));
     return profile;
   }, []);
 

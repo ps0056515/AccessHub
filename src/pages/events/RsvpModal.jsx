@@ -68,7 +68,7 @@ export default function RsvpModal({ event, onClose }) {
               }}
             >
               <span style={{ fontSize: 13, fontWeight: 600 }}>
-                Your email address *
+                Your email address<span className="required-asterisk" aria-hidden="true"> *</span>
               </span>
               <input
                 type="email"

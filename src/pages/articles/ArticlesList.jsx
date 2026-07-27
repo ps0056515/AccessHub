@@ -40,7 +40,7 @@ export default function ArticlesList() {
       {loading ? (
         <p>Loading articles...</p>
       ) : error ? (
-        <p style={{ color: "red" }}>{error}</p>
+        <p style={{ color: "var(--error)" }}>{error}</p>
       ) : articles.length > 0 ? (
         <div className={styles.grid}>
           {articles.map((article) => (

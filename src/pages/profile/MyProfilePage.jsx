@@ -9,6 +9,7 @@ import {
   Camera, Mail, MapPin, Building2, Calendar, Edit3,
   Briefcase, User, CheckCircle2, ChevronRight, MessageSquare, FileText, Star
 } from 'lucide-react';
+import Avatar from 'components/common/Avatar/Avatar';
 import styles from './MyProfilePage.module.css';
 
 
@@ -66,10 +67,10 @@ export default function MyProfilePage() {
   const [errorMsg, setErrorMsg] = useState("");
   const [avatarUploading, setAvatarUploading] = useState(false);
   const fileInputRef = useRef(null);
+  const lastFocusRef = useRef(null);
 
   const [formData, setFormData] = useState({
     displayName: "",
-    role: "",
     bio: "",
     company: "",
     designation: "",
@@ -81,7 +82,6 @@ export default function MyProfilePage() {
     if (user) {
       setFormData({
         displayName: user.displayName || "",
-        role: user.role || "",
         bio: user.bio || "",
         company: user.company || "",
         designation: user.designation || "",
@@ -181,6 +181,9 @@ export default function MyProfilePage() {
       addToast("Profile updated successfully!", "success");
       announce("Profile updated successfully!");
       setIsEditing(false);
+      setTimeout(() => {
+        if (lastFocusRef.current) lastFocusRef.current.focus();
+      }, 0);
     } catch (err) {
       setErrorMsg(err.message || "Failed to update profile.");
     } finally {
@@ -188,10 +191,13 @@ export default function MyProfilePage() {
     }
   };
 
+  const handlePreventEnterSubmit = (e) => {
+    if (e.key === 'Enter') e.preventDefault();
+  };
+
   const handleCancel = () => {
     setFormData({
       displayName: user.displayName || "",
-      role: user.role || "",
       bio: user.bio || "",
       company: user.company || "",
       designation: user.designation || "",
@@ -200,6 +206,9 @@ export default function MyProfilePage() {
     });
     setErrorMsg("");
     setIsEditing(false);
+    setTimeout(() => {
+      if (lastFocusRef.current) lastFocusRef.current.focus();
+    }, 0);
   };
 
   const colors = COLOR_MAP[user.color] || COLOR_MAP.blue;
@@ -213,40 +222,7 @@ export default function MyProfilePage() {
   // Build company line
   const companyLine = [user.designation, user.company].filter(Boolean).join(' at ');
 
-  /* ── AVATAR ELEMENT (shared between view and edit modes) ── */
-  const avatarElement = (
-    <div className={styles.avatarWrapper}>
-      <div
-        className={styles.avatar}
-        style={!hasAvatar ? { background: colors.bg, color: colors.text } : undefined}
-        aria-hidden="true"
-      >
-        {hasAvatar ? (
-          <img src={user.avatarUrl} alt="" className={styles.avatarImg} />
-        ) : (
-          initial
-        )}
-      </div>
-      <button
-        type="button"
-        className={styles.avatarOverlay}
-        onClick={() => fileInputRef.current?.click()}
-        disabled={avatarUploading}
-        aria-label="Change profile photo"
-      >
-        <Camera size={20} />
-        <span>{avatarUploading ? 'Uploading...' : 'Change'}</span>
-      </button>
-      <input
-        ref={fileInputRef}
-        type="file"
-        accept="image/png,image/jpeg,image/webp,image/gif"
-        className={styles.avatarHiddenInput}
-        onChange={handleAvatarSelect}
-        aria-label="Upload profile photo"
-      />
-    </div>
-  );
+
 
   /* ══════════════════════════════════════════════════════════
      EDIT MODE
@@ -267,10 +243,34 @@ export default function MyProfilePage() {
         <form onSubmit={handleSave} noValidate>
           <div className={`${styles.editCard} ${styles.fadeUp} ${styles.fadeUp1}`}>
             <div className={styles.profileHeader}>
-              {avatarElement}
+              <div className={styles.avatarWrapper}>
+                <Avatar
+                  src={user.avatarUrl}
+                  initials={initial}
+                  color={user.color}
+                  size={120}
+                  className={styles.avatarOverride}
+                />
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/png,image/jpeg,image/webp,image/gif"
+                  className={styles.avatarHiddenInput}
+                  onChange={handleAvatarSelect}
+                  aria-label="Upload profile photo"
+                />
+              </div>
               <div className={styles.profileHeaderInfo}>
-                {hasAvatar && (
-                  <div className={styles.avatarActions}>
+                <div className={styles.avatarActions}>
+                  <button
+                    type="button"
+                    className={styles.avatarAddBtn}
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={avatarUploading}
+                  >
+                    {hasAvatar ? 'Change photo' : 'Add photo'}
+                  </button>
+                  {hasAvatar && (
                     <button
                       type="button"
                       className={styles.avatarRemoveBtn}
@@ -279,8 +279,8 @@ export default function MyProfilePage() {
                     >
                       Remove photo
                     </button>
-                  </div>
-                )}
+                  )}
+                </div>
                 <h1 className={styles.editTitle}>Edit Profile</h1>
               </div>
             </div>
@@ -289,22 +289,31 @@ export default function MyProfilePage() {
 
             <div className={styles.formGrid}>
               <div className={styles.formGroup}>
-                <label htmlFor="edit-name" className={styles.formLabel}>Display Name *</label>
+                <label htmlFor="edit-name" className={styles.formLabel}>
+                  Display Name
+                  <span className="required-asterisk" aria-hidden="true"> *</span>
+                </label>
                 <input
                   id="edit-name"
                   className={styles.formInput}
+                  autoComplete="name"
                   value={formData.displayName}
                   onChange={e => setFormData({ ...formData, displayName: e.target.value })}
+                  onKeyDown={handlePreventEnterSubmit}
+                  required
+                  aria-required="true"
                 />
               </div>
 
               <div className={styles.formGroup}>
-                <label htmlFor="edit-role" className={styles.formLabel}>Role / Job Title</label>
+                <label htmlFor="edit-designation" className={styles.formLabel}>Designation / Job Title</label>
                 <input
-                  id="edit-role"
+                  id="edit-designation"
                   className={styles.formInput}
-                  value={formData.role}
-                  onChange={e => setFormData({ ...formData, role: e.target.value })}
+                  autoComplete="organization-title"
+                  value={formData.designation}
+                  onChange={e => setFormData({ ...formData, designation: e.target.value })}
+                  onKeyDown={handlePreventEnterSubmit}
                   placeholder="e.g. Accessibility Engineer"
                 />
               </div>
@@ -314,21 +323,30 @@ export default function MyProfilePage() {
                 <input
                   id="edit-company"
                   className={styles.formInput}
+                  autoComplete="organization"
                   value={formData.company}
                   onChange={e => setFormData({ ...formData, company: e.target.value })}
+                  onKeyDown={handlePreventEnterSubmit}
                 />
               </div>
 
 
               <div className={styles.formGroup}>
-                <label htmlFor="edit-country" className={styles.formLabel}>Country</label>
+                <label htmlFor="edit-country" className={styles.formLabel}>
+                  Country
+                  <span className="required-asterisk" aria-hidden="true"> *</span>
+                </label>
                 <input
                   list="edit-country-list"
                   id="edit-country"
                   className={styles.formInput}
+                  autoComplete="country-name"
                   value={formData.country}
                   onChange={handleCountryChange}
+                  onKeyDown={handlePreventEnterSubmit}
                   placeholder="Search or select a country"
+                  required
+                  aria-required="true"
                 />
                 <datalist id="edit-country-list">
                   {countries.map((c) => (
@@ -338,15 +356,22 @@ export default function MyProfilePage() {
               </div>
 
               <div className={styles.formGroup}>
-                <label htmlFor="edit-city" className={styles.formLabel}>City</label>
+                <label htmlFor="edit-city" className={styles.formLabel}>
+                  City
+                  <span className="required-asterisk" aria-hidden="true"> *</span>
+                </label>
                 <input
                   list="edit-city-list"
                   id="edit-city"
                   className={styles.formInput}
+                  autoComplete="address-level2"
                   value={formData.city}
                   onChange={e => setFormData({ ...formData, city: e.target.value })}
+                  onKeyDown={handlePreventEnterSubmit}
                   placeholder={cities.length === 0 && formData.country ? 'No cities available' : 'Search or select a city'}
                   disabled={!formData.country || cities.length === 0}
+                  required
+                  aria-required="true"
                 />
                 <datalist id="edit-city-list">
                   {cities.map((c, i) => (
@@ -401,11 +426,18 @@ export default function MyProfilePage() {
       <div className={`${styles.profileCard} ${styles.fadeUp} ${styles.fadeUp1}`}>
 
         <div className={styles.profileHeader}>
-          {avatarElement}
+          <div className={styles.avatarWrapper}>
+            <Avatar
+              src={user.avatarUrl}
+              initials={initial}
+              color={user.color}
+              size={120}
+              className={styles.avatarOverride}
+            />
+          </div>
           <div className={styles.profileHeaderInfo}>
             <div className={styles.nameRow}>
               <h1 className={styles.name}>{user.displayName}</h1>
-              {user.role && <span className={styles.roleBadge}>{user.role}</span>}
             </div>
 
             <div className={styles.metaRow}>
@@ -428,7 +460,11 @@ export default function MyProfilePage() {
         <button
           type="button"
           className={styles.editBtnBottom}
-          onClick={() => setIsEditing(true)}
+          onClick={(e) => {
+            lastFocusRef.current = e.currentTarget;
+            setIsEditing(true);
+            setTimeout(() => document.getElementById('edit-name')?.focus(), 0);
+          }}
         >
           <Edit3 size={16} /> Edit Profile
         </button>
@@ -460,7 +496,12 @@ export default function MyProfilePage() {
             <button
               type="button"
               className={styles.crumbBtn}
-              onClick={() => setIsEditing(true)}
+              aria-label="Complete your profile now"
+              onClick={(e) => {
+                lastFocusRef.current = e.currentTarget;
+                setIsEditing(true);
+                setTimeout(() => document.getElementById('edit-name')?.focus(), 0);
+              }}
               style={{ fontSize: 12, marginLeft: 4 }}
             >
               Complete now <ChevronRight size={12} style={{ verticalAlign: -2 }} />

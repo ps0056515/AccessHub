@@ -17,7 +17,7 @@ export default function FlyingFocus() {
     if (prefersReducedMotion) return;
 
     const handleKeyDown = (e) => {
-      if (['Tab', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) {
+      if (['Tab', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Enter', ' ', 'Escape'].includes(e.key)) {
         keyDownTimeRef.current = Date.now();
       }
     };
@@ -35,6 +35,15 @@ export default function FlyingFocus() {
 
       setIsVisible(true);
       updatePosition(target);
+
+      let start = performance.now();
+      const tick = (now) => {
+        if (now - start < 300 && document.activeElement === target) {
+          updatePosition(target);
+          requestAnimationFrame(tick);
+        }
+      };
+      requestAnimationFrame(tick);
     };
 
     const updatePosition = (target) => {

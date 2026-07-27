@@ -114,6 +114,7 @@ export default function EventsView({ showToast }) {
       await eventsApi.delete(id);
       showToast?.(`Event "${title}" deleted.`, "success");
       loadEvents();
+      setTimeout(() => document.getElementById("admin-search-input")?.focus(), 0);
     } catch (err) {
       showToast?.(err.message || "Failed to delete event.", "error");
     }
@@ -134,6 +135,7 @@ export default function EventsView({ showToast }) {
       );
       setSelectedIds([]);
       loadEvents();
+      setTimeout(() => document.getElementById("admin-search-input")?.focus(), 0);
     } catch (err) {
       showToast?.(err.message || "Failed to bulk delete events.", "error");
     }
@@ -160,6 +162,7 @@ export default function EventsView({ showToast }) {
       await eventsApi.rejectProposal(id);
       showToast?.(`Proposal "${title}" rejected.`, "success");
       loadProposals();
+      setTimeout(() => document.getElementById("admin-search-input")?.focus(), 0);
     } catch (err) {
       showToast?.(err.message || "Failed to reject proposal.", "error");
     }
@@ -171,6 +174,7 @@ export default function EventsView({ showToast }) {
       await eventsApi.deleteProposal(id);
       showToast?.(`Proposal "${title}" deleted.`, "success");
       loadProposals();
+      setTimeout(() => document.getElementById("admin-search-input")?.focus(), 0);
     } catch (err) {
       showToast?.(err.message || "Failed to delete proposal.", "error");
     }
@@ -444,6 +448,7 @@ export default function EventsView({ showToast }) {
           </h2>
           <div className={styles.searchWrapper}>
             <input
+              id="admin-search-input"
               type="text"
               placeholder="Search events..."
               value={eventSearch}

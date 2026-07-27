@@ -13,24 +13,6 @@
   grid-template-columns: 80px minmax(0, 1fr);
 }
 
-.skipLink {
-  position: absolute;
-  top: -9999px;
-  left: 16px;
-  background: var(--accent);
-  color: var(--text-on-accent) !important;
-  padding: 10px 16px;
-  z-index: 1000;
-  text-decoration: none;
-  font-weight: bold;
-  border-radius: 4px;
-}
-
-.skipLink:focus {
-  top: 16px;
-  outline: 2px solid var(--accent-focus);
-}
-
 /* ── Sidebar Styling ── */
 .sidebar {
   display: flex;

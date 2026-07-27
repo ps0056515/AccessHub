@@ -62,6 +62,7 @@ export default function ResourcesView({ showToast }) {
       await resourcesApi.delete(id);
       showToast?.(`Resource "${title}" deleted.`, "success");
       loadResources();
+      setTimeout(() => document.getElementById("admin-search-input")?.focus(), 0);
     } catch (err) {
       showToast?.(err.message || "Failed to delete resource.", "error");
     }
@@ -82,6 +83,7 @@ export default function ResourcesView({ showToast }) {
       );
       setSelectedIds([]);
       loadResources();
+      setTimeout(() => document.getElementById("admin-search-input")?.focus(), 0);
     } catch (err) {
       showToast?.(err.message || "Failed to bulk delete resources.", "error");
     }
@@ -93,6 +95,7 @@ export default function ResourcesView({ showToast }) {
       await resourcesApi.rejectProposal(id);
       showToast?.("Proposal rejected.", "success");
       loadProposals();
+      setTimeout(() => document.getElementById("admin-search-input")?.focus(), 0);
     } catch (err) {
       showToast?.(err.message || "Failed to reject proposal.", "error");
     }
@@ -104,6 +107,7 @@ export default function ResourcesView({ showToast }) {
       await resourcesApi.deleteProposal(id);
       showToast?.("Proposal deleted.", "success");
       loadProposals();
+      setTimeout(() => document.getElementById("admin-search-input")?.focus(), 0);
     } catch (err) {
       showToast?.(err.message || "Failed to delete proposal.", "error");
     }
@@ -336,6 +340,7 @@ export default function ResourcesView({ showToast }) {
           </h2>
           <div className={styles.headerActions}>
             <input
+              id="admin-search-input"
               type="text"
               placeholder="Search resources..."
               value={resourceSearch}

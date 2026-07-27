@@ -1,6 +1,7 @@
-import React, { useState, useMemo, useEffect } from "react";
+import React, { useState, useMemo, useEffect, useRef } from "react";
 import { Filter, ChevronUp, ChevronDown, ChevronsUpDown } from "lucide-react";
 import Pagination from "../Pagination/Pagination";
+import useFocusTrap from "hooks/useFocusTrap";
 import styles from "./Table.module.css";
 
 export default function Table({
@@ -16,11 +17,17 @@ export default function Table({
   onSelectChange,
   pagination = false,
   itemsPerPage = 10,
+  tableLabel = "Data table",
 }) {
   const [sortConfig, setSortConfig] = useState(null);
   const [filters, setFilters] = useState({});
   const [openFilter, setOpenFilter] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
+  const [announcement, setAnnouncement] = useState("");
+  const tableRef = useRef(null);
+  const activeFilterRef = useRef(null);
+
+  useFocusTrap(activeFilterRef, !!openFilter);
 
   // Reset to first page when data or filters change
   useEffect(() => {
@@ -36,6 +43,30 @@ export default function Table({
 
   const handleFilterChange = (key, value) => {
     setFilters((prev) => ({ ...prev, [key]: value }));
+    const colName = columns.find(c => c.key === key)?.label || key;
+    setAnnouncement(value ? `Filter applied for ${colName}: ${value}` : `Filter removed for ${colName}`);
+  };
+
+  const handleFilterKeyDown = (e, colKey, val) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      handleFilterChange(colKey, val);
+      setOpenFilter(null);
+    } else if (e.key === 'Escape') {
+      setOpenFilter(null);
+    } else if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      e.currentTarget.nextElementSibling?.focus();
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      e.currentTarget.previousElementSibling?.focus();
+    } else if (e.key === 'Home') {
+      e.preventDefault();
+      e.currentTarget.parentElement.firstElementChild?.focus();
+    } else if (e.key === 'End') {
+      e.preventDefault();
+      e.currentTarget.parentElement.lastElementChild?.focus();
+    }
   };
 
   const filteredData = useMemo(() => {
@@ -121,33 +152,36 @@ export default function Table({
       sortConfig.direction === "desc"
     ) {
       setSortConfig(null);
+      setAnnouncement("Sorting removed");
       return;
     }
     setSortConfig({ key, direction });
+    const colName = columns.find(c => c.key === key)?.label || key;
+    setAnnouncement(`Sorted by ${colName} ${direction === 'asc' ? 'ascending' : 'descending'}`);
   };
 
-  if (loading) {
-    return <p className={styles.empty}>Loading...</p>;
-  }
 
-  if (!data || data.length === 0) {
-    return <p className={styles.empty}>{emptyMessage}</p>;
-  }
 
   const isAllPageSelected = paginatedData.length > 0 && paginatedData.every(r => selectedRowIds.includes(r.id));
   const isSomePageSelected = paginatedData.length > 0 && paginatedData.some(r => selectedRowIds.includes(r.id)) && !isAllPageSelected;
 
   return (
     <div className={styles.tableWrapper}>
+      <div aria-live="polite" style={{ position: 'absolute', width: 1, height: 1, overflow: 'hidden', clip: 'rect(0,0,0,0)' }}>
+        {announcement}
+      </div>
       <div className={styles.scrollContainer}>
         <table
+          ref={tableRef}
+          tabIndex={-1}
           className={styles.table}
-          style={minWidth ? { minWidth } : undefined}
+          style={{ ...(minWidth ? { minWidth } : {}), outline: 'none' }}
+          aria-label={tableLabel}
         >
           <thead>
             <tr>
               {selectable && (
-                <th className={styles.fixedHeader} style={{ width: '40px', minWidth: '40px', textAlign: 'center' }}>
+                <th scope="col" className={styles.fixedHeader} style={{ width: '40px', minWidth: '40px', textAlign: 'center' }}>
                   <input
                     type="checkbox"
                     style={{ cursor: 'pointer' }}
@@ -175,7 +209,13 @@ export default function Table({
               {columns.map((col, i) => (
                 <th
                   key={col.key || i}
+                  scope="col"
                   className={styles.fixedHeader}
+                  onBlur={(e) => {
+                    if (openFilter === col.key && !e.currentTarget.contains(e.relatedTarget)) {
+                      setOpenFilter(null);
+                    }
+                  }}
                   style={{
                     zIndex: openFilter === col.key ? 100 : undefined,
                     ...(col.width
@@ -218,35 +258,26 @@ export default function Table({
                       >
                         {sortConfig?.key === col.key ? (
                           sortConfig.direction === "asc" ? (
-                            <ChevronUp size={14} />
+                            <ChevronUp aria-hidden="true" size={14} />
                           ) : (
-                            <ChevronDown size={14} />
+                            <ChevronDown aria-hidden="true" size={14} />
                           )
                         ) : (
-                          <ChevronsUpDown size={14} />
+                          <ChevronsUpDown aria-hidden="true" size={14} />
                         )}
                       </span>
                     )}
                     {col.filterOptions && (
                       <>
-                        <div
+                        <button
+                          type="button"
+                          className={styles.filterBtn}
                           onClick={(e) => {
                             e.stopPropagation();
                             setOpenFilter((prev) =>
                               prev === col.key ? null : col.key,
                             );
                           }}
-                          onKeyDown={(e) => {
-                            if (e.key === 'Enter' || e.key === ' ') {
-                              e.preventDefault();
-                              e.stopPropagation();
-                              setOpenFilter((prev) =>
-                                prev === col.key ? null : col.key,
-                              );
-                            }
-                          }}
-                          role="button"
-                          tabIndex={0}
                           aria-label={`Filter ${col.label}`}
                           aria-haspopup="listbox"
                           aria-expanded={openFilter === col.key}
@@ -256,14 +287,16 @@ export default function Table({
                             gap: "4px",
                             background:
                               filters[col.key] || openFilter === col.key
-                                ? "var(--surface-color-alt, #f1f5f9)"
+                                ? "var(--surface-secondary)"
                                 : "transparent",
-                            padding: "4px",
+                            padding: "2px 4px",
                             borderRadius: "4px",
                             cursor: "pointer",
+                            border: "none",
                           }}
                         >
                           <Filter
+                            aria-hidden="true"
                             size={14}
                             style={{
                               opacity:
@@ -273,10 +306,11 @@ export default function Table({
                               flexShrink: 0,
                             }}
                           />
-                        </div>
+                        </button>
 
                         {openFilter === col.key && (
                           <div
+                            ref={activeFilterRef}
                             onClick={(e) => e.stopPropagation()}
                             role="listbox"
                             aria-label={`Filter options for ${col.label}`}
@@ -285,9 +319,9 @@ export default function Table({
                               top: "100%",
                               right: "-49px",
                               marginTop: "-10px",
-                              background: "var(--surface-color, #ffffff)",
-                              border: "1px solid var(--border-color, #e2e8f0)",
-                              borderRadius: "6px",
+                              background: "var(--surface-primary)",
+                              border: "1px solid var(--border-primary)",
+                              color: "var(--text-primary)",
                               boxShadow:
                                 "0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)",
                               zIndex: 2,
@@ -295,7 +329,7 @@ export default function Table({
                               display: "flex",
                               flexDirection: "column",
                               padding: "4px",
-                              color: "var(--text-color, #1e293b)",
+                              color: "var(--text-primary)",
                               textAlign: "left",
                             }}
                           >
@@ -309,7 +343,7 @@ export default function Table({
                                 borderRadius: "4px",
                                 fontSize: "13px",
                                 background: !filters[col.key]
-                                  ? "var(--surface-color-alt, #f1f5f9)"
+                                  ? "var(--surface-secondary)"
                                   : "transparent",
                                 fontWeight: !filters[col.key] ? 600 : 400,
                               }}
@@ -317,24 +351,16 @@ export default function Table({
                                 handleFilterChange(col.key, "");
                                 setOpenFilter(null);
                               }}
-                              onKeyDown={(e) => {
-                                if (e.key === 'Enter' || e.key === ' ') {
-                                  e.preventDefault();
-                                  handleFilterChange(col.key, "");
-                                  setOpenFilter(null);
-                                } else if (e.key === 'Escape') {
-                                  setOpenFilter(null);
-                                }
-                              }}
+                              onKeyDown={(e) => handleFilterKeyDown(e, col.key, "")}
                               onMouseEnter={(e) =>
                                 (e.currentTarget.style.background =
-                                  "var(--surface-color-alt, #f1f5f9)")
+                                  "var(--surface-secondary)")
                               }
                               onMouseLeave={(e) =>
                                 (e.currentTarget.style.background = !filters[
                                   col.key
                                 ]
-                                  ? "var(--surface-color-alt, #f1f5f9)"
+                                  ? "var(--surface-secondary)"
                                   : "transparent")
                               }
                             >
@@ -358,7 +384,7 @@ export default function Table({
                                     borderRadius: "4px",
                                     fontSize: "13px",
                                     background: isSelected
-                                      ? "var(--surface-color-alt, #f1f5f9)"
+                                      ? "var(--surface-secondary)"
                                       : "transparent",
                                     fontWeight: isSelected ? 600 : 400,
                                   }}
@@ -366,23 +392,15 @@ export default function Table({
                                     handleFilterChange(col.key, val);
                                     setOpenFilter(null);
                                   }}
-                                  onKeyDown={(e) => {
-                                    if (e.key === 'Enter' || e.key === ' ') {
-                                      e.preventDefault();
-                                      handleFilterChange(col.key, val);
-                                      setOpenFilter(null);
-                                    } else if (e.key === 'Escape') {
-                                      setOpenFilter(null);
-                                    }
-                                  }}
+                                  onKeyDown={(e) => handleFilterKeyDown(e, col.key, val)}
                                   onMouseEnter={(e) =>
                                     (e.currentTarget.style.background =
-                                      "var(--surface-color-alt, #f1f5f9)")
+                                      "var(--surface-secondary)")
                                   }
                                   onMouseLeave={(e) =>
                                     (e.currentTarget.style.background =
                                       isSelected
-                                        ? "var(--surface-color-alt, #f1f5f9)"
+                                        ? "var(--surface-secondary)"
                                         : "transparent")
                                   }
                                 >
@@ -400,11 +418,19 @@ export default function Table({
             </tr>
           </thead>
           <tbody>
-            {sortedData.length === 0 ? (
+            {loading ? (
               <tr>
                 <td colSpan={columns.length + (selectable ? 1 : 0)} style={{ padding: 0 }}>
                   <div className={styles.noDataContent}>
-                    No matching records found.
+                    Loading...
+                  </div>
+                </td>
+              </tr>
+            ) : !data || sortedData.length === 0 ? (
+              <tr>
+                <td colSpan={columns.length + (selectable ? 1 : 0)} style={{ padding: 0 }}>
+                  <div className={styles.noDataContent}>
+                    {!data || data.length === 0 ? emptyMessage : "No matching records found."}
                   </div>
                 </td>
               </tr>
@@ -428,15 +454,22 @@ export default function Table({
                             onSelectChange(selectedRowIds.filter(id => id !== row.id));
                           }
                         }}
-                        aria-label={`Select row ${rowIndex + 1}`}
+                        aria-label={`Select ${row[columns[0]?.key] || `row ${rowIndex + 1}`}`}
                       />
                     </td>
                   )}
-                  {columns.map((col, colIndex) => (
-                    <td key={col.key || colIndex}>
-                      {col.render ? col.render(row, rowIndex) : row[col.key]}
-                    </td>
-                  ))}
+                  {columns.map((col, colIndex) => {
+                    if (colIndex === 0 && !col.render) {
+                      return <th key={col.key || colIndex} scope="row" style={{ fontWeight: 'normal', textAlign: 'left' }}>{row[col.key]}</th>;
+                    } else if (colIndex === 0 && col.render) {
+                      return <th key={col.key || colIndex} scope="row" style={{ fontWeight: 'normal', textAlign: 'left' }}>{col.render(row, rowIndex)}</th>;
+                    }
+                    return (
+                      <td key={col.key || colIndex}>
+                        {col.render ? col.render(row, rowIndex) : row[col.key]}
+                      </td>
+                    );
+                  })}
                 </tr>
               ))
             )}
@@ -447,7 +480,10 @@ export default function Table({
         <Pagination 
           currentPage={currentPage}
           totalPages={totalPages}
-          onPageChange={setCurrentPage}
+          onPageChange={(page) => {
+            setCurrentPage(page);
+            if (tableRef.current) tableRef.current.focus({ preventScroll: true });
+          }}
         />
       )}
     </div>

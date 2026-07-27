@@ -103,10 +103,18 @@ function AccessibleCombobox({ id, label, placeholder, value, onChange, options, 
         setActiveIndex(-1);
       }
     } else if (e.key === 'Escape') {
-      if (isOpen) {
+      e.preventDefault();
+      setIsOpen(false);
+      setActiveIndex(-1);
+    } else if (e.key === 'Home') {
+      if (isOpen && filteredOptions.length > 0) {
         e.preventDefault();
-        setIsOpen(false);
-        setActiveIndex(-1);
+        setActiveIndex(0);
+      }
+    } else if (e.key === 'End') {
+      if (isOpen && filteredOptions.length > 0) {
+        e.preventDefault();
+        setActiveIndex(filteredOptions.length - 1);
       }
     } else if (e.altKey && e.key === 'ArrowDown') {
       e.preventDefault();
@@ -261,7 +269,7 @@ export default function AccessibilityJobs() {
           </p>
           <div className={styles.heroActions}>
             <button type="button" onClick={handleShare} className={styles.shareBtn}>
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false">
                 <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" />
               </svg>
               Share on LinkedIn
@@ -279,7 +287,7 @@ export default function AccessibilityJobs() {
               onChange={setSearchQuery}
               options={SUGGESTED_ROLES}
               icon={
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false">
                   <circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" />
                 </svg>
               }
@@ -293,7 +301,7 @@ export default function AccessibilityJobs() {
               onChange={setLocationQuery}
               options={SUGGESTED_LOCATIONS}
               icon={
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false">
                   <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" /><circle cx="12" cy="10" r="3" />
                 </svg>
               }
@@ -397,13 +405,13 @@ export default function AccessibilityJobs() {
                 )}
 
                 <div className={styles.cardFooter}>
-                  <div className={styles.tagList} aria-label={`Skills: ${job.tags ? job.tags.join(', ') : 'Not specified'}`}>
+                  <ul className={styles.tagList} aria-label={`Skills: ${job.tags ? job.tags.join(', ') : 'Not specified'}`}>
                     {(job.tags || []).map(tag => (
-                      <span key={tag} className={styles.tag}>
+                      <li key={tag} className={styles.tag}>
                         {tag}
-                      </span>
+                      </li>
                     ))}
-                  </div>
+                  </ul>
                   <div className={styles.cardActions}>
                     {job.posted_date && (
                       <span className={styles.postedDate}>
