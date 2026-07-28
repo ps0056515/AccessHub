@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useConfig } from 'context/ConfigContext';
 import { useConfirm } from 'context/ConfirmContext';
 import { settingsApi } from 'api/client';
+import { Trash } from 'lucide-react';
 import dashboardStyles from '../../AdminDashboard.module.css';
 import styles from './SettingsView.module.css';
 
@@ -135,6 +136,9 @@ export default function SettingsView({ showToast }) {
   };
 
   const handleDeleteHeroBg = async () => {
+    if (!(await confirm("Are you sure you want to remove the hero background image?"))) {
+      return;
+    }
     setPortalSaving(true);
     try {
       await settingsApi.update({
@@ -337,36 +341,44 @@ export default function SettingsView({ showToast }) {
       {/* Inner Sub-Navigation Tab Bar */}
       <div className={styles.tabBar} role="tablist" aria-label="Settings categories">
         <button
+          id="tab-branding"
           type="button"
           role="tab"
           aria-selected={activeSubTab === 'branding'}
+          aria-controls="tabpanel-branding"
           onClick={() => setActiveSubTab('branding')}
           className={`${styles.tabBtn} ${activeSubTab === 'branding' ? styles.tabBtnActive : ''}`}
         >
           🎨 Branding & Logos
         </button>
         <button
+          id="tab-navbar"
           type="button"
           role="tab"
           aria-selected={activeSubTab === 'navbar'}
+          aria-controls="tabpanel-navbar"
           onClick={() => setActiveSubTab('navbar')}
           className={`${styles.tabBtn} ${activeSubTab === 'navbar' ? styles.tabBtnActive : ''}`}
         >
           🔝 Navbar Links
         </button>
         <button
+          id="tab-footer"
           type="button"
           role="tab"
           aria-selected={activeSubTab === 'footer'}
+          aria-controls="tabpanel-footer"
           onClick={() => setActiveSubTab('footer')}
           className={`${styles.tabBtn} ${activeSubTab === 'footer' ? styles.tabBtnActive : ''}`}
         >
           ⬇️ Footer Columns
         </button>
         <button
+          id="tab-landing"
           type="button"
           role="tab"
           aria-selected={activeSubTab === 'landing'}
+          aria-controls="tabpanel-landing"
           onClick={() => setActiveSubTab('landing')}
           className={`${styles.tabBtn} ${activeSubTab === 'landing' ? styles.tabBtnActive : ''}`}
         >
@@ -376,7 +388,7 @@ export default function SettingsView({ showToast }) {
 
       {/* Tab 1: Branding & Logos */}
       {activeSubTab === 'branding' && (
-        <div className={styles.tabContent}>
+        <div id="tabpanel-branding" role="tabpanel" aria-labelledby="tab-branding" className={styles.tabContent}>
           {/* <section className={dashboardStyles.panel}>
             <h2 className={dashboardStyles.panelTitle}>Site Brand</h2>
             <form onSubmit={handleSaveBranding}>
@@ -440,13 +452,14 @@ export default function SettingsView({ showToast }) {
 
       {/* Tab: Landing Page */}
       {activeSubTab === 'landing' && (
-        <div className={styles.tabContent}>
+        <div id="tabpanel-landing" role="tabpanel" aria-labelledby="tab-landing" className={styles.tabContent}>
           <section className={dashboardStyles.panel}>
             <h2 className={dashboardStyles.panelTitle}>Hero Section Text</h2>
             <form onSubmit={handleSavePortalConfig}>
               <div className={styles.formGroup}>
-                <label className={styles.formLabel}>Content Alignment</label>
+                <label htmlFor="contentAlignment" className={styles.formLabel}>Content Alignment</label>
                 <select
+                  id="contentAlignment"
                   value={localPortalConfig.contentPosition || 'center'}
                   onChange={(e) => setLocalPortalConfig({...localPortalConfig, contentPosition: e.target.value})}
                   className={styles.textInput}
@@ -457,8 +470,9 @@ export default function SettingsView({ showToast }) {
                 </select>
               </div>
               <div className={styles.formGroup}>
-                <label className={styles.formLabel}>Badge Text</label>
+                <label htmlFor="badgeText" className={styles.formLabel}>Badge Text</label>
                 <input
+                  id="badgeText"
                   type="text"
                   value={localPortalConfig.badge}
                   onChange={(e) => setLocalPortalConfig({...localPortalConfig, badge: e.target.value})}
@@ -466,8 +480,9 @@ export default function SettingsView({ showToast }) {
                 />
               </div>
               <div className={styles.formGroup}>
-                <label className={styles.formLabel}>Hero Heading</label>
+                <label htmlFor="heroHeading" className={styles.formLabel}>Hero Heading</label>
                 <textarea
+                  id="heroHeading"
                   value={localPortalConfig.heading}
                   onChange={(e) => setLocalPortalConfig({...localPortalConfig, heading: e.target.value})}
                   className={styles.textInput}
@@ -475,8 +490,9 @@ export default function SettingsView({ showToast }) {
                 />
               </div>
               <div className={styles.formGroup}>
-                <label className={styles.formLabel}>Hero Subheading</label>
+                <label htmlFor="heroSubheading" className={styles.formLabel}>Hero Subheading</label>
                 <textarea
+                  id="heroSubheading"
                   value={localPortalConfig.subheading}
                   onChange={(e) => setLocalPortalConfig({...localPortalConfig, subheading: e.target.value})}
                   className={styles.textInput}
@@ -528,8 +544,8 @@ export default function SettingsView({ showToast }) {
                 </label>
                 <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>(JPG, PNG, SVG, WEBP)</span>
                 {localPortalConfig.bgUrl && (
-                  <button type="button" onClick={handleDeleteHeroBg} disabled={portalSaving} className={styles.uploadLabelBtn} style={{ color: '#ef4444', background: '#fef2f2', border: '1px solid #fca5a5' }}>
-                    🗑 Remove
+                  <button type="button" onClick={handleDeleteHeroBg} disabled={portalSaving} className={styles.deleteBgBtn}>
+                    <Trash size={16} /> Remove Custom Background
                   </button>
                 )}
               </div>
@@ -571,6 +587,7 @@ export default function SettingsView({ showToast }) {
                     />
                     <input
                       type="text"
+                      aria-label="Search Text hidden query"
                       value={tag.searchText}
                       onChange={(e) => {
                         const newTags = [...localPortalConfig.tags];
@@ -584,7 +601,7 @@ export default function SettingsView({ showToast }) {
                   <button type="button" onClick={() => {
                     const newTags = localPortalConfig.tags.filter((_, idx) => idx !== i);
                     setLocalPortalConfig({ ...localPortalConfig, tags: newTags });
-                  }} className={styles.deleteLinkBtn}>🗑</button>
+                  }} className={styles.deleteLinkBtn} aria-label="Delete tag"><Trash aria-hidden="true" size={16} /></button>
                 </div>
               ))}
             </div>
@@ -614,6 +631,8 @@ export default function SettingsView({ showToast }) {
                       }}
                       className={styles.linkLabelInput}
                       placeholder="Number (e.g. 10k+)"
+                      aria-label="Stat Number"
+                      title="Stat Number"
                     />
                     <input
                       type="text"
@@ -625,12 +644,14 @@ export default function SettingsView({ showToast }) {
                       }}
                       className={styles.linkUrlInput}
                       placeholder="Label (e.g. Active Members)"
+                      aria-label="Stat Label"
+                      title="Stat Label"
                     />
                   </div>
                   <button type="button" onClick={() => {
                     const newStats = localPortalConfig.stats.filter((_, idx) => idx !== i);
                     setLocalPortalConfig({ ...localPortalConfig, stats: newStats });
-                  }} className={styles.deleteLinkBtn}>🗑</button>
+                  }} className={styles.deleteLinkBtn} aria-label="Delete stat"><Trash aria-hidden="true" size={16} /></button>
                 </div>
               ))}
             </div>
@@ -641,7 +662,7 @@ export default function SettingsView({ showToast }) {
 
       {/* Tab 2: Navbar Link configuration */}
       {activeSubTab === 'navbar' && (
-        <section className={dashboardStyles.panel}>
+        <section id="tabpanel-navbar" role="tabpanel" aria-labelledby="tab-navbar" className={dashboardStyles.panel}>
           <div className={styles.panelHeader}>
             <h2 className={dashboardStyles.panelTitle} style={{ margin: 0 }}>Header Navbar Navigation Links</h2>
             <button type="button" onClick={() => addLink('navbar')} className={styles.addLinkBtn}>
@@ -685,7 +706,7 @@ export default function SettingsView({ showToast }) {
                   </label>
                 </div>
 
-                <button type="button" onClick={() => removeLink('navbar', index)} className={styles.deleteLinkBtn} title="Delete Link" aria-label={`Delete navbar link "${link.label || 'New Link'}"`}>🗑</button>
+                <button type="button" onClick={() => removeLink('navbar', index)} className={styles.deleteLinkBtn} title="Delete Link" aria-label={`Delete navbar link "${link.label || 'New Link'}"`}><Trash aria-hidden="true" size={16} /></button>
               </div>
             ))}
             {localNavbarLinks.length === 0 && <p className={styles.emptyState}>No Navbar links configured. Click "Add Navbar Link" to start.</p>}
@@ -704,7 +725,7 @@ export default function SettingsView({ showToast }) {
 
       {/* Tab 3: Footer Link configuration */}
       {activeSubTab === 'footer' && (
-        <div className={styles.tabContent}>
+        <div id="tabpanel-footer" role="tabpanel" aria-labelledby="tab-footer" className={styles.tabContent}>
           {/* Panel 1: Column Layout Manager */}
           <section className={dashboardStyles.panel}>
             <h2 className={dashboardStyles.panelTitle}>Footer Columns Layout</h2>
@@ -735,7 +756,7 @@ export default function SettingsView({ showToast }) {
                     </span>
                   </div>
 
-                  <button type="button" onClick={() => handleDeleteColumn(col.key_name, col.title)} className={styles.deleteLinkBtn} title="Delete Column" aria-label={`Delete footer column "${col.title}"`}>🗑</button>
+                  <button type="button" onClick={() => handleDeleteColumn(col.key_name, col.title)} className={styles.deleteLinkBtn} title="Delete Column" aria-label={`Delete footer column "${col.title}"`}><Trash aria-hidden="true" size={16} /></button>
                 </div>
               ))}
               {localFooterColumns.length === 0 && <p className={styles.emptyState}>No columns configured. Add a column below.</p>}
@@ -832,7 +853,7 @@ export default function SettingsView({ showToast }) {
                     </label>
                   </div>
 
-                  <button type="button" onClick={() => removeLink('footer', index)} className={styles.deleteLinkBtn} title="Delete Link" aria-label={`Delete link "${link.label || 'New Link'}"`}>🗑</button>
+                  <button type="button" onClick={() => removeLink('footer', index)} className={styles.deleteLinkBtn} title="Delete Link" aria-label={`Delete link "${link.label || 'New Link'}"`}><Trash aria-hidden="true" size={16} /></button>
                 </div>
               ))}
               {localFooterLinks.length === 0 && <p className={styles.emptyState}>No links configured in this footer column. Click "Add Link to Column" to add.</p>}

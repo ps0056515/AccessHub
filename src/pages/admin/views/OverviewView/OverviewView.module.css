@@ -22,8 +22,8 @@
 
 .actionBtn:hover:not(:disabled) {
   background: var(--bg-secondary);
-  color: var(--accent);
-  border-color: var(--accent);
+  color: var(--text);
+  border-color: var(--text);
 }
 
 .actionBtn:disabled {
@@ -32,8 +32,8 @@
 }
 
 .actionBtnDanger:hover:not(:disabled) {
-  color: var(--error);
-  border-color: var(--error);
+  color: var(--red-text);
+  border-color: var(--red-border-interactive);
 }
 
 .gridRow {

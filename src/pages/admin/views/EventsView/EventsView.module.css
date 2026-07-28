@@ -8,7 +8,7 @@
 
 .addEventBtn {
   background: var(--accent);
-  color: #ffffff;
+  color: var(--text-on-accent);
   border: none;
   padding: 8px 16px;
   border-radius: 6px;
@@ -17,7 +17,7 @@
   cursor: pointer;
   transition: background 0.2s;
 }
-.addEventBtn:hover { background: #063d82; }
+.addEventBtn:hover { background: var(--button-primary-hover); }
 
 /* ─── Tabs ────────────────────────────────────────────────────────────────── */
 .tabs {
@@ -41,8 +41,8 @@
 }
 .tab:hover { color: var(--text); }
 .tabActive {
-  color: var(--accent);
-  border-bottom-color: var(--accent);
+  color: var(--text);
+  border-bottom-color: var(--text);
 }
 
 .dateBadge {
@@ -50,7 +50,7 @@
   flex-direction: column;
   align-items: center;
   background: var(--accent-subtle);
-  color: var(--accent);
+  color: var(--text);
   border-radius: 6px;
   padding: 4px 8px;
   font-size: 11px;
@@ -68,9 +68,9 @@
   border-radius: 9999px;
   text-transform: uppercase;
 }
-.timingUpcoming { background: #eff6ff; color: #1d4ed8; }
-.timingLive     { background: #fef3c7; color: #b45309; }
-.timingPast     { background: #f1f5f9; color: #64748b; }
+.timingUpcoming { background: var(--accent-bg); color: var(--accent-text); }
+.timingLive     { background: var(--amber-bg); color: var(--amber-text); }
+.timingPast     { background: var(--bg-tertiary); color: var(--text-muted); }
 
 .rsvpCount {
   font-size: 12px;
@@ -111,30 +111,30 @@
 .editBtn:hover { background: var(--bg-secondary); }
 .approveBtn {
   background: transparent;
-  border: 1px solid #bbf7d0;
-  color: #16a34a;
+  border: 1px solid var(--green-border-interactive);
+  color: var(--green-text);
   padding: 4px 8px;
   border-radius: 4px;
   font-size: 12px;
   cursor: pointer;
 }
-.approveBtn:hover { background: #f0fdf4; }
+.approveBtn:hover { background: var(--green-bg); }
 .deleteBtn {
   background: transparent;
-  border: 1px solid #fecaca;
-  color: #ef4444;
+  border: 1px solid var(--red-border-interactive);
+  color: var(--red-text);
   padding: 4px 8px;
   border-radius: 4px;
   font-size: 12px;
   cursor: pointer;
 }
-.deleteBtn:hover { background: #fef2f2; }
+.deleteBtn:hover { background: var(--red-bg); }
 
 /* ─── Extracted Inline Styles ─────────────────────────────────────────────── */
 .rsvpBtn {
   background: none;
   border: none;
-  color: var(--accent);
+  color: var(--text);
   cursor: pointer;
   padding: 0 4px;
   font-family: inherit;

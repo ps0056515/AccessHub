@@ -45,7 +45,7 @@
 
 .table tbody tr:hover td,
 .table tbody tr:hover th {
-  background-color: var(--surface-secondary);
+  background-color: var(--bg-tertiary);
 }
 
 .noDataContent {

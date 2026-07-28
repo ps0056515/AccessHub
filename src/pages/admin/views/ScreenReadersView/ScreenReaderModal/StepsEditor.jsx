@@ -43,6 +43,8 @@ export default function StepsEditor({ items, onChange }) {
               value={step.title || ''}
               onChange={e => handleChange(index, 'title', e.target.value)}
               placeholder={`Step ${index + 1} Title`}
+              aria-label={`Step ${index + 1} Title`}
+              title={`Step ${index + 1} Title`}
               required
             />
             <div className={styles.editorWrapper}>

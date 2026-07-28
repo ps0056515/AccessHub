@@ -18,6 +18,7 @@ export default function Table({
   pagination = false,
   itemsPerPage = 10,
   tableLabel = "Data table",
+  ariaLabel = "Data table",
 }) {
   const [sortConfig, setSortConfig] = useState(null);
   const [filters, setFilters] = useState({});
@@ -28,6 +29,18 @@ export default function Table({
   const activeFilterRef = useRef(null);
 
   useFocusTrap(activeFilterRef, !!openFilter);
+
+  const prevSelectedCount = useRef(selectedRowIds.length);
+  useEffect(() => {
+    if (selectedRowIds.length !== prevSelectedCount.current) {
+      if (selectedRowIds.length > 0) {
+        setAnnouncement(`${selectedRowIds.length} item${selectedRowIds.length > 1 ? 's' : ''} selected. Bulk actions available.`);
+      } else if (prevSelectedCount.current > 0) {
+        setAnnouncement(`Selection cleared.`);
+      }
+      prevSelectedCount.current = selectedRowIds.length;
+    }
+  }, [selectedRowIds.length]);
 
   // Reset to first page when data or filters change
   useEffect(() => {
@@ -172,12 +185,12 @@ export default function Table({
       </div>
       <div 
         className={styles.scrollContainer} 
+        ref={tableRef}
         role="region" 
-        aria-label={tableLabel} 
+        aria-label={ariaLabel} 
         tabIndex="0"
       >
         <table
-          ref={tableRef}
           tabIndex={-1}
           className={styles.table}
           style={{ ...(minWidth ? { minWidth } : {}), outline: 'none' }}
@@ -185,30 +198,31 @@ export default function Table({
           <thead>
             <tr>
               {selectable && (
-                <th scope="col" className={styles.fixedHeader} style={{ width: '40px', minWidth: '40px', textAlign: 'center' }} aria-label="Select">
-                  <input
-                    type="checkbox"
-                    style={{ cursor: 'pointer' }}
-                    aria-label="Select all rows"
-                    checked={isAllPageSelected}
-                    ref={input => {
-                      if (input) {
-                        input.indeterminate = isSomePageSelected;
-                      }
-                    }}
-                    onChange={(e) => {
-                      if (!onSelectChange) return;
-                      if (e.target.checked) {
-                        const newIds = new Set(selectedRowIds);
-                        paginatedData.forEach(r => newIds.add(r.id));
-                        onSelectChange(Array.from(newIds));
-                      } else {
-                        const pageIds = new Set(paginatedData.map(r => r.id));
-                        onSelectChange(selectedRowIds.filter(id => !pageIds.has(id)));
-                      }
-                    }}
-                    aria-label="Select all rows on this page"
-                  />
+                <th scope="col" className={styles.fixedHeader} style={{ width: '40px', minWidth: '40px', textAlign: 'center' }}>
+                  <label style={{ display: 'flex', justifyContent: 'center', margin: 0 }}>
+                    <span className="sr-only">Select all rows</span>
+                    <input
+                      type="checkbox"
+                      style={{ cursor: 'pointer' }}
+                      checked={isAllPageSelected}
+                      ref={input => {
+                        if (input) {
+                          input.indeterminate = isSomePageSelected;
+                        }
+                      }}
+                      onChange={(e) => {
+                        if (!onSelectChange) return;
+                        if (e.target.checked) {
+                          const newIds = new Set(selectedRowIds);
+                          paginatedData.forEach(r => newIds.add(r.id));
+                          onSelectChange(Array.from(newIds));
+                        } else {
+                          const pageIds = new Set(paginatedData.map(r => r.id));
+                          onSelectChange(selectedRowIds.filter(id => !pageIds.has(id)));
+                        }
+                      }}
+                    />
+                  </label>
                 </th>
               )}
               {columns.map((col, i) => (
@@ -448,11 +462,11 @@ export default function Table({
                   style={getRowStyle ? getRowStyle(row) : undefined}
                 >
                   {selectable && (
-                    <td style={{ width: '40px', minWidth: '40px', textAlign: 'center' }} onClick={(e) => e.stopPropagation()}>
+                    <td style={{ width: '40px', minWidth: '40px', textAlign: 'center' }}>
                       <input
                         type="checkbox"
                         style={{ cursor: 'pointer' }}
-                        aria-label={`Select row`}
+                        aria-label={`Select ${row.name || row.title || row.label || row[columns.find(c => c.key && typeof row[c.key] === 'string')?.key] || `row ${rowIndex + 1}`}`}
                         checked={selectedRowIds.includes(row.id)}
                         onChange={(e) => {
                           if (!onSelectChange) return;
@@ -462,7 +476,6 @@ export default function Table({
                             onSelectChange(selectedRowIds.filter(id => id !== row.id));
                           }
                         }}
-                        aria-label={`Select ${row[columns[0]?.key] || `row ${rowIndex + 1}`}`}
                       />
                     </td>
                   )}
@@ -486,6 +499,7 @@ export default function Table({
       </div>
       {pagination && sortedData.length > 0 && (
         <Pagination 
+          ariaLabel={`${ariaLabel} Pagination`}
           currentPage={currentPage}
           totalPages={totalPages}
           onPageChange={(page) => {

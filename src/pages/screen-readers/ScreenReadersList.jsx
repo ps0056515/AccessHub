@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { Link } from "react-router-dom";
 import { screenReadersApi } from "api/client";
 import Container from "components/common/Container/Container";
@@ -10,6 +10,7 @@ export default function ScreenReadersList() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
+  const searchInputRef = useRef(null);
   const { announce } = useAriaLive();
 
   useEffect(() => {
@@ -58,17 +59,32 @@ export default function ScreenReadersList() {
       </header>
 
       <div className={styles.searchBar} style={{ marginBottom: "2rem" }}>
-        <label htmlFor="sr-search" className="sr-only">Search screen reader guides</label>
-        <input 
-          id="sr-search"
-          type="search" 
-          placeholder="Search guides (e.g. NVDA, VoiceOver)..." 
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          className={styles.searchInput}
-          style={{ width: "100%", padding: "10px", borderRadius: "6px", border: "1px solid var(--border-color)", 
-backgroundColor: "var(--surface-primary)", color: "var(--text-primary)" }}
-        />
+        <label htmlFor="sr-search" className="sr-only">Search screen readers</label>
+        <div className={styles.searchWrapper}>
+          <input 
+            ref={searchInputRef}
+            id="sr-search"
+            type="search" 
+            placeholder="Search by OS, platform, or name..." 
+            title="Search by OS, platform, or name..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className={styles.searchInput}
+          />
+          {searchQuery && (
+            <button
+              type="button"
+              className={styles.searchClearBtn}
+              onClick={() => {
+                setSearchQuery("");
+                searchInputRef.current?.focus();
+              }}
+              aria-label="Clear search"
+            >
+              &#x2715;
+            </button>
+          )}
+        </div>
       </div>
 
       <div className={styles.grid}>

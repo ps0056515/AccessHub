@@ -42,7 +42,7 @@
 }
 
 .placeholder {
-  color: #475569;
+  color: var(--text-secondary);
   font-size: 14px;
   padding-top: 4px;
 }
@@ -62,7 +62,7 @@
 
 .removeBtn {
   background: var(--red-bg);
-  border: 1px solid var(--red);
+  border: 1px solid var(--red-text);
   color: var(--error);
   cursor: pointer;
   padding: 0;
@@ -92,7 +92,7 @@
   top: 50%;
   margin-top: -6px;
   font-size: 10px;
-  color: #475569;
+  color: var(--text-secondary);
   transition: transform 0.2s;
   pointer-events: none;
 }

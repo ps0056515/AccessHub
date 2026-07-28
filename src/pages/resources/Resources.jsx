@@ -71,12 +71,13 @@ export default function Resources({ setActivePage }) {
     resources.forEach(r => {
       if (r.category) unique.add(r.category);
     });
-    return ["All", ...Array.from(unique)];
+    return ["All", "Saved", ...Array.from(unique)];
   }, [resources]);
 
   const filtered = useMemo(() => {
     return resources.filter((r) => {
-      if (activeCategory !== "All" && r.category !== activeCategory)
+      if (activeCategory === "Saved" && !saved.has(r.slug)) return false;
+      if (activeCategory !== "All" && activeCategory !== "Saved" && r.category !== activeCategory)
         return false;
       if (!query) return true;
       const q = query.toLowerCase();
@@ -84,7 +85,7 @@ export default function Resources({ setActivePage }) {
         r.title.toLowerCase().includes(q) || r.desc.toLowerCase().includes(q)
       );
     });
-  }, [activeCategory, query, resources]);
+  }, [activeCategory, query, resources, saved]);
 
   useEffect(() => {
     announce(`Filters applied: ${filtered.length} resources found.`);
@@ -158,6 +159,7 @@ export default function Resources({ setActivePage }) {
             className={styles.searchInput}
             type="search"
             placeholder="Search resources…"
+            title="Search resources…"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
           />
@@ -166,20 +168,15 @@ export default function Resources({ setActivePage }) {
           <legend className="sr-only">Filter by category</legend>
           <div className={styles.catNav}>
             {dynamicCategories.map((c) => (
-              <label
+              <button
                 key={c}
+                type="button"
                 className={`${styles.catLabel} ${activeCategory === c ? styles.catActive : ""}`}
+                aria-pressed={activeCategory === c}
+                onClick={() => setActiveCategory(c)}
               >
-                <input
-                  type="radio"
-                  name="resource-category"
-                  className={styles.catInput}
-                  value={c}
-                  checked={activeCategory === c}
-                  onChange={() => setActiveCategory(c)}
-                />
                 <span className={styles.catText}>{c}</span>
-              </label>
+              </button>
             ))}
           </div>
         </fieldset>

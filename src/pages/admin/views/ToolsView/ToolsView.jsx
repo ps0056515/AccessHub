@@ -1,4 +1,5 @@
-import { useState, useEffect } from "react";
+﻿import { useState, useEffect } from "react";
+import { Trash } from "lucide-react";
 import { toolsApi } from "api/client";
 import { COLOR_MAP } from "data";
 import ToolModal from "./components/ToolModal";
@@ -237,6 +238,7 @@ export default function ToolsView({ showToast }) {
             <input
               id="admin-search-input"
               type="search"
+              aria-label="Search tools"
               placeholder="Search tools..."
               value={toolSearch}
               onChange={(e) => setToolSearch(e.target.value)}
@@ -255,7 +257,7 @@ export default function ToolsView({ showToast }) {
                 className={styles.deleteBtn}
                 style={{ padding: '8px 12px', fontSize: '14px', borderRadius: '6px' }}
               >
-                🗑 Bulk Delete ({selectedIds.length})
+                <Trash aria-hidden="true" size={16} /> Bulk Delete ({selectedIds.length})
               </button>
             )}
             <button

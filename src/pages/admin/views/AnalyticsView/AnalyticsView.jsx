@@ -217,11 +217,11 @@ export default function AnalyticsView({ showToast }) {
                       <stop offset="95%" stopColor="#007A33" stopOpacity={0} />
                     </linearGradient>
                   </defs>
-                  <XAxis dataKey="displayDate" stroke="#475569" fontSize={13} />
-                  <YAxis stroke="#475569" fontSize={13} allowDecimals={false} />
+                  <XAxis dataKey="displayDate" stroke="var(--text-muted)" fontSize={13} />
+                  <YAxis stroke="var(--text-muted)" fontSize={13} allowDecimals={false} />
                   <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#cbd5e1" />
                   <RechartsTooltip contentStyle={{ borderRadius: '8px', border: '1px solid #cbd5e1' }} />
-                  <Legend verticalAlign="top" height={36} />
+                  <Legend verticalAlign="top" height={36} wrapperStyle={{ color: 'var(--text)' }} />
                   <Area type="monotone" name="Sessions" dataKey="sessions" stroke="#005A9C" fillOpacity={1} fill="url(#gradVisitors)" />
                   <Area type="monotone" name="Pageviews" dataKey="pageviews" stroke="#007A33" fillOpacity={1} fill="url(#gradPageviews)" />
                 </AreaChart>

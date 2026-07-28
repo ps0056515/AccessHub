@@ -6,7 +6,7 @@ import { useAriaLive } from 'context/AriaLiveContext';
 import { Country, City } from 'country-state-city';
 import { COLOR_MAP } from 'data';
 import {
-  Camera, Mail, MapPin, Building2, Calendar, Edit3,
+  Camera, Mail, MapPin, Building2, Calendar, Edit2,
   Briefcase, User, CheckCircle2, ChevronRight, MessageSquare, FileText, Star
 } from 'lucide-react';
 import Avatar from 'components/common/Avatar/Avatar';
@@ -153,6 +153,7 @@ export default function MyProfilePage() {
   }, [uploadAvatar, addToast, announce]);
 
   const handleRemoveAvatar = useCallback(async () => {
+    if (!window.confirm("Are you sure you want to remove your profile photo?")) return;
     setAvatarUploading(true);
     try {
       await removeAvatar();
@@ -224,9 +225,9 @@ export default function MyProfilePage() {
 
 
 
-  /* ══════════════════════════════════════════════════════════
+  /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
      EDIT MODE
-     ══════════════════════════════════════════════════════════ */
+     â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
   if (isEditing) {
     return (
       <div className={styles.page}>
@@ -240,7 +241,7 @@ export default function MyProfilePage() {
 
         <div className={`${styles.coverBanner} ${styles.fadeUp}`} />
 
-        <form onSubmit={handleSave} noValidate>
+        <form onSubmit={handleSave}>
           <div className={`${styles.editCard} ${styles.fadeUp} ${styles.fadeUp1}`}>
             <div className={styles.profileHeader}>
               <div className={styles.avatarWrapper}>
@@ -302,6 +303,8 @@ export default function MyProfilePage() {
                   onKeyDown={handlePreventEnterSubmit}
                   required
                   aria-required="true"
+                  pattern=".*\S+.*"
+                  title="This field cannot be empty or just spaces"
                 />
               </div>
 
@@ -406,9 +409,9 @@ export default function MyProfilePage() {
     );
   }
 
-  /* ══════════════════════════════════════════════════════════
+  /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
      VIEW MODE
-     ══════════════════════════════════════════════════════════ */
+     â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
   return (
     <div className={styles.page}>
       <nav className={styles.breadcrumb} aria-label="Breadcrumb">
@@ -466,7 +469,7 @@ export default function MyProfilePage() {
             setTimeout(() => document.getElementById('edit-name')?.focus(), 0);
           }}
         >
-          <Edit3 size={16} /> Edit Profile
+          <Edit2 size={16} /> Edit Profile
         </button>
       </div>
 

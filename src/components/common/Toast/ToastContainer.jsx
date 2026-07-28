@@ -32,7 +32,7 @@ export default function ToastContainer({ toasts, removeToast }) {
             }}
             aria-label="Close notification"
           >
-            ✕
+            ×
           </button>
         </div>
       ))}

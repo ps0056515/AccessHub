@@ -116,6 +116,29 @@
   background: #cbd5e1;
 }
 
+.deleteBgBtn {
+  font-size: 13px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  background: var(--bg-card);
+  color: var(--text);
+  border: 1px solid var(--border-interactive-strong);
+  cursor: pointer;
+  text-align: center;
+  font-weight: 500;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.deleteBgBtn:hover {
+  background: var(--bg-secondary);
+  color: var(--text);
+  border-color: var(--text);
+}
+
 .panelHeader {
   display: flex;
   justify-content: space-between;

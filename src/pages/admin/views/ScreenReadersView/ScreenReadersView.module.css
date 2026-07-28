@@ -37,7 +37,7 @@
 
 .addBtn {
   background: var(--accent);
-  color: #fff;
+  color: var(--text-on-accent);
   border: none;
   padding: 8px 16px;
   border-radius: 6px;
@@ -47,7 +47,7 @@
 }
 
 .addBtn:hover {
-  background: #063d82;
+  background: var(--button-primary-hover);
 }
 
 
@@ -80,7 +80,7 @@
 
 .btnDanger {
   background: transparent;
-  color: var(--red);
+  color: var(--red-text);
   border: 1px solid var(--red-border-interactive);
   padding: 4px 8px;
   border-radius: var(--radius-sm, 6px);
@@ -90,13 +90,13 @@
   cursor: pointer;
 }
 .btnDanger:hover {
-  background: #fef2f2;
+  background: var(--red-bg);
 }
 
 .btnSuccess {
   background: transparent;
-  color: var(--green);
-  border: 1px solid var(--green-border);
+  color: var(--green-text);
+  border: 1px solid var(--green-border-interactive);
   padding: 4px 8px;
   border-radius: var(--radius-sm, 6px);
   font-size: 13px;
@@ -105,7 +105,7 @@
   cursor: pointer;
 }
 .btnSuccess:hover {
-  background: #f0fdf4;
+  background: var(--green-bg);
 }
 
 .statusBadge {
@@ -119,13 +119,13 @@
 }
 
 .statusDraft {
-  background: #fef3c7;
-  color: #78350f;
+  background: var(--amber-bg);
+  color: var(--amber-text);
 }
 
 .statusPublished {
-  background: #dcfce7;
-  color: #14532d;
+  background: var(--green-bg);
+  color: var(--green-text);
 }
 
 .editorWrapper {

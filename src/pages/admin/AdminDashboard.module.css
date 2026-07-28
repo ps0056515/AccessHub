@@ -54,9 +54,9 @@
 }
 
 .collapseToggle {
-  background: transparent;
+  background: var(--brand-navy);
   border: 1px solid var(--sidebar-border);
-  color: var(--sidebar-text-muted);
+  color: var(--text);
   cursor: pointer;
   border-radius: 4px;
   width: 24px;
@@ -66,6 +66,11 @@
   justify-content: center;
   margin-left: auto;
   transition: all 0.2s ease;
+}
+
+.collapseToggle:focus-visible {
+  outline: 2px solid var(--accent-focus, #38bdf8);
+  outline-offset: 2px;
 }
 
 .collapseToggle:focus-visible {
@@ -216,7 +221,7 @@
 
 .profileEmail {
   font-size: 11px;
-  color: #64748b;
+  color: var(--sidebar-text-muted);
   margin: 0;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -224,9 +229,9 @@
 }
 
 .logoutBtn {
-  background: transparent;
+  background: var(--brand-navy);
   border: none;
-  color: var(--sidebar-text-muted);
+  color: var(--text);
   cursor: pointer;
   padding: 4px;
   border-radius: 4px;
@@ -235,7 +240,7 @@
 
 .logoutBtn:hover {
   background: rgba(255, 255, 255, 0.08);
-  color: var(--red);
+  color: var(--red-text);
 }
 
 /* ── Right-Side Main CMS Display Frame ── */
@@ -264,16 +269,17 @@
   text-transform: uppercase;
   letter-spacing: 0.08em;
   color: var(--text-faint);
+  margin: 0;
 }
 
 .backBtn {
-  background: transparent;
+  background: var(--bg-card);
   border: 1px solid var(--border-interactive-strong);
+  color: var(--text);
   border-radius: var(--radius-sm, 6px);
   padding: 6px 12px;
   font-size: 13px;
   font-weight: 500;
-  color: var(--text-muted);
   cursor: pointer;
   transition: all var(--transition, 0.15s ease);
 }
@@ -302,7 +308,7 @@
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  color: var(--accent);
+  color: var(--text);
   margin: 0 0 6px;
 }
 

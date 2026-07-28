@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { Link } from "react-router-dom";
 import { articlesApi } from "api/client";
 import { SITE_NAME } from "brand";
@@ -12,6 +12,7 @@ export default function ArticlesList() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
+  const searchInputRef = useRef(null);
   const { announce } = useAriaLive();
 
   useEffect(() => {
@@ -59,14 +60,31 @@ export default function ArticlesList() {
 
       <div className={styles.searchBar}>
         <label htmlFor="article-search" className="sr-only">Search articles</label>
-        <input 
-          id="article-search"
-          type="search" 
-          placeholder="Search by title or author..." 
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          className={styles.searchInput}
-        />
+        <div className={styles.searchWrapper}>
+          <input 
+            ref={searchInputRef}
+            id="article-search"
+            type="search" 
+            placeholder="Search by title or author..." 
+            title="Search by title or author..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className={styles.searchInput}
+          />
+          {searchQuery && (
+            <button
+              type="button"
+              className={styles.searchClearBtn}
+              onClick={() => {
+                setSearchQuery("");
+                searchInputRef.current?.focus();
+              }}
+              aria-label="Clear search"
+            >
+              &#x2715;
+            </button>
+          )}
+        </div>
       </div>
 
       {loading ? (

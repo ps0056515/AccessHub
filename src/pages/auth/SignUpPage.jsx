@@ -72,7 +72,7 @@ export default function SignUpPage({ goToPortal }) {
   const countries = useMemo(() => Country.getAllCountries(), []);
 
   const formik = useFormik({
-    initialValues: signUpInitialValues,
+    initialValues: { ...signUpInitialValues, email: location.state?.email || signUpInitialValues.email },
     validationSchema: signUpValidationSchema,
     onSubmit: async (values, { setSubmitting }) => {
       try {
@@ -242,7 +242,7 @@ export default function SignUpPage({ goToPortal }) {
               name="email"
               className={`${styles.input} ${formik.touched.email && formik.errors.email ? styles.inputError : ''}`}
               type="email"
-              autoComplete="email"
+              autoComplete="username"
               value={formik.values.email}
               onChange={formik.handleChange}
               onBlur={async (e) => {
@@ -425,7 +425,7 @@ export default function SignUpPage({ goToPortal }) {
 
           <p className={styles.footer}>
             Already have an account?{' '}
-            <Link className={styles.link} to="/sign-in" state={location.state}>
+            <Link className={styles.link} to="/sign-in" state={{ ...location.state, email: formik.values.email }}>
               Sign in
             </Link>
           </p>

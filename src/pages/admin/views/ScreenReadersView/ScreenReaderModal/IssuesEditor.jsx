@@ -25,6 +25,8 @@ export default function IssuesEditor({ items, onChange }) {
                 className={styles.input} 
                 value={issue.sev || 'high'} 
                 onChange={e => handleChange(index, 'sev', e.target.value)}
+                aria-label="Severity"
+                title="Severity"
                 style={{ flex: '0 0 120px' }}
               >
                 <option value="high">High</option>
@@ -37,6 +39,8 @@ export default function IssuesEditor({ items, onChange }) {
                 value={issue.title || ''} 
                 onChange={e => handleChange(index, 'title', e.target.value)}
                 placeholder="Issue Title (e.g. Ambiguous button and link names)"
+                aria-label="Issue Title"
+                title="Issue Title"
                 required
               />
             </div>
@@ -45,6 +49,8 @@ export default function IssuesEditor({ items, onChange }) {
               value={issue.desc || ''} 
               onChange={e => handleChange(index, 'desc', e.target.value)}
               placeholder="Issue Description"
+              aria-label="Issue Description"
+              title="Issue Description"
               style={{ minHeight: '60px' }}
               required
             />

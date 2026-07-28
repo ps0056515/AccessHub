@@ -164,7 +164,7 @@ function AdminDashboardInner({ goToPortal }) {
       {/* Main CMS Display Frame */}
       <div className={styles.mainFrame}>
         <header className={styles.frameHeader}>
-          <span className={styles.pathIndicator}>CMS / {activeTab}</span>
+          <h1 className={styles.pathIndicator}>CMS / {activeTab}</h1>
           <button
             type="button"
             className={styles.backBtn}

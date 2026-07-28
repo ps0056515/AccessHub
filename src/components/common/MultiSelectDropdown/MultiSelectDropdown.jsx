@@ -209,7 +209,10 @@ export default function MultiSelectDropdown({
                   role="option"
                   aria-selected={isSelected}
                   className={`${styles.option} ${isActive ? styles.activeOption : ''}`}
-                  onClick={() => handleToggle(opt)}
+                  onMouseDown={(e) => {
+                    e.preventDefault(); // Prevent blur on the combobox
+                    handleToggle(opt);
+                  }}
                 >
                   <input 
                     type="checkbox" 

@@ -11,7 +11,7 @@ export const signInInitialValues = {
 
 export const signInValidationSchema = Yup.object({
   email: Yup.string()
-    .matches(emailRegex, 'Invalid email address')
+    .matches(emailRegex, 'Email must be in the format name@example.com')
     .required('Email is required'),
   password: Yup.string()
     .required('Password is required'),
@@ -35,7 +35,7 @@ export const signUpValidationSchema = Yup.object({
     .min(2, 'Display name must be at least 2 characters')
     .required('Display name is required'),
   email: Yup.string()
-    .matches(emailRegex, 'Invalid email address')
+    .matches(emailRegex, 'Email must be in the format name@example.com')
     .required('Email is required'),
   company: Yup.string(),
   designation: Yup.string(),
