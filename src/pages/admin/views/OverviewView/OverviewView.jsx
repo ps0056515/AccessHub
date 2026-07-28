@@ -4,8 +4,8 @@ import { useAuth } from "context/AuthContext";
 import { Download } from "lucide-react";
 import dashboardStyles from "../../AdminDashboard.module.css";
 import styles from "./OverviewView.module.css";
-import Table from "components/common/Table/Table";
-import Tooltip from "components/common/Tooltip/Tooltip";
+import Table from "pages/admin/components/Table/Table";
+import Tooltip from "pages/admin/components/Tooltip/Tooltip";
 import { useConfirm } from "context/ConfirmContext";
 import { exportToExcel } from "utils/commonUtils";
 
@@ -283,6 +283,7 @@ export default function OverviewView({ showToast }) {
               </Tooltip>
               <input 
                 type="search" 
+                aria-label="Search members by country"
                 placeholder="Search..." 
                 value={countrySearch}
                 onChange={(e) => setCountrySearch(e.target.value)}
@@ -330,6 +331,7 @@ export default function OverviewView({ showToast }) {
               </Tooltip>
               <input 
                 type="search" 
+                aria-label="Search members by city"
                 placeholder="Search..." 
                 value={citySearch}
                 onChange={(e) => setCitySearch(e.target.value)}
@@ -390,6 +392,7 @@ export default function OverviewView({ showToast }) {
             </Tooltip>
             <input 
               type="search" 
+              aria-label="Search all members"
               placeholder="Search members..." 
               value={memberSearch}
               onChange={(e) => setMemberSearch(e.target.value)}

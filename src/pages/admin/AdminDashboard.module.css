@@ -1,7 +1,7 @@
 /* ── Main CMS Layout Grid ── */
 .cmsContainer {
   display: grid;
-  grid-template-columns: 260px minmax(0, 1fr);
+  grid-template-columns: var(--admin-sidebar-width, 260px) minmax(0, 1fr);
   min-height: 100vh;
   background: var(--bg);
   color: var(--text);
@@ -10,7 +10,7 @@
 }
 
 .cmsCollapsed {
-  grid-template-columns: 80px minmax(0, 1fr);
+  grid-template-columns: var(--admin-sidebar-collapsed, 80px) minmax(0, 1fr);
 }
 
 /* ── Sidebar Styling ── */
@@ -66,6 +66,11 @@
   justify-content: center;
   margin-left: auto;
   transition: all 0.2s ease;
+}
+
+.collapseToggle:focus-visible {
+  outline: 2px solid var(--accent-focus, #38bdf8);
+  outline-offset: 2px;
 }
 
 .collapseToggle:hover {
@@ -127,7 +132,6 @@
   padding: 10px 14px;
   border-radius: var(--radius-sm, 6px);
   border: none;
-  border-left: 3px solid transparent;
   background: transparent;
   color: var(--sidebar-text-muted);
   font-size: 14px;
@@ -143,22 +147,28 @@
 }
 
 .tabItem:focus-visible {
-  outline: 2px solid var(--focus-border-color);
+  outline: 2px solid var(--accent-focus);
   outline-offset: 2px;
 }
 
-.tabItemActive { 
-  border-left-color: var(--accent); 
-  color: var(--text-on-dark) !important; 
-  font-weight: 600; 
+.tabItemActive {
+  background: var(--accent);
+  color: var(--text-on-accent) !important;
 }
 
 .tabIcon {
   font-size: 16px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .tabLabel {
-  line-height: 1;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* ── Profile Footer ── */
@@ -190,6 +200,8 @@
 .profileInfo {
   flex: 1;
   min-width: 0;
+  display: flex;
+  flex-direction: column;
 }
 
 .profileName {
@@ -198,13 +210,17 @@
   margin: 0;
   color: var(--text-on-dark);
   overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .profileEmail {
   font-size: 11px;
-  color: #334155;
+  color: #64748b;
   margin: 0;
   overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .logoutBtn {
@@ -278,7 +294,7 @@
 
 /* ── Sub-page header ── */
 .header {
-  margin-bottom: 32px;
+  margin-bottom: 24px;
 }
 
 .kicker {
@@ -326,7 +342,7 @@
 /* ── Stats Summary Grid ── */
 .statsGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 180px), 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
   gap: 16px;
   margin-bottom: 32px;
 }
@@ -363,7 +379,7 @@
 /* ── Content Panels ── */
 .panels {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 360px), 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
   gap: 24px;
   margin-bottom: 32px;
 }
@@ -417,13 +433,37 @@
     padding: 16px 20px;
   }
   .frameContent {
-    padding: 20px;
+    padding: 24px;
   }
   .panels {
     grid-template-columns: 1fr;
   }
 }
 
+@media (max-width: 768px) {
+  .frameContent {
+    padding: 16px;
+  }
+  .panel {
+    padding: 20px;
+  }
+}
 
-
+@media (max-width: 480px) {
+  .frameHeader {
+    padding: 16px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .frameContent {
+    padding: 12px;
+  }
+  .panel {
+    padding: 16px;
+  }
+  .title {
+    font-size: 24px;
+  }
+}
 

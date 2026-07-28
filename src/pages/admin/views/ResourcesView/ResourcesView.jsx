@@ -3,7 +3,7 @@ import { resourcesApi } from "api/client";
 import dashboardStyles from "../../AdminDashboard.module.css";
 import styles from "./ResourcesView.module.css";
 import ResourceModal from "./components/ResourceModal";
-import Table from "components/common/Table/Table";
+import Table from "pages/admin/components/Table/Table";
 import { useConfirm } from "context/ConfirmContext";
 import { truncateText } from "utils/commonUtils";
 import { Trash } from "lucide-react";
@@ -347,6 +347,7 @@ export default function ResourcesView({ showToast }) {
             <input
               id="admin-search-input"
               type="search"
+              aria-label="Search resources"
               placeholder="Search resources..."
               value={resourceSearch}
               onChange={(e) => setResourceSearch(e.target.value)}

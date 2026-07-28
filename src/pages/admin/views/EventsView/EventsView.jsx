@@ -4,7 +4,7 @@ import EventModal from "./components/EventModal";
 import RsvpModal from "./components/RsvpModal";
 import dashboardStyles from "../../AdminDashboard.module.css";
 import styles from "./EventsView.module.css";
-import Table from "components/common/Table/Table";
+import Table from "pages/admin/components/Table/Table";
 import { truncateText } from "utils/commonUtils";
 import { useConfirm } from "context/ConfirmContext";
 

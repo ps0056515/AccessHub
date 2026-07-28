@@ -3,7 +3,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
+  margin-bottom: 24px;
 }
 
 .addEventBtn {
@@ -107,9 +107,6 @@
   border-radius: 4px;
   font-size: 12px;
   cursor: pointer;
-  min-height: 24px;
-  display: inline-flex;
-  align-items: center;
 }
 .editBtn:hover { background: var(--bg-secondary); }
 .approveBtn {
@@ -120,9 +117,6 @@
   border-radius: 4px;
   font-size: 12px;
   cursor: pointer;
-  min-height: 24px;
-  display: inline-flex;
-  align-items: center;
 }
 .approveBtn:hover { background: #f0fdf4; }
 .deleteBtn {
@@ -133,9 +127,6 @@
   border-radius: 4px;
   font-size: 12px;
   cursor: pointer;
-  min-height: 24px;
-  display: inline-flex;
-  align-items: center;
 }
 .deleteBtn:hover { background: #fef2f2; }
 
@@ -188,5 +179,28 @@
 
 .tabBadge {
   margin-left: 6px;
+}
+
+@media (max-width: 768px) {
+  .eventsHeader {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .searchWrapper {
+    width: 100%;
+    flex-wrap: wrap;
+  }
+  .searchInput {
+    flex: 1;
+    min-width: 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .tabs {
+    overflow-x: auto;
+    padding-bottom: 8px;
+  }
 }
 

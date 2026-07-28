@@ -1,4 +1,4 @@
-﻿.errorContainer {
+.errorContainer {
   text-align: center;
   padding: 48px;
   color: var(--text-muted);
@@ -34,4 +34,76 @@
 .actionBtnDanger:hover:not(:disabled) {
   color: var(--error);
   border-color: var(--error);
+}
+
+.gridRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  margin-bottom: 32px;
+}
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg, 12px);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+}
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+.sectionTitle {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text);
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+.exportBtn {
+  background: transparent;
+  border: 1px solid var(--border-interactive-strong);
+  border-radius: var(--radius-sm, 6px);
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all var(--transition, 0.15s ease);
+}
+.exportBtn:hover {
+  background: var(--bg-secondary);
+  color: var(--text);
+}
+.fullWidthCard {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg, 12px);
+  padding: 24px;
+}
+
+@media (max-width: 1024px) {
+  .gridRow {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .card, .fullWidthCard {
+    padding: 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .cardHeader {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .card, .fullWidthCard {
+    padding: 16px;
+  }
 }

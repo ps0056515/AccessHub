@@ -58,7 +58,7 @@ export default function AccessibleChartWrapper({ title, data, columns, children 
       {/* Hide the visual SVG chart from screen readers and toggle display for keyboard users */}
       <div 
         aria-hidden="true" 
-        style={{ width: '100%', height: '100%', display: showTable ? 'none' : 'block' }}
+        style={{ width: '100%', flex: 1, minHeight: 0, display: showTable ? 'none' : 'block' }}
         className={tooltipDismissed ? 'hide-recharts-tooltip' : ''}
       >
         {children}
@@ -72,7 +72,7 @@ export default function AccessibleChartWrapper({ title, data, columns, children 
       </div>
 
       {/* Data table */}
-      <div style={{ width: '100%', overflowX: 'auto' }}>
+      <div style={showTable ? { width: '100%', overflowX: 'auto', overflowY: 'auto', flex: 1, minHeight: 0 } : { width: '100%' }}>
         <table className={showTable ? styles.visibleTable : styles.srOnly} aria-label={`Data table for ${title}`}>
           <thead>
             <tr>

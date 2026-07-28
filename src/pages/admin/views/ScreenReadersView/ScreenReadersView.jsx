@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { screenReadersApi } from "api/client";
 import ScreenReaderModal from "./ScreenReaderModal";
-import Table from "components/common/Table/Table";
+import Table from "pages/admin/components/Table/Table";
 import { useConfirm } from "context/ConfirmContext";
 import styles from "./ScreenReadersView.module.css";
 import { truncateText } from "utils/commonUtils";

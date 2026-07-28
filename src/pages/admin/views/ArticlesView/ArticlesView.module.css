@@ -1,4 +1,4 @@
-﻿.container {
+.container {
   display: flex;
   flex-direction: column;
   gap: 24px;
@@ -189,4 +189,18 @@
   padding: 48px;
   text-align: center;
   color: var(--text-muted);
+}
+
+@media (max-width: 768px) {
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .form {
+    padding: 16px;
+  }
 }

@@ -25,6 +25,7 @@
   text-align: left;
   font-size: 13px;
   padding: 8px 12px;
+  white-space: nowrap;
 }
 
 .fixedHeader {
@@ -35,14 +36,15 @@
   border-bottom: 2px solid var(--border-strong);
 }
 
-.table td {
+.table td,
+.table tbody th {
   position: relative;
   border-bottom: 1px solid var(--border);
   vertical-align: middle;
-  color: var(--text-color);
 }
 
-.table tbody tr:hover td {
+.table tbody tr:hover td,
+.table tbody tr:hover th {
   background-color: var(--surface-secondary);
 }
 
@@ -64,5 +66,19 @@
   color: inherit;
   cursor: pointer;
   text-align: inherit;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
+.sortBtn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 11px;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px;
+}

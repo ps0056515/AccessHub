@@ -56,11 +56,10 @@
 }
 
 .filterBtn[aria-pressed="true"] {
-  background: transparent;
-  color: var(--accent);
-  border: 2px solid var(--accent);
+  background: var(--accent);
+  color: #ffffff;
+  border-color: var(--accent);
   box-shadow: var(--shadow-sm);
-  padding: 8px 19px; /* offset the 1px thicker border to prevent layout shift */
 }
 
 /* --- KPI Cards Grid --- */
@@ -179,6 +178,8 @@
 .tablePath {
   max-width: 250px;
   overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   font-family: 'Courier New', Courier, monospace;
   font-weight: 500;
   color: var(--accent);
@@ -275,7 +276,6 @@
   transition: width 0.3s ease;
 }
 
-/* --- Responsive Breakpoints --- */
 @media (max-width: 1200px) {
   .kpiGrid {
     grid-template-columns: repeat(2, 1fr);
@@ -285,6 +285,15 @@
 @media (max-width: 1024px) {
   .chartRow {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .kpiCard {
+    padding: 20px 16px;
+  }
+  .sectionPanel {
+    padding: 20px;
   }
 }
 
@@ -300,6 +309,15 @@
   .filterBtn {
     width: 100%;
     text-align: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .sectionPanel {
+    padding: 16px;
+  }
+  .kpiCard {
+    padding: 16px;
   }
 }
 

@@ -127,4 +127,12 @@
   border-bottom-color: var(--accent);
 }
 
+@media (max-width: 480px) {
+  .tabs {
+    overflow-x: auto;
+    padding-bottom: 8px;
+    gap: 8px;
+  }
+}
+
 

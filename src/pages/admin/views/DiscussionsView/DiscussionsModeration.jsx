@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { postsApi } from 'api/client';
 import dashboardStyles from '../../AdminDashboard.module.css';
 import DiscussionModal from './DiscussionModal';
-import Table from 'components/common/Table/Table';
+import Table from 'pages/admin/components/Table/Table';
 import { useConfirm } from 'context/ConfirmContext';
 import styles from './DiscussionsView.module.css';
 import { truncateText } from 'utils/commonUtils';

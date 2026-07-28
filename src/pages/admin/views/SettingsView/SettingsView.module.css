@@ -48,7 +48,7 @@
   border: 1px solid var(--text-faint);
   background: var(--bg-card);
   color: var(--text);
-  font-size: 16px;
+  font-size: 14px;
   max-width: 400px;
   width: 100%;
 }
@@ -120,7 +120,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 16px;
+  margin-bottom: 24px;
 }
 
 .panelHeaderFooter {
@@ -173,6 +173,16 @@
   gap: 2px;
 }
 
+.editBtn {
+  background: transparent;
+  border: 1px solid var(--border-interactive-strong);
+  color: var(--text);
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  cursor: pointer;
+}
+
 .sortBtn {
   background: transparent;
   border: none;
@@ -206,7 +216,7 @@
   border: 1px solid var(--text-faint);
   background: var(--bg-card);
   color: var(--text);
-  font-size: 16px;
+  font-size: 13px;
 }
 
 .linkUrlInput {
@@ -217,7 +227,7 @@
   border: 1px solid var(--text-faint);
   background: var(--bg-card);
   color: var(--text);
-  font-size: 16px;
+  font-size: 13px;
 }
 
 .checkboxLabel {
@@ -289,7 +299,7 @@
   border: 1px solid var(--text-faint);
   background: var(--bg-card);
   color: var(--text);
-  font-size: 16px;
+  font-size: 13px;
 }
 
 .createBtn {
@@ -329,7 +339,7 @@
   border: 1px solid var(--text-faint);
   background: var(--bg-card);
   color: var(--text);
-  font-size: 16px;
+  font-size: 13px;
 }
 
 .visuallyHidden {
@@ -341,4 +351,40 @@
   overflow: hidden;
   clip: rect(0, 0, 0, 0);
   border: 0;
+}
+
+@media (max-width: 768px) {
+  .panelHeader {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .panelHeaderFooter {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .linkFields {
+    flex-direction: column;
+  }
+  .createColumnBlock {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
+@media (max-width: 480px) {
+  .tabBar {
+    overflow-x: auto;
+    padding-bottom: 8px;
+  }
+  .linkRow {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .sortButtons {
+    flex-direction: row;
+    justify-content: center;
+    margin-bottom: 8px;
+  }
 }
