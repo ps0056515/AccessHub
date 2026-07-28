@@ -1,0 +1,86 @@
+.tooltipWrapper {
+  position: relative;
+  display: flex;
+}
+
+.fullWidth {
+  width: 100%;
+}
+
+.tooltipBox {
+  position: fixed;
+  background-color: var(--tooltip-bg);
+  color: var(--tooltip-text);
+  padding: 6px 10px;
+  border-radius: var(--radius-sm, 6px);
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.4;
+  z-index: 9999;
+  pointer-events: none;
+  opacity: 0;
+  animation: fadeIn 0.15s ease-in-out forwards;
+  box-shadow:
+    0 4px 6px -1px var(--shadow-md),
+    0 2px 4px -1px var(--shadow-md);
+}
+
+.tooltipArrow {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  background-color: var(--tooltip-bg);
+  transform: rotate(45deg);
+}
+
+/* Top position */
+.top {
+  --tx: -50%;
+  --ty: -100%;
+}
+.top .tooltipArrow {
+  bottom: -4px;
+  left: calc(50% - 4px);
+}
+
+/* Bottom position */
+.bottom {
+  --tx: -50%;
+  --ty: 0;
+}
+.bottom .tooltipArrow {
+  top: -4px;
+  left: calc(50% - 4px);
+}
+
+/* Left position */
+.left {
+  --tx: -100%;
+  --ty: -50%;
+}
+.left .tooltipArrow {
+  right: -4px;
+  top: calc(50% - 4px);
+}
+
+/* Right position */
+.right {
+  --tx: 0;
+  --ty: -50%;
+}
+.right .tooltipArrow {
+  left: -4px;
+  top: calc(50% - 4px);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translate(var(--tx, 0), var(--ty, 0)) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translate(var(--tx, 0), var(--ty, 0)) scale(1);
+  }
+}
+

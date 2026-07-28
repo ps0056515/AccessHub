@@ -3,7 +3,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
+  margin-bottom: 24px;
 }
 
 .headerTitle {
@@ -49,6 +49,8 @@
 .metaLink {
   display: block;
   overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .noteText {
@@ -156,7 +158,7 @@
 .deleteBtn {
   background: transparent;
   border: 1px solid #fecaca;
-  color: #ef4444;
+  color: #dc2626;
   padding: 4px 8px;
   border-radius: 4px;
   font-size: 12px;
@@ -241,7 +243,30 @@
   text-transform: capitalize;
 }
 .statusPending  { background: #fef9c3; color: #713f12; }
-.statusApproved { background: #dcfce7; color: #14532d; }
 .statusRejected { background: #fee2e2; color: #7f1d1d; }
 
+@media (max-width: 768px) {
+  .eventsHeader {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .headerActions {
+    width: 100%;
+    flex-wrap: wrap;
+  }
+  .searchInput {
+    flex: 1;
+    min-width: 0;
+  }
+}
 
+@media (max-width: 480px) {
+  .formRow {
+    grid-template-columns: 1fr;
+  }
+  .tabs {
+    overflow-x: auto;
+    padding-bottom: 8px;
+  }
+}

@@ -185,7 +185,7 @@ export default function Table({
           <thead>
             <tr>
               {selectable && (
-                <th scope="col" className={styles.fixedHeader} style={{ width: '40px', minWidth: '40px', textAlign: 'center' }}>
+                <th scope="col" className={styles.fixedHeader} style={{ width: '40px', minWidth: '40px', textAlign: 'center' }} aria-label="Select">
                   <input
                     type="checkbox"
                     style={{ cursor: 'pointer' }}

@@ -7,7 +7,7 @@ import {
 } from 'recharts';
 import dashboardStyles from "../../AdminDashboard.module.css";
 import styles from "./AnalyticsView.module.css";
-import AccessibleChartWrapper from "components/common/AccessibleChartWrapper/AccessibleChartWrapper";
+import AccessibleChartWrapper from "pages/admin/components/AccessibleChartWrapper/AccessibleChartWrapper";
 
 // High contrast, WCAG AA compliant color palette (responsive to theme)
 const COLORS = ['var(--chart-1)', 'var(--chart-2)', 'var(--chart-3)', 'var(--chart-4)', 'var(--chart-5)'];

@@ -4,8 +4,8 @@ import { COLOR_MAP } from "data";
 import ToolModal from "./components/ToolModal";
 import dashboardStyles from "../../AdminDashboard.module.css";
 import styles from "./ToolsView.module.css";
-import Table from "components/common/Table/Table";
-import Tooltip from "components/common/Tooltip/Tooltip";
+import Table from "pages/admin/components/Table/Table";
+import Tooltip from "pages/admin/components/Tooltip/Tooltip";
 import { truncateText } from "utils/commonUtils";
 import { useConfirm } from "context/ConfirmContext";
 

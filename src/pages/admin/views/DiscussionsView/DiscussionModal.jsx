@@ -5,8 +5,8 @@ import { useToast } from 'context/ToastContext';
 import styles from './DiscussionsView.module.css';
 import dashboardStyles from '../../AdminDashboard.module.css';
 import { useConfig } from 'context/ConfigContext';
-import MultiSelectDropdown from 'components/common/MultiSelectDropdown/MultiSelectDropdown';
-import Modal from 'components/common/Modal/Modal';
+import MultiSelectDropdown from 'pages/admin/components/MultiSelectDropdown/MultiSelectDropdown';
+import Modal from 'pages/admin/components/Modal/Modal';
 
 // Helper to format ISO strings or Date objects for datetime-local input (YYYY-MM-DDThh:mm)
 function toDatetimeLocal(isoString) {

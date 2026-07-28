@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { toolsApi } from "api/client";
-import Modal from "components/common/Modal/Modal";
-import MultiSelectDropdown from "components/common/MultiSelectDropdown/MultiSelectDropdown";
+import Modal from "pages/admin/components/Modal/Modal";
+import MultiSelectDropdown from "pages/admin/components/MultiSelectDropdown/MultiSelectDropdown";
 import styles from "../ToolsView.module.css";
 
 const COMPATIBILITY_OPTIONS = ["Web", "Android", "iOS", "React", "Angular", "PDF"];

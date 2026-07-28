@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { eventsApi } from 'api/client';
-import Modal from 'components/common/Modal/Modal';
+import Modal from 'pages/admin/components/Modal/Modal';
 import styles from './EventModals.module.css';
 
 const BAND_OPTIONS = ['Free', 'Members only', 'In-person'];

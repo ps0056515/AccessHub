@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { resourcesApi } from 'api/client';
-import Modal from 'components/common/Modal/Modal';
+import Modal from 'pages/admin/components/Modal/Modal';
 import styles from '../ResourcesView.module.css';
 
 const COLORS = ['blue', 'purple', 'green', 'amber', 'red', 'pink', 'gray'];

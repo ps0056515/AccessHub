@@ -3,7 +3,7 @@ import ReactQuill, { Quill } from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import ImageResize from 'quill-image-resize-module-react';
 import { blogpostsApi } from "api/client";
-import Table from "components/common/Table/Table";
+import Table from "pages/admin/components/Table/Table";
 import { useConfirm } from "context/ConfirmContext";
 import styles from "./BlogpostsView.module.css";
 import { truncateText } from 'utils/commonUtils';

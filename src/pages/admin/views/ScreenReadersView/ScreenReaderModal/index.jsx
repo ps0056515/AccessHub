@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { screenReadersApi } from 'api/client';
 import { useConfirm } from 'context/ConfirmContext';
 import PhaseEditor from './PhaseEditor';
-import Modal from 'components/common/Modal/Modal';
+import Modal from 'pages/admin/components/Modal/Modal';
 import styles from './ScreenReaderModal.module.css';
 
 export default function ScreenReaderModal({ isOpen, onClose, onSuccess, editingGuide, showToast }) {

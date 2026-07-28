@@ -2,7 +2,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
+  margin-bottom: 24px;
 }
 
 .addToolBtn {
@@ -72,9 +72,6 @@
   border-radius: 4px;
   font-size: 12px;
   cursor: pointer;
-  min-height: 24px;
-  display: inline-flex;
-  align-items: center;
 }
 
 .editBtn:hover {
@@ -89,9 +86,6 @@
   border-radius: 4px;
   font-size: 12px;
   cursor: pointer;
-  min-height: 24px;
-  display: inline-flex;
-  align-items: center;
 }
 
 .deleteBtn:hover {
@@ -181,3 +175,10 @@
   border: 0;
 }
 
+@media (max-width: 768px) {
+  .toolsHeader {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+}

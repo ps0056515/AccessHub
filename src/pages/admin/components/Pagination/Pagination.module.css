@@ -1,0 +1,38 @@
+﻿.container {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 12px 16px;
+}
+
+.info {
+  font-size: 14px;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  border: 1px solid var(--border-interactive);
+  background: var(--surface-secondary);
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.button:hover:not(:disabled):not([aria-disabled="true"]) {
+  background: var(--surface-color-alt);
+  border-color: var(--border-interactive-strong);
+}
+
+.button:disabled, .button[aria-disabled="true"] {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background: var(--surface-secondary);
+}

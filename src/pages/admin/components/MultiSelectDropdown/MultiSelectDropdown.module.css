@@ -1,0 +1,153 @@
+.container {
+  position: relative;
+  width: 100%;
+}
+
+.inputArea {
+  min-height: 40px;
+  padding: 6px 32px 6px 12px;
+  border: 1px solid var(--text-faint);
+  border-radius: var(--radius-sm, 6px);
+  background: var(--surface-secondary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  position: relative;
+  transition: border-color 0.15s;
+}
+
+.inputArea:hover {
+  border-color: var(--text-secondary);
+}
+
+.inputArea:focus-within {
+  border-color: var(--accent-text);
+  outline: 2px solid var(--focus-border-color); outline-offset: 2px; box-shadow: none;
+  outline: 2px solid transparent;
+}
+
+.pillsContainer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  width: 100%;
+}
+
+.comboboxElement {
+  outline: none;
+  flex: 1;
+  min-width: 10px;
+  border: none;
+  background: transparent;
+}
+
+.placeholder {
+  color: #475569;
+  font-size: 14px;
+  padding-top: 4px;
+}
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--accent-subtle);
+  color: var(--accent-text);
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 13px;
+  font-weight: 500;
+  border: 1px solid var(--accent-border-interactive);
+}
+
+.removeBtn {
+  background: var(--red-bg);
+  border: 1px solid var(--red);
+  color: var(--error);
+  cursor: pointer;
+  padding: 0;
+  font-size: 16px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  opacity: 0.7;
+  transition: opacity 0.15s, background 0.15s;
+  width: 24px;
+  height: 24px;
+}
+
+.removeBtn:hover,
+.removeBtn:focus-visible {
+  opacity: 1;
+  background: var(--accent-border-interactive);
+  outline: 2px solid var(--focus-border-color);
+  outline-offset: 1px;
+}
+
+.chevron {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  margin-top: -6px;
+  font-size: 10px;
+  color: #475569;
+  transition: transform 0.2s;
+  pointer-events: none;
+}
+
+.dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  margin-top: 4px;
+  background: var(--surface-secondary);
+  border: 1px solid var(--text-faint);
+  border-radius: var(--radius-sm, 6px);
+  box-shadow: 0 4px 6px -1px var(--shadow-md), 0 2px 4px -1px var(--shadow-md);
+  max-height: 200px;
+  overflow-y: auto;
+  z-index: 100;
+  padding: 8px 0;
+}
+
+.option {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 16px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.option:hover, .activeOption {
+  background: var(--surface-tertiary);
+}
+
+.activeOption {
+  outline: 2px solid var(--focus-border-color);
+  outline-offset: -2px;
+}
+
+.checkbox {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  accent-color: var(--accent-text);
+}
+
+.optionText {
+  font-size: 14px;
+  color: var(--text-primary);
+}
+
+.emptyOption {
+  padding: 8px 16px;
+  color: var(--text-secondary);
+  font-size: 14px;
+  text-align: center;
+}
+
+
