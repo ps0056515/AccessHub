@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
+import { Trash } from "lucide-react";
 import { eventsApi } from "api/client";
 import EventModal from "./components/EventModal";
 import RsvpModal from "./components/RsvpModal";
@@ -455,6 +456,7 @@ export default function EventsView({ showToast }) {
             <input
               id="admin-search-input"
               type="search"
+              aria-label="Search events"
               placeholder="Search events..."
               value={eventSearch}
               onChange={(e) => setEventSearch(e.target.value)}
@@ -466,7 +468,7 @@ export default function EventsView({ showToast }) {
                 onClick={handleBulkDelete}
                 className={`${styles.deleteBtn} ${styles.bulkDeleteBtn}`}
               >
-                🗑 Bulk Delete ({selectedIds.length})
+                <Trash aria-hidden="true" size={16} /> Bulk Delete ({selectedIds.length})
               </button>
             )}
             {activeTab === "Active Events" && (
@@ -485,13 +487,15 @@ export default function EventsView({ showToast }) {
         </div>
 
         {/* Tabs */}
-        <nav className={styles.tabs} aria-label="Events admin sections">
+        <nav className={styles.tabs} role="tablist" aria-label="Events admin sections">
           {TABS.map((tab) => (
             <button
               key={tab}
+              id={`tab-${tab.replace(/\s+/g, '-').toLowerCase()}`}
               type="button"
               role="tab"
               aria-selected={activeTab === tab}
+              aria-controls={`tabpanel-${tab.replace(/\s+/g, '-').toLowerCase()}`}
               onClick={() => setActiveTab(tab)}
               className={`${styles.tab} ${activeTab === tab ? styles.tabActive : ""}`}
             >
@@ -508,7 +512,8 @@ export default function EventsView({ showToast }) {
 
         {/* Active Events Tab */}
         {activeTab === "Active Events" && (
-          <Table
+          <div role="tabpanel" id="tabpanel-active-events" aria-labelledby="tab-active-events">
+            <Table
             columns={activeEventColumns}
             data={eventsList}
             loading={eventsLoading}
@@ -519,10 +524,12 @@ export default function EventsView({ showToast }) {
             onSelectChange={setSelectedIds}
             pagination={true}
           />
+          </div>
         )}
         {/* Proposed Events Tab */}
         {activeTab === "Proposed Events" && (
-          <Table
+          <div role="tabpanel" id="tabpanel-proposed-events" aria-labelledby="tab-proposed-events">
+            <Table
             columns={proposedEventColumns}
             data={proposals}
             loading={proposalsLoading}
@@ -530,6 +537,7 @@ export default function EventsView({ showToast }) {
             searchQuery={eventSearch}
             pagination={true}
           />
+          </div>
         )}
       </section>
 

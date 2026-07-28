@@ -731,6 +731,10 @@ export default function Portal({
                   portalConfig.searchPlaceholder ||
                   "Search discussions by title or text…"
                 }
+                title={
+                  portalConfig.searchPlaceholder ||
+                  "Search discussions by title or text…"
+                }
                 value={query}
                 onChange={(e) => {
                   setQuery(e.target.value);
@@ -982,7 +986,7 @@ export default function Portal({
                   isValid = false;
                 }
                 if (!isValid) {
-                  setWaveError("Please enter a valid URL.");
+                  setWaveError("Please enter a valid URL starting with http:// or https://");
                   return;
                 }
                 setWaveError("");

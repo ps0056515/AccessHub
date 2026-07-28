@@ -144,13 +144,14 @@ function AccessibleCombobox({ id, label, placeholder, value, onChange, options, 
         type="text"
         className={styles.input}
         placeholder={placeholder}
+        title={placeholder}
         value={value}
         onChange={(e) => {
           onChange(e.target.value);
           setIsOpen(true);
           setActiveIndex(-1);
         }}
-        onFocus={() => setIsOpen(true)}
+        onClick={() => setIsOpen(true)}
         onKeyDown={handleKeyDown}
         autoComplete="off"
         role="combobox"
@@ -324,8 +325,6 @@ export default function AccessibilityJobs() {
                 checked={remoteOnly}
                 onChange={e => {
                   setRemoteOnly(e.target.checked);
-                  setLoading(true);
-                  setFetchParams(prev => ({ ...prev, remote_jobs_only: e.target.checked }));
                 }}
                 className={styles.checkbox}
               />

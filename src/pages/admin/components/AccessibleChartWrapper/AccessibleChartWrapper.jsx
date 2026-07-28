@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useId } from 'react';
 import styles from './AccessibleChartWrapper.module.css';
 
 /**
@@ -15,6 +15,7 @@ export default function AccessibleChartWrapper({ title, data, columns, children 
   const [showTable, setShowTable] = useState(false);
   const [tooltipDismissed, setTooltipDismissed] = useState(false);
   const [isHovering, setIsHovering] = useState(false);
+  const tableContainerId = useId();
 
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -50,6 +51,7 @@ export default function AccessibleChartWrapper({ title, data, columns, children 
           onClick={() => setShowTable((prev) => !prev)}
           className={styles.toggleBtn}
           aria-expanded={showTable}
+          aria-controls={tableContainerId}
         >
           {showTable ? `Hide data table for ${title}` : `Show data table for ${title}`}
         </button>
@@ -58,6 +60,7 @@ export default function AccessibleChartWrapper({ title, data, columns, children 
       {/* Hide the visual SVG chart from screen readers and toggle display for keyboard users */}
       <div 
         aria-hidden="true" 
+        inert="true"
         style={{ width: '100%', flex: 1, minHeight: 0, display: showTable ? 'none' : 'block' }}
         className={tooltipDismissed ? 'hide-recharts-tooltip' : ''}
       >
@@ -72,7 +75,7 @@ export default function AccessibleChartWrapper({ title, data, columns, children 
       </div>
 
       {/* Data table */}
-      <div style={showTable ? { width: '100%', overflowX: 'auto', overflowY: 'auto', flex: 1, minHeight: 0 } : { width: '100%' }}>
+      <div id={tableContainerId} style={showTable ? { width: '100%', overflowX: 'auto', overflowY: 'auto', flex: 1, minHeight: 0 } : { width: '100%' }}>
         <table className={showTable ? styles.visibleTable : styles.srOnly} aria-label={`Data table for ${title}`}>
           <thead>
             <tr>

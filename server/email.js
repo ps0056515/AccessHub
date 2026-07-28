@@ -77,9 +77,14 @@ function escapeAttr(value) {
   return escapeHtml(value).replace(/'/g, '&#39;');
 }
 
-function buildResetUrl(token, origin) {
+function buildResetUrl(token, origin, email) {
   const base = origin || getAppOrigin();
-  return `${base.replace(/\/$/, '')}/reset-password?token=${encodeURIComponent(token)}`;
+  const url = new URL(`${base.replace(/\/$/, '')}/reset-password`);
+  url.searchParams.set('token', token);
+  if (email) {
+    url.searchParams.set('email', email);
+  }
+  return url.toString();
 }
 
 // ─── iCalendar helpers ────────────────────────────────────────────────────────

@@ -71,13 +71,12 @@ export default function Tools() {
           Vetted by the community — from quick browser checks to deep CI/CD integration.
         </p>
 
-        <div className={styles.filterBar} role="tablist" aria-label="Filter tools by platform compatibility">
+        <div className={styles.filterBar} role="group" aria-label="Filter tools by platform compatibility">
           {FILTERS.map(f => (
             <button
               key={f}
               type="button"
-              role="tab"
-              aria-selected={selectedFilter === f}
+              aria-pressed={selectedFilter === f}
               className={`${styles.filterBtn} ${selectedFilter === f ? styles.filterBtnActive : ''}`}
               onClick={() => setSelectedFilter(f)}
             >

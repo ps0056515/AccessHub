@@ -23,7 +23,7 @@ export default function SignInPage({ goToPortal }) {
   const [showPassword, setShowPassword] = useState(false);
 
   const formik = useFormik({
-    initialValues: signInInitialValues,
+    initialValues: { ...signInInitialValues, email: location.state?.email || signInInitialValues.email },
     validationSchema: signInValidationSchema,
     onSubmit: async (values, { setSubmitting }) => {
       try {
@@ -96,7 +96,7 @@ export default function SignInPage({ goToPortal }) {
               name="email"
               className={`${styles.input} ${formik.touched.email && formik.errors.email ? styles.inputError : ''}`}
               type="email"
-              autoComplete="email"
+              autoComplete="username"
               autoFocus
               value={formik.values.email}
               onChange={formik.handleChange}
@@ -117,7 +117,7 @@ export default function SignInPage({ goToPortal }) {
               <label className={styles.label} htmlFor="signin-password">
                 Password<span className="required-asterisk" aria-hidden="true"> *</span>
               </label>
-              <Link className={styles.linkInline} to="/forgot-password">
+              <Link className={styles.linkInline} to="/forgot-password" state={{ ...location.state, email: formik.values.email }}>
                 Forgot password?
               </Link>
             </div>
@@ -159,7 +159,7 @@ export default function SignInPage({ goToPortal }) {
 
         <p className={styles.footer}>
           Don&apos;t have an account?{' '}
-          <Link className={styles.link} to="/sign-up" state={location.state}>
+          <Link className={styles.link} to="/sign-up" state={{ ...location.state, email: formik.values.email }}>
             Join community
           </Link>
         </p>

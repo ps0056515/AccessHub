@@ -5,6 +5,7 @@ import ImageResize from "quill-image-resize-module-react";
 import { articlesApi } from "api/client";
 import Table from "pages/admin/components/Table/Table";
 import { useConfirm } from "context/ConfirmContext";
+import { Trash } from "lucide-react";
 import styles from "./ArticlesView.module.css";
 import { truncateText } from "utils/commonUtils";
 
@@ -278,14 +279,7 @@ export default function ArticlesView({ showToast }) {
       label: "Status",
       render: (article) => (
         <span
-          style={{
-            padding: "4px 8px",
-            borderRadius: "12px",
-            fontSize: "12px",
-            fontWeight: "600",
-            background: article.is_published ? "#dcfce7" : "#f1f5f9",
-            color: article.is_published ? "#166534" : "#64748b",
-          }}
+          className={`${styles.statusBadge} ${article.is_published ? styles.statusPublished : styles.statusDraft}`}
         >
           {article.is_published ? "Published" : "Draft"}
         </span>
@@ -368,6 +362,7 @@ export default function ArticlesView({ showToast }) {
               <input
                 id="admin-search-input"
                 type="search"
+                aria-label="Search articles"
                 placeholder="Search articles..."
                 value={articleSearch}
                 onChange={(e) => setArticleSearch(e.target.value)}
@@ -415,7 +410,7 @@ export default function ArticlesView({ showToast }) {
                       borderRadius: "6px",
                     }}
                   >
-                    🗑 Bulk Delete ({selectedIds.length})
+                    <Trash aria-hidden="true" size={16} /> Bulk Delete ({selectedIds.length})
                   </button>
                 </>
               )}
@@ -448,10 +443,11 @@ export default function ArticlesView({ showToast }) {
           </h2>
 
           <div className={styles.formGroup}>
-            <label className={styles.label}>
+            <label htmlFor="article-title" className={styles.label}>
               Title<span className="required-asterisk" aria-hidden="true"> *</span>
             </label>
             <input
+              id="article-title"
               type="text"
               value={formData.title}
               onChange={(e) =>
@@ -467,10 +463,11 @@ export default function ArticlesView({ showToast }) {
               className={styles.formGroup}
               style={{ flex: 1, minWidth: "200px" }}
             >
-              <label className={styles.label}>
+              <label htmlFor="article-author" className={styles.label}>
                 Author<span className="required-asterisk" aria-hidden="true"> *</span>
               </label>
               <input
+                id="article-author"
                 type="text"
                 value={formData.author}
                 onChange={(e) =>
@@ -484,8 +481,9 @@ export default function ArticlesView({ showToast }) {
               className={styles.formGroup}
               style={{ flex: 1, minWidth: "200px" }}
             >
-              <label className={styles.label}>Publish Date</label>
+              <label htmlFor="article-publish-date" className={styles.label}>Publish Date</label>
               <input
+                id="article-publish-date"
                 type="datetime-local"
                 value={formData.published_date}
                 onChange={(e) =>
@@ -497,8 +495,9 @@ export default function ArticlesView({ showToast }) {
           </div>
 
           <div className={styles.formGroup}>
-            <label className={styles.label}>Cover Image (Max 2MB)</label>
+            <label htmlFor="article-cover" className={styles.label}>Cover Image (Max 2MB)</label>
             <input
+              id="article-cover"
               type="file"
               accept="image/*"
               onChange={handleCoverChange}
@@ -556,10 +555,10 @@ export default function ArticlesView({ showToast }) {
           </div>
 
           <div className={styles.formGroup}>
-            <label className={styles.label}>
+            <label htmlFor="article-content" className={styles.label}>
               Content<span className="required-asterisk" aria-hidden="true"> *</span>
             </label>
-            <div className={styles.quillWrapper}>
+            <div className={styles.quillWrapper} id="article-content">
               <ReactQuill
                 theme="snow"
                 value={formData.content_html}

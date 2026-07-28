@@ -187,15 +187,17 @@ export default function ScreenReaderDetail() {
                     {current.checklist.map((item, i) => item.group === group && (
                       <li key={i} className={styles.checkItem}>
                         <button
+                          type="button"
+                          role="checkbox"
                           className={`${styles.checkBox} ${checked[`${current.id}_${i}`] ? styles.checkBoxChecked : ''}`}
                           onClick={() => toggleCheck(current.id, i)}
-                          aria-pressed={!!checked[`${current.id}_${i}`]}
-                          aria-label={item.label}
+                          aria-checked={!!checked[`${current.id}_${i}`]}
+                          aria-labelledby={`check-label-${current.id}-${i}`}
                         >
                           {checked[`${current.id}_${i}`] && <span aria-hidden="true">✓</span>}
                         </button>
                         <div>
-                          <p className={`${styles.checkLabel} ${checked[`${current.id}_${i}`] ? styles.checkLabelDone : ''}`}>{item.label}</p>
+                          <p id={`check-label-${current.id}-${i}`} className={`${styles.checkLabel} ${checked[`${current.id}_${i}`] ? styles.checkLabelDone : ''}`}>{item.label}</p>
                           <p className={styles.checkSub}>{item.sub}</p>
                         </div>
                       </li>

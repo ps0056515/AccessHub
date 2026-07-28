@@ -3,7 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from 'context/AuthContext';
 import { useAriaLive } from 'context/AriaLiveContext';
 import { useToast } from 'context/ToastContext';
-import { ThumbsUp, ThumbsDown, Edit2, Trash2 } from 'lucide-react';
+import { ThumbsUp, ThumbsDown, Edit2, Trash } from 'lucide-react';
 import { COLOR_MAP } from 'data';
 import styles from './Interactions.module.css';
 
@@ -249,7 +249,7 @@ export default function Interactions({
                           aria-label={`Delete comment by ${comment.author_name}`}
                           title="Delete"
                         >
-                          <Trash2 aria-hidden="true" size={16} />
+                          <Trash aria-hidden="true" size={16} />
                         </button>
                       </div>
                     )}
@@ -296,10 +296,10 @@ export default function Interactions({
 
         {/* Comment Form */}
         {user ? (
-          <form className={styles.addCommentBox} onSubmit={handleCommentSubmit} noValidate>
+          <form className={styles.addCommentBox} onSubmit={handleCommentSubmit}>
             <h3 className={styles.commentTitle}>Add a Comment</h3>
             {commentError && (
-              <div className={styles.errorMsg} role="alert">
+              <div id="comment-error-msg" className={styles.errorMsg} role="alert">
                 {commentError}
               </div>
             )}
@@ -312,6 +312,8 @@ export default function Interactions({
               onChange={(e) => setNewComment(e.target.value)}
               required
               aria-required="true"
+              aria-invalid={!!commentError}
+              aria-describedby={commentError ? "comment-error-msg" : undefined}
             />
             <div className={styles.actions}>
               <button 

@@ -1,4 +1,5 @@
-import { useState, useEffect } from "react";
+﻿import { useState, useEffect } from "react";
+import { Trash } from "lucide-react";
 import { screenReadersApi } from "api/client";
 import ScreenReaderModal from "./ScreenReaderModal";
 import Table from "pages/admin/components/Table/Table";
@@ -198,6 +199,7 @@ export default function ScreenReadersView({ showToast }) {
           <input
             id="admin-search-input"
             type="search"
+            aria-label="Search guides"
             placeholder="Search guides..."
             value={screenReaderSearch}
             onChange={(e) => setScreenReaderSearch(e.target.value)}
@@ -230,7 +232,7 @@ export default function ScreenReadersView({ showToast }) {
                 className={styles.btnDanger}
                 style={{ padding: '8px 12px', fontSize: '14px', borderRadius: '6px' }}
               >
-                🗑 Bulk Delete ({selectedIds.length})
+                <Trash aria-hidden="true" size={16} /> Bulk Delete ({selectedIds.length})
               </button>
             </>
           )}

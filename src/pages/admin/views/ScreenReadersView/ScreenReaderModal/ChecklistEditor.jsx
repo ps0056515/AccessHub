@@ -27,6 +27,8 @@ export default function ChecklistEditor({ items, onChange }) {
                 value={item.label || ''} 
                 onChange={e => handleChange(index, 'label', e.target.value)}
                 placeholder="Checklist Item (e.g. Page title announced correctly)"
+                aria-label="Checklist Item"
+                title="Checklist Item"
                 required
               />
               <input 
@@ -35,6 +37,8 @@ export default function ChecklistEditor({ items, onChange }) {
                 value={item.group || ''} 
                 onChange={e => handleChange(index, 'group', e.target.value)}
                 placeholder="Group Name (e.g. Page structure)"
+                aria-label="Group Name"
+                title="Group Name"
                 required
               />
             </div>
@@ -43,6 +47,8 @@ export default function ChecklistEditor({ items, onChange }) {
               value={item.sub || ''} 
               onChange={e => handleChange(index, 'sub', e.target.value)}
               placeholder="Sub-description (e.g. Tab title should uniquely describe...)"
+              aria-label="Sub-description"
+              title="Sub-description"
               style={{ minHeight: '60px' }}
               required
             />

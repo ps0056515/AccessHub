@@ -359,7 +359,7 @@ export default function ResourcesView({ showToast }) {
                 onClick={handleBulkDelete}
                 className={`${styles.deleteBtn} ${styles.bulkDeleteBtn}`}
               >
-                <Trash aria-hidden="true" size={16} /> Delete ({selectedIds.length})
+                <Trash aria-hidden="true" size={16} /> Bulk Delete ({selectedIds.length})
               </button>
             )}
             {activeTab === "Active Resources" && (
@@ -377,13 +377,15 @@ export default function ResourcesView({ showToast }) {
           </div>
         </div>
 
-        <nav className={styles.tabs} aria-label="Resources admin sections">
+        <nav className={styles.tabs} role="tablist" aria-label="Resources admin sections">
           {TABS.map((tab) => (
             <button
               key={tab}
+              id={`tab-${tab.replace(/\s+/g, '-').toLowerCase()}`}
               type="button"
               role="tab"
               aria-selected={activeTab === tab}
+              aria-controls={`tabpanel-${tab.replace(/\s+/g, '-').toLowerCase()}`}
               onClick={() => setActiveTab(tab)}
               className={`${styles.tab} ${activeTab === tab ? styles.tabActive : ""}`}
             >
@@ -399,8 +401,9 @@ export default function ResourcesView({ showToast }) {
         </nav>
 
         {activeTab === "Active Resources" &&
-          (resourcesLoading && resourcesList.length === 0 ? (
-            <p className={dashboardStyles.loading}>Loading resources…</p>
+          <div role="tabpanel" id="tabpanel-active-resources" aria-labelledby="tab-active-resources">
+            {resourcesLoading && resourcesList.length === 0 ? (
+            <p className={dashboardStyles.loading}>Loading resourcesâ€¦</p>
           ) : (
             <Table
               columns={activeResourceColumns}
@@ -414,11 +417,14 @@ export default function ResourcesView({ showToast }) {
               pagination={true}
               
             />
-          ))}
+          )}
+          </div>
+        }
 
         {activeTab === "Proposed Resources" &&
-          (proposalsLoading && proposals.length === 0 ? (
-            <p className={dashboardStyles.loading}>Loading proposals…</p>
+          <div role="tabpanel" id="tabpanel-proposed-resources" aria-labelledby="tab-proposed-resources">
+            {proposalsLoading && proposals.length === 0 ? (
+            <p className={dashboardStyles.loading}>Loading proposalsâ€¦</p>
           ) : (
             <Table
               columns={proposedResourceColumns}
@@ -428,7 +434,9 @@ export default function ResourcesView({ showToast }) {
               searchQuery={resourceSearch}
               pagination={true}
             />
-          ))}
+          )}
+          </div>
+        }
       </section>
 
       <ResourceModal

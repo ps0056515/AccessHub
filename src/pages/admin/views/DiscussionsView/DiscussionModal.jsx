@@ -164,8 +164,9 @@ export default function DiscussionModal({ post, onClose, onSave, isSaving }) {
           </div>
 
           <div className={styles.formGroup}>
-            <label className={styles.label}>Tags</label>
+            <label id="discussion-tags-label" className={styles.label}>Tags</label>
             <MultiSelectDropdown 
+              aria-labelledby="discussion-tags-label"
               options={portalConfig?.askTopics || []}
               value={formData.tags}
               onChange={tags => setFormData({ ...formData, tags })}

@@ -30,7 +30,7 @@ export default function SuggestResourceModal({ isOpen, onClose }) {
         note: submitNote.trim(),
       });
       setSubmitMsg(
-        "Thanks — your suggestion has been submitted for review. You can submit another anytime.",
+        "Thanks â€” your suggestion has been submitted for review. You can submit another anytime.",
       );
       setSubmitTitle("");
       setSubmitUrl("");
@@ -57,7 +57,7 @@ export default function SuggestResourceModal({ isOpen, onClose }) {
 
   return (
     <Modal title="Suggest a resource" onClose={handleClose}>
-      <form id="resource-submit-form" onSubmit={handleSubmit} noValidate>
+      <form id="resource-submit-form" onSubmit={handleSubmit}>
         <label className={styles.formLabel} htmlFor="suggest-title">
           Title<span className="required-asterisk" aria-hidden="true"> *</span>
           <input
@@ -69,6 +69,8 @@ export default function SuggestResourceModal({ isOpen, onClose }) {
             onChange={(e) => setSubmitTitle(e.target.value)}
             required
             aria-required="true"
+            pattern=".*\S+.*"
+            title="This field cannot be empty or just spaces"
           />
         </label>
         <label className={styles.formLabel} htmlFor="suggest-url">

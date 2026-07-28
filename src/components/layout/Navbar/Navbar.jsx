@@ -253,12 +253,13 @@ export default function Navbar({
                 aria-label="User Profile"
                 aria-expanded={profileOpen}
                 aria-haspopup="dialog"
+                aria-controls="profile-menu"
               >
                 <Avatar src={user.avatarUrl} initials={user.initials || (user.displayName ? user.displayName[0] : "U")} color={user.color || "blue"} size={32} />
               </button>
 
               {profileOpen && (
-                <div ref={profileMenuRef} className={styles.profileDropdown} role="dialog" aria-label="User menu">
+                <div id="profile-menu" ref={profileMenuRef} className={styles.profileDropdown} role="dialog" aria-label="User menu">
                   <div className={styles.dropdownHeader}>
                     <span className={styles.dropdownName}>
                       {user.displayName}
@@ -310,6 +311,7 @@ export default function Navbar({
             className={styles.menuBtn}
             aria-label={menuOpen ? "Close menu" : "Open menu"}
             aria-expanded={menuOpen}
+            aria-controls="mobile-nav-menu"
             onClick={() => setMenuOpen((o) => !o)}
           >
             <span
@@ -324,6 +326,7 @@ export default function Navbar({
 
       {menuOpen && (
         <div 
+          id="mobile-nav-menu"
           role="dialog" 
           aria-modal="true" 
           aria-label="Mobile navigation"
@@ -356,6 +359,7 @@ export default function Navbar({
           )}
           {!authLoading && user && (
             <>
+              <span className={styles.mobileUser}>{user.displayName}</span>
               <button
                 type="button"
                 className={styles.mobileLink}
@@ -378,7 +382,6 @@ export default function Navbar({
                   Admin dashboard
                 </button>
               )}
-              <span className={styles.mobileUser}>{user.displayName}</span>
               <button
                 type="button"
                 className={styles.mobileLink}

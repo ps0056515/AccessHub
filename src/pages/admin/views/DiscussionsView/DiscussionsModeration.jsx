@@ -1,4 +1,5 @@
-import { useState, useEffect, useMemo } from 'react';
+﻿import { useState, useEffect, useMemo } from 'react';
+import { Trash } from "lucide-react";
 import { postsApi } from 'api/client';
 import dashboardStyles from '../../AdminDashboard.module.css';
 import DiscussionModal from './DiscussionModal';
@@ -149,6 +150,7 @@ export default function DiscussionsModeration({ showToast }) {
           <input
             id="admin-search-input"
             type="search"
+            aria-label="Search discussions"
             placeholder="Search discussions..."
             value={discussionSearch}
             onChange={(e) => setDiscussionSearch(e.target.value)}
@@ -166,7 +168,7 @@ export default function DiscussionsModeration({ showToast }) {
               onClick={handleBulkDelete}
               style={{ padding: '8px 12px', fontSize: '14px', borderRadius: '6px' }}
             >
-              🗑 Bulk Delete ({selectedIds.length})
+              <Trash aria-hidden="true" size={16} /> Bulk Delete ({selectedIds.length})
             </button>
           )}
           <button className={styles.btnPrimary} onClick={handleCreateNew}>

@@ -3,11 +3,11 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 import Tooltip from '../Tooltip/Tooltip';
 import styles from './Pagination.module.css';
 
-export default function Pagination({ currentPage, totalPages, onPageChange }) {
+export default function Pagination({ currentPage, totalPages, onPageChange, ariaLabel = "Pagination" }) {
   if (totalPages <= 1) return null;
 
   return (
-    <nav className={styles.container} aria-label="Pagination">
+    <nav className={styles.container} aria-label={ariaLabel}>
       <Tooltip content={`Previous page (Page ${currentPage - 1})`}>
         <button 
           type="button"

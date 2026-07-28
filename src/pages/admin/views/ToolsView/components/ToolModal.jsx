@@ -243,10 +243,11 @@ export default function ToolModal({
           </div>
 
           <div className={styles.formGroup}>
-            <label className={styles.formLabel}>
+            <label id="tool-platform-compat-label" className={styles.formLabel}>
               Platform Compatibility
             </label>
             <MultiSelectDropdown
+              aria-labelledby="tool-platform-compat-label"
               options={COMPATIBILITY_OPTIONS}
               value={formData.compatibility || []}
               onChange={(newValue) => setFormData(prev => ({ ...prev, compatibility: newValue }))}

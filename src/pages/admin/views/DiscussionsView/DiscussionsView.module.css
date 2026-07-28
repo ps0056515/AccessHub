@@ -43,7 +43,7 @@
 
 .saveBtn {
   background: var(--accent);
-  color: #ffffff;
+  color: var(--text-on-accent);
   border: none;
   padding: 10px 20px;
   border-radius: var(--radius-sm, 6px);
@@ -58,7 +58,7 @@
 
 .btnPrimary {
   background: var(--accent);
-  color: #ffffff;
+  color: var(--text-on-accent);
   border: none;
   padding: 8px 16px;
   border-radius: var(--radius-sm, 6px);
@@ -67,7 +67,7 @@
   transition: all 0.15s ease;
 }
 .btnPrimary:hover {
-  background: #063d82;
+  background: var(--button-primary-hover);
 }
 
 .btnSecondary {
@@ -87,8 +87,8 @@
 
 .btnDanger {
   background: transparent;
-  color: #ef4444;
-  border: 1px solid #fca5a5;
+  color: var(--red-text);
+  border: 1px solid var(--red-border-interactive);
   padding: 8px 16px;
   border-radius: var(--radius-sm, 6px);
   font-weight: 500;
@@ -96,7 +96,7 @@
   transition: all 0.15s ease;
 }
 .btnDanger:hover {
-  background: #fef2f2;
+  background: var(--red-bg);
 }
 
 .tabs {
@@ -123,8 +123,8 @@
 }
 
 .activeTab {
-  color: var(--accent);
-  border-bottom-color: var(--accent);
+  color: var(--text);
+  border-bottom-color: var(--text);
 }
 
 @media (max-width: 480px) {

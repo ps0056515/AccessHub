@@ -7,6 +7,7 @@ export default function ResetPasswordPage() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const token = searchParams.get('token') || '';
+  const email = searchParams.get('email') || '';
 
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -86,6 +87,21 @@ export default function ResetPasswordPage() {
         )}
 
         <form className={styles.form} onSubmit={handleSubmit} noValidate>
+          {/* Visually hidden email field for password managers */}
+          {email && (
+            <input
+              type="text"
+              name="email"
+              id="reset-email"
+              autoComplete="username"
+              value={email}
+              readOnly
+              style={{ position: 'absolute', opacity: 0, height: 0, width: 0, overflow: 'hidden' }}
+              aria-hidden="true"
+              tabIndex={-1}
+            />
+          )}
+
           <div className={styles.field}>
             <label className={styles.label} htmlFor="reset-password">
               New password<span className="required-asterisk" aria-hidden="true"> *</span>

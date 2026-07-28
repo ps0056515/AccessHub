@@ -299,6 +299,7 @@ export default function OverviewView({ showToast }) {
             </div>
           </div>
           <Table
+            ariaLabel="Top Countries Data"
             columns={countryColumns}
             data={stats.byCountry}
             emptyMessage="No data available."
@@ -347,6 +348,7 @@ export default function OverviewView({ showToast }) {
             </div>
           </div>
           <Table
+            ariaLabel="Top Cities Data"
             columns={cityColumns}
             data={stats.byCity.map((r) => ({
               id: `${r.city}-${r.country}`,
@@ -407,6 +409,7 @@ export default function OverviewView({ showToast }) {
           </div>
         </div>
         <Table
+          ariaLabel="Recent Members Data"
           columns={userColumns}
           data={users}
           emptyMessage="No members found."

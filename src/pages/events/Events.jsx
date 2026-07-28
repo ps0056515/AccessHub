@@ -133,20 +133,15 @@ export default function Events() {
           <legend className="sr-only">Filter events by type</legend>
           <div className={styles.filters}>
             {TYPES.map(t => (
-              <label
+              <button
                 key={t}
+                type="button"
                 className={`${styles.filterLabel} ${filter === t ? styles.filterSelected : ''}`}
+                aria-pressed={filter === t}
+                onClick={() => setFilter(t)}
               >
-                <input
-                  type="radio"
-                  name="event-type-filter"
-                  className={styles.filterInput}
-                  value={t}
-                  checked={filter === t}
-                  onChange={() => setFilter(t)}
-                />
                 <span className={styles.filterText}>{t}</span>
-              </label>
+              </button>
             ))}
           </div>
         </fieldset>
