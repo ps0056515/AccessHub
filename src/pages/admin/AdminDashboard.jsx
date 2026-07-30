@@ -8,6 +8,7 @@ import { useToast } from 'context/ToastContext';
 import styles from './AdminDashboard.module.css';
 import './AdminTheme.css';
 import { AdminThemeProvider, useAdminTheme } from './context/AdminThemeContext';
+import Avatar from 'components/common/Avatar/Avatar';
 
 // Sub-page Views
 import OverviewView from './views/OverviewView/OverviewView';
@@ -55,6 +56,16 @@ function AdminDashboardInner({ goToPortal }) {
     }
     if (mainContentRef.current) {
       mainContentRef.current.focus({ preventScroll: true });
+      
+      const root = document.documentElement;
+      const prev = root.style.scrollBehavior;
+      root.style.scrollBehavior = 'auto';
+      window.scrollTo(0, 0);
+      root.scrollTop = 0;
+      document.body.scrollTop = 0;
+      requestAnimationFrame(() => {
+        root.style.scrollBehavior = prev;
+      });
     }
   }, [activeTab]);
 
@@ -139,9 +150,14 @@ function AdminDashboardInner({ goToPortal }) {
         {/* Sidebar Profile Card */}
         {user && (
           <div className={styles.profileCard}>
-            <div className={styles.profileAvatar} aria-hidden="true">
-              {user.displayName?.slice(0, 2).toUpperCase() || 'AD'}
-            </div>
+            <Avatar 
+              src={user.avatarUrl} 
+              initials={user.displayName?.slice(0, 2).toUpperCase() || 'AD'}
+              color={user.color || 'blue'}
+              size={32}
+              className={styles.profileAvatar}
+              alt={`${user.displayName}'s avatar`}
+            />
             <div className={styles.profileInfo}>
               <p className={styles.profileName}>{user.displayName}</p>
               <p className={styles.profileEmail} title={user.email}>{user.email}</p>
