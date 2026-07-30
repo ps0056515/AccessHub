@@ -7,7 +7,7 @@ function getAppOrigin() {
     process.env.APP_URL ||
     process.env.FRONTEND_URL ||
     process.env.REACT_APP_APP_URL ||
-    'http://localhost:3010';
+    (process.env.NODE_ENV === 'production' ? 'https://allcanaccess.com' : 'http://localhost:3010');
   return origin.replace(/\/$/, '');
 }
 

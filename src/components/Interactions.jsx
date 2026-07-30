@@ -5,6 +5,7 @@ import { useAriaLive } from 'context/AriaLiveContext';
 import { useToast } from 'context/ToastContext';
 import { ThumbsUp, ThumbsDown, Edit2, Trash } from 'lucide-react';
 import { COLOR_MAP } from 'data';
+import Avatar from 'components/common/Avatar/Avatar';
 import styles from './Interactions.module.css';
 
 export default function Interactions({
@@ -220,13 +221,14 @@ export default function Interactions({
                 <article key={comment.id} className={styles.commentCard}>
                   <header className={styles.commentHeader}>
                     <div className={styles.authorInfo}>
-                      <div 
-                        className={styles.avatar} 
-                        style={{ background: `var(--${authorColor}-bg, var(--surface-secondary))`, color: `var(--${authorColor}-text, var(--text-primary))` }}
-                        aria-hidden="true"
-                      >
-                        {comment.author_initials}
-                      </div>
+                      <Avatar
+                        src={comment.avatar_url}
+                        initials={comment.author_initials}
+                        color={authorColor}
+                        size={36}
+                        className={styles.avatar}
+                        alt={`${comment.author_name}'s avatar`}
+                      />
                       <h3 className={styles.authorName}>{comment.author_name}</h3>
                     </div>
                     {isAuthorOrAdmin && !isEditing && (

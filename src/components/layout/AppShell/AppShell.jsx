@@ -78,7 +78,10 @@ function scrollWindowTopInstant() {
   window.scrollTo(0, 0);
   root.scrollTop = 0;
   document.body.scrollTop = 0;
-  root.style.scrollBehavior = prev;
+  // Restore smooth scroll after the instant scroll has been processed
+  requestAnimationFrame(() => {
+    root.style.scrollBehavior = prev;
+  });
 }
 
 export default function AppShell() {

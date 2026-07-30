@@ -92,19 +92,20 @@ export default function Resources({ setActivePage }) {
   }, [filtered.length, activeCategory, query, announce]);
 
   const toggleSave = (slug) => {
-    setSaved((prev) => {
-      const next = new Set(prev);
-      const isCurrentlySaved = next.has(slug);
-      if (isCurrentlySaved) next.delete(slug);
-      else next.add(slug);
-      try {
-        localStorage.setItem(SAVED_KEY, JSON.stringify([...next]));
-      } catch {
-        /* private mode / quota — state still updates this session */
-      }
-      addToast(isCurrentlySaved ? "Resource removed from saved list." : "Resource saved successfully.", "success");
-      return next;
-    });
+    const isCurrentlySaved = saved.has(slug);
+    const next = new Set(saved);
+    
+    if (isCurrentlySaved) next.delete(slug);
+    else next.add(slug);
+    
+    try {
+      localStorage.setItem(SAVED_KEY, JSON.stringify([...next]));
+    } catch {
+      /* private mode / quota — state still updates this session */
+    }
+    
+    setSaved(next);
+    addToast(isCurrentlySaved ? "Resource removed from saved list." : "Resource saved successfully.", "success");
   };
 
   const closeSubmit = () => {
