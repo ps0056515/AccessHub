@@ -225,7 +225,7 @@ export default function OverviewView({ showToast }) {
             className={`${styles.actionBtn} ${styles.actionBtnDanger}`}
             onClick={() => deleteUser(u)}
             disabled={u.id === currentUser?.id}
-            title="Delete user"
+            aria-label={`Delete ${u.displayName}`}
           >
             Delete
           </button>
@@ -276,7 +276,7 @@ export default function OverviewView({ showToast }) {
                   onClick={() => exportToExcel(stats.byCountry, "members_by_country")} 
                   className={styles.actionBtn}
                   style={{ padding: '8px', borderRadius: '6px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-                  aria-label="Export to Excel"
+                  aria-label="Export members by country to Excel"
                 >
                   <Download aria-hidden="true" size={16} />
                 </button>
@@ -325,7 +325,7 @@ export default function OverviewView({ showToast }) {
                   }} 
                   className={styles.actionBtn}
                   style={{ padding: '8px', borderRadius: '6px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-                  aria-label="Export to Excel"
+                  aria-label="Export members by city to Excel"
                 >
                   <Download aria-hidden="true" size={16} />
                 </button>
@@ -387,7 +387,7 @@ export default function OverviewView({ showToast }) {
                 }} 
                 className={styles.actionBtn}
                 style={{ padding: '8px', borderRadius: '6px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-                aria-label="Export to Excel"
+                aria-label="Export all members to Excel"
               >
                 <Download aria-hidden="true" size={16} />
               </button>

@@ -213,7 +213,7 @@ export default function Events() {
             Running a workshop, webinar, or local meetup? Reach thousands of practitioners through AllCanAccess.
           </p>
           <button type="button" className={styles.hostBtn} onClick={() => setHostOpen(true)} aria-haspopup="dialog">
-            Submit your event →
+            Submit your event <span aria-hidden="true">→</span>
           </button>
         </div>
       </div>
@@ -230,6 +230,7 @@ function EventCard({ ev, i, onRsvp, timing }) {
       id={`event-${ev.id}`}
       className={`${styles.eventCard} fade-up`}
       style={{ animationDelay: `${i * 0.05}s` }}
+      aria-labelledby={`event-title-${ev.id}`}
     >
       <div className={styles.dateBadge}>
         <span className={styles.dateMonth}>{fmtMonth(ev.event_date)}</span>
@@ -237,7 +238,7 @@ function EventCard({ ev, i, onRsvp, timing }) {
       </div>
       <div className={styles.eventBody}>
         <p className={styles.timingPill}>{timing} • {fmtTime(ev.event_date)}</p>
-        <h2 className={styles.eventTitle}>{ev.title}</h2>
+        <h2 id={`event-title-${ev.id}`} className={styles.eventTitle}>{ev.title}</h2>
         <p className={styles.eventMeta}>{ev.type}</p>
         
         {(() => {
@@ -261,13 +262,14 @@ function EventCard({ ev, i, onRsvp, timing }) {
         type="button"
         className={styles.rsvpBtn}
         disabled={timing === 'Past'}
+        aria-label={timing === 'Past' ? `Event Completed: ${ev.title}` : `RSVP for ${ev.title}`}
         onClick={e => {
           e.preventDefault();
           e.stopPropagation();
           if (timing !== 'Past') onRsvp();
         }}
       >
-        {timing === 'Past' ? 'Event Completed' : 'RSVP →'}
+        {timing === 'Past' ? 'Event Completed' : <>RSVP <span aria-hidden="true">→</span></>}
       </button>
     </article>
   );

@@ -146,7 +146,7 @@ export default function Resources({ setActivePage }) {
           className={styles.certCta}
           onClick={() => setActivePage?.("tools")}
         >
-          Open tools &amp; certifications →
+          Open tools &amp; certifications <span aria-hidden="true">→</span>
         </button>
       </section>
 
@@ -160,7 +160,6 @@ export default function Resources({ setActivePage }) {
             className={styles.searchInput}
             type="search"
             placeholder="Search resources…"
-            title="Search resources…"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
           />
@@ -225,7 +224,6 @@ export default function Resources({ setActivePage }) {
                       ? `Remove from saved: ${r.title}`
                       : `Save for later: ${r.title}`
                   }
-                  title={isSaved ? `Remove from saved: ${r.title}` : `Save for later: ${r.title}`}
                   aria-pressed={isSaved}
                   onClick={(e) => {
                     e.preventDefault();
@@ -276,7 +274,7 @@ export default function Resources({ setActivePage }) {
           className={styles.bannerBtn}
           onClick={() => setSubmitOpen(true)}
         >
-          Submit a resource →
+          Submit a resource <span aria-hidden="true">→</span>
         </button>
       </div>
 

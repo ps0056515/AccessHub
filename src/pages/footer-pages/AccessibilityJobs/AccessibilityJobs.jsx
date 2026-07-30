@@ -144,7 +144,6 @@ function AccessibleCombobox({ id, label, placeholder, value, onChange, options, 
         type="text"
         className={styles.input}
         placeholder={placeholder}
-        title={placeholder}
         value={value}
         onChange={(e) => {
           onChange(e.target.value);

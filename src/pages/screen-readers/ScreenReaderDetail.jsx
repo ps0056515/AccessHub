@@ -55,7 +55,7 @@ export default function ScreenReaderDetail() {
   return (
     <Container className={styles.page}>
       <header className={styles.pageHeader}>
-        <Link to="/screen-readers" className={styles.backLink}>← Back to screen readers</Link>
+        <Link to="/screen-readers" className={styles.backLink}><span aria-hidden="true">← </span>Back to screen readers</Link>
         <h1 className={styles.pageTitle}>{guide.title} testing guide</h1>
         <p className={styles.pageSub}>{guide.description}</p>
       </header>

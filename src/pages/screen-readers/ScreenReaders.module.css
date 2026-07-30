@@ -69,12 +69,11 @@
   gap: 4px;
 }
 
-.cardFooter::after {
-  content: '\2192';
+.arrow {
   transition: transform 0.2s;
 }
 
-.card:hover .cardFooter::after {
+.card:hover .arrow {
   transform: translateX(4px);
 }
 

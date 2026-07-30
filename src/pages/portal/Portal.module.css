@@ -551,6 +551,7 @@
   padding: 18px 24px;
   border-bottom: 1px solid var(--border);
   transition: background var(--transition);
+  position: relative;
 }
 
 .postCard:hover {
@@ -558,8 +559,6 @@
 }
 
 .postOpen {
-  flex: 1;
-  min-width: 0;
   background: none;
   border: none;
   padding: 0;
@@ -567,12 +566,23 @@
   cursor: pointer;
   text-align: left;
   font: inherit;
-  align-self: stretch;
+  color: inherit;
+}
+
+.postOpen::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
 }
 
 .postOpen:focus-visible {
+  outline: none;
+}
+
+.postOpen:focus-visible::after {
   outline: 2px solid var(--focus-border-color);
-  outline-offset: 2px;
+  outline-offset: -2px;
   border-radius: var(--radius-sm);
 }
 
@@ -591,6 +601,8 @@
   align-items: center;
   gap: 3px;
   flex-shrink: 0;
+  position: relative;
+  z-index: 2;
 }
 
 .voteBtn {

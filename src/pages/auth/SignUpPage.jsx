@@ -132,7 +132,7 @@ export default function SignUpPage({ goToPortal }) {
   return (
     <div className={styles.page}>
       <button type="button" className={styles.back} onClick={() => navigate('/')}>
-        ← Back to community home
+        <span aria-hidden="true">← </span>Back to community home
       </button>
 
       <div className={styles.card}>

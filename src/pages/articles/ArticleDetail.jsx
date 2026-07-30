@@ -49,7 +49,7 @@ export default function ArticleDetail() {
         ogType="article"
       />
       <Link to="/articles" className={styles.backBtn}>
-        ← Back to Articles
+        <span aria-hidden="true">← </span>Back to Articles
       </Link>
 
       {article.cover_image && (

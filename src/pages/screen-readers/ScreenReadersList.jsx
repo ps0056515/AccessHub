@@ -66,7 +66,6 @@ export default function ScreenReadersList() {
             id="sr-search"
             type="search" 
             placeholder="Search by OS, platform, or name..." 
-            title="Search by OS, platform, or name..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className={styles.searchInput}
@@ -92,7 +91,9 @@ export default function ScreenReadersList() {
           <Link key={guide.id} to={`/screen-readers/${guide.id}`} className={styles.card}>
             <h2 className={styles.cardTitle}>{guide.title}</h2>
             <p className={styles.cardBody}>{guide.description}</p>
-            <span className={styles.cardFooter}>View guide</span>
+            <span className={styles.cardFooter}>
+              View guide <span className={styles.arrow} aria-hidden="true">→</span>
+            </span>
           </Link>
         ))}
       </div>

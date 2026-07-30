@@ -30,7 +30,7 @@ export default function ForgotPasswordPage() {
   return (
     <div className={styles.page}>
       <button type="button" className={styles.back} onClick={() => navigate('/sign-in')}>
-        ← Back to sign in
+        <span aria-hidden="true">← </span>Back to sign in
       </button>
 
       <div className={styles.card}>

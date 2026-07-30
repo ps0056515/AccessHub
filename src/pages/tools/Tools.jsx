@@ -101,13 +101,13 @@ export default function Tools() {
                 rel="noopener noreferrer"
                 className={`${styles.toolCard} fade-up`}
                 style={{ animationDelay: `${i * 0.04}s` }}
-                aria-label={`${t.name} — ${t.type} — ${t.price}${t.badge ? ` — ${t.badge}` : ''}${Array.isArray(t.compatibility) && t.compatibility.length > 0 ? ` — Compatible with ${t.compatibility.join(', ')}` : ''}`}
+                aria-labelledby={`tool-title-${t.id || i}`}
               >
                 <div className={styles.toolTop}>
                   <div className={styles.toolIcon}>{t.icon}</div>
                   {t.badge && <BadgePill label={t.badge} color={t.badge_color || t.badgeColor} />}
                 </div>
-                <h3 className={styles.toolName}>{t.name}</h3>
+                <h3 id={`tool-title-${t.id || i}`} className={styles.toolName}>{t.name}</h3>
                 <p className={styles.toolType}>{t.type}</p>
                 {Array.isArray(t.compatibility) && t.compatibility.length > 0 && (
                   <div className={styles.toolTags}>
@@ -138,6 +138,7 @@ export default function Tools() {
                 key={i}
                 className={`${styles.certCard} fade-up`}
                 style={{ animationDelay: `${i * 0.06}s` }}
+                aria-labelledby={`cert-title-${i}`}
               >
                 <div className={styles.certLeft}>
                   <div className={styles.certBadge} style={{ background: col.bg, color: col.text }}>
@@ -145,7 +146,7 @@ export default function Tools() {
                   </div>
                 </div>
                 <div className={styles.certBody}>
-                  <h3 className={styles.certTitle}>{c.title}</h3>
+                  <h3 id={`cert-title-${i}`} className={styles.certTitle}>{c.title}</h3>
                   <p className={styles.certDesc}>{c.body}</p>
                   <div className={styles.progressWrap}>
                     <div

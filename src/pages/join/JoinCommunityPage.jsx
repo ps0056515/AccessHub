@@ -20,7 +20,7 @@ export default function JoinCommunityPage({ goToPortal, goToSection }) {
     <div className={styles.page}>
       <nav aria-label="Breadcrumb">
         <button type="button" className={styles.btnSecondary} onClick={goToPortal}>
-          ← Back to community home
+          <span aria-hidden="true">← </span>Back to community home
         </button>
       </nav>
 

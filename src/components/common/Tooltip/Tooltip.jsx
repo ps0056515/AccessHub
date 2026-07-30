@@ -89,7 +89,7 @@ export default function Tooltip({
 
   const child = React.isValidElement(children) ? React.Children.only(children) : null;
   const childProps = child ? {
-    'aria-describedby': isVisible && content ? tooltipId : undefined,
+    'aria-describedby': (isVisible && content && !child.props['aria-label']) ? tooltipId : undefined,
   } : {};
 
   return (

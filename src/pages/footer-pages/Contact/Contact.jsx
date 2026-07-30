@@ -12,7 +12,7 @@ const CARDS = [
         href="mailto:contactus@allcanaccess.com"
         className={styles.action}
       >
-        contactus@allcanaccess.com →
+        contactus@allcanaccess.com <span aria-hidden="true">→</span>
       </a>
     ),
   },
@@ -25,7 +25,7 @@ const CARDS = [
         to="/"
         className={styles.action}
       >
-        Visit community page →
+        Visit community page <span aria-hidden="true">→</span>
       </Link>
     ),
   },
@@ -38,7 +38,7 @@ const CARDS = [
         href="mailto:contactus@allcanaccess.com?subject=Accessibility%20Issue"
         className={styles.action}
       >
-        Report an issue →
+        Report an issue <span aria-hidden="true">→</span>
       </a>
     ),
   },

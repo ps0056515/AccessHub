@@ -349,7 +349,7 @@ export default function SettingsView({ showToast }) {
           onClick={() => setActiveSubTab('branding')}
           className={`${styles.tabBtn} ${activeSubTab === 'branding' ? styles.tabBtnActive : ''}`}
         >
-          🎨 Branding & Logos
+          <span aria-hidden="true">🎨</span> Branding & Logos
         </button>
         <button
           id="tab-navbar"
@@ -360,7 +360,7 @@ export default function SettingsView({ showToast }) {
           onClick={() => setActiveSubTab('navbar')}
           className={`${styles.tabBtn} ${activeSubTab === 'navbar' ? styles.tabBtnActive : ''}`}
         >
-          🔝 Navbar Links
+          <span aria-hidden="true">🔝</span> Navbar Links
         </button>
         <button
           id="tab-footer"
@@ -371,7 +371,7 @@ export default function SettingsView({ showToast }) {
           onClick={() => setActiveSubTab('footer')}
           className={`${styles.tabBtn} ${activeSubTab === 'footer' ? styles.tabBtnActive : ''}`}
         >
-          ⬇️ Footer Columns
+          <span aria-hidden="true">⬇️</span> Footer Columns
         </button>
         <button
           id="tab-landing"
@@ -382,7 +382,7 @@ export default function SettingsView({ showToast }) {
           onClick={() => setActiveSubTab('landing')}
           className={`${styles.tabBtn} ${activeSubTab === 'landing' ? styles.tabBtnActive : ''}`}
         >
-          🏠 Landing Page
+          <span aria-hidden="true">🏠</span> Landing Page
         </button>
       </div>
 
@@ -425,7 +425,7 @@ export default function SettingsView({ showToast }) {
                 <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
                   <label className={styles.uploadLabelBtn}>
                     {logoLoading === 'navbar_logo_url' ? 'Uploading...' : 'Choose Navbar Logo'}
-                    <input type="file" accept="image/*" onChange={(e) => handleLogoUpload(e, 'navbar_logo_url')} className={styles.visuallyHidden} />
+                    <input type="file" accept="image/*" onChange={(e) => handleLogoUpload(e, 'navbar_logo_url')} className={styles.fileInputOverlay} />
                   </label>
                   <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>(JPG, PNG, SVG, WEBP)</span>
                 </div>
@@ -440,7 +440,7 @@ export default function SettingsView({ showToast }) {
                 <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
                   <label className={styles.uploadLabelBtn}>
                     {logoLoading === 'footer_logo_url' ? 'Uploading...' : 'Choose Footer Logo'}
-                    <input type="file" accept="image/*" onChange={(e) => handleLogoUpload(e, 'footer_logo_url')} className={styles.visuallyHidden} />
+                    <input type="file" accept="image/*" onChange={(e) => handleLogoUpload(e, 'footer_logo_url')} className={styles.fileInputOverlay} />
                   </label>
                   <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>(JPG, PNG, SVG, WEBP)</span>
                 </div>
@@ -523,9 +523,10 @@ export default function SettingsView({ showToast }) {
                 )}
               </div>
               <div className={styles.formGroup} style={{ marginTop: '16px', marginBottom: '16px' }}>
-                <label className={styles.formLabel}>Background Overlay Opacity</label>
+                <label htmlFor="bg-opacity" className={styles.formLabel}>Background Overlay Opacity</label>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                   <input
+                    id="bg-opacity"
                     type="range"
                     min="0"
                     max="1"
@@ -538,9 +539,9 @@ export default function SettingsView({ showToast }) {
                 </div>
               </div>
               <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-                <label className={styles.uploadLabelBtn}>
+                  <label className={styles.uploadLabelBtn}>
                   {logoLoading === 'portal_hero_bg_url' ? 'Uploading...' : 'Upload New Hero Background'}
-                  <input type="file" accept="image/*" onChange={(e) => handleLogoUpload(e, 'portal_hero_bg_url')} className={styles.visuallyHidden} />
+                  <input type="file" accept="image/*" onChange={(e) => handleLogoUpload(e, 'portal_hero_bg_url')} className={styles.fileInputOverlay} />
                 </label>
                 <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>(JPG, PNG, SVG, WEBP)</span>
                 {localPortalConfig.bgUrl && (
@@ -567,7 +568,7 @@ export default function SettingsView({ showToast }) {
               <button type="button" onClick={() => {
                 setLocalPortalConfig(p => ({ ...p, tags: [...p.tags, { label: 'New Tag', searchText: 'New Tag' }] }))
               }} className={styles.addLinkBtn}>
-                ➕ Add Tag
+                <span aria-hidden="true">➕</span> Add Tag
               </button>
             </div>
             <div className={styles.linksList}>
@@ -614,7 +615,7 @@ export default function SettingsView({ showToast }) {
               <button type="button" onClick={() => {
                 setLocalPortalConfig(p => ({ ...p, stats: [...p.stats, { num: '100', label: 'New Stat' }] }))
               }} className={styles.addLinkBtn}>
-                ➕ Add Stat
+                <span aria-hidden="true">➕</span> Add Stat
               </button>
             </div>
             <div className={styles.linksList}>
@@ -666,7 +667,7 @@ export default function SettingsView({ showToast }) {
           <div className={styles.panelHeader}>
             <h2 className={dashboardStyles.panelTitle} style={{ margin: 0 }}>Header Navbar Navigation Links</h2>
             <button type="button" onClick={() => addLink('navbar')} className={styles.addLinkBtn}>
-              ➕ Add Navbar Link
+              <span aria-hidden="true">➕</span> Add Navbar Link
             </button>
           </div>
 
@@ -780,7 +781,7 @@ export default function SettingsView({ showToast }) {
                 disabled={createLoading}
                 className={`${dashboardStyles.backBtn} ${styles.createBtn}`}
               >
-                {createLoading ? 'Creating...' : '➕ Create Column'}
+                {createLoading ? 'Creating...' : <><span aria-hidden="true">➕</span> Create Column</>}
               </button>
             </div>
 
@@ -813,7 +814,7 @@ export default function SettingsView({ showToast }) {
               </div>
 
               <button type="button" onClick={() => addLink('footer')} className={styles.addLinkBtn}>
-                ➕ Add Link to Column
+                <span aria-hidden="true">➕</span> Add Link to Column
               </button>
             </div>
 

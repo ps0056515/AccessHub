@@ -192,7 +192,7 @@ function AdminDashboardInner({ goToPortal }) {
             }}
             aria-label="Return to the main community portal"
           >
-            ← Exit to site
+            <span aria-hidden="true">← </span>Exit to site
           </button>
         </header>
 
