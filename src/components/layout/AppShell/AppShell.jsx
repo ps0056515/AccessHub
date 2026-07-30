@@ -266,9 +266,6 @@ export default function AppShell() {
     <div
       style={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}
     >
-      <a href="#main-content" className="global-skip-link">
-        Skip to main content
-      </a>
       <Navbar
         activePage={navActive}
         setActivePage={setActivePage}

@@ -2,10 +2,8 @@ import React from 'react';
 import styles from './Toast.module.css';
 
 export default function ToastContainer({ toasts, removeToast }) {
-  if (toasts.length === 0) return null;
-
   return (
-    <div className={styles.toastContainer}>
+    <div className={styles.toastContainer} aria-live="polite" aria-atomic="true">
       {toasts.map((toast) => (
         <div
           key={toast.id}

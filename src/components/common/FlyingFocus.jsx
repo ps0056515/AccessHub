@@ -123,7 +123,7 @@ export default function FlyingFocus() {
         height: `${focusStyle.height}px`,
         transform: focusStyle.transform,
         borderRadius: focusStyle.borderRadius,
-        transition: 'transform 0.35s cubic-bezier(0.2, 0, 0, 1), width 0.1s cubic-bezier(0.2, 0, 0, 1), height 0.1s cubic-bezier(0.2, 0, 0, 1), opacity 0.1s ease',
+        transition: 'transform 0.40s cubic-bezier(0.2, 0, 0, 1), width 0.1s cubic-bezier(0.2, 0, 0, 1), height 0.1s cubic-bezier(0.2, 0, 0, 1), opacity 0.1s ease',
       }}
     />
   );

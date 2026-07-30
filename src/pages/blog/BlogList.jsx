@@ -64,7 +64,6 @@ export default function BlogList() {
             id="blog-search"
             type="search" 
             placeholder="Search by title or author..." 
-            title="Search by title or author..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className={styles.searchInput}

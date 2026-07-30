@@ -213,7 +213,7 @@ export default function AboutUs() {
             Together, we can build a world where everyone can access, participate, and thrive.
           </p>
           <Link to="/join" className={styles.joinBtn}>
-            Join the community →
+            Join the community <span aria-hidden="true">→</span>
           </Link>
         </div>
 

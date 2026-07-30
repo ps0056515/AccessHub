@@ -102,14 +102,14 @@ export default function Contribute() {
                       onClick={queueStartDiscussion}
                       className={styles.link}
                     >
-                      {item.cta.label} →
+                      {item.cta.label} <span aria-hidden="true">→</span>
                     </Link>
                   ) : (
                     <Link
                       to={item.cta.to}
                       className={styles.link}
                     >
-                      {item.cta.label} →
+                      {item.cta.label} <span aria-hidden="true">→</span>
                     </Link>
                   )}
                 </p>

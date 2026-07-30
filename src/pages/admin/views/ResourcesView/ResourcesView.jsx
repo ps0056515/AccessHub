@@ -135,7 +135,7 @@ export default function ResourcesView({ showToast }) {
       key: "icon",
       label: "Icon",
       width: "15%",
-      render: (res) => <span className={styles.resourceIcon}>{res.icon}</span>,
+      render: (res) => <span className={styles.resourceIcon} aria-hidden="true">{res.icon}</span>,
     },
     {
       key: "title",

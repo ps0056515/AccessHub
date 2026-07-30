@@ -159,7 +159,7 @@ function PostCard({
   };
 
   return (
-    <article className={styles.postCard}>
+    <article className={styles.postCard} aria-labelledby={`post-title-${post.id}`}>
       <div className={styles.voteCol}>
         <div aria-live="polite" aria-atomic="true" className="sr-only">
           {announcement}
@@ -204,32 +204,34 @@ function PostCard({
         ) : null}
       </div>
       <Avatar src={post.avatarUrl} initials={post.initials} color={post.color} />
-      <button
-        type="button"
-        className={styles.postOpen}
-        onClick={() => onOpenThread(post)}
-        aria-label={`Open discussion: ${post.title}`}
-      >
-        <div className={styles.postBody}>
-          <div className={styles.postMeta}>
-            <span className={styles.postAuthor}>
-              {post.author}
-              <CountryFlag countryName={post.country} />
-            </span>
-            <span className={styles.postDot} aria-hidden="true">·</span>
-            <RelativeTime rawTime={post.raw_time} fallback={post.time} />
-            <span className={styles.postDot} aria-hidden="true">·</span>
-            <span>{post.replies} replies</span>
-          </div>
-          <h2 className={styles.postTitle}>{post.title}</h2>
-          <p className={styles.postExcerpt}>{post.excerpt}</p>
-          <div className={styles.postTags}>
-            {post.tags.map((t) => (
-              <Tag key={t} label={t} />
-            ))}
-          </div>
+      <div className={styles.postBody}>
+        <div className={styles.postMeta}>
+          <span className={styles.postAuthor}>
+            {post.author}
+            <CountryFlag countryName={post.country} />
+          </span>
+          <span className={styles.postDot} aria-hidden="true">·</span>
+          <RelativeTime rawTime={post.raw_time} fallback={post.time} />
+          <span className={styles.postDot} aria-hidden="true">·</span>
+          <span>{post.replies} replies</span>
         </div>
-      </button>
+        <h2 id={`post-title-${post.id}`} className={styles.postTitle}>
+          <button
+            type="button"
+            className={styles.postOpen}
+            onClick={() => onOpenThread(post)}
+            aria-label={`Open discussion: ${post.title}`}
+          >
+            {post.title}
+          </button>
+        </h2>
+        <p className={styles.postExcerpt}>{post.excerpt}</p>
+        <div className={styles.postTags}>
+          {post.tags.map((t) => (
+            <Tag key={t} label={t} />
+          ))}
+        </div>
+      </div>
     </article>
   );
 }
@@ -434,10 +436,10 @@ export default function Portal({
   };
 
   const tabs = [
-    { id: "hot", label: "🔥 Hot" },
-    { id: "new", label: "✨ New" },
-    { id: "top", label: "⬆ Top" },
-    { id: "unanswered", label: "💬 Unanswered" },
+    { id: "hot", label: "Hot", icon: "🔥" },
+    { id: "new", label: "New", icon: "✨" },
+    { id: "top", label: "Top", icon: "⬆" },
+    { id: "unanswered", label: "Unanswered", icon: "💬" },
   ];
 
   const baseFiltered = useMemo(() => {
@@ -691,7 +693,7 @@ export default function Portal({
                 onClick={handlePostQuestion}
                 disabled={posting}
               >
-                {posting ? "Posting…" : "Post question →"}
+                {posting ? "Posting…" : <>Post question <span aria-hidden="true">→</span></>}
               </button>
             </div>
           </div>
@@ -728,10 +730,6 @@ export default function Portal({
                 className={styles.searchInput}
                 type="search"
                 placeholder={
-                  portalConfig.searchPlaceholder ||
-                  "Search discussions by title or text…"
-                }
-                title={
                   portalConfig.searchPlaceholder ||
                   "Search discussions by title or text…"
                 }
@@ -775,6 +773,7 @@ export default function Portal({
           </div>
           <div
             className={styles.tabBar}
+            role="group"
             aria-label="Discussion filter"
           >
             {tabs.map((t) => (
@@ -785,6 +784,7 @@ export default function Portal({
                 className={`${styles.tabBtn} ${activeTab === t.id ? styles.tabActive : ""}`}
                 onClick={() => setActiveTab(t.id)}
               >
+                <span aria-hidden="true">{t.icon} </span>
                 {t.label}
               </button>
             ))}
@@ -793,6 +793,7 @@ export default function Portal({
           <div className={styles.postsWrapper}>
             <div
               className={styles.postsContainer}
+              role="region"
               aria-label={`${activeTab} discussions`}
             >
             {postsLoading ? (
@@ -898,7 +899,7 @@ export default function Portal({
               className={styles.sideLink}
               onClick={goToAllEvents}
             >
-              View all events →
+              View all events <span aria-hidden="true">→</span>
             </button>
           </section>
 
@@ -916,8 +917,8 @@ export default function Portal({
                     type="button"
                     className={styles.memberRowBtn}
                     onClick={() => navigate(`/profile/${m.id}`)}
-                    aria-label={`View public profile: ${m.name}`}
                   >
+                    <span className="sr-only">View public profile: </span>
                     <Avatar src={m.avatarUrl} initials={m.initials} color={m.color} size={32} />
                     <div className={styles.memberInfo}>
                       <span className={styles.memberName}>
@@ -947,7 +948,7 @@ export default function Portal({
             <h2 id="checker-heading" className={styles.sideTitle}>
               Quick WAVE scan
             </h2>
-            <p className={styles.checkerDesc}>
+            <p id="wave-desc" className={styles.checkerDesc}>
               Paste any URL for an instant accessibility scan
             </p>
             <label htmlFor="wave-url" className="sr-only">
@@ -955,6 +956,7 @@ export default function Portal({
             </label>
             <input
               id="wave-url"
+              aria-describedby="wave-desc"
               className={styles.checkerInput}
               type="url"
               placeholder="https://yoursite.com"
@@ -996,7 +998,7 @@ export default function Portal({
                 );
               }}
             >
-              Run scan →
+              Run scan <span aria-hidden="true">→</span>
             </button>
           </section>
 

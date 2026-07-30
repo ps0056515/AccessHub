@@ -1,6 +1,6 @@
 import { useConfig } from 'context/ConfigContext';
 
-export default function FooterLogo({ className, width = 200, height = 60 }) {
+export default function FooterLogo({ className, width = 200, height = 60, ...props }) {
   const { siteName, footerLogoUrl } = useConfig();
 
   return (
@@ -10,6 +10,7 @@ export default function FooterLogo({ className, width = 200, height = 60 }) {
       className={className}
       width={width}
       height={height}
+      {...props}
     />
   );
 }

@@ -252,7 +252,7 @@ export default function ThreadPage({ posts, setPosts, refreshPosts, returnToComm
       <div className={styles.page}>
         <p className={styles.notFound}>{loadError || 'Discussion not found.'}</p>
         <button type="button" className={styles.backLink} onClick={returnToCommunity}>
-          ← Back to community
+          <span aria-hidden="true">← </span>Back to community
         </button>
       </div>
     );
@@ -310,7 +310,7 @@ export default function ThreadPage({ posts, setPosts, refreshPosts, returnToComm
       </nav>
 
       <button type="button" className={styles.back} onClick={() => navigate(-1)}>
-        ← Back
+        <span aria-hidden="true">← </span>Back
       </button>
 
       <article className={styles.rootPost}>
@@ -356,7 +356,8 @@ export default function ThreadPage({ posts, setPosts, refreshPosts, returnToComm
           </div>
           <Link 
             to={`/profile/${post.userId}`} 
-            aria-label={`View ${post.author}'s profile`}
+            aria-hidden="true"
+            tabIndex={-1}
             style={{ textDecoration: 'none', display: 'flex' }}
           >
             <Avatar src={post.avatarUrl} initials={post.initials} color={post.color} size={44} />
@@ -426,8 +427,8 @@ export default function ThreadPage({ posts, setPosts, refreshPosts, returnToComm
                   <h1 className={styles.title}>{post.title}</h1>
                   {isOwner && (
                     <div className={styles.ownerActions}>
-                      <button id="edit-post-btn" type="button" onClick={startEdit} className={styles.editBtn}>Edit</button>
-                      <button type="button" onClick={handleDelete} className={styles.deleteBtn}>Delete</button>
+                      <button id="edit-post-btn" type="button" onClick={startEdit} className={styles.editBtn} aria-label={`Edit post: ${post.title}`}>Edit</button>
+                      <button type="button" onClick={handleDelete} className={styles.deleteBtn} aria-label={`Delete post: ${post.title}`}>Delete</button>
                     </div>
                   )}
                 </div>
@@ -451,10 +452,12 @@ export default function ThreadPage({ posts, setPosts, refreshPosts, returnToComm
         </h2>
         <ol className={styles.replyList}>
           {comments.map(c => (
-            <li key={c.id} className={styles.reply}>
+            <li key={c.id}>
+              <article className={styles.reply} aria-label={`Reply by ${c.author}`}>
               <Link 
                 to={`/profile/${c.userId}`} 
-                aria-label={`View ${c.author}'s profile`}
+                aria-hidden="true"
+                tabIndex={-1}
                 style={{ textDecoration: 'none', display: 'flex' }}
               >
                 <Avatar src={c.avatarUrl} initials={c.initials} color={c.color} size={36} />
@@ -462,6 +465,7 @@ export default function ThreadPage({ posts, setPosts, refreshPosts, returnToComm
               <div className={styles.replyBody}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', width: '100%' }}>
                   <p className={styles.replyMeta}>
+                    <span className="sr-only">Reply by </span>
                     <Link 
                       to={`/profile/${c.userId}`} 
                       className={styles.author} 
@@ -516,6 +520,7 @@ export default function ThreadPage({ posts, setPosts, refreshPosts, returnToComm
                   <p className={styles.replyText}>{c.body}</p>
                 )}
               </div>
+              </article>
             </li>
           ))}
         </ol>

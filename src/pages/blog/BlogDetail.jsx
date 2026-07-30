@@ -42,7 +42,7 @@ export default function BlogpostDetail() {
   return (
     <Container className={styles.detailContainer} style={{ display: 'block' }}>
       <Link to="/blog" className={styles.backBtn}>
-        ← Back to Blogposts
+        <span aria-hidden="true">← </span>Back to Blogposts
       </Link>
 
       {blogpost.cover_image && (

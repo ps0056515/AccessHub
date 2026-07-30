@@ -92,12 +92,14 @@ export default function Footer({ goToSection, goToPortal }) {
               type="button"
               className={styles.brandBtn}
               onClick={() => goToPage("/")}
+              aria-label="Return to homepage"
             >
               <span className={styles.logo}>
                 <FooterLogo
                   className={styles.logoImg}
                   width={200}
                   height={60}
+                  aria-hidden="true"
                 />
               </span>
             </button>

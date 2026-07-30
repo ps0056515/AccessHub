@@ -144,6 +144,9 @@ export default function Navbar({
         }
       }}
     >
+      <a href="#main-content" className="global-skip-link">
+        Skip to main content
+      </a>
       <Container className={styles.inner}>
         <button
           type="button"
@@ -253,7 +256,7 @@ export default function Navbar({
                 aria-label="User Profile"
                 aria-expanded={profileOpen}
                 aria-haspopup="dialog"
-                aria-controls="profile-menu"
+                aria-controls={profileOpen ? "profile-menu" : undefined}
               >
                 <Avatar src={user.avatarUrl} initials={user.initials || (user.displayName ? user.displayName[0] : "U")} color={user.color || "blue"} size={32} />
               </button>
