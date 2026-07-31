@@ -852,6 +852,7 @@ export default function Portal({
                   <li key={rp.id} className={styles.recentItem}>
                     <Link to={`/thread/${rp.id}`} className={styles.recentLink}>
                       <span className={styles.recentTitle}>{rp.title}</span>
+                      <span className="sr-only">, viewed on </span>
                       <span className={styles.recentMeta}>
                         <RelativeTime rawTime={rp.viewedAt} fallback="Just now" />
                       </span>
@@ -879,7 +880,7 @@ export default function Portal({
                     className={styles.eventRowBtn}
                     onClick={() => goToEvent(e.id)}
                   >
-                    <div className={styles.eventDate}>
+                    <div className={styles.eventDate} aria-hidden="true">
                       <span className={styles.eventMonth}>
                         {fmtMonth(e.event_date)}
                       </span>
@@ -888,7 +889,9 @@ export default function Portal({
                       </span>
                     </div>
                     <div className={styles.eventRowText}>
+                      <span className="sr-only">{fmtMonth(e.event_date)} {fmtDay(e.event_date)}, </span>
                       <p className={styles.eventTitle}>{e.title}</p>
+                      <span className="sr-only">, </span>
                       <p className={styles.eventType}>{e.type}</p>
                     </div>
                   </button>
