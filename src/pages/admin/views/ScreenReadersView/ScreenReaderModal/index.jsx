@@ -171,7 +171,7 @@ export default function ScreenReaderModal({ isOpen, onClose, onSuccess, editingG
             ))}
           </div>
           <button type="button" onClick={handleAddPhase} className={styles.addPhaseBtn}>
-            + Add Phase
+            <span aria-hidden="true">+</span> Add Phase
           </button>
         </div>
       </form>

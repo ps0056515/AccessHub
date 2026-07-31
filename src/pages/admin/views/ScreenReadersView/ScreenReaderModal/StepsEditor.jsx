@@ -66,7 +66,7 @@ export default function StepsEditor({ items, onChange }) {
         </div>
       ))}
       <button type="button" onClick={handleAdd} className={styles.addItemBtn}>
-        + Add Step
+        <span aria-hidden="true">+</span> Add Step
       </button>
     </div>
   );

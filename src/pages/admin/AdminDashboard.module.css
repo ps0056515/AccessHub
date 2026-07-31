@@ -54,9 +54,9 @@
 }
 
 .collapseToggle {
-  background: var(--brand-navy);
+  background: transparent;
   border: 1px solid var(--sidebar-border);
-  color: var(--text);
+  color: var(--sidebar-text-muted);
   cursor: pointer;
   border-radius: 4px;
   width: 24px;

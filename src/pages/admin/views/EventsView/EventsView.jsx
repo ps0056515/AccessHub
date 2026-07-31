@@ -480,7 +480,7 @@ export default function EventsView({ showToast }) {
                 }}
                 className={styles.addEventBtn}
               >
-                📅 Add Event
+                <span aria-hidden="true">📅</span> Add Event
               </button>
             )}
           </div>

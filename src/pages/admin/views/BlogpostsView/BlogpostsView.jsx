@@ -319,7 +319,7 @@ export default function BlogpostsView({ showToast }) {
                 </>
               )}
               <button type="button" onClick={() => openEditor()} className={styles.createBtn}>
-                ➕ Create New Blogpost
+                <span aria-hidden="true">➕</span> Create New Blogpost
               </button>
             </div>
           </div>
