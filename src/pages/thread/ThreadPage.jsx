@@ -315,7 +315,11 @@ export default function ThreadPage({ posts, setPosts, refreshPosts, returnToComm
 
       <article className={styles.rootPost}>
         <div className={styles.rootTop}>
-          <div className={styles.voteCol}>
+          <div 
+            className={styles.voteCol}
+            role="group"
+            aria-labelledby="thread-title"
+          >
             <div aria-live="polite" aria-atomic="true" className="sr-only">
               {announcement}
             </div>
@@ -425,7 +429,7 @@ export default function ThreadPage({ posts, setPosts, refreshPosts, returnToComm
             ) : (
               <>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                  <h1 className={styles.title}>{post.title}</h1>
+                  <h1 id="thread-title" className={styles.title}>{post.title}</h1>
                   {isOwner && (
                     <div className={styles.ownerActions}>
                       <button id="edit-post-btn" type="button" onClick={startEdit} className={styles.editBtn} aria-label={`Edit post: ${post.title}`}>Edit</button>
