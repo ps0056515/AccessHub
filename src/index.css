@@ -19,9 +19,9 @@
 
   /* Brand-aligned: navy + vibrant blue (matches public/allcanaccess.jpg) */
   --brand-navy: #0c1929;
-  /* Darker than legacy #0b6cff so link/text-on-page meets WCAG AA on --bg */
-  --brand-blue: #074a9e;
-  --accent-rgb: 7, 74, 158;
+  /* Darker than legacy #0b6cff so link/text-on-page meets WCAG AAA on --bg */
+  --brand-blue: #06428c;
+  --accent-rgb: 6, 66, 140;
 
   --bg: #f4f7fb;
   --bg-card: #ffffff;
@@ -29,13 +29,13 @@
   --bg-tertiary: #dde6f0;
 
   --text: #0c1929;
-  --text-muted: #3d4f66;
+  --text-muted: #3a4b61;
   --text-faint: #2d3f52;
 
   --border: rgba(12, 25, 41, 0.75);
   --border-strong: rgba(12, 25, 41, 0.85);
 
-  --accent: #074a9e;
+  --accent: #06428c;
   --accent-bg: #e8f2ff;
   --accent-text: #003d99;
 
@@ -58,7 +58,7 @@
 
   --pink: #db2777;
   --pink-bg: #fce7f3;
-  --pink-text: #9d174d;
+  --pink-text: #8a1444;
 
   --green: #166534;
   --green-bg: #dcfce7;

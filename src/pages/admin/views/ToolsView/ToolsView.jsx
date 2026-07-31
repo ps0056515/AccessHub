@@ -1,4 +1,4 @@
-﻿import { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Trash } from "lucide-react";
 import { toolsApi } from "api/client";
 import { COLOR_MAP } from "data";
@@ -265,7 +265,7 @@ export default function ToolsView({ showToast }) {
               onClick={handleOpenCreateModal}
               className={styles.addToolBtn}
             >
-              ➕ Add Recommended Tool
+              <span aria-hidden="true">➕</span> Add Recommended Tool
             </button>
           </div>
         </div>

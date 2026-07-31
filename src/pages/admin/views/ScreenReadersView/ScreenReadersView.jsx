@@ -1,4 +1,4 @@
-﻿import { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Trash } from "lucide-react";
 import { screenReadersApi } from "api/client";
 import ScreenReaderModal from "./ScreenReaderModal";
@@ -237,7 +237,7 @@ export default function ScreenReadersView({ showToast }) {
             </>
           )}
           <button onClick={() => openModal()} className={styles.addBtn}>
-            + New Guide
+            <span aria-hidden="true">+</span> New Guide
           </button>
         </div>
       </header>

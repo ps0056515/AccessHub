@@ -371,7 +371,7 @@ export default function ResourcesView({ showToast }) {
                 }}
                 className={styles.addEventBtn}
               >
-                📚 Add Resource
+                <span aria-hidden="true">📚</span> Add Resource
               </button>
             )}
           </div>

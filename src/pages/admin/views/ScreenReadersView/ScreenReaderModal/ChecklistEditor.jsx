@@ -59,7 +59,7 @@ export default function ChecklistEditor({ items, onChange }) {
         </div>
       ))}
       <button type="button" onClick={handleAdd} className={styles.addItemBtn}>
-        + Add Checklist Item
+        <span aria-hidden="true">+</span> Add Checklist Item
       </button>
     </div>
   );

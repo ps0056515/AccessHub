@@ -1,4 +1,4 @@
-﻿import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Trash } from "lucide-react";
 import { postsApi } from 'api/client';
 import dashboardStyles from '../../AdminDashboard.module.css';
@@ -172,7 +172,7 @@ export default function DiscussionsModeration({ showToast }) {
             </button>
           )}
           <button className={styles.btnPrimary} onClick={handleCreateNew}>
-            + Create Discussion
+            <span aria-hidden="true">+</span> Create Discussion
           </button>
         </div>
       </div>

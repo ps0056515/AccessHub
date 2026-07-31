@@ -85,13 +85,13 @@ export default function ShortcutsEditor({ items, onChange }) {
               </div>
             ))}
             <button type="button" onClick={() => handleAddRow(sectionIndex)} className={styles.addItemBtn} style={{ padding: '8px' }}>
-              + Add Shortcut Row
+              <span aria-hidden="true">+</span> Add Shortcut Row
             </button>
           </div>
         </div>
       ))}
       <button type="button" onClick={handleAddSection} className={styles.addItemBtn}>
-        + Add Shortcut Section
+        <span aria-hidden="true">+</span> Add Shortcut Section
       </button>
     </div>
   );

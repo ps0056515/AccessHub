@@ -419,7 +419,7 @@ export default function ArticlesView({ showToast }) {
                 onClick={() => openEditor()}
                 className={styles.createBtn}
               >
-                ➕ Create New Article
+                <span aria-hidden="true">➕</span> Create New Article
               </button>
             </div>
           </div>

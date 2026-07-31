@@ -61,7 +61,7 @@ export default function IssuesEditor({ items, onChange }) {
         </div>
       ))}
       <button type="button" onClick={handleAdd} className={styles.addItemBtn}>
-        + Add Issue
+        <span aria-hidden="true">+</span> Add Issue
       </button>
     </div>
   );
