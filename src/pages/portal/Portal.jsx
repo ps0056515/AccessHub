@@ -171,18 +171,15 @@ function PostCard({
             if (voting) { e.preventDefault(); e.stopPropagation(); return; }
             vote("up", e);
           }}
-          aria-label={`Upvote ${post.title}. Current score ${votes}`}
+          aria-label="Upvote"
           aria-pressed={voted === "up" ? "true" : "false"}
           aria-disabled={voting ? "true" : "false"}
         >
-          ▲
+          <span aria-hidden="true">▲</span>
         </button>
-        <span
-          className={styles.voteCount}
-          aria-live="polite"
-          aria-atomic="true"
-        >
+        <span className={styles.voteCount}>
           {votes}
+          <span className="sr-only"> votes</span>
         </span>
         <button
           type="button"
@@ -191,11 +188,11 @@ function PostCard({
             if (voting) { e.preventDefault(); e.stopPropagation(); return; }
             vote("down", e);
           }}
-          aria-label={`Downvote ${post.title}. Current score ${votes}`}
+          aria-label="Downvote"
           aria-pressed={voted === "down" ? "true" : "false"}
           aria-disabled={voting ? "true" : "false"}
         >
-          ▼
+          <span aria-hidden="true">▼</span>
         </button>
         {voteError ? (
           <span className="sr-only" role="alert">
