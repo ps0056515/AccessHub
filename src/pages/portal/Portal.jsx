@@ -160,7 +160,11 @@ function PostCard({
 
   return (
     <article className={styles.postCard} aria-labelledby={`post-title-${post.id}`}>
-      <div className={styles.voteCol}>
+      <div 
+        className={styles.voteCol}
+        role="group"
+        aria-labelledby={`post-title-${post.id}`}
+      >
         <div aria-live="polite" aria-atomic="true" className="sr-only">
           {announcement}
         </div>
