@@ -14,7 +14,9 @@ export default function ContentCard({ to, image, title, author, date, typeIcon =
       <div className={styles.cardContent}>
         <h2 className={styles.cardTitle}>{title}</h2>
         <div className={styles.cardMeta}>
+          <span className="sr-only">Posted by </span>
           <span>{author}</span>
+          <span className="sr-only">, on </span>
           <span>{new Date(date).toLocaleDateString()}</span>
         </div>
       </div>
