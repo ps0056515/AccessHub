@@ -11,38 +11,45 @@ export function useAriaLive() {
 }
 
 export function AriaLiveProvider({ children }) {
-  const [message, setMessage] = useState('');
-  const timeoutRef = useRef(null);
+  const [politeMessage, setPoliteMessage] = useState('');
+  const [assertiveMessage, setAssertiveMessage] = useState('');
+  
+  const politeTimeoutRef = useRef(null);
+  const assertiveTimeoutRef = useRef(null);
 
-  const announce = useCallback((msg) => {
-    setMessage('');
+  const announce = useCallback((msg, priority = 'polite') => {
+    const setMsg = priority === 'assertive' ? setAssertiveMessage : setPoliteMessage;
+    const timeoutRef = priority === 'assertive' ? assertiveTimeoutRef : politeTimeoutRef;
+    
+    setMsg('');
     // Slight delay ensures screen reader registers a change if the same message is announced twice
     setTimeout(() => {
-      setMessage(msg);
+      setMsg(msg);
       if (timeoutRef.current) clearTimeout(timeoutRef.current);
-      timeoutRef.current = setTimeout(() => setMessage(''), 3000);
+      timeoutRef.current = setTimeout(() => setMsg(''), 3000);
     }, 50);
   }, []);
+
+  const hiddenStyle = {
+    position: 'absolute',
+    width: '1px',
+    height: '1px',
+    padding: 0,
+    margin: '-1px',
+    overflow: 'hidden',
+    clip: 'rect(0, 0, 0, 0)',
+    whiteSpace: 'nowrap',
+    border: 0,
+  };
 
   return (
     <AriaLiveContext.Provider value={{ announce }}>
       {children}
-      <div 
-        aria-live="polite" 
-        aria-atomic="true" 
-        style={{
-          position: 'absolute',
-          width: '1px',
-          height: '1px',
-          padding: 0,
-          margin: '-1px',
-          overflow: 'hidden',
-          clip: 'rect(0, 0, 0, 0)',
-          whiteSpace: 'nowrap',
-          border: 0,
-        }}
-      >
-        {message}
+      <div aria-live="polite" aria-atomic="true" style={hiddenStyle}>
+        {politeMessage}
+      </div>
+      <div aria-live="assertive" aria-atomic="true" style={hiddenStyle}>
+        {assertiveMessage}
       </div>
     </AriaLiveContext.Provider>
   );

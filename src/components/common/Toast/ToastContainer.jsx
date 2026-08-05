@@ -3,14 +3,13 @@ import styles from './Toast.module.css';
 
 export default function ToastContainer({ toasts, removeToast }) {
   return (
-    <div className={styles.toastContainer} aria-live="polite" aria-atomic="true">
+    <div className={styles.toastContainer}>
       {toasts.map((toast) => (
         <div
           key={toast.id}
           className={`${styles.toast} ${
             toast.type === 'error' ? styles.toastError : styles.toastSuccess
           }`}
-          role={toast.type === 'error' ? 'alert' : 'status'}
         >
           <span className={styles.toastIcon} aria-hidden="true">
             {toast.type === 'error' ? '❌' : '✔'}

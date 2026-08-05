@@ -11,7 +11,7 @@
   margin-bottom: 10px;
 }
 
-.pageSub { font-size: 15px; color: var(--text-secondary); max-width: 520px; }
+.pageSub { font-size: 15px; color: var(--text-primary); max-width: 520px; }
 
 .toolbar {
   display: flex;
@@ -65,7 +65,8 @@
   border-radius: var(--radius-full);
   padding: 6px 14px;
   font-size: 13px;
-  color: var(--text-secondary);
+  font-weight: 500;
+  color: var(--text-primary);
   transition: all var(--transition);
   user-select: none;
   -webkit-tap-highlight-color: transparent;
@@ -137,8 +138,8 @@
 
 .cardBody { flex: 1; }
 
-.cardTitle { font-size: 14px; font-weight: 500; color: var(--text-primary); margin-bottom: 5px; line-height: 1.4; }
-.cardDesc { font-size: 12px; color: var(--text-secondary); line-height: 1.55; }
+.cardTitle { font-size: 14px; font-weight: 600; color: var(--text-primary); margin-bottom: 5px; line-height: 1.4; }
+.cardDesc { font-size: 13px; color: var(--text-primary); line-height: 1.55; }
 
 .cardActions {
   display: flex;
@@ -151,13 +152,13 @@
 .cardBtn {
   flex: 1;
   min-width: 0;
-  background: var(--surface-secondary);
-  border: 1px solid var(--border-interactive);
+  background: var(--surface-tertiary);
+  border: 1px solid var(--border-interactive-strong);
   border-radius: var(--radius-sm);
   padding: 7px 14px;
   font-size: 13px;
   color: var(--text-primary);
-  font-weight: 500;
+  font-weight: 600;
   transition: background var(--transition);
   text-decoration: none;
   text-align: center;
@@ -166,7 +167,7 @@
   justify-content: center;
 }
 
-.cardBtn:hover { background: var(--surface-tertiary); }
+.cardBtn:hover { background: var(--surface-secondary); }
 
 .cardSave {
   flex-shrink: 0;
@@ -194,9 +195,10 @@
 
 .cardCat {
   font-size: 11px;
+  font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  color: var(--text-faint);
+  color: var(--text-primary);
   margin-bottom: 6px;
 }
 
@@ -220,7 +222,7 @@
   margin-bottom: 8px;
 }
 
-.certDesc { font-size: 14px; color: var(--text-secondary); max-width: 560px; }
+.certDesc { font-size: 15px; color: var(--text-primary); max-width: 560px; }
 
 .certCta {
   background: var(--button-primary);

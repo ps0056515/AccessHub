@@ -38,9 +38,9 @@ export default function App() {
       <AuthProvider>
         <TrackerMount>
           <ConfigProvider>
-            <ToastProvider>
-              <ConfirmProvider>
-                <AriaLiveProvider>
+            <AriaLiveProvider>
+              <ToastProvider>
+                <ConfirmProvider>
                   <Routes>
                     <Route element={<RequireAuth />}>
                       <Route
@@ -54,9 +54,9 @@ export default function App() {
                     </Route>
                     <Route path="*" element={<AppShell />} />
                   </Routes>
-                </AriaLiveProvider>
-              </ConfirmProvider>
-            </ToastProvider>
+                </ConfirmProvider>
+              </ToastProvider>
+            </AriaLiveProvider>
           </ConfigProvider>
         </TrackerMount>
       </AuthProvider>

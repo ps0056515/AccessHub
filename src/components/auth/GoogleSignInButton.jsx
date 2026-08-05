@@ -80,7 +80,7 @@ export default function GoogleSignInButton({
         btnRef.current.innerHTML = '';
         window.google.accounts.id.renderButton(btnRef.current, {
           type: 'standard',
-          theme: 'filled_blue',
+          theme: 'outline',
           size: 'large',
           text,
           width,

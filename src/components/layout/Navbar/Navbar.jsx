@@ -80,6 +80,18 @@ export default function Navbar({
     };
   }, [profileOpen, menuOpen]);
 
+  useEffect(() => {
+    if (profileOpen) {
+      setTimeout(() => {
+        const btn = document.getElementById('my-profile-dropdown-btn');
+        if (btn) {
+          document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Tab' }));
+          btn.focus();
+        }
+      }, 50);
+    }
+  }, [profileOpen]);
+
   const navigate = useNavigate();
   const location = useLocation();
   const { user, signOut, loading: authLoading, isAdmin } = useAuth();
@@ -273,6 +285,7 @@ export default function Navbar({
                   </div>
                   <div className={styles.dropdownBody}>
                     <button
+                      id="my-profile-dropdown-btn"
                       type="button"
                       className={styles.dropdownItem}
                       onClick={() => { setProfileOpen(false); navigate("/my-profile"); }}

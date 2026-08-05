@@ -9,9 +9,9 @@ import styles from './Tools.module.css';
 function BadgePill({ label, color }) {
   const c = COLOR_MAP[color] || COLOR_MAP.blue;
   return (
-    <Badge className={styles.badge} bg={c.bg}>
+    <span className={styles.badge}>
       {label}
-    </Badge>
+    </span>
   );
 }
 

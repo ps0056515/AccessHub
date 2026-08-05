@@ -10,6 +10,8 @@ import {
   Briefcase, User, CheckCircle2, ChevronRight, MessageSquare, FileText, Star
 } from 'lucide-react';
 import Avatar from 'components/common/Avatar/Avatar';
+import Modal from 'components/common/Modal/Modal';
+import AvatarPickerModal from 'components/common/AvatarPicker/AvatarPickerModal';
 import styles from './MyProfilePage.module.css';
 
 
@@ -66,7 +68,8 @@ export default function MyProfilePage() {
   const [saving, setSaving] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
   const [avatarUploading, setAvatarUploading] = useState(false);
-  const fileInputRef = useRef(null);
+  const [isImageViewerOpen, setIsImageViewerOpen] = useState(false);
+  const [isAvatarPickerOpen, setIsAvatarPickerOpen] = useState(false);
   const lastFocusRef = useRef(null);
 
   const [formData, setFormData] = useState({
@@ -91,6 +94,19 @@ export default function MyProfilePage() {
     }
   }, [user]);
 
+  useEffect(() => {
+    if (isEditing) {
+      // Use a slight timeout to ensure React has fully committed the DOM
+      setTimeout(() => {
+        const btn = document.getElementById('avatar-add-btn');
+        if (btn) {
+          document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Tab' }));
+          btn.focus();
+        }
+      }, 50);
+    }
+  }, [isEditing]);
+
   const countries = useMemo(() => Country.getAllCountries(), []);
 
   const selectedCountry = useMemo(() => {
@@ -112,45 +128,27 @@ export default function MyProfilePage() {
 
   const completeness = useMemo(() => calcCompleteness(user), [user]);
 
-  const handleAvatarSelect = useCallback(async (e) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    if (!file.type.match(/^image\/(png|jpe?g|webp|gif)$/)) {
-      addToast('Please select a PNG, JPEG, WebP, or GIF image.', 'error');
-      return;
-    }
-    if (file.size > 2 * 1024 * 1024) {
-      addToast('Image must be smaller than 2 MB.', 'error');
-      return;
-    }
-
+  const handleAvatarSelect = async (file) => {
+    setIsAvatarPickerOpen(false);
     setAvatarUploading(true);
     try {
       const reader = new FileReader();
-      reader.onload = async () => {
+      reader.onloadend = async () => {
         try {
           await uploadAvatar(reader.result);
-          addToast('Profile photo updated!', 'success');
-          announce('Profile photo updated');
+          addToast("Profile photo updated successfully!", "success", true);
         } catch (err) {
-          addToast(err.message || 'Failed to upload photo.', 'error');
+          addToast(err.message || "Failed to update profile photo.", "error", true);
         } finally {
           setAvatarUploading(false);
         }
       };
-      reader.onerror = () => {
-        addToast('Failed to read file.', 'error');
-        setAvatarUploading(false);
-      };
       reader.readAsDataURL(file);
-    } catch {
+    } catch (err) {
       setAvatarUploading(false);
+      addToast(err.message || "Failed to read image file.", "error", true);
     }
-
-    // Reset file input so the same file can be re-selected
-    e.target.value = '';
-  }, [uploadAvatar, addToast, announce]);
+  };
 
   const handleRemoveAvatar = useCallback(async () => {
     if (!window.confirm("Are you sure you want to remove your profile photo?")) return;
@@ -158,7 +156,6 @@ export default function MyProfilePage() {
     try {
       await removeAvatar();
       addToast('Profile photo removed.', 'success');
-      announce('Profile photo removed');
     } catch (err) {
       addToast(err.message || 'Failed to remove photo.', 'error');
     } finally {
@@ -180,7 +177,6 @@ export default function MyProfilePage() {
     try {
       await updateProfile(formData);
       addToast("Profile updated successfully!", "success");
-      announce("Profile updated successfully!");
       setIsEditing(false);
       setTimeout(() => {
         if (lastFocusRef.current) lastFocusRef.current.focus();
@@ -225,9 +221,9 @@ export default function MyProfilePage() {
 
 
 
-  /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+  /* ------------------------------------------------------------------------- 
      EDIT MODE
-     â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+     -------------------------------------------------------------------------  */
   if (isEditing) {
     return (
       <div className={styles.page}>
@@ -241,7 +237,7 @@ export default function MyProfilePage() {
 
         <div className={`${styles.coverBanner} ${styles.fadeUp}`} />
 
-        <form onSubmit={handleSave}>
+        <form onSubmit={handleSave} aria-labelledby="edit-profile-heading">
           <div className={`${styles.editCard} ${styles.fadeUp} ${styles.fadeUp1}`}>
             <div className={styles.profileHeader}>
               <div className={styles.avatarWrapper}>
@@ -252,23 +248,16 @@ export default function MyProfilePage() {
                   size={120}
                   className={styles.avatarOverride}
                 />
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept="image/png,image/jpeg,image/webp,image/gif"
-                  className={styles.avatarHiddenInput}
-                  onChange={handleAvatarSelect}
-                  aria-label="Upload profile photo"
-                />
               </div>
               <div className={styles.profileHeaderInfo}>
                 <div className={styles.avatarActions}>
-                  <button
-                    type="button"
-                    className={styles.avatarAddBtn}
-                    onClick={() => fileInputRef.current?.click()}
-                    disabled={avatarUploading}
-                  >
+                      <button
+                        id="avatar-add-btn"
+                        type="button"
+                        className={styles.avatarAddBtn}
+                        onClick={() => setIsAvatarPickerOpen(true)}
+                        disabled={avatarUploading}
+                      >
                     {hasAvatar ? 'Change photo' : 'Add photo'}
                   </button>
                   {hasAvatar && (
@@ -282,7 +271,7 @@ export default function MyProfilePage() {
                     </button>
                   )}
                 </div>
-                <h1 className={styles.editTitle}>Edit Profile</h1>
+                <h1 id="edit-profile-heading" className={styles.editTitle}>Edit Profile</h1>
               </div>
             </div>
 
@@ -405,6 +394,13 @@ export default function MyProfilePage() {
             </div>
           </div>
         </form>
+
+        <AvatarPickerModal 
+          isOpen={isAvatarPickerOpen}
+          onClose={() => setIsAvatarPickerOpen(false)}
+          onSelectFile={handleAvatarSelect}
+          returnFocusRef={lastFocusRef}
+        />
       </div>
     );
   }
@@ -430,13 +426,20 @@ export default function MyProfilePage() {
 
         <div className={styles.profileHeader}>
           <div className={styles.avatarWrapper}>
-            <Avatar
-              src={user.avatarUrl}
-              initials={initial}
-              color={user.color}
-              size={120}
-              className={styles.avatarOverride}
-            />
+            <button 
+              type="button" 
+              className={styles.avatarViewBtn} 
+              onClick={() => setIsImageViewerOpen(true)}
+              aria-label="View profile picture"
+            >
+              <Avatar
+                src={user.avatarUrl}
+                initials={initial}
+                color={user.color}
+                size={120}
+                className={styles.avatarOverride}
+              />
+            </button>
           </div>
           <div className={styles.profileHeaderInfo}>
             <div className={styles.nameRow}>
@@ -466,7 +469,6 @@ export default function MyProfilePage() {
           onClick={(e) => {
             lastFocusRef.current = e.currentTarget;
             setIsEditing(true);
-            setTimeout(() => document.getElementById('edit-name')?.focus(), 0);
           }}
         >
           <Edit2 size={16} /> Edit Profile
@@ -500,10 +502,8 @@ export default function MyProfilePage() {
               type="button"
               className={styles.crumbBtn}
               aria-label="Complete now: your profile"
-              onClick={(e) => {
-                lastFocusRef.current = e.currentTarget;
+              onClick={() => {
                 setIsEditing(true);
-                setTimeout(() => document.getElementById('edit-name')?.focus(), 0);
               }}
               style={{ fontSize: 12, marginLeft: 4 }}
             >
@@ -600,6 +600,37 @@ export default function MyProfilePage() {
           </div>
         </div>
       </div>
+
+      {isImageViewerOpen && (
+        <Modal 
+          title="Profile Picture" 
+          onClose={() => setIsImageViewerOpen(false)}
+          width="auto"
+        >
+          <div style={{ display: 'flex', justifyContent: 'center', padding: '20px' }}>
+            {user.avatarUrl ? (
+              <img 
+                src={user.avatarUrl} 
+                alt="Full profile" 
+                style={{ width: '300px', height: '300px', objectFit: 'contain', borderRadius: '8px' }} 
+              />
+            ) : (
+              <Avatar
+                initials={user.displayName ? user.displayName.charAt(0).toUpperCase() : '?'}
+                color={user.color}
+                size={300}
+              />
+            )}
+          </div>
+        </Modal>
+      )}
+
+      <AvatarPickerModal 
+        isOpen={isAvatarPickerOpen}
+        onClose={() => setIsAvatarPickerOpen(false)}
+        onSelectFile={handleAvatarSelect}
+        returnFocusRef={lastFocusRef}
+      />
     </div>
   );
 }

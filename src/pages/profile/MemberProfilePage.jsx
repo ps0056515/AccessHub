@@ -4,6 +4,7 @@ import { usersApi } from 'api/client';
 import { COLOR_MAP } from 'data';
 import { Mail, MapPin, Building2, Calendar, Briefcase, User, ArrowLeft, MessageSquare, FileText, Star } from 'lucide-react';
 import Avatar from 'components/common/Avatar/Avatar';
+import Modal from 'components/common/Modal/Modal';
 import styles from './MemberProfilePage.module.css';
 
 function formatDate(dateStr) {
@@ -33,6 +34,7 @@ export default function MemberProfilePage({ goToPortal }) {
   const [member, setMember] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isImageViewerOpen, setIsImageViewerOpen] = useState(false);
 
   useEffect(() => {
     if (!memberId) return;
@@ -94,13 +96,20 @@ export default function MemberProfilePage({ goToPortal }) {
       <div className={`${styles.profileCard} ${styles.fadeUp} ${styles.fadeUp1}`}>
         <div className={styles.profileHeader}>
           <div className={styles.avatarWrapper}>
-            <Avatar 
-              src={member.avatarUrl} 
-              initials={member.initials} 
-              color={member.color} 
-              size={120} 
-              className={styles.avatarOverride} 
-            />
+            <button 
+              type="button" 
+              className={styles.avatarViewBtn} 
+              onClick={() => setIsImageViewerOpen(true)}
+              aria-label={`View ${member.displayName}'s profile picture`}
+            >
+              <Avatar 
+                src={member.avatarUrl} 
+                initials={member.initials} 
+                color={member.color} 
+                size={120} 
+                className={styles.avatarOverride} 
+              />
+            </button>
           </div>
           
           <div className={styles.profileHeaderInfo}>
@@ -209,6 +218,30 @@ export default function MemberProfilePage({ goToPortal }) {
           <ArrowLeft aria-hidden="true" size={16} /> Back to discussions
         </button>
       </div>
+
+      {isImageViewerOpen && (
+        <Modal 
+          title="Profile Picture" 
+          onClose={() => setIsImageViewerOpen(false)}
+          width="auto"
+        >
+          <div style={{ display: 'flex', justifyContent: 'center', padding: '20px' }}>
+            {member.avatarUrl ? (
+              <img 
+                src={member.avatarUrl} 
+                alt="Full profile" 
+                style={{ width: '300px', height: '300px', objectFit: 'contain', borderRadius: '8px' }} 
+              />
+            ) : (
+              <Avatar
+                initials={member.initials}
+                color={member.color}
+                size={300}
+              />
+            )}
+          </div>
+        </Modal>
+      )}
     </div>
   );
 }

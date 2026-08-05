@@ -1,12 +1,44 @@
+/**
+ * Jobs Route — slim handler delegating all logic to providerManager.
+ *
+ * Search flow:
+ *   1. Check in-memory cache
+ *   2. Query PostgreSQL for recent matching jobs (≥5 → return immediately)
+ *   3. Fetch from providers in parallel (circuit breakers applied)
+ *   4. Normalize + deduplicate
+ *   5. Save to PostgreSQL (async, non-blocking)
+ *   6. Refresh cache + return
+ *   7. Last resort: hardcoded FALLBACK_JOBS
+ */
+
 const express = require('express');
-const axios = require('axios');
+const {
+  fetchFromProviders,
+  getJobsFromDB,
+  saveJobsAsync,
+  getProviderHealth,
+  getDBJobCount,
+  getRecentDBJobCount
+} = require('../providers/providerManager');
+const { inferTags, truncateDescription } = require('../providers/baseProvider');
 
 const router = express.Router();
 
-// In-memory cache for job search queries (6-hour TTL to save API limits)
-const CACHE_TTL_MS = 6 * 60 * 60 * 1000;
+// ─── In-Memory Cache ─────────────────────────────────────────────────────────
+const CACHE_TTL_MS = 6 * 60 * 60 * 1000; // 6 hours
 const jobsCache = new Map();
 
+function getCached(key) {
+  const entry = jobsCache.get(key);
+  if (entry && Date.now() - entry.timestamp < CACHE_TTL_MS) return entry.data;
+  return null;
+}
+
+function setCache(key, data) {
+  jobsCache.set(key, { timestamp: Date.now(), data });
+}
+
+// ─── Fallback Jobs (absolute last resort) ────────────────────────────────────
 const FALLBACK_JOBS = [
   {
     id: 'fallback-1',
@@ -52,141 +84,126 @@ const FALLBACK_JOBS = [
   }
 ];
 
-// GET /api/jobs - Search jobs in real-time using JSearch API
-router.get('/', async (req, res, next) => {
+function filterFallback({ searchTerms, location, remoteOnly }) {
+  return FALLBACK_JOBS.filter(job => {
+    if (remoteOnly && !job.is_remote) return false;
+    if (location && !job.location.toLowerCase().includes(location.toLowerCase()) && job.location !== 'Remote') return false;
+    if (searchTerms && searchTerms.toLowerCase() !== 'accessibility') {
+      const text = `${job.title} ${job.description} ${job.company}`.toLowerCase();
+      if (!text.includes(searchTerms.toLowerCase())) return false;
+    }
+    return true;
+  });
+}
+
+// ─── Normalize provider jobs to API response shape ────────────────────────────
+function toResponseShape(job) {
+  return {
+    id: `${job.provider}-${job.providerJobId || Math.random()}`,
+    title: job.title,
+    company: job.company,
+    company_logo: job.companyLogo || null,
+    location: job.location || 'Remote / Unknown',
+    job_type: job.employmentType || 'Full-time',
+    is_remote: job.isRemote || false,
+    url: job.applyUrl,
+    source: job.provider,
+    posted_date: job.postedDate || new Date().toISOString(),
+    description: truncateDescription(job.description, 300),
+    tags: job.tags || inferTags(job.title, job.description)
+  };
+}
+
+// ─── Main Search Route ────────────────────────────────────────────────────────
+router.get('/', async (req, res) => {
+  const searchTerms = req.query.query || 'accessibility';
+  const location = req.query.location || '';
+  const page = parseInt(req.query.page, 10) || 1;
+  const remoteOnly = req.query.remote_jobs_only === 'true';
+
+  const cacheKey = `${searchTerms}|${location}|${page}|${remoteOnly}`;
+
+  // Layer 1: In-memory cache
+  const cached = getCached(cacheKey);
+  if (cached) {
+    console.log(`[jobs] Cache hit for: ${cacheKey}`);
+    return res.json(cached);
+  }
+
+  // Layer 2: PostgreSQL — if we have ≥5 recent jobs, serve them immediately
+  // and trigger a background refresh from providers
   try {
-    const searchTerms = req.query.query || 'accessibility';
-    const location = req.query.location || '';
-    const page = req.query.page || '1';
-    const remoteOnly = req.query.remote_jobs_only === 'true';
+    const dbJobs = await getJobsFromDB({ query: searchTerms, location, remoteOnly });
+    if (dbJobs.length >= 5) {
+      console.log(`[jobs] Serving ${dbJobs.length} jobs from DB`);
+      setCache(cacheKey, dbJobs);
 
-    // Construct a cache key based on query parameters
-    const cacheKey = `${searchTerms}|${location}|${page}|${remoteOnly}`;
-    const cachedData = jobsCache.get(cacheKey);
-
-    if (cachedData && (Date.now() - cachedData.timestamp < CACHE_TTL_MS)) {
-      return res.json(cachedData.data);
-    }
-
-    // Allow multiple keys from comma-separated RAPIDAPI_KEYS or a single RAPIDAPI_KEY
-    const apiKeysString = process.env.RAPIDAPI_KEYS || process.env.RAPIDAPI_KEY || '';
-    const apiKeys = apiKeysString.split(',').map(k => k.trim()).filter(Boolean);
-
-    if (apiKeys.length === 0) {
-      return res.status(500).json({ error: 'RAPIDAPI_KEY is not configured on the server.' });
-    }
-
-    // Build the query string for JSearch
-    let jsearchQuery = searchTerms;
-    if (location) {
-      jsearchQuery += ` in ${location}`;
-    }
-
-    let response = null;
-    let lastError = null;
-
-    // Try each API key in order until one works or we run out of keys
-    for (let i = 0; i < apiKeys.length; i++) {
-      try {
-        const rapidApiKey = apiKeys[i];
-        response = await axios.get('https://jsearch.p.rapidapi.com/search', {
-          params: {
-            query: jsearchQuery,
-            page: page,
-            num_pages: '2', // Fetch 2 pages (up to 20 jobs) to prevent RapidAPI timeouts
-            remote_jobs_only: remoteOnly ? 'true' : 'false'
-          },
-          headers: {
-            'x-rapidapi-key': rapidApiKey,
-            'x-rapidapi-host': 'jsearch.p.rapidapi.com'
+      // Background refresh from providers (non-blocking)
+      setImmediate(async () => {
+        try {
+          const freshJobs = await fetchFromProviders({ query: searchTerms, location, remoteOnly, page });
+          if (freshJobs.length > 0) {
+            saveJobsAsync(freshJobs);
+            const shaped = freshJobs.map(toResponseShape);
+            setCache(cacheKey, shaped);
+            console.log(`[jobs] Background refresh: ${freshJobs.length} fresh jobs cached`);
           }
-        });
-        
-        // If successful, break out of the loop
-        break;
-      } catch (err) {
-        lastError = err;
-        // If it's a 429 Rate Limit error and we have more keys, continue to the next key
-        if (err.response && err.response.status === 429 && i < apiKeys.length - 1) {
-          console.log(`Rate limit exceeded for API key index ${i}. Switching to backup key...`);
-          continue;
+        } catch (err) {
+          console.error(`[jobs] Background refresh failed: ${err.message}`);
         }
-        // If it's another type of error or we are out of keys, throw the error
-        throw err;
-      }
+      });
+
+      return res.json(dbJobs);
     }
+  } catch (dbErr) {
+    console.error(`[jobs] DB query failed: ${dbErr.message}`);
+  }
 
-    // Normalize and clean up data format, filtering out fake/spam jobs
-    const jobs = (response.data?.data || []).filter(job => {
-      // Fake Job Filter 1: Must have a valid apply link or google link
-      if (!job.job_apply_link && !job.job_google_link) return false;
-      
-      // Fake Job Filter 2: Must be relevant to Accessibility (sometimes APIs return unrelated junk)
-      const textToSearch = `${job.job_title} ${job.job_description}`.toLowerCase();
-      const isRelevant = textToSearch.includes('accessibil') || 
-                         textToSearch.includes('wcag') || 
-                         textToSearch.includes('a11y') || 
-                         textToSearch.includes('ada ') || 
-                         textToSearch.includes('508') ||
-                         textToSearch.includes('screen reader');
-      if (!isRelevant) return false;
+  // Layer 3: Fetch from all providers in parallel
+  try {
+    const providerJobs = await fetchFromProviders({ query: searchTerms, location, remoteOnly, page });
 
-      return true;
-    }).map(job => {
-      // Extract clean description preview
-      let descPreview = job.job_description || '';
-      if (descPreview.length > 300) {
-        descPreview = descPreview.substring(0, 300) + '...';
-      }
-
-      // Infer tags from title and description
-      const tags = [];
-      const textToSearch = `${job.job_title} ${job.job_description}`.toLowerCase();
-      if (textToSearch.includes('wcag') || textToSearch.includes('web accessibility')) tags.push('WCAG');
-      if (textToSearch.includes('screen reader') || textToSearch.includes('nvda') || textToSearch.includes('jaws')) tags.push('Screen Readers');
-      if (textToSearch.includes('ada') || textToSearch.includes('americans with disabilities')) tags.push('ADA');
-      if (textToSearch.includes('aria') || textToSearch.includes('wai-aria')) tags.push('ARIA');
-      if (textToSearch.includes('pdf')) tags.push('PDF Accessibility');
-      if (textToSearch.includes('a11y')) tags.push('A11y');
-
-      return {
-        id: job.job_id,
-        title: job.job_title,
-        company: job.employer_name,
-        company_logo: job.employer_logo || null,
-        location: job.job_city && job.job_country 
-          ? `${job.job_city}, ${job.job_country}` 
-          : job.job_country || job.job_state || 'Remote / Unknown',
-        job_type: job.job_employment_type || 'Full-time',
-        is_remote: remoteOnly || job.job_is_remote || false,
-        url: job.job_apply_link || job.job_google_link,
-        source: job.job_publisher || 'Job Board',
-        posted_date: job.job_posted_at_datetime_utc || new Date().toISOString(),
-        description: descPreview,
-        tags: tags.length > 0 ? tags : ['Accessibility']
-      };
-    });
-
-    // Cache the response
-    jobsCache.set(cacheKey, {
-      timestamp: Date.now(),
-      data: jobs
-    });
-
-    res.json(jobs);
+    if (providerJobs.length > 0) {
+      const shaped = providerJobs.map(toResponseShape);
+      setCache(cacheKey, shaped);
+      saveJobsAsync(providerJobs); // persist to DB non-blocking
+      return res.json(shaped);
+    }
   } catch (err) {
-    console.error('Error fetching jobs from JSearch:', err.message);
-    if (err.response) {
-      console.error('Response Data:', err.response.data);
-      if (err.response.status === 403) {
-        return res.status(403).json({ error: 'API Error: Your RapidAPI account is not subscribed to the JSearch API. Please go to the Pricing tab on RapidAPI and subscribe to the free tier.' });
-      } else if (err.response.status === 429) {
-        console.log('Rate limit exceeded on all available API keys. Returning fallback jobs.');
-        return res.json(FALLBACK_JOBS);
-      }
+    console.error(`[jobs] All providers failed: ${err.message}`);
+  }
+
+  // Layer 4: Try DB again (even if < 5 jobs — better than fallback)
+  try {
+    const dbJobs = await getJobsFromDB({ query: searchTerms, location, remoteOnly });
+    if (dbJobs.length > 0) {
+      console.log(`[jobs] Serving ${dbJobs.length} jobs from DB (after provider failure)`);
+      return res.json(dbJobs);
     }
-    console.log('API error occurred. Returning fallback jobs.');
-    return res.json(FALLBACK_JOBS);
+  } catch (dbErr) {
+    console.error(`[jobs] DB fallback query failed: ${dbErr.message}`);
+  }
+
+  // Layer 5: Absolute last resort — hardcoded fallback
+  console.log('[jobs] All sources failed — returning hardcoded fallback jobs');
+  return res.json(filterFallback({ searchTerms, location, remoteOnly }));
+});
+
+// ─── Provider Health Endpoint ─────────────────────────────────────────────────
+router.get('/health', async (_req, res) => {
+  try {
+    const [totalJobs, recentJobs] = await Promise.all([
+      getDBJobCount(),
+      getRecentDBJobCount()
+    ]);
+
+    res.json({
+      providers: getProviderHealth(),
+      database: { totalJobs, jobsLastWeek: recentJobs },
+      cache: { entries: jobsCache.size, ttlMs: CACHE_TTL_MS }
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
   }
 });
 

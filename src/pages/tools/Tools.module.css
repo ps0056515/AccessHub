@@ -43,26 +43,27 @@
 }
 
 .badge {
-  font-size: 10px;
-  font-weight: 500;
-  padding: 3px 8px;
-  border-radius: var(--radius-full);
+  font-size: 11px;
+  font-weight: 600;
+  padding: 0;
+  color: var(--text-primary);
 }
 
-.toolName { font-size: 14px; font-weight: 500; color: var(--text-primary); }
-.toolType { font-size: 12px; color: var(--text-faint); flex: 1; }
+.toolName { font-size: 14px; font-weight: 600; color: var(--text-primary); }
+.toolType { font-size: 12px; color: var(--text-primary); flex: 1; }
 
 .toolFooter { display: flex; align-items: center; justify-content: space-between; margin-top: 4px; }
 
 .toolPrice {
   font-size: 12px;
-  background: var(--surface-secondary);
+  background: var(--surface-tertiary);
   padding: 2px 8px;
   border-radius: var(--radius-full);
-  color: var(--text-secondary);
+  color: var(--text-primary);
+  font-weight: 500;
 }
 
-.toolArrow { font-size: 14px; color: var(--text-faint); }
+.toolArrow { font-size: 14px; color: var(--text-primary); font-weight: 600; }
 
 /* Certs */
 .certsSection { border-top: 1px solid var(--border); padding-top: 48px; }
@@ -93,24 +94,25 @@
 
 .certBody { flex: 1; min-width: 0; }
 
-.certTitle { font-size: 14px; font-weight: 500; color: var(--text-primary); margin-bottom: 4px; line-height: 1.4; }
-.certDesc { font-size: 12px; color: var(--text-secondary); margin-bottom: 10px; }
+.certTitle { font-size: 14px; font-weight: 600; color: var(--text-primary); margin-bottom: 4px; line-height: 1.4; }
+.certDesc { font-size: 13px; color: var(--text-primary); margin-bottom: 10px; }
 
 .progressWrap { height: 4px; background: var(--surface-tertiary); border-radius: 2px; margin-bottom: 6px; overflow: hidden; }
 .progressFill { height: 100%; border-radius: 2px; transition: width 0.5s ease; }
 
-.certMembers { font-size: 11px; color: var(--text-faint); }
+.certMembers { font-size: 12px; color: var(--text-primary); font-weight: 500; }
 
 .certBtn {
   flex-shrink: 0;
   position: relative;
   z-index: 2;
-  background: none;
+  background: var(--surface-tertiary);
   border: 1px solid var(--border-interactive-strong);
   border-radius: var(--radius-sm);
   padding: 7px 16px;
   font-size: 13px;
-  color: var(--text-secondary);
+  color: var(--text-primary);
+  font-weight: 600;
   align-self: center;
   transition: all var(--transition);
   text-decoration: none;
@@ -143,7 +145,8 @@
   border-radius: var(--radius-full);
   padding: 6px 14px;
   font-size: 13px;
-  color: var(--text-secondary);
+  color: var(--text-primary);
+  font-weight: 500;
   cursor: pointer;
   transition: all var(--transition);
 }
@@ -169,11 +172,11 @@
 
 .toolTag {
   font-size: 10px;
-  color: var(--text-secondary);
-  background: var(--surface-secondary);
+  color: var(--text-primary);
+  background: var(--surface-tertiary);
   padding: 2px 6px;
   border-radius: 4px;
-  font-weight: 500;
+  font-weight: 600;
 }
 
 

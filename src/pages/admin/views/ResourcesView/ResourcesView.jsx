@@ -403,7 +403,9 @@ export default function ResourcesView({ showToast }) {
         {activeTab === "Active Resources" &&
           <div role="tabpanel" id="tabpanel-active-resources" aria-labelledby="tab-active-resources">
             {resourcesLoading && resourcesList.length === 0 ? (
-            <p className={dashboardStyles.loading}>Loading resourcesâ€¦</p>
+            <div className={dashboardStyles.loading} role="status" aria-live="polite">
+        Loading resourcesâ€¦
+      </div>
           ) : (
             <Table
               columns={activeResourceColumns}
@@ -424,7 +426,9 @@ export default function ResourcesView({ showToast }) {
         {activeTab === "Proposed Resources" &&
           <div role="tabpanel" id="tabpanel-proposed-resources" aria-labelledby="tab-proposed-resources">
             {proposalsLoading && proposals.length === 0 ? (
-            <p className={dashboardStyles.loading}>Loading proposalsâ€¦</p>
+            <div className={dashboardStyles.loading} role="status" aria-live="polite">
+        Loading proposalsâ€¦
+      </div>
           ) : (
             <Table
               columns={proposedResourceColumns}

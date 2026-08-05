@@ -100,6 +100,7 @@ export default function Footer({ goToSection, goToPortal }) {
                   width={200}
                   height={60}
                   aria-hidden="true"
+                  alt=""
                 />
               </span>
             </button>
