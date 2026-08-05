@@ -42,6 +42,7 @@
   display: block;
   object-fit: contain;
   opacity: 0.98;
+  color: #ffffff;
 }
 
 .brandDesc {

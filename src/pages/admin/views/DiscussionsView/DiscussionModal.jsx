@@ -216,7 +216,9 @@ export default function DiscussionModal({ post, onClose, onSave, isSaving }) {
             
             <div style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '16px', paddingRight: '8px' }}>
               {loadingComments ? (
-                <p style={{ color: 'var(--text-secondary)' }}>Loading replies...</p>
+                <div style={{ color: 'var(--text-secondary)' }} role="status" aria-live="polite">
+        Loading replies...
+      </div>
               ) : comments.length === 0 ? (
                 <p style={{ color: 'var(--text-secondary)' }}>No replies yet.</p>
               ) : (

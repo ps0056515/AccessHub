@@ -271,7 +271,9 @@ export default function ToolsView({ showToast }) {
         </div>
 
         {loading && toolsList.length === 0 ? (
-          <p className={dashboardStyles.loading} role="status">Loading tools list…</p>
+          <div className={dashboardStyles.loading} role="status" role="status" aria-live="polite">
+        Loading tools list…
+      </div>
         ) : (
           <Table
             columns={columns}

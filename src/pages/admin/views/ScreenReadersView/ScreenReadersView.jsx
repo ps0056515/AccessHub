@@ -104,7 +104,7 @@ export default function ScreenReadersView({ showToast }) {
   };
 
   if (loading) {
-    return <div className={styles.container}>Loading screen readers...</div>;
+    return <div className={styles.container} role="status" aria-live="polite">Loading screen readers...</div>;
   }
 
   const columns = [

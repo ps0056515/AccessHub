@@ -203,11 +203,11 @@ export default function AccessibilityJobs() {
   
   // Search state
   const [searchQuery, setSearchQuery] = useState('');
-  const [locationQuery, setLocationQuery] = useState('India');
+  const [locationQuery, setLocationQuery] = useState('');
   const [remoteOnly, setRemoteOnly] = useState(false);
   
   // Real API parameters (what is actually being fetched)
-  const [fetchParams, setFetchParams] = useState({ query: 'accessibility', location: 'India', remote_jobs_only: false });
+  const [fetchParams, setFetchParams] = useState({ query: 'accessibility', location: '', remote_jobs_only: false });
 
   const fetchJobs = useCallback(async (params) => {
     setLoading(true);
@@ -242,10 +242,10 @@ export default function AccessibilityJobs() {
 
   const clearFilters = () => {
     setSearchQuery('');
-    setLocationQuery('India');
+    setLocationQuery('');
     setRemoteOnly(false);
     // Don't set hasSearched to false, just fetch global jobs again
-    setFetchParams({ query: 'accessibility', location: 'India', remote_jobs_only: false });
+    setFetchParams({ query: 'accessibility', location: '', remote_jobs_only: false });
   };
 
   const handleShare = () => {
@@ -347,12 +347,14 @@ export default function AccessibilityJobs() {
           )}
         </div>
 
-        {loading && (
-          <div className={styles.loadingState} role="status">
-            <div className={styles.spinner} aria-hidden="true"></div>
-            <p>Loading real-time jobs...</p>
-          </div>
-        )}
+        <div aria-live="polite" aria-atomic="true">
+          {loading && (
+            <div className={styles.loadingState}>
+              <div className={styles.spinner} aria-hidden="true"></div>
+              <p>Loading real-time jobs...</p>
+            </div>
+          )}
+        </div>
 
         {error && (
           <div className={styles.errorState} role="alert">
@@ -423,9 +425,9 @@ export default function AccessibilityJobs() {
                       target="_blank"
                       rel="noopener noreferrer"
                       className={styles.applyBtn}
-                      aria-label={`Apply on ${job.source} for ${job.title} at ${job.company} (opens in new window)`}
+                      aria-label={`Apply for ${job.title} at ${job.company || 'this company'} (opens in new window)`}
                     >
-                      Apply on {job.source} <span aria-hidden="true">↗</span>
+                      {job.company ? `Apply at ${job.company}` : 'Apply Now'} <span aria-hidden="true">↗</span>
                     </a>
                   </div>
                 </div>

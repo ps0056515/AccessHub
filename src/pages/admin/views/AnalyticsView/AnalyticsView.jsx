@@ -91,7 +91,9 @@ export default function AnalyticsView({ showToast }) {
 
   /* ---------- Loading / Error / Empty guards ---------- */
   if (loading && !data) {
-    return <p className={dashboardStyles.loading}>Loading web analytics…</p>;
+    return <div className={dashboardStyles.loading} role="status" aria-live="polite">
+        Loading web analytics…
+      </div>;
   }
 
   if (error && !data) {

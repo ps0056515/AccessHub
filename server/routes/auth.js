@@ -189,6 +189,32 @@ router.post('/google', async (req, res, next) => {
       return;
     }
 
+
+    let geoCountry = country;
+    let geoCity = city;
+
+    if (!geoCountry || !geoCity) {
+      try {
+        let ip = req.headers['x-forwarded-for'] || req.socket?.remoteAddress;
+        if (!ip || ip === '::1' || ip === '127.0.0.1') {
+          ip = '8.8.8.8'; // Mock for localhost (US)
+        } else {
+          ip = ip.split(',')[0].trim();
+        }
+
+        const geoRes = await fetch(`http://ip-api.com/json/${ip}`);
+        if (geoRes.ok) {
+          const geoData = await geoRes.json();
+          if (geoData.status === 'success') {
+            if (!geoCountry) geoCountry = geoData.country;
+            if (!geoCity) geoCity = geoData.city;
+          }
+        }
+      } catch (e) {
+        console.warn("GeoIP lookup failed:", e.message);
+      }
+    }
+
     let { rows } = await query(`${USER_SELECT} WHERE google_id = $1`, [googleId]);
     let user = rows[0];
     let isNew = false;
@@ -211,7 +237,7 @@ router.post('/google', async (req, res, next) => {
           `INSERT INTO users (email, password_hash, display_name, google_id, country, city, company, designation, is_verified)
            VALUES ($1, '', $2, $3, $4, $5, $6, $7, true)
            RETURNING ${USER_RETURNING}`,
-          [email, displayName, googleId, normalizeLocation(country), normalizeLocation(city), company?.trim() || null, designation?.trim() || null],
+          [email, displayName, googleId, normalizeLocation(geoCountry), normalizeLocation(geoCity), company?.trim() || null, designation?.trim() || null],
         );
         user = inserted.rows[0];
       }
@@ -222,10 +248,10 @@ router.post('/google', async (req, res, next) => {
       return;
     }
 
-    if (country?.trim() || city?.trim() || company?.trim()) {
+    if (geoCountry?.trim() || geoCity?.trim() || company?.trim()) {
       await query(
         `UPDATE users SET country = COALESCE($1, country), city = COALESCE($2, city), company = COALESCE($3, company) WHERE id = $4`,
-        [normalizeLocation(country), normalizeLocation(city), company?.trim() || null, user.id],
+        [normalizeLocation(geoCountry), normalizeLocation(geoCity), company?.trim() || null, user.id],
       );
       const updated = await query(`${USER_SELECT} WHERE id = $1`, [user.id]);
       user = updated.rows[0];

@@ -130,10 +130,17 @@ export default function OverviewView({ showToast }) {
     };
   }, [showToast]);
 
-  if (loading)
+  if (loading) {
     return (
-      <p className={dashboardStyles.loading}>Loading dashboard overview…</p>
+      <div 
+        className={dashboardStyles.loading} 
+        role="status" 
+        aria-live="polite"
+      >
+        Loading dashboard overview…
+      </div>
     );
+  }
   if (error) {
     return (
       <div className={styles.errorContainer}>

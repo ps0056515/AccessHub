@@ -109,7 +109,7 @@
 
   .searchBtn {
     background: none;
-    border: 1px solid var(--text-faint);
+    border: 1px solid var(--text-muted);
     border-radius: var(--radius-sm);
     width: 34px;
     height: 34px;
@@ -123,11 +123,12 @@
   .searchBtn:hover {
     background: var(--surface-secondary);
     color: var(--text-primary);
+    border-color: var(--text-primary);
   }
 
   .signInBtn {
     background: none;
-    color: var(--accent-text);
+    color: var(--text-primary);
     border: 1px solid var(--border-interactive-strong);
     border-radius: var(--radius-sm);
     padding: 7px 14px;
@@ -163,7 +164,7 @@
   /* ── Theme toggle ── */
   .themeToggle {
     background: none;
-    border: 1px solid var(--border-interactive-strong);
+    border: 1px solid var(--text-muted);
     border-radius: var(--radius-sm);
     width: 34px;
     height: 34px;
@@ -177,7 +178,7 @@
   .themeToggle:hover {
     background: var(--surface-secondary);
     color: var(--text-primary);
-    border-color: var(--accent-text);
+    border-color: var(--text-primary);
   }
 
   .communityBtn {
@@ -349,7 +350,7 @@
 
   .avatarBtn {
     background: none;
-    border: 1px solid var(--border-interactive-strong);
+    border: 1px solid var(--text-muted);
     border-radius: 50%;
     width: 34px;
     height: 34px;
@@ -364,6 +365,7 @@
 
   .avatarBtn:hover {
     background: var(--surface-secondary);
+    border-color: var(--text-primary);
   }
 
   .profileDropdown {

@@ -1,0 +1,16 @@
+version: 2
+updates:
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+    allow:
+      - dependency-name: "geoip-lite"
+    labels:
+      - "dependencies"
+      - "analytics"
+    assignees:
+      - "loki2002-tech"
+    commit-message:
+      prefix: "chore"
+      include: "scope"

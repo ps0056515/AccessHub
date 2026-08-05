@@ -15,7 +15,11 @@ function getTokensFromBg(bgHex) {
 }
 
 export default function Badge({ bg, text, children, className = '', as: Component = 'span', ...props }) {
-  const tokens = bg ? getTokensFromBg(bg) : { bg: 'var(--surface-secondary)', text: 'var(--text-secondary)' };
+  // If bg starts with var(--), it's already a semantic token, use it. Otherwise map it.
+  const isSemantic = bg && bg.startsWith('var(--');
+  const tokens = isSemantic 
+    ? { bg, text: text || 'var(--text-primary)' } 
+    : (bg ? getTokensFromBg(bg) : { bg: 'var(--surface-secondary)', text: 'var(--text-primary)' });
   
   return (
     <Component 

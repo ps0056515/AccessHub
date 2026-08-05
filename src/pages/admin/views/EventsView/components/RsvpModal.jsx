@@ -31,7 +31,9 @@ export default function RsvpModal({ isOpen, event, onClose }) {
     <Modal title={`RSVPs for ${event.title}`} onClose={onClose} width="400px">
       <div className={styles.content}>
         {loading ? (
-          <p>Loading RSVPs...</p>
+          <div role="status" aria-live="polite">
+        Loading RSVPs...
+      </div>
         ) : rsvps.length === 0 ? (
           <p className={styles.emptyText}>No RSVPs yet.</p>
         ) : (
