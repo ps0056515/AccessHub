@@ -2,11 +2,8 @@ FROM node:22-alpine
 
 WORKDIR /app
 
-# Copy dependency files first
-COPY package.json package-lock.json ./
-
 # Install dependencies
-COPY package*.json ./
+COPY package.json package-lock.json ./
 RUN npm install -g npm@11
 RUN npm ci
 
@@ -17,7 +14,7 @@ COPY . .
 RUN npm run build
 
 # Runtime port
-EXPOSE 3010
+EXPOSE 3010 3015
 
-# Start production application
-CMD ["npm", "run", "start:prod"]
+# Run database migration and start production application
+CMD ["sh", "-c", "npm run db:migrate && npm run start:deploy"]
