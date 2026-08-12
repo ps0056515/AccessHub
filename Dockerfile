@@ -2,19 +2,18 @@ FROM node:22-alpine
 
 WORKDIR /app
 
-# Copy dependency files first
+# Copy package files
 COPY package.json package-lock.json ./
 
-# Install ALL dependencies required to build React
-RUN npm ci
+# Install dependencies
+RUN npm install --include=dev
 
 # Copy application source
 COPY . .
 
-# Build React application inside Docker
+# Build React application
 RUN npm run build
 
-# Runtime port
 EXPOSE 3010
 
 # Start production application
