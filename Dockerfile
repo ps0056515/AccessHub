@@ -5,7 +5,9 @@ WORKDIR /app
 # Copy dependency files first
 COPY package.json package-lock.json ./
 
-# Install ALL dependencies required to build React
+# Install dependencies
+COPY package*.json ./
+RUN npm install -g npm@11
 RUN npm ci
 
 # Copy application source
