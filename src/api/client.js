@@ -21,10 +21,16 @@ export function setStoredToken(token) {
 export async function api(path, options = {}) {
   const { suppressUnauthorizedEvent, ...fetchOptions } = options;
   const token = getStoredToken();
-  const headers = {
-    "Content-Type": "application/json",
-    ...fetchOptions.headers,
-  };
+  const headers = { ...fetchOptions.headers };
+
+  if (!(fetchOptions.body instanceof FormData)) {
+    if (!headers["Content-Type"]) {
+      headers["Content-Type"] = "application/json";
+    }
+  } else {
+    delete headers["Content-Type"];
+  }
+
   if (token) headers.Authorization = `Bearer ${token}`;
 
   const res = await fetch(`${API_BASE}${path}`, { ...fetchOptions, headers });
@@ -438,4 +444,18 @@ export const jobsApi = {
     const queryString = queryParams.toString();
     return api(`/api/jobs${queryString ? `?${queryString}` : ''}`);
   },
+};
+
+export const gamesApi = {
+  list: () => api("/api/games"),
+  get: (slug) => api(`/api/games/${slug}`),
+  listAdmin: () => api("/api/admin/games"),
+  create: (formData) => api("/api/admin/games", { method: "POST", body: formData }),
+  update: (id, formData) => api(`/api/admin/games/${id}`, { method: "PUT", body: formData }),
+  delete: (id) => api(`/api/admin/games/${id}`, { method: "DELETE" }),
+  toggleActive: (id, isActive) => {
+    const fd = new FormData();
+    fd.append("is_active", isActive);
+    return api(`/api/admin/games/${id}`, { method: "PUT", body: fd });
+  }
 };

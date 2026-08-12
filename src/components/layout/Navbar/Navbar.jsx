@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useLocation, Link } from "react-router-dom";
 import { useAuth } from "context/AuthContext";
 import { useConfig } from "context/ConfigContext";
 import { useTheme } from "context/ThemeContext";
@@ -113,6 +113,7 @@ export default function Navbar({
     if (url === '/events') return 'events';
     if (url === '/screen-readers') return 'guide';
     if (url === '/articles' || url.startsWith('/articles/')) return 'articles';
+    if (url === '/games' || url.startsWith('/games/')) return 'games';
     return '';
   };
 
@@ -160,10 +161,10 @@ export default function Navbar({
         Skip to main content
       </a>
       <Container className={styles.inner}>
-        <button
-          type="button"
+        <Link
+          to="/"
           className={styles.logo}
-          onClick={() => visitPortal()}
+          onClick={visitPortal}
           aria-label="AllCanAccess home"
         >
           <img
@@ -171,19 +172,32 @@ export default function Navbar({
             alt=""
             className={styles.logoImg}
           />
-
-        </button>
+        </Link>
 
         <nav className={styles.nav} aria-label="Main navigation">
           {links.map((l) => (
-            <button
-              key={l.id}
-              className={`${styles.navLink} ${isLinkActive(l) ? styles.active : ""}`}
-              onClick={() => handleLinkClick(l)}
-              aria-current={isLinkActive(l) ? "page" : undefined}
-            >
-              {l.label}
-            </button>
+            l.isExternal ? (
+              <a
+                key={l.id}
+                href={l.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={`${styles.navLink} ${isLinkActive(l) ? styles.active : ""}`}
+                aria-current={isLinkActive(l) ? "page" : undefined}
+              >
+                {l.label}
+              </a>
+            ) : (
+              <Link
+                key={l.id}
+                to={l.url}
+                className={`${styles.navLink} ${isLinkActive(l) ? styles.active : ""}`}
+                onClick={() => handleLinkClick(l)}
+                aria-current={isLinkActive(l) ? "page" : undefined}
+              >
+                {l.label}
+              </Link>
+            )
           ))}
         </nav>
 
@@ -242,13 +256,12 @@ export default function Navbar({
             </svg>
           </button>
           {!authLoading && !user && (
-            <button
+            <Link
+              to="/sign-in"
               className={styles.signInBtn}
-              type="button"
-              onClick={() => navigate("/sign-in")}
             >
               Sign in
-            </button>
+            </Link>
           )}
           {!authLoading && user && (
             <div 
@@ -284,22 +297,22 @@ export default function Navbar({
                     </span>
                   </div>
                   <div className={styles.dropdownBody}>
-                    <button
+                    <Link
                       id="my-profile-dropdown-btn"
-                      type="button"
+                      to="/my-profile"
                       className={styles.dropdownItem}
-                      onClick={() => { setProfileOpen(false); navigate("/my-profile"); }}
+                      onClick={() => setProfileOpen(false)}
                     >
                       My profile
-                    </button>
+                    </Link>
                     {isAdmin && (
-                      <button
-                        type="button"
+                      <Link
+                        to="/admin"
                         className={styles.dropdownItem}
-                        onClick={() => { setProfileOpen(false); navigate("/admin"); }}
+                        onClick={() => setProfileOpen(false)}
                       >
                         Admin dashboard
-                      </button>
+                      </Link>
                     )}
                     <button
                       type="button"
@@ -318,9 +331,13 @@ export default function Navbar({
             </div>
           )}
           {!authLoading && !user && (
-            <button className={styles.joinBtn} type="button" onClick={goToJoin}>
+            <Link 
+              to="/sign-up"
+              className={styles.joinBtn} 
+              onClick={goToJoin}
+            >
               Join community
-            </button>
+            </Link>
           )}
           <button
             ref={menuBtnRef}
@@ -350,53 +367,58 @@ export default function Navbar({
           className={styles.mobileNav}
         >
           {links.map((l) => (
-            <button
-              key={l.id}
-              className={`${styles.mobileLink} ${isLinkActive(l) ? styles.mobileActive : ""}`}
-              onClick={() => {
-                handleLinkClick(l);
-                setMenuOpen(false);
-              }}
-            >
-              {l.label}
-            </button>
+            l.isExternal ? (
+              <a
+                key={l.id}
+                href={l.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={`${styles.mobileLink} ${isLinkActive(l) ? styles.mobileActive : ""}`}
+                onClick={() => setMenuOpen(false)}
+              >
+                {l.label}
+              </a>
+            ) : (
+              <Link
+                key={l.id}
+                to={l.url}
+                className={`${styles.mobileLink} ${isLinkActive(l) ? styles.mobileActive : ""}`}
+                onClick={() => {
+                  handleLinkClick(l);
+                  setMenuOpen(false);
+                }}
+              >
+                {l.label}
+              </Link>
+            )
           ))}
           {!authLoading && !user && (
-            <button
-              type="button"
+            <Link
+              to="/sign-in"
               className={styles.mobileLink}
-              onClick={() => {
-                navigate("/sign-in");
-                setMenuOpen(false);
-              }}
+              onClick={() => setMenuOpen(false)}
             >
               Sign in
-            </button>
+            </Link>
           )}
           {!authLoading && user && (
             <>
               <span className={styles.mobileUser}>{user.displayName}</span>
-              <button
-                type="button"
+              <Link
+                to="/my-profile"
                 className={styles.mobileLink}
-                onClick={() => {
-                  navigate("/my-profile");
-                  setMenuOpen(false);
-                }}
+                onClick={() => setMenuOpen(false)}
               >
                 My profile
-              </button>
+              </Link>
               {isAdmin && (
-                <button
-                  type="button"
+                <Link
+                  to="/admin"
                   className={styles.mobileLink}
-                  onClick={() => {
-                    navigate("/admin");
-                    setMenuOpen(false);
-                  }}
+                  onClick={() => setMenuOpen(false)}
                 >
                   Admin dashboard
-                </button>
+                </Link>
               )}
               <button
                 type="button"
@@ -412,8 +434,8 @@ export default function Navbar({
             </>
           )}
           {!authLoading && !user && (
-            <button
-              type="button"
+            <Link
+              to="/sign-up"
               className={styles.mobileJoin}
               onClick={() => {
                 goToJoin();
@@ -421,7 +443,7 @@ export default function Navbar({
               }}
             >
               Join community
-            </button>
+            </Link>
           )}
         </div>
       )}

@@ -172,6 +172,14 @@
   --button-secondary: transparent;
   --button-secondary-hover: var(--accent-bg);
   --button-secondary-active: var(--blue-bg);
+  
+  --button-success: #166534; /* AAA contrast against white text */
+  --button-success-hover: #064e3b;
+  --button-success-text: #ffffff;
+  
+  --button-danger: #991b1b; /* AAA contrast against white text */
+  --button-danger-hover: #7f1d1d;
+  --button-danger-text: #ffffff;
 
   /* STATUS */
   --success: var(--green);
@@ -287,6 +295,15 @@
   --button-secondary: transparent;
   --button-secondary-hover: rgba(59, 130, 246, 0.2);
   --button-secondary-active: rgba(59, 130, 246, 0.3);
+  
+  /* AAA compliant Dark Mode buttons (light bg + dark text) */
+  --button-success: #86efac;
+  --button-success-hover: #4ade80;
+  --button-success-text: #022c22;
+  
+  --button-danger: #fca5a5;
+  --button-danger-hover: #f87171;
+  --button-danger-text: #450a0a;
 
   color-scheme: dark;
 }

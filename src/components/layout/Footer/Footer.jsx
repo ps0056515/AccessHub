@@ -84,7 +84,7 @@ export default function Footer({ goToSection, goToPortal }) {
   };
 
   return (
-    <footer className={styles.footer}>
+    <footer id="footer" tabIndex="-1" className={styles.footer}>
       <Container className={styles.inner}>
         <div className={styles.top}>
           <div className={styles.brand}>
