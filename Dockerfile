@@ -17,4 +17,4 @@ RUN npm run build
 EXPOSE 3010 3015
 
 # Run database migration and start production application
-CMD ["sh", "-c", "npm run db:migrate && npm run start:prod"]
+CMD ["sh", "-c", "npm run db:migrate && npm run start:deploy"]
