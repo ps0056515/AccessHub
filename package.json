@@ -35,7 +35,7 @@
     "db:migrate": "node server/db/migrate.js",
     "dev": "concurrently -k \"npm run start\" \"wait-on tcp:3010 && cross-env NODE_ENV=development npm run server\"",
     "build": "react-scripts build",
-    "start:prod": "cross-env NODE_ENV=production PORT=3010 CLIENT_ORIGIN=http://localhost:3010 node --max-http-header-size=262144 server/index.js",
+    "start:prod": "cross-env NODE_ENV=production PORT=3010 node --max-http-header-size=262144 server/index.js",
     "build:prod": "npm run build && npm run start:prod",
     "test": "react-scripts test",
     "test:e2e": "playwright test",
