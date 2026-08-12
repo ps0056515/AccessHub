@@ -14,7 +14,7 @@ COPY . .
 # Build React application
 RUN npm run build
 
-EXPOSE 3010
+EXPOSE 3010 3015
 
-# Start production application
-CMD ["npm", "run", "start:prod"]
+# Run database migration and start production application
+CMD ["sh", "-c", "npm run db:migrate && npm run start:deploy"]
