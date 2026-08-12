@@ -1,18 +1,22 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { Link } from "react-router-dom";
 import { articlesApi } from "api/client";
 import { SITE_NAME } from "brand";
 import Container from "components/common/Container/Container";
 import ContentCard from "components/common/ContentCard/ContentCard";
+import { useAriaLive } from "context/AriaLiveContext";
 import styles from "./Articles.module.css";
 
 export default function ArticlesList() {
   const [articles, setArticles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const searchInputRef = useRef(null);
+  const { announce } = useAriaLive();
 
   useEffect(() => {
-    document.title = `Articles · ${SITE_NAME}`;
+    document.title = `Articles  ${SITE_NAME}`;
 
     const fetchArticles = async () => {
       try {
@@ -28,6 +32,23 @@ export default function ArticlesList() {
     fetchArticles();
   }, []);
 
+  const filteredArticles = useMemo(() => {
+    if (!searchQuery.trim()) return articles;
+    const query = searchQuery.toLowerCase();
+    return articles.filter(
+      (a) =>
+        a.title.toLowerCase().includes(query) ||
+        a.author.toLowerCase().includes(query) ||
+        (a.excerpt && a.excerpt.toLowerCase().includes(query))
+    );
+  }, [articles, searchQuery]);
+
+  useEffect(() => {
+    if (!loading && !error) {
+      announce(`Found ${filteredArticles.length} articles matching your search.`);
+    }
+  }, [filteredArticles.length, loading, error, announce]);
+
   return (
     <Container className={styles.container}>
       <header className={styles.header}>
@@ -37,13 +58,41 @@ export default function ArticlesList() {
         </p>
       </header>
 
+      <div className={styles.searchBar}>
+        <label htmlFor="article-search" className="sr-only">Search articles</label>
+        <div className={styles.searchWrapper}>
+          <input 
+            ref={searchInputRef}
+            id="article-search"
+            type="search" 
+            placeholder="Search by title or author..." 
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className={styles.searchInput}
+          />
+          {searchQuery && (
+            <button
+              type="button"
+              className={styles.searchClearBtn}
+              onClick={() => {
+                setSearchQuery("");
+                searchInputRef.current?.focus();
+              }}
+              aria-label="Clear search"
+            >
+              &#x2715;
+            </button>
+          )}
+        </div>
+      </div>
+
       {loading ? (
-        <p>Loading articles...</p>
+        <p role="status">Loading articles...</p>
       ) : error ? (
-        <p style={{ color: "red" }}>{error}</p>
-      ) : articles.length > 0 ? (
+        <p style={{ color: "var(--error)" }}>{error}</p>
+      ) : filteredArticles.length > 0 ? (
         <div className={styles.grid}>
-          {articles.map((article) => (
+          {filteredArticles.map((article) => (
             <ContentCard
               key={article.id}
               to={`/articles/${article.id}`}
@@ -56,8 +105,9 @@ export default function ArticlesList() {
           ))}
         </div>
       ) : (
-        <p>No articles published yet. Check back soon!</p>
+        <p>No articles match your search. Please try different keywords.</p>
       )}
     </Container>
   );
 }
+

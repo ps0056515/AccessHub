@@ -1,15 +1,19 @@
 import { useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { authApi } from 'api/client';
+import { Eye, EyeOff } from 'lucide-react';
 import styles from 'components/auth/AuthPage.module.css';
 
 export default function ResetPasswordPage() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const token = searchParams.get('token') || '';
+  const email = searchParams.get('email') || '';
 
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
   const [submitting, setSubmitting] = useState(false);
@@ -65,7 +69,7 @@ export default function ResetPasswordPage() {
   return (
     <div className={styles.page}>
       <button type="button" className={styles.back} onClick={() => navigate('/sign-in')}>
-        ← Back to sign in
+        <span aria-hidden="true">← </span>Back to sign in
       </button>
 
       <div className={styles.card}>
@@ -74,7 +78,7 @@ export default function ResetPasswordPage() {
         <p className={styles.lead}>Choose a new password for your account.</p>
 
         {error && (
-          <div className={styles.error} role="alert">
+          <div id="reset-error" className={styles.error} role="alert">
             {error}
           </div>
         )}
@@ -86,38 +90,82 @@ export default function ResetPasswordPage() {
         )}
 
         <form className={styles.form} onSubmit={handleSubmit} noValidate>
+          {/* Visually hidden email field for password managers */}
+          {email && (
+            <input
+              type="text"
+              name="email"
+              id="reset-email"
+              autoComplete="username"
+              value={email}
+              readOnly
+              style={{ position: 'absolute', opacity: 0, height: 0, width: 0, overflow: 'hidden' }}
+              aria-hidden="true"
+              tabIndex={-1}
+            />
+          )}
+
           <div className={styles.field}>
             <label className={styles.label} htmlFor="reset-password">
-              New password
+              New password<span className="required-asterisk" aria-hidden="true"> *</span>
             </label>
-            <input
-              id="reset-password"
-              className={styles.input}
-              type="password"
-              autoComplete="new-password"
-              required
-              minLength={8}
-              value={password}
-              onChange={e => setPassword(e.target.value)}
-              disabled={submitting}
-            />
-            <span className={styles.hint}>At least 8 characters</span>
+            <div className={styles.passwordWrapper}>
+              <input
+                id="reset-password"
+                className={styles.input}
+                style={{ paddingRight: '40px' }}
+                type={showPassword ? 'text' : 'password'}
+                autoComplete="new-password"
+                autoFocus
+                required
+                aria-required="true"
+                minLength={8}
+                value={password}
+                onChange={e => setPassword(e.target.value)}
+                disabled={submitting}
+                aria-invalid={!!error}
+                aria-describedby={error ? "reset-error reset-password-hint" : "reset-password-hint"}
+              />
+              <button
+                type="button"
+                className={styles.passwordToggle}
+                onClick={() => setShowPassword(!showPassword)}
+                aria-label={showPassword ? 'Hide new password' : 'Show new password'}
+              >
+                {showPassword ? <EyeOff aria-hidden="true" size={18} /> : <Eye aria-hidden="true" size={18} />}
+              </button>
+            </div>
+            <span className={styles.hint} id="reset-password-hint">At least 8 characters</span>
           </div>
 
           <div className={styles.field}>
             <label className={styles.label} htmlFor="reset-confirm">
-              Confirm password
+              Confirm password<span className="required-asterisk" aria-hidden="true"> *</span>
             </label>
-            <input
-              id="reset-confirm"
-              className={styles.input}
-              type="password"
-              autoComplete="new-password"
-              required
-              value={confirmPassword}
-              onChange={e => setConfirmPassword(e.target.value)}
-              disabled={submitting}
-            />
+            <div className={styles.passwordWrapper}>
+              <input
+                id="reset-confirm"
+                className={styles.input}
+                style={{ paddingRight: '40px' }}
+                type={showConfirmPassword ? 'text' : 'password'}
+                autoComplete="new-password"
+                required
+                aria-required="true"
+                value={confirmPassword}
+                onChange={e => setConfirmPassword(e.target.value)}
+                disabled={submitting}
+                aria-invalid={!!error}
+                aria-describedby={error ? "reset-error" : undefined}
+              />
+              <button
+                type="button"
+                className={styles.passwordToggle}
+                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                aria-label={showConfirmPassword ? 'Hide confirm password' : 'Show confirm password'}
+              >
+                {showConfirmPassword ? <EyeOff aria-hidden="true" size={18} /> : <Eye aria-hidden="true" size={18} />}
+              </button>
+            </div>
           </div>
 
           <button type="submit" className={styles.submit} disabled={submitting}>

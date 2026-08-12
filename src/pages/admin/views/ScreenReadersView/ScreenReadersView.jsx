@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
+import { Trash } from "lucide-react";
 import { screenReadersApi } from "api/client";
 import ScreenReaderModal from "./ScreenReaderModal";
-import Table from "components/common/Table/Table";
+import Table from "pages/admin/components/Table/Table";
 import { useConfirm } from "context/ConfirmContext";
 import styles from "./ScreenReadersView.module.css";
 import { truncateText } from "utils/commonUtils";
@@ -70,6 +71,7 @@ export default function ScreenReadersView({ showToast }) {
       await screenReadersApi.delete(id);
       showToast?.("Guide deleted", "success");
       loadGuides();
+      setTimeout(() => document.getElementById("admin-search-input")?.focus(), 0);
     } catch (err) {
       showToast?.("Failed to delete guide", "error");
     }
@@ -82,6 +84,7 @@ export default function ScreenReadersView({ showToast }) {
       showToast?.(`Successfully deleted ${selectedIds.length} guides.`, "success");
       setSelectedIds([]);
       loadGuides();
+      setTimeout(() => document.getElementById("admin-search-input")?.focus(), 0);
     } catch (err) {
       showToast?.(err.message || "Failed to bulk delete guides.", "error");
     }
@@ -94,13 +97,14 @@ export default function ScreenReadersView({ showToast }) {
       showToast?.(`Successfully ${publishState ? "published" : "unpublished"} ${selectedIds.length} guides.`, "success");
       setSelectedIds([]);
       loadGuides();
+      setTimeout(() => document.getElementById("admin-search-input")?.focus(), 0);
     } catch (err) {
       showToast?.(err.message || `Failed to bulk ${publishState ? "publish" : "unpublish"} guides.`, "error");
     }
   };
 
   if (loading) {
-    return <div className={styles.container}>Loading screen readers...</div>;
+    return <div className={styles.container} role="status" aria-live="polite">Loading screen readers...</div>;
   }
 
   const columns = [
@@ -152,6 +156,7 @@ export default function ScreenReadersView({ showToast }) {
           <button
             onClick={() => openModal(guide)}
             className={styles.btnSecondary}
+            aria-label={`Edit ${guide.title}`}
           >
             Edit
           </button>
@@ -160,12 +165,14 @@ export default function ScreenReadersView({ showToast }) {
             className={
               guide.is_published ? styles.btnSecondary : styles.btnSuccess
             }
+            aria-label={`${guide.is_published ? "Unpublish" : "Publish"} ${guide.title}`}
           >
             {guide.is_published ? "Unpublish" : "Publish"}
           </button>
           <button
             onClick={() => handleDelete(guide.id)}
             className={styles.btnDanger}
+            aria-label={`Delete ${guide.title}`}
           >
             Delete
           </button>
@@ -190,7 +197,9 @@ export default function ScreenReadersView({ showToast }) {
         </h1>
         <div style={{ display: "flex", gap: "16px", alignItems: "center" }}>
           <input
-            type="text"
+            id="admin-search-input"
+            type="search"
+            aria-label="Search guides"
             placeholder="Search guides..."
             value={screenReaderSearch}
             onChange={(e) => setScreenReaderSearch(e.target.value)}
@@ -223,12 +232,12 @@ export default function ScreenReadersView({ showToast }) {
                 className={styles.btnDanger}
                 style={{ padding: '8px 12px', fontSize: '14px', borderRadius: '6px' }}
               >
-                🗑 Bulk Delete ({selectedIds.length})
+                <Trash aria-hidden="true" size={16} /> Bulk Delete ({selectedIds.length})
               </button>
             </>
           )}
           <button onClick={() => openModal()} className={styles.addBtn}>
-            + New Guide
+            <span aria-hidden="true">+</span> New Guide
           </button>
         </div>
       </header>

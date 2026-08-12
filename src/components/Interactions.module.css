@@ -16,7 +16,7 @@
   font-family: var(--serif);
   font-size: 1.5rem;
   font-weight: 500;
-  color: var(--text);
+  color: var(--text-primary);
   margin: 0;
 }
 
@@ -25,7 +25,7 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  background: var(--bg-card);
+  background: var(--surface-secondary);
   padding: 6px;
   border-radius: var(--radius-full);
   border: 1px solid var(--border);
@@ -39,16 +39,16 @@
   width: 32px;
   height: 32px;
   border-radius: 50%;
-  border: none;
+  border: 2px solid transparent;
   background: transparent;
-  color: var(--text-muted);
+  color: var(--text-secondary);
   cursor: pointer;
   transition: all 0.2s;
 }
 
 .voteBtn:hover:not(:disabled) {
-  background: var(--bg-secondary);
-  color: var(--text);
+  background: var(--surface-secondary);
+  color: var(--text-primary);
 }
 
 .voteBtn:disabled {
@@ -56,14 +56,19 @@
   cursor: not-allowed;
 }
 
+.voteBtn[aria-pressed="true"] {
+  border-width: 2px;
+  border-style: solid;
+}
+
 .voteBtn[aria-pressed="true"].upvote {
-  color: var(--accent);
-  background: var(--accent-bg);
+  color: var(--accent-text);
+  border-color: var(--accent-text);
 }
 
 .voteBtn[aria-pressed="true"].downvote {
-  color: var(--red);
-  background: var(--red-bg);
+  color: var(--error);
+  border-color: var(--error);
 }
 
 .voteCount {
@@ -71,15 +76,13 @@
   font-size: 14px;
   min-width: 24px;
   text-align: center;
-  color: var(--text);
+  color: var(--text-primary);
 }
 
-.voteCount.positive {
-  color: var(--accent);
-}
+.voteCount.positive { color: var(--green-text); }
 
 .voteCount.negative {
-  color: var(--red);
+  color: var(--error);
 }
 
 /* ── Comments ── */
@@ -95,7 +98,7 @@
 }
 
 .commentCard {
-  background: var(--bg-card);
+  background: var(--surface-secondary);
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
   padding: 20px;
@@ -129,20 +132,20 @@
   height: 28px;
   border: none;
   background: transparent;
-  color: var(--text-muted);
+  color: var(--text-secondary);
   border-radius: var(--radius-sm);
   cursor: pointer;
   transition: all 0.2s;
 }
 
 .actionBtn:hover {
-  background: var(--bg-secondary);
-  color: var(--text);
+  background: var(--surface-secondary);
+  color: var(--text-primary);
 }
 
 .actionBtnDelete:hover {
   background: var(--red-bg);
-  color: var(--red);
+  color: var(--error);
 }
 
 .editCommentBox {
@@ -160,7 +163,7 @@
 .cancelBtn {
   background: transparent;
   border: none;
-  color: var(--text-muted);
+  color: var(--text-secondary);
   font-family: var(--sans);
   font-weight: 500;
   font-size: 14px;
@@ -169,7 +172,7 @@
 }
 
 .cancelBtn:hover:not(:disabled) {
-  color: var(--text);
+  color: var(--text-primary);
 }
 
 .avatar {
@@ -187,20 +190,20 @@
 .authorName {
   font-weight: 600;
   font-size: 14px;
-  color: var(--text);
+  color: var(--text-primary);
   margin: 0;
 }
 
 .commentBody {
   font-size: 15px;
   line-height: 1.6;
-  color: var(--text);
+  color: var(--text-primary);
   margin: 0;
   white-space: pre-wrap;
 }
 
 .emptyState {
-  color: var(--text-muted);
+  color: var(--text-secondary);
   font-style: italic;
   font-size: 14px;
   margin: 0 0 24px;
@@ -208,7 +211,7 @@
 
 /* ── Add Comment Form ── */
 .addCommentBox {
-  background: var(--bg-card);
+  background: var(--surface-secondary);
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
   padding: 20px;
@@ -218,7 +221,7 @@
 .commentTitle {
   font-size: 14px;
   font-weight: 600;
-  color: var(--text);
+  color: var(--text-primary);
   margin: 0 0 16px;
 }
 
@@ -226,10 +229,10 @@
   width: 100%;
   min-height: 100px;
   padding: 12px;
-  border: 1px solid var(--border-strong);
+  border: 1px solid var(--text-faint);
   border-radius: var(--radius-sm);
-  background: var(--bg);
-  color: var(--text);
+  background: var(--surface-primary);
+  color: var(--text-primary);
   font-family: inherit;
   font-size: 14px;
   resize: vertical;
@@ -239,9 +242,9 @@
 
 .textarea:focus {
   outline: none;
-  border-color: var(--accent);
-  box-shadow: 0 0 0 3px rgba(var(--accent-rgb), 0.12);
-  background: var(--bg-card);
+  border-color: var(--accent-text);
+  outline: 2px solid var(--focus-border-color); outline-offset: 2px; box-shadow: none;
+  background: var(--surface-secondary);
 }
 
 .actions {
@@ -250,8 +253,8 @@
 }
 
 .submitBtn {
-  background: var(--accent);
-  color: #fff;
+  background: var(--button-primary);
+  color: var(--text-on-accent);
   border: none;
   padding: 10px 24px;
   border-radius: var(--radius-full);
@@ -273,7 +276,7 @@
 }
 
 .loginPrompt {
-  background: var(--bg-secondary);
+  background: var(--surface-secondary);
   border-radius: var(--radius-md);
   padding: 24px;
   text-align: center;
@@ -281,13 +284,13 @@
 
 .loginPrompt p {
   margin: 0 0 16px;
-  color: var(--text-muted);
+  color: var(--text-secondary);
   font-size: 14px;
 }
 
 .loginBtn {
-  background: var(--accent);
-  color: #fff;
+  background: var(--button-primary);
+  color: var(--text-on-accent);
   border: none;
   padding: 8px 20px;
   border-radius: var(--radius-full);
@@ -304,10 +307,12 @@
 }
 
 .errorMsg {
-  color: var(--red);
+  color: var(--error);
   background: var(--red-bg);
   padding: 10px 14px;
   border-radius: var(--radius-sm);
   font-size: 13px;
   margin-bottom: 16px;
 }
+
+

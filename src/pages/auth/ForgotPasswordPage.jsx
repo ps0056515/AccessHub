@@ -1,11 +1,12 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { authApi } from 'api/client';
 import styles from 'components/auth/AuthPage.module.css';
 
 export default function ForgotPasswordPage() {
   const navigate = useNavigate();
-  const [email, setEmail] = useState('');
+  const location = useLocation();
+  const [email, setEmail] = useState(location.state?.email || '');
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
   const [submitting, setSubmitting] = useState(false);
@@ -29,7 +30,7 @@ export default function ForgotPasswordPage() {
   return (
     <div className={styles.page}>
       <button type="button" className={styles.back} onClick={() => navigate('/sign-in')}>
-        ← Back to sign in
+        <span aria-hidden="true">← </span>Back to sign in
       </button>
 
       <div className={styles.card}>
@@ -41,7 +42,7 @@ export default function ForgotPasswordPage() {
         </p>
 
         {error && (
-          <div className={styles.error} role="alert">
+          <div id="forgot-error" className={styles.error} role="alert">
             {error}
           </div>
         )}
@@ -55,17 +56,21 @@ export default function ForgotPasswordPage() {
         <form className={styles.form} onSubmit={handleSubmit} noValidate>
           <div className={styles.field}>
             <label className={styles.label} htmlFor="forgot-email">
-              Email
+              Email<span className="required-asterisk" aria-hidden="true"> *</span>
             </label>
             <input
               id="forgot-email"
               className={styles.input}
               type="email"
               autoComplete="email"
+              autoFocus
               required
+              aria-required="true"
               value={email}
               onChange={e => setEmail(e.target.value)}
               disabled={submitting}
+              aria-invalid={!!error}
+              aria-describedby={error ? "forgot-error" : undefined}
             />
           </div>
 

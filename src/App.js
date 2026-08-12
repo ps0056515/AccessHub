@@ -9,7 +9,9 @@ import { ConfigProvider } from "context/ConfigContext";
 import { ToastProvider } from "context/ToastContext";
 import { ConfirmProvider } from "context/ConfirmContext";
 import { AriaLiveProvider } from "context/AriaLiveContext";
+import { ThemeProvider } from "context/ThemeContext";
 import useTracker from "hooks/useTracker";
+import FlyingFocus from "components/common/FlyingFocus";
 
 /* Thin wrapper so useTracker runs inside BrowserRouter context */
 function TrackerMount({ children }) {
@@ -30,13 +32,15 @@ export default function App() {
   }, []);
 
   return (
+    <ThemeProvider>
+      <FlyingFocus />
     <BrowserRouter>
       <AuthProvider>
         <TrackerMount>
           <ConfigProvider>
-            <ToastProvider>
-              <ConfirmProvider>
-                <AriaLiveProvider>
+            <AriaLiveProvider>
+              <ToastProvider>
+                <ConfirmProvider>
                   <Routes>
                     <Route element={<RequireAuth />}>
                       <Route
@@ -50,12 +54,13 @@ export default function App() {
                     </Route>
                     <Route path="*" element={<AppShell />} />
                   </Routes>
-                </AriaLiveProvider>
-              </ConfirmProvider>
-            </ToastProvider>
+                </ConfirmProvider>
+              </ToastProvider>
+            </AriaLiveProvider>
           </ConfigProvider>
         </TrackerMount>
       </AuthProvider>
     </BrowserRouter>
+    </ThemeProvider>
   );
 }

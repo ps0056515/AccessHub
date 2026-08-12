@@ -105,7 +105,7 @@ export default function GoogleSignInButton({
   if (!clientId) return null;
 
   return (
-    <div ref={wrapRef} className={styles.googleWrap}>
+    <div ref={wrapRef} className={styles.googleWrap} role="group" aria-label="Google authentication">
       {status === 'loading' && (
         <p className={styles.googleLoading} aria-live="polite">
           Loading Google sign-in…

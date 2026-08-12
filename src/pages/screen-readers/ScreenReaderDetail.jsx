@@ -37,7 +37,7 @@ export default function ScreenReaderDetail() {
     }
   };
 
-  if (loading) return <div className={styles.container}>Loading...</div>;
+  if (loading) return <div className={styles.container} role="status">Loading...</div>;
   if (error || !guide) return <div className={styles.container}>{error || 'Guide not found'}</div>;
 
   const PHASES = guide.content_json || [];
@@ -55,7 +55,7 @@ export default function ScreenReaderDetail() {
   return (
     <Container className={styles.page}>
       <header className={styles.pageHeader}>
-        <Link to="/screen-readers" className={styles.backLink}>← Back to screen readers</Link>
+        <Link to="/screen-readers" className={styles.backLink}><span aria-hidden="true">← </span>Back to screen readers</Link>
         <h1 className={styles.pageTitle}>{guide.title} testing guide</h1>
         <p className={styles.pageSub}>{guide.description}</p>
       </header>
@@ -91,7 +91,7 @@ export default function ScreenReaderDetail() {
                   <li key={i} className={`${styles.step} fade-up`} style={{ animationDelay: `${i * 0.06}s` }}>
                     <span className={styles.stepNum} aria-hidden="true">{i + 1}</span>
                     <div>
-                      <h3 className={styles.stepTitle}>{s.title}</h3>
+                      <h2 className={styles.stepTitle}>{s.title}</h2>
                       <div className={styles.stepDesc} dangerouslySetInnerHTML={{ __html: s.desc }} />
                     </div>
                   </li>
@@ -105,12 +105,12 @@ export default function ScreenReaderDetail() {
               )}
               {current.id === 'modes' && (
                 <div className={styles.modeGrid}>
-                  <div className={styles.modeCard} style={{ borderLeftColor: '#b03020' }}>
-                    <h3 className={styles.modeTitle}>Browse mode</h3>
+                  <div className={styles.modeCard} style={{ borderLeftColor: 'var(--red)' }}>
+                    <h2 className={styles.modeTitle}>Browse mode</h2>
                     <p className={styles.modeDesc}>Red highlight. Single-key navigation shortcuts active. Use for reading and scanning.</p>
                   </div>
-                  <div className={styles.modeCard} style={{ borderLeftColor: '#1a4f8a' }}>
-                    <h3 className={styles.modeTitle}>Focus mode</h3>
+                  <div className={styles.modeCard} style={{ borderLeftColor: 'var(--blue)' }}>
+                    <h2 className={styles.modeTitle}>Focus mode</h2>
                     <p className={styles.modeDesc}>Blue highlight. Key shortcuts disabled. Use for forms, inputs, and interactive widgets.</p>
                   </div>
                 </div>
@@ -123,7 +123,7 @@ export default function ScreenReaderDetail() {
             <div>
               {current.shortcuts.map((s, si) => (
                 <div key={si} className={styles.shortcutSection}>
-                  <h3 className={styles.shortcutHeading}>{s.section}</h3>
+                  <h2 className={styles.shortcutHeading}>{s.section}</h2>
                   <table className={styles.table} aria-label={s.section}>
                     <thead>
                       <tr>
@@ -134,7 +134,7 @@ export default function ScreenReaderDetail() {
                     <tbody>
                       {s.rows.map((r, ri) => (
                         <tr key={ri} className={styles.tr}>
-                          <td className={styles.tdAction}>{r.action}</td>
+                          <th scope="row" className={styles.tdAction}>{r.action}</th>
                           <td className={styles.tdCmd}>
                             {r.cmd.split(' / ').map((part, pi) => (
                               <span key={pi}>
@@ -182,20 +182,22 @@ export default function ScreenReaderDetail() {
               </div>
               {[...new Set(current.checklist.map(c => c.group))].map(group => (
                 <div key={group} className={styles.checkGroup}>
-                  <h3 className={styles.checkGroupTitle}>{group}</h3>
+                  <h2 className={styles.checkGroupTitle}>{group}</h2>
                   <ul className={styles.checkList}>
                     {current.checklist.map((item, i) => item.group === group && (
                       <li key={i} className={styles.checkItem}>
                         <button
+                          type="button"
+                          role="checkbox"
                           className={`${styles.checkBox} ${checked[`${current.id}_${i}`] ? styles.checkBoxChecked : ''}`}
                           onClick={() => toggleCheck(current.id, i)}
-                          aria-pressed={!!checked[`${current.id}_${i}`]}
-                          aria-label={item.label}
+                          aria-checked={!!checked[`${current.id}_${i}`]}
+                          aria-labelledby={`check-label-${current.id}-${i}`}
                         >
                           {checked[`${current.id}_${i}`] && <span aria-hidden="true">✓</span>}
                         </button>
                         <div>
-                          <p className={`${styles.checkLabel} ${checked[`${current.id}_${i}`] ? styles.checkLabelDone : ''}`}>{item.label}</p>
+                          <p id={`check-label-${current.id}-${i}`} className={`${styles.checkLabel} ${checked[`${current.id}_${i}`] ? styles.checkLabelDone : ''}`}>{item.label}</p>
                           <p className={styles.checkSub}>{item.sub}</p>
                         </div>
                       </li>
@@ -220,7 +222,7 @@ export default function ScreenReaderDetail() {
                       <span className={`${styles.issueSev} ${issue.sev === 'high' ? styles.sevHigh : styles.sevMedium}`}>
                         {issue.sev === 'high' ? 'High' : 'Medium'}
                       </span>
-                      <h3 className={styles.issueTitle}>{issue.title}</h3>
+                      <h2 className={styles.issueTitle}>{issue.title}</h2>
                     </div>
                     <p className={styles.issueDesc}>{issue.desc}</p>
                   </article>
@@ -239,3 +241,5 @@ export default function ScreenReaderDetail() {
     </Container>
   );
 }
+
+

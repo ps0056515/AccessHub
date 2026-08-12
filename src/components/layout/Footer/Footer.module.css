@@ -1,6 +1,6 @@
 .footer {
-  background: var(--text);
-  color: rgba(250,249,247,0.7);
+  background: var(--brand-navy);
+  color: var(--footer-text);
   margin-top: auto;
   position: relative;
   z-index: 2;
@@ -14,7 +14,7 @@
   grid-template-columns: 2fr 1fr 1fr 1fr;
   gap: 40px;
   padding: 48px 0 40px;
-  border-bottom: 1px solid rgba(250,249,247,0.1);
+  border-bottom: 1px solid var(--footer-border);
 }
 
 .brand {}
@@ -42,12 +42,13 @@
   display: block;
   object-fit: contain;
   opacity: 0.98;
+  color: #ffffff;
 }
 
 .brandDesc {
   font-size: 13px;
   line-height: 1.65;
-  color: rgba(250,249,247,0.55);
+  color: var(--footer-text-muted);
   max-width: 280px;
   margin-bottom: 18px;
 }
@@ -56,14 +57,14 @@
 
 .social {
   font-size: 12px;
-  color: rgba(250,249,247,0.5);
+  color: var(--footer-text-muted);
   padding: 4px 10px;
-  border: 1px solid rgba(250,249,247,0.15);
+  border: 1px solid var(--footer-border-interactive);
   border-radius: var(--radius-full);
   transition: all var(--transition);
 }
 
-.social:hover { color: #faf9f7; border-color: rgba(250,249,247,0.4); }
+.social:hover { color: var(--footer-text-bright); border-color: var(--footer-border-hover); }
 
 .col {}
 .colHeading {
@@ -71,7 +72,7 @@
   font-weight: 500;
   text-transform: uppercase;
   letter-spacing: 0.07em;
-  color: rgba(250,249,247,0.85);
+  color: var(--footer-heading);
   margin-bottom: 14px;
 }
 
@@ -79,7 +80,7 @@
 
 .colLink {
   font-size: 13px;
-  color: rgba(250,249,247,0.5);
+  color: var(--footer-text-muted);
   transition: color var(--transition);
   display: block;
   background: none;
@@ -100,25 +101,25 @@ a.colLink {
 
 button.colLink { font: inherit; }
 
-.colLink:hover { color: #faf9f7; }
+.colLink:hover { color: var(--footer-text-bright); }
 
 .bottom {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 20px 0;
+  padding: 20px 0 calc(20px + env(safe-area-inset-bottom));
   flex-wrap: wrap;
   gap: 12px;
 }
 
-.copy { font-size: 12px; color: rgba(250,249,247,0.72); }
+.copy { font-size: 12px; color: var(--footer-text); }
 
 .bottomLinks { display: flex; gap: 16px; flex-wrap: wrap; align-items: center; }
 
 .bottomLink,
 .bottomLinkBtn {
   font-size: 12px;
-  color: rgba(250,249,247,0.72);
+  color: var(--footer-text);
   transition: color var(--transition);
   background: none;
   border: none;
@@ -130,7 +131,7 @@ button.colLink { font: inherit; }
 }
 
 .bottomLink:hover,
-.bottomLinkBtn:hover { color: rgba(250,249,247,0.7); }
+.bottomLinkBtn:hover { color: var(--footer-text); }
 
 @media (max-width: 900px) {
   .top { grid-template-columns: 1fr 1fr; }

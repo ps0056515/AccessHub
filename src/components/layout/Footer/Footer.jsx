@@ -84,7 +84,7 @@ export default function Footer({ goToSection, goToPortal }) {
   };
 
   return (
-    <footer className={styles.footer} role="contentinfo">
+    <footer id="footer" tabIndex="-1" className={styles.footer}>
       <Container className={styles.inner}>
         <div className={styles.top}>
           <div className={styles.brand}>
@@ -92,12 +92,15 @@ export default function Footer({ goToSection, goToPortal }) {
               type="button"
               className={styles.brandBtn}
               onClick={() => goToPage("/")}
+              aria-label="Return to homepage"
             >
               <span className={styles.logo}>
                 <FooterLogo
                   className={styles.logoImg}
                   width={200}
                   height={60}
+                  aria-hidden="true"
+                  alt=""
                 />
               </span>
             </button>
@@ -161,6 +164,9 @@ export default function Footer({ goToSection, goToPortal }) {
             </FooterRouteLink>
             <FooterRouteLink className={styles.bottomLink} to="/accessibility">
               Accessibility statement
+            </FooterRouteLink>
+            <FooterRouteLink className={styles.bottomLink} to="/sitemap">
+              Sitemap
             </FooterRouteLink>
           </div>
         </div>

@@ -1,6 +1,7 @@
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { jobsApi } from 'api/client';
 import Container from 'components/common/Container/Container';
+import SEO from 'components/common/SEO/SEO';
 import styles from './AccessibilityJobs.module.css';
 
 const QUICK_TAGS = ['WCAG', 'Screen Readers', 'ADA', 'ARIA', 'A11y', 'PDF Accessibility'];
@@ -40,7 +41,9 @@ const SUGGESTED_ROLES = [
 ];
 
 const SUGGESTED_LOCATIONS = [
-  "India", "United States", "United Kingdom", "Canada", "Australia", "Europe", "Remote"
+  "India", "United States", "United Kingdom", "Canada", "Australia", 
+  "Europe", "Germany", "France", "Netherlands", "Ireland", "Spain",
+  "Singapore", "New Zealand", "South Africa", "Brazil", "Japan", "Remote"
 ];
 
 function AccessibleCombobox({ id, label, placeholder, value, onChange, options, icon }) {
@@ -64,8 +67,18 @@ function AccessibleCombobox({ id, label, placeholder, value, onChange, options, 
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  useEffect(() => {
+    if (isOpen && activeIndex >= 0) {
+      const activeEl = document.getElementById(`${listboxId}-option-${activeIndex}`);
+      if (activeEl) {
+        activeEl.scrollIntoView({ block: 'nearest' });
+      }
+    }
+  }, [activeIndex, isOpen, listboxId]);
+
   const handleKeyDown = (e) => {
     if (e.key === 'ArrowDown') {
+      if (filteredOptions.length === 0) return;
       e.preventDefault();
       if (!isOpen) {
         setIsOpen(true);
@@ -74,6 +87,7 @@ function AccessibleCombobox({ id, label, placeholder, value, onChange, options, 
         setActiveIndex(prev => (prev < filteredOptions.length - 1 ? prev + 1 : prev));
       }
     } else if (e.key === 'ArrowUp') {
+      if (filteredOptions.length === 0) return;
       e.preventDefault();
       if (!isOpen) {
         setIsOpen(true);
@@ -89,10 +103,18 @@ function AccessibleCombobox({ id, label, placeholder, value, onChange, options, 
         setActiveIndex(-1);
       }
     } else if (e.key === 'Escape') {
-      if (isOpen) {
+      e.preventDefault();
+      setIsOpen(false);
+      setActiveIndex(-1);
+    } else if (e.key === 'Home') {
+      if (isOpen && filteredOptions.length > 0) {
         e.preventDefault();
-        setIsOpen(false);
-        setActiveIndex(-1);
+        setActiveIndex(0);
+      }
+    } else if (e.key === 'End') {
+      if (isOpen && filteredOptions.length > 0) {
+        e.preventDefault();
+        setActiveIndex(filteredOptions.length - 1);
       }
     } else if (e.altKey && e.key === 'ArrowDown') {
       e.preventDefault();
@@ -128,14 +150,14 @@ function AccessibleCombobox({ id, label, placeholder, value, onChange, options, 
           setIsOpen(true);
           setActiveIndex(-1);
         }}
-        onFocus={() => setIsOpen(true)}
+        onClick={() => setIsOpen(true)}
         onKeyDown={handleKeyDown}
         autoComplete="off"
         role="combobox"
         aria-expanded={isOpen && filteredOptions.length > 0}
-        aria-controls={listboxId}
+        aria-controls={isOpen && filteredOptions.length > 0 ? listboxId : undefined}
         aria-autocomplete="list"
-        aria-activedescendant={activeIndex >= 0 ? `${listboxId}-option-${activeIndex}` : undefined}
+        aria-activedescendant={isOpen && filteredOptions.length > 0 && activeIndex >= 0 ? `${listboxId}-option-${activeIndex}` : undefined}
       />
       {isOpen && filteredOptions.length > 0 && (
         <ul
@@ -155,6 +177,8 @@ function AccessibleCombobox({ id, label, placeholder, value, onChange, options, 
                 aria-selected={isSelected}
                 onMouseDown={(e) => {
                   e.preventDefault(); // Prevent input blur
+                }}
+                onClick={() => {
                   onChange(option);
                   setIsOpen(false);
                   setActiveIndex(-1);
@@ -175,14 +199,15 @@ export default function AccessibilityJobs() {
   const [jobs, setJobs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [hasSearched, setHasSearched] = useState(true);
   
   // Search state
   const [searchQuery, setSearchQuery] = useState('');
-  const [locationQuery, setLocationQuery] = useState('India');
+  const [locationQuery, setLocationQuery] = useState('');
   const [remoteOnly, setRemoteOnly] = useState(false);
   
   // Real API parameters (what is actually being fetched)
-  const [fetchParams, setFetchParams] = useState({ query: 'accessibility', location: 'India', remote_jobs_only: false });
+  const [fetchParams, setFetchParams] = useState({ query: 'accessibility', location: '', remote_jobs_only: false });
 
   const fetchJobs = useCallback(async (params) => {
     setLoading(true);
@@ -198,11 +223,15 @@ export default function AccessibilityJobs() {
   }, []);
 
   useEffect(() => {
-    fetchJobs(fetchParams);
+    if (fetchParams) {
+      fetchJobs(fetchParams);
+    }
   }, [fetchParams, fetchJobs]);
 
   const handleSearch = (e) => {
     e.preventDefault();
+    setHasSearched(true);
+    setLoading(true);
     
     setFetchParams({
       query: searchQuery.trim() || 'accessibility',
@@ -213,13 +242,24 @@ export default function AccessibilityJobs() {
 
   const clearFilters = () => {
     setSearchQuery('');
-    setLocationQuery('India');
+    setLocationQuery('');
     setRemoteOnly(false);
-    setFetchParams({ query: 'accessibility', location: 'India', remote_jobs_only: false });
+    // Don't set hasSearched to false, just fetch global jobs again
+    setFetchParams({ query: 'accessibility', location: '', remote_jobs_only: false });
+  };
+
+  const handleShare = () => {
+    const url = encodeURIComponent(window.location.href);
+    window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${url}`, '_blank', 'width=600,height=600');
   };
 
   return (
     <Container>
+      <SEO 
+        title="Accessibility Jobs | AllCanAccess"
+        description="Launch your career in digital inclusion. Find remote accessibility jobs, WCAG testing roles, inclusive design positions, and compliance expert opportunities at top global organizations prioritizing digital accessibility."
+        keywords="accessibility jobs, a11y careers, digital accessibility roles, WCAG testing jobs, inclusive design jobs, accessibility engineer, ADA compliance jobs, Section 508 jobs, accessibility specialist, accessibility consultant, accessibility QA tester, remote accessibility jobs, web accessibility developer, IAAP jobs, CPACC jobs, WAS jobs, accessibility manager, inclusive UX researcher, digital inclusion careers, accessibility analyst, PDF accessibility jobs, accessibility product manager, accessibility auditor, assistive technology specialist, a11y employment, accessible tech careers"
+      />
       <div className={styles.page}>
         <header className={styles.hero}>
           <div className={styles.heroBadge}>
@@ -229,6 +269,14 @@ export default function AccessibilityJobs() {
           <p className={styles.heroSubtitle}>
             Real-time accessibility roles from top companies worldwide. Find your next role in digital inclusion.
           </p>
+          <div className={styles.heroActions}>
+            <button type="button" onClick={handleShare} className={styles.shareBtn}>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false">
+                <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" />
+              </svg>
+              Share on LinkedIn
+            </button>
+          </div>
         </header>
 
         <form className={styles.searchForm} onSubmit={handleSearch} aria-label="Search jobs">
@@ -241,7 +289,7 @@ export default function AccessibilityJobs() {
               onChange={setSearchQuery}
               options={SUGGESTED_ROLES}
               icon={
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false">
                   <circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" />
                 </svg>
               }
@@ -250,18 +298,23 @@ export default function AccessibilityJobs() {
             <AccessibleCombobox
               id="search-location"
               label="Location"
-              placeholder="City, state, or country..."
+              placeholder="e.g. India, Remote, New York..."
               value={locationQuery}
               onChange={setLocationQuery}
               options={SUGGESTED_LOCATIONS}
               icon={
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false">
                   <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" /><circle cx="12" cy="10" r="3" />
                 </svg>
               }
             />
 
-            <button type="submit" className={styles.searchBtn}>Search</button>
+            <button 
+              type="submit" 
+              className={styles.searchBtn}
+            >
+              Search
+            </button>
           </div>
 
           <div className={styles.filtersRow}>
@@ -271,8 +324,6 @@ export default function AccessibilityJobs() {
                 checked={remoteOnly}
                 onChange={e => {
                   setRemoteOnly(e.target.checked);
-                  // Auto submit when checking remote
-                  setFetchParams(prev => ({ ...prev, remote_jobs_only: e.target.checked }));
                 }}
                 className={styles.checkbox}
               />
@@ -296,12 +347,14 @@ export default function AccessibilityJobs() {
           )}
         </div>
 
-        {loading && (
-          <div className={styles.loadingState} role="status">
-            <div className={styles.spinner} aria-hidden="true"></div>
-            <p>Loading real-time jobs...</p>
-          </div>
-        )}
+        <div aria-live="polite" aria-atomic="true">
+          {loading && (
+            <div className={styles.loadingState}>
+              <div className={styles.spinner} aria-hidden="true"></div>
+              <p>Loading real-time jobs...</p>
+            </div>
+          )}
+        </div>
 
         {error && (
           <div className={styles.errorState} role="alert">
@@ -354,13 +407,13 @@ export default function AccessibilityJobs() {
                 )}
 
                 <div className={styles.cardFooter}>
-                  <div className={styles.tagList} aria-label={`Skills: ${job.tags ? job.tags.join(', ') : 'Not specified'}`}>
+                  <ul className={styles.tagList} aria-label={`Skills: ${job.tags ? job.tags.join(', ') : 'Not specified'}`}>
                     {(job.tags || []).map(tag => (
-                      <span key={tag} className={styles.tag}>
+                      <li key={tag} className={styles.tag}>
                         {tag}
-                      </span>
+                      </li>
                     ))}
-                  </div>
+                  </ul>
                   <div className={styles.cardActions}>
                     {job.posted_date && (
                       <span className={styles.postedDate}>
@@ -372,9 +425,9 @@ export default function AccessibilityJobs() {
                       target="_blank"
                       rel="noopener noreferrer"
                       className={styles.applyBtn}
-                      aria-label={`Apply for ${job.title} at ${job.company} (opens in new window)`}
+                      aria-label={`Apply for ${job.title} at ${job.company || 'this company'} (opens in new window)`}
                     >
-                      Apply on {job.source} <span aria-hidden="true">↗</span>
+                      {job.company ? `Apply at ${job.company}` : 'Apply Now'} <span aria-hidden="true">↗</span>
                     </a>
                   </div>
                 </div>

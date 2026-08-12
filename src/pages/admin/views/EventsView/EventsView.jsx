@@ -1,10 +1,11 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
+import { Trash } from "lucide-react";
 import { eventsApi } from "api/client";
 import EventModal from "./components/EventModal";
 import RsvpModal from "./components/RsvpModal";
 import dashboardStyles from "../../AdminDashboard.module.css";
 import styles from "./EventsView.module.css";
-import Table from "components/common/Table/Table";
+import Table from "pages/admin/components/Table/Table";
 import { truncateText } from "utils/commonUtils";
 import { useConfirm } from "context/ConfirmContext";
 
@@ -114,6 +115,7 @@ export default function EventsView({ showToast }) {
       await eventsApi.delete(id);
       showToast?.(`Event "${title}" deleted.`, "success");
       loadEvents();
+      setTimeout(() => document.getElementById("admin-search-input")?.focus(), 0);
     } catch (err) {
       showToast?.(err.message || "Failed to delete event.", "error");
     }
@@ -134,6 +136,7 @@ export default function EventsView({ showToast }) {
       );
       setSelectedIds([]);
       loadEvents();
+      setTimeout(() => document.getElementById("admin-search-input")?.focus(), 0);
     } catch (err) {
       showToast?.(err.message || "Failed to bulk delete events.", "error");
     }
@@ -160,6 +163,7 @@ export default function EventsView({ showToast }) {
       await eventsApi.rejectProposal(id);
       showToast?.(`Proposal "${title}" rejected.`, "success");
       loadProposals();
+      setTimeout(() => document.getElementById("admin-search-input")?.focus(), 0);
     } catch (err) {
       showToast?.(err.message || "Failed to reject proposal.", "error");
     }
@@ -171,6 +175,7 @@ export default function EventsView({ showToast }) {
       await eventsApi.deleteProposal(id);
       showToast?.(`Proposal "${title}" deleted.`, "success");
       loadProposals();
+      setTimeout(() => document.getElementById("admin-search-input")?.focus(), 0);
     } catch (err) {
       showToast?.(err.message || "Failed to delete proposal.", "error");
     }
@@ -305,6 +310,7 @@ export default function EventsView({ showToast }) {
               setIsModalOpen(true);
             }}
             className={styles.editBtn}
+            aria-label={`Edit ${ev.title}`}
           >
             Edit
           </button>
@@ -312,6 +318,7 @@ export default function EventsView({ showToast }) {
             type="button"
             onClick={() => handleDeleteEvent(ev.id, ev.title)}
             className={styles.deleteBtn}
+            aria-label={`Delete ${ev.title}`}
           >
             Delete
           </button>
@@ -392,6 +399,7 @@ export default function EventsView({ showToast }) {
               type="button"
               onClick={() => handleApproveProposal(p)}
               className={styles.approveBtn}
+              aria-label={`Approve ${p.title}`}
             >
               Approve
             </button>
@@ -399,6 +407,7 @@ export default function EventsView({ showToast }) {
               type="button"
               onClick={() => handleRejectProposal(p.id, p.title)}
               className={styles.deleteBtn}
+              aria-label={`Reject ${p.title}`}
             >
               Reject
             </button>
@@ -409,6 +418,7 @@ export default function EventsView({ showToast }) {
               type="button"
               className={styles.deleteBtn}
               onClick={() => handleDeleteProposal(p.id, p.title)}
+              aria-label={`Delete ${p.title}`}
             >
               Delete
             </button>
@@ -444,7 +454,9 @@ export default function EventsView({ showToast }) {
           </h2>
           <div className={styles.searchWrapper}>
             <input
-              type="text"
+              id="admin-search-input"
+              type="search"
+              aria-label="Search events"
               placeholder="Search events..."
               value={eventSearch}
               onChange={(e) => setEventSearch(e.target.value)}
@@ -456,7 +468,7 @@ export default function EventsView({ showToast }) {
                 onClick={handleBulkDelete}
                 className={`${styles.deleteBtn} ${styles.bulkDeleteBtn}`}
               >
-                🗑 Bulk Delete ({selectedIds.length})
+                <Trash aria-hidden="true" size={16} /> Bulk Delete ({selectedIds.length})
               </button>
             )}
             {activeTab === "Active Events" && (
@@ -468,20 +480,22 @@ export default function EventsView({ showToast }) {
                 }}
                 className={styles.addEventBtn}
               >
-                📅 Add Event
+                <span aria-hidden="true">📅</span> Add Event
               </button>
             )}
           </div>
         </div>
 
         {/* Tabs */}
-        <nav className={styles.tabs} aria-label="Events admin sections">
+        <nav className={styles.tabs} role="tablist" aria-label="Events admin sections">
           {TABS.map((tab) => (
             <button
               key={tab}
+              id={`tab-${tab.replace(/\s+/g, '-').toLowerCase()}`}
               type="button"
               role="tab"
               aria-selected={activeTab === tab}
+              aria-controls={`tabpanel-${tab.replace(/\s+/g, '-').toLowerCase()}`}
               onClick={() => setActiveTab(tab)}
               className={`${styles.tab} ${activeTab === tab ? styles.tabActive : ""}`}
             >
@@ -498,7 +512,8 @@ export default function EventsView({ showToast }) {
 
         {/* Active Events Tab */}
         {activeTab === "Active Events" && (
-          <Table
+          <div role="tabpanel" id="tabpanel-active-events" aria-labelledby="tab-active-events">
+            <Table
             columns={activeEventColumns}
             data={eventsList}
             loading={eventsLoading}
@@ -509,10 +524,12 @@ export default function EventsView({ showToast }) {
             onSelectChange={setSelectedIds}
             pagination={true}
           />
+          </div>
         )}
         {/* Proposed Events Tab */}
         {activeTab === "Proposed Events" && (
-          <Table
+          <div role="tabpanel" id="tabpanel-proposed-events" aria-labelledby="tab-proposed-events">
+            <Table
             columns={proposedEventColumns}
             data={proposals}
             loading={proposalsLoading}
@@ -520,6 +537,7 @@ export default function EventsView({ showToast }) {
             searchQuery={eventSearch}
             pagination={true}
           />
+          </div>
         )}
       </section>
 

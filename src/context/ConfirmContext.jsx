@@ -34,7 +34,7 @@ export function ConfirmProvider({ children }) {
     <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', width: '100%' }}>
       <button 
         onClick={handleCancel} 
-        style={{ padding: '8px 16px', background: 'none', border: '1px solid var(--border)', borderRadius: 'var(--radius-sm)', cursor: 'pointer', color: 'var(--text)', fontSize: '14px', fontWeight: 500 }}
+        style={{ padding: '8px 16px', background: 'none', border: '1px solid var(--text-faint)', borderRadius: 'var(--radius-sm)', cursor: 'pointer', color: 'var(--text)', fontSize: '14px', fontWeight: 500 }}
       >
         Cancel
       </button>

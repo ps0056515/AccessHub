@@ -12,13 +12,32 @@
 .title {
   font-size: 24px;
   font-weight: 700;
-  color: var(--text, #0f172a);
+  color: var(--text);
   margin: 0;
 }
 
+.visuallyHidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
+}
+
+@media (max-width: 768px) {
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+}
+
 .addBtn {
-  background: var(--accent, #074a9e);
-  color: #fff;
+  background: var(--accent);
+  color: var(--text-on-accent);
   border: none;
   padding: 8px 16px;
   border-radius: 6px;
@@ -28,7 +47,7 @@
 }
 
 .addBtn:hover {
-  background: #063d82;
+  background: var(--button-primary-hover);
 }
 
 
@@ -45,48 +64,48 @@
 
 .btnSecondary {
   background: transparent;
-  color: var(--text-muted, #475569);
-  border: 1px solid var(--border-strong, #cbd5e1);
+  color: var(--text-muted);
+  border: 1px solid var(--border-interactive-strong);
   padding: 4px 8px;
   border-radius: var(--radius-sm, 6px);
   font-size: 13px;
   font-weight: 500;
-  cursor: pointer;
   transition: all 0.15s ease;
+  cursor: pointer;
 }
 .btnSecondary:hover {
-  background: var(--bg-secondary, #f8fafc);
-  color: var(--text, #0f172a);
+  background: var(--bg-secondary);
+  color: var(--text);
 }
 
 .btnDanger {
   background: transparent;
-  color: #ef4444;
-  border: 1px solid #fca5a5;
+  color: var(--red-text);
+  border: 1px solid var(--red-border-interactive);
   padding: 4px 8px;
   border-radius: var(--radius-sm, 6px);
   font-size: 13px;
   font-weight: 500;
-  cursor: pointer;
   transition: all 0.15s ease;
+  cursor: pointer;
 }
 .btnDanger:hover {
-  background: #fef2f2;
+  background: var(--red-bg);
 }
 
 .btnSuccess {
   background: transparent;
-  color: #16a34a;
-  border: 1px solid #bbf7d0;
+  color: var(--green-text);
+  border: 1px solid var(--green-border-interactive);
   padding: 4px 8px;
   border-radius: var(--radius-sm, 6px);
   font-size: 13px;
   font-weight: 500;
-  cursor: pointer;
   transition: all 0.15s ease;
+  cursor: pointer;
 }
 .btnSuccess:hover {
-  background: #f0fdf4;
+  background: var(--green-bg);
 }
 
 .statusBadge {
@@ -100,13 +119,13 @@
 }
 
 .statusDraft {
-  background: #fef3c7;
-  color: #b45309;
+  background: var(--amber-bg);
+  color: var(--amber-text);
 }
 
 .statusPublished {
-  background: #dcfce7;
-  color: #15803d;
+  background: var(--green-bg);
+  color: var(--green-text);
 }
 
 .editorWrapper {

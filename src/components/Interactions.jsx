@@ -3,8 +3,9 @@ import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from 'context/AuthContext';
 import { useAriaLive } from 'context/AriaLiveContext';
 import { useToast } from 'context/ToastContext';
-import { ThumbsUp, ThumbsDown, Edit2, Trash2 } from 'lucide-react';
+import { ThumbsUp, ThumbsDown, Edit2, Trash } from 'lucide-react';
 import { COLOR_MAP } from 'data';
+import Avatar from 'components/common/Avatar/Avatar';
 import styles from './Interactions.module.css';
 
 export default function Interactions({
@@ -178,7 +179,7 @@ export default function Interactions({
             aria-pressed={userVote === 1}
             aria-label="Upvote"
           >
-            <ThumbsUp size={18} />
+            <ThumbsUp aria-hidden="true" size={18} />
           </button>
           
           <span 
@@ -198,7 +199,7 @@ export default function Interactions({
             aria-pressed={userVote === -1}
             aria-label="Downvote"
           >
-            <ThumbsDown size={18} />
+            <ThumbsDown aria-hidden="true" size={18} />
           </button>
         </div>
       </div>
@@ -212,7 +213,7 @@ export default function Interactions({
             <p className={styles.emptyState}>No comments yet. Be the first to share your thoughts!</p>
           ) : (
             comments.map(comment => {
-              const colors = COLOR_MAP[comment.author_color] || COLOR_MAP.blue;
+              const authorColor = comment.author_color || 'blue';
               const isAuthorOrAdmin = user?.id === comment.user_id || user?.is_admin;
               const isEditing = editingCommentId === comment.id;
 
@@ -220,13 +221,14 @@ export default function Interactions({
                 <article key={comment.id} className={styles.commentCard}>
                   <header className={styles.commentHeader}>
                     <div className={styles.authorInfo}>
-                      <div 
-                        className={styles.avatar} 
-                        style={{ background: colors.bg, color: colors.text }}
-                        aria-hidden="true"
-                      >
-                        {comment.author_initials}
-                      </div>
+                      <Avatar
+                        src={comment.avatar_url}
+                        initials={comment.author_initials}
+                        color={authorColor}
+                        size={36}
+                        className={styles.avatar}
+                        alt={`${comment.author_name}'s avatar`}
+                      />
                       <h3 className={styles.authorName}>{comment.author_name}</h3>
                     </div>
                     {isAuthorOrAdmin && !isEditing && (
@@ -237,19 +239,19 @@ export default function Interactions({
                             setEditingCommentId(comment.id);
                             setEditCommentBody(comment.body);
                           }}
-                          aria-label="Edit comment"
+                          aria-label={`Edit comment by ${comment.author_name}`}
                           title="Edit"
                         >
-                          <Edit2 size={16} />
+                          <Edit2 aria-hidden="true" size={16} />
                         </button>
                         <button 
                           className={`${styles.actionBtn} ${styles.actionBtnDelete}`} 
                           onClick={() => handleDeleteComment(comment.id)}
                           disabled={deletingCommentId === comment.id}
-                          aria-label="Delete comment"
+                          aria-label={`Delete comment by ${comment.author_name}`}
                           title="Delete"
                         >
-                          <Trash2 size={16} />
+                          <Trash aria-hidden="true" size={16} />
                         </button>
                       </div>
                     )}
@@ -257,12 +259,16 @@ export default function Interactions({
                   
                   {isEditing ? (
                     <div className={styles.editCommentBox}>
+                      <label htmlFor={`edit-comment-${comment.id}`} className="sr-only">Edit comment</label>
                       <textarea
+                        id={`edit-comment-${comment.id}`}
                         className={styles.textarea}
                         value={editCommentBody}
                         onChange={(e) => setEditCommentBody(e.target.value)}
                         disabled={savingComment}
                         autoFocus
+                        required
+                        aria-required="true"
                       />
                       <div className={styles.editActions}>
                         <button 
@@ -292,20 +298,24 @@ export default function Interactions({
 
         {/* Comment Form */}
         {user ? (
-          <form className={styles.addCommentBox} onSubmit={handleCommentSubmit} noValidate>
+          <form className={styles.addCommentBox} onSubmit={handleCommentSubmit}>
             <h3 className={styles.commentTitle}>Add a Comment</h3>
             {commentError && (
-              <div className={styles.errorMsg} role="alert">
+              <div id="comment-error-msg" className={styles.errorMsg} role="alert">
                 {commentError}
               </div>
             )}
+            <label htmlFor="new-comment" className="sr-only">Comment body</label>
             <textarea
+              id="new-comment"
               className={styles.textarea}
               placeholder="What are your thoughts?"
               value={newComment}
               onChange={(e) => setNewComment(e.target.value)}
               required
-              aria-label="Comment body"
+              aria-required="true"
+              aria-invalid={!!commentError}
+              aria-describedby={commentError ? "comment-error-msg" : undefined}
             />
             <div className={styles.actions}>
               <button 
@@ -329,3 +339,5 @@ export default function Interactions({
     </section>
   );
 }
+
+

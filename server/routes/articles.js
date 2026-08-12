@@ -105,7 +105,7 @@ router.get("/:id", optionalAuthMiddleware, async (req, res, next) => {
 router.get("/:id/comments", async (req, res, next) => {
   try {
     const { rows } = await query(
-      "SELECT * FROM article_comments WHERE article_id = $1 ORDER BY created_at DESC",
+      "SELECT c.*, u.avatar_url FROM article_comments c LEFT JOIN users u ON c.user_id = u.id WHERE c.article_id = $1 ORDER BY c.created_at DESC",
       [req.params.id]
     );
     res.json({ comments: rows });
@@ -135,7 +135,9 @@ router.post("/:id/comments", authMiddleware, async (req, res, next) => {
        RETURNING *`,
       [req.params.id, req.userId, author.author_name, author.author_initials, author.author_color, body.trim()]
     );
-    res.status(201).json({ comment: rows[0] });
+    const newComment = rows[0];
+    newComment.avatar_url = user.avatar_url;
+    res.status(201).json({ comment: newComment });
   } catch (err) {
     next(err);
   }
@@ -162,7 +164,9 @@ router.put("/:id/comments/:commentId", authMiddleware, async (req, res, next) =>
       "UPDATE article_comments SET body = $1, updated_at = NOW() WHERE id = $2 RETURNING *",
       [body.trim(), req.params.commentId]
     );
-    res.json({ comment: rows[0] });
+    const updatedComment = rows[0];
+    updatedComment.avatar_url = user.avatar_url;
+    res.json({ comment: updatedComment });
   } catch (err) {
     next(err);
   }

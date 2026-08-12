@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta property="og:title" content="Focus Frenzy | Accessibility Game">
+<meta property="og:description" content="Experience why WCAG 2.4.7 requires highly visible focus indicators for keyboard navigation.">
+<title>Focus Frenzy - Accessibility Game</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+:root{
+  --bg:#0f0c29;
+  --panel:rgba(25, 20, 43, 0.75);
+  --card:#1e1838;
+  --border:rgba(255,255,255,.08);
+
+  --blue:#3b82f6;
+  --green:#10b981;
+  --red:#ef4444;
+  --yellow:#f59e0b;
+  --purple:#8b5cf6;
+  
+  --text:#fff;
+  --muted:#94a3b8;
+}
+
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:Inter,sans-serif;
+}
+
+html, body { height: 100vh; width: 100vw; overflow: hidden; }
+
+body{
+  display:flex; justify-content:center; align-items:center; padding:16px;
+  background: radial-gradient(circle at center, #30144d 0%, #0f0c29 100%);
+  color:white;
+}
+
+/* animated grid background */
+body::before{
+  content:""; position:fixed; inset:0;
+  background-image: 
+    linear-gradient(rgba(255,255,255,.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.05) 1px, transparent 1px);
+  background-size: 50px 50px;
+  animation: panBg 20s linear infinite;
+  pointer-events:none; opacity:.4;
+}
+@keyframes panBg{
+  from{ transform:translateY(0) translateX(0); }
+  to{ transform:translateY(-50px) translateX(-50px); }
+}
+
+.game{
+  width:100%; max-width:820px; max-height: calc(100vh - 32px); height: 100%;
+  background:var(--panel); backdrop-filter:blur(18px);
+  border:1px solid var(--border); border-radius:24px;
+  padding:20px 24px; box-shadow: 0 25px 80px rgba(0,0,0,.45);
+  position:relative; overflow:hidden; display: flex; flex-direction: column;
+}
+
+/* title */
+.title{
+  font-size:clamp(22px, 4vh, 32px); font-weight:800; text-align:center;
+  background: linear-gradient(90deg, #f59e0b, #ef4444, #8b5cf6);
+  background-clip:text; -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+}
+.subtitle{
+  text-align:center; margin-top:4px; margin-bottom:12px; color:var(--muted);
+  font-size: clamp(12px, 1.8vh, 14px);
+}
+
+/* stats */
+.stats{ display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-bottom:12px; }
+.stat{
+  background:rgba(0,0,0,0.3); padding:8px 12px; border-radius:14px;
+  text-align:center; border:1px solid rgba(255,255,255,.05);
+}
+.stat span{ display:block; font-size:11px; margin-bottom:2px; color:#94a3b8; }
+.stat strong{ font-size:clamp(18px, 2.8vh, 22px); }
+
+/* instruction */
+.instruction{
+  background:rgba(0,0,0,0.5); padding:10px; border-radius:14px; text-align:center;
+  font-size:clamp(15px, 2.2vh, 18px); font-weight:700; margin-bottom:12px;
+}
+.target-text{ color:var(--green); text-transform: uppercase; animation: pulse 1s infinite; }
+
+/* warning */
+.warning{
+  display:none; background:#ef4444; padding:8px; border-radius:12px;
+  font-size: 13px; font-weight:700; text-align:center; margin-bottom:10px;
+  animation:pulse 1.3s infinite; box-shadow: 0 0 15px rgba(239, 68, 68, 0.4);
+}
+@keyframes pulse{ 50%{ transform:scale(1.02); } }
+
+/* 3x3 Grid Layout */
+.grid{
+  display:grid; grid-template-columns:repeat(3,1fr); grid-template-rows:repeat(3,1fr);
+  gap:16px; flex: 1; min-height: 0; transition:.4s; padding: 10px;
+}
+.card{
+  height: 100%; width: 100%; border-radius:16px; background:var(--card);
+  display:flex; align-items:center; justify-content:center;
+  cursor:pointer; transition:.2s; border:3px solid transparent;
+  outline:none; box-shadow: 0 10px 25px rgba(0,0,0,.35), inset 0 1px rgba(255,255,255,.05);
+  font-size: 2rem; font-weight: 800; color: rgba(255,255,255,0.1);
+}
+
+/* LEVEL 1: High Visibility Focus */
+body[data-level="1"] .card:focus-visible {
+  outline: 6px solid var(--blue); outline-offset: 4px;
+  background: rgba(59, 130, 246, 0.2); transform: scale(1.05);
+}
+
+/* LEVEL 2: No Focus Visible (WCAG Failure) */
+body[data-level="2"] .card:focus-visible {
+  outline: none !important; /* The core issue */
+}
+
+.card.is-target {
+  background: rgba(16, 185, 129, 0.1); border-color: var(--green); color: var(--green);
+  box-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
+}
+
+/* transition */
+.overlay{
+  position:absolute; inset:0; display:none; justify-content:center; align-items:center;
+  flex-direction:column; background:rgba(15,12,41,.98); z-index:20; text-align:center; padding:24px;
+}
+.overlay h2{ font-size:clamp(28px, 5vh, 36px); margin-bottom:12px; color:var(--yellow); }
+.overlay p{ line-height:1.6; max-width:480px; color:#d1d5db; font-size: clamp(14px, 2vh, 16px); }
+.count{ font-size:clamp(60px, 10vh, 80px); font-weight:800; margin-top:16px; color:var(--purple); }
+
+/* game over */
+.modal{
+  display:none; position:absolute; inset:0; background:rgba(15,12,41,.98);
+  justify-content:center; align-items:center; padding:20px; z-index:30;
+}
+.modalBox{
+  background:rgba(0,0,0,0.6); padding:32px; border-radius:20px; border:1px solid var(--border);
+  width:100%; max-width:500px; text-align:center; box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+}
+.modalBox h2{ font-size:clamp(24px, 4vh, 30px); margin-bottom:14px; color: var(--blue); }
+.modalBox p{ line-height:1.6; color:#cbd5e1; font-size: clamp(14px, 2vh, 15px); margin-bottom:20px; }
+.modalBox h1 { font-size: 4rem; color: var(--green); margin-bottom: 20px; }
+
+button.primary {
+  background:var(--blue); color:white; border:none; padding:16px 32px;
+  border-radius:12px; cursor:pointer; font-size:16px; font-weight:700; transition:.25s;
+}
+button.primary:hover{ background:#2563eb; transform: translateY(-2px); }
+
+/* animations */
+.correct{ animation:pop .35s forwards; }
+@keyframes pop{ 0%{transform:scale(.8); background: var(--green);} 100%{transform:scale(1); background: var(--card);} }
+
+.wrong{ animation:shake .4s; background: rgba(239, 68, 68, 0.2) !important; border-color: var(--red) !important;}
+@keyframes shake{ 20%{transform:translateX(-8px);} 40%{transform:translateX(8px);} 60%{transform:translateX(-6px);} 80%{transform:translateX(6px);} }
+
+@media(max-width:600px){ .grid{ gap:10px; } }
+@media(max-width:480px){ .stats{ gap:8px; } .stat{ padding:6px; } .game{ padding:16px; } }
+
+</style>
+</head>
+<body data-level="1">
+
+<div class="game">
+
+<div class="title">Focus Frenzy</div>
+<div class="subtitle">Experience why WCAG 2.4.7 requires highly visible focus indicators.</div>
+
+<div id="warning" class="warning">
+⚠ Level 2 • "outline: none" Applied. Focus Indicators Removed.
+</div>
+
+<div class="stats">
+  <div class="stat"><span>LEVEL</span><strong id="level">1</strong></div>
+  <div class="stat"><span>SCORE</span><strong id="score">0</strong></div>
+  <div class="stat"><span>TIME</span><strong id="time">45</strong></div>
+</div>
+
+<div class="instruction">
+  Use <kbd>Tab</kbd> to find and <kbd>Space</kbd> to activate the <span id="target" class="target-text">TARGET</span>
+</div>
+
+<div id="grid" class="grid">
+  <!-- 9 Buttons will be injected here -->
+</div>
+
+<div id="transition" class="overlay">
+  <h2>Accessibility Challenge</h2>
+  <p>You completed Level 1.<br><br>Now repeat the task on a website that has disabled default focus outlines (outline: none). Can you track where you are using only your keyboard?</p>
+  <div id="count" class="count">3</div>
+</div>
+
+<div id="gameover" class="modal">
+  <div class="modalBox">
+    <h2>Challenge Complete</h2>
+    <p>Level 2 demonstrates why WCAG 2.4.7 is critical. Without a visible focus indicator, keyboard users are effectively flying blind.</p>
+    <h1 id="finalScore">0</h1>
+    <button id="restart" class="primary">Play Again</button>
+  </div>
+</div>
+
+</div>
+
+<script>
+// --- Audio System ---
+const audioCtx = new(window.AudioContext||window.webkitAudioContext)();
+function beep(freq, type, duration){
+  if(audioCtx.state === 'suspended') audioCtx.resume();
+  const osc=audioCtx.createOscillator();
+  const gain=audioCtx.createGain();
+  osc.type = type;
+  osc.connect(gain); gain.connect(audioCtx.destination);
+  osc.frequency.value=freq; gain.gain.value=.05;
+  osc.start();
+  gain.gain.exponentialRampToValueAtTime(0.0001,audioCtx.currentTime+duration);
+  osc.stop(audioCtx.currentTime+duration);
+}
+const sfx = {
+  correct: () => { beep(800, 'sine', 0.1); setTimeout(()=>beep(1200, 'sine', 0.15), 100); },
+  wrong: () => beep(150, 'sawtooth', 0.3),
+  level: () => { beep(400, 'sine', 0.1); setTimeout(()=>beep(600, 'sine', 0.1), 150); setTimeout(()=>beep(900, 'sine', 0.3), 300); }
+};
+
+// --- Confetti System ---
+const canvas=document.createElement("canvas");
+canvas.style.position="fixed"; canvas.style.left='0'; canvas.style.top='0';
+canvas.style.pointerEvents="none"; canvas.style.zIndex='999';
+document.body.appendChild(canvas);
+const ctx=canvas.getContext("2d");
+function resize(){ canvas.width=innerWidth; canvas.height=innerHeight; }
+resize(); window.addEventListener("resize",resize);
+let confetti=[];
+function launchConfetti(){
+  for(let i=0;i<100;i++){
+    confetti.push({
+      x:canvas.width/2, y:canvas.height/2,
+      vx:(Math.random()-.5)*15, vy:(Math.random()-.5)*15 - 5,
+      size:Math.random()*8+4, life:100,
+      color:['#3b82f6','#10b981','#ef4444','#f59e0b','#8b5cf6'][Math.floor(Math.random()*5)]
+    });
+  }
+}
+function animConfetti(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  confetti.forEach(p=>{
+    p.x+=p.vx; p.y+=p.vy; p.vy+=0.2; p.life--;
+    ctx.fillStyle=p.color; ctx.fillRect(p.x,p.y,p.size,p.size);
+  });
+  confetti=confetti.filter(p=>p.life>0);
+  requestAnimationFrame(animConfetti);
+}
+animConfetti();
+
+// --- Toast System ---
+const toast=document.createElement("div");
+toast.style.cssText = "position:fixed; left:50%; top:20px; transform:translateX(-50%); background:var(--green); color:#000; padding:12px 24px; border-radius:30px; font-weight:bold; z-index:9999; display:none;";
+document.body.appendChild(toast);
+function showToast(msg, isError=false){
+  toast.innerText=msg;
+  toast.style.background = isError ? "var(--red)" : "var(--green)";
+  toast.style.color = isError ? "#fff" : "#000";
+  toast.style.display="block";
+  toast.animate([{opacity:0, transform:"translate(-50%,-20px)"},{opacity:1, transform:"translate(-50%,0)"},{opacity:0, transform:"translate(-50%,-30px)"}], {duration:800});
+  setTimeout(()=>toast.style.display="none", 800);
+}
+
+// --- Live Region ---
+const liveRegion = document.createElement("div");
+liveRegion.setAttribute("aria-live","polite"); liveRegion.className="sr-only";
+document.body.appendChild(liveRegion);
+function announce(msg){ liveRegion.textContent=""; setTimeout(()=>liveRegion.textContent=msg,50); }
+
+// --- Game Logic ---
+let score=0, level=1, combo=0;
+let timeLeft=45; const MAX_TIME = 60;
+let targetIndex = -1;
+let gameTimer=null, transitioning=false;
+
+const els = {
+  grid: document.getElementById('grid'), score: document.getElementById('score'),
+  level: document.getElementById('level'), time: document.getElementById('time'),
+  warning: document.getElementById('warning'), overlay: document.getElementById('transition'),
+  count: document.getElementById('count'), modal: document.getElementById('gameover'),
+  finalScore: document.getElementById('finalScore')
+};
+
+function updateUI(){
+  els.score.textContent=score; els.level.textContent=level; els.time.textContent=Math.ceil(timeLeft);
+  els.time.style.color = timeLeft<=5 ? "var(--red)" : timeLeft<=15 ? "var(--yellow)" : "var(--blue)";
+}
+
+function initGrid(){
+  els.grid.innerHTML = "";
+  for(let i=0; i<9; i++){
+    const btn = document.createElement('button');
+    btn.className = "card"; btn.type = "button";
+    btn.setAttribute("aria-label", "Grid Button " + (i+1));
+    btn.textContent = (i+1);
+    
+    // Mouse click penalty - force keyboard use
+    btn.addEventListener('mousedown', (e) => {
+      e.preventDefault();
+      showToast("Use Keyboard Only!", true);
+      sfx.wrong(); announce("Keyboard required");
+    });
+    
+    // Keyboard activation
+    btn.addEventListener('keydown', (e) => {
+      if(e.key==='Enter' || e.key===' '){
+        e.preventDefault(); checkHit(i, btn);
+      }
+    });
+    
+    els.grid.appendChild(btn);
+  }
+}
+
+function spawnTarget(){
+  const cards = els.grid.querySelectorAll('.card');
+  cards.forEach(c => c.classList.remove('is-target', 'correct', 'wrong'));
+  
+  let newTarget;
+  do { newTarget = Math.floor(Math.random() * 9); } while(newTarget === targetIndex);
+  targetIndex = newTarget;
+  
+  const targetCard = cards[targetIndex];
+  targetCard.classList.add('is-target');
+  
+  // Reset focus to the grid container to force tab navigation from start, 
+  // or let them keep current focus. Let's let them keep current focus.
+}
+
+function checkHit(index, btn){
+  if(transitioning) return;
+  
+  if(index === targetIndex){
+    combo++;
+    const pts = 10 + (combo*5);
+    score += pts;
+    timeLeft = Math.min(MAX_TIME, timeLeft + 2);
+    
+    sfx.correct(); showToast(`+${pts} Combo x${combo}`); announce("Correct");
+    btn.classList.remove('is-target');
+    btn.classList.add('correct');
+    
+    if(score >= 150 && level === 1) {
+      setTimeout(startLevel2, 300);
+    } else {
+      setTimeout(spawnTarget, 200);
+    }
+  } else {
+    combo = 0;
+    timeLeft = Math.max(0, timeLeft - 3);
+    sfx.wrong(); showToast("Miss! -3s", true); announce("Incorrect");
+    btn.classList.add('wrong');
+    setTimeout(()=>btn.classList.remove('wrong'), 400);
+  }
+  updateUI();
+}
+
+function startLevel2(){
+  transitioning = true; level = 2;
+  clearInterval(gameTimer);
+  sfx.level(); launchConfetti();
+  
+  document.body.setAttribute('data-level', '2');
+  els.warning.style.display="block";
+  els.overlay.style.display="flex";
+  
+  let count=3; els.count.textContent=count;
+  const cd = setInterval(()=>{
+    count--; els.count.textContent=count;
+    if(count===0){
+      clearInterval(cd);
+      els.overlay.style.display="none";
+      transitioning = false;
+      spawnTarget(); startTimer(); updateUI();
+      // Blur current focus to make them lost
+      document.activeElement.blur();
+    }
+  }, 1000);
+}
+
+function startTimer(){
+  clearInterval(gameTimer);
+  gameTimer = setInterval(()=>{
+    timeLeft -= 1; updateUI();
+    if(timeLeft<=0) endGame();
+  }, 1000);
+}
+
+function endGame(){
+  clearInterval(gameTimer);
+  els.modal.style.display="flex";
+  els.finalScore.textContent = score;
+  document.activeElement.blur();
+  setTimeout(()=>document.getElementById('restart').focus(), 100);
+}
+
+document.getElementById('restart').addEventListener('click', ()=>{
+  score=0; level=1; combo=0; timeLeft=45;
+  document.body.setAttribute('data-level', '1');
+  els.warning.style.display="none";
+  els.modal.style.display="none";
+  initGrid(); spawnTarget(); startTimer(); updateUI();
+});
+
+// Init Game
+initGrid(); spawnTarget(); startTimer(); updateUI();
+
+</script>
+</body>
+</html>

@@ -35,18 +35,18 @@ export default function BlogpostDetail() {
     fetchBlogpost();
   }, [id, navigate]);
 
-  if (loading) return <Container className={styles.detailContainer}>Loading blogpost...</Container>;
-  if (error) return <Container className={styles.detailContainer} style={{ color: 'red' }}>{error}</Container>;
+  if (loading) return <Container className={styles.detailContainer} role="status">Loading blogpost...</Container>;
+  if (error) return <Container className={styles.detailContainer} style={{ color: 'var(--error)' }}>{error}</Container>;
   if (!blogpost) return null;
 
   return (
     <Container className={styles.detailContainer} style={{ display: 'block' }}>
       <Link to="/blog" className={styles.backBtn}>
-        ← Back to Blogposts
+        <span aria-hidden="true">← </span>Back to Blogposts
       </Link>
 
       {blogpost.cover_image && (
-        <img src={blogpost.cover_image} alt="" className={styles.detailImage} />
+        <img src={blogpost.cover_image} alt={blogpost.cover_image_alt || ""} className={styles.detailImage} />
       )}
 
       <header className={styles.detailHeader}>
@@ -73,3 +73,4 @@ export default function BlogpostDetail() {
     </Container>
   );
 }
+

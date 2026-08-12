@@ -1,11 +1,14 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from 'context/AuthContext';
 import { SITE_NAME } from 'brand';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import Tooltip from 'components/common/Tooltip/Tooltip';
+import Tooltip from 'pages/admin/components/Tooltip/Tooltip';
 import { useToast } from 'context/ToastContext';
 import styles from './AdminDashboard.module.css';
+import './AdminTheme.css';
+import { AdminThemeProvider, useAdminTheme } from './context/AdminThemeContext';
+import Avatar from 'components/common/Avatar/Avatar';
 
 // Sub-page Views
 import OverviewView from './views/OverviewView/OverviewView';
@@ -18,6 +21,7 @@ import BlogpostsView from './views/BlogpostsView/BlogpostsView';
 import ScreenReadersView from './views/ScreenReadersView/ScreenReadersView';
 import SettingsView from './views/SettingsView/SettingsView';
 import AnalyticsView from './views/AnalyticsView/AnalyticsView';
+import GamesView from './views/GamesView/GamesView';
 
 const VIEWS = {
   overview: OverviewView,
@@ -30,11 +34,13 @@ const VIEWS = {
   screen_readers: ScreenReadersView,
   settings: SettingsView,
   analytics: AnalyticsView,
+  games: GamesView,
 };
 
-export default function AdminDashboard({ goToPortal }) {
+function AdminDashboardInner({ goToPortal }) {
   const navigate = useNavigate();
   const { user, signOut } = useAuth();
+  const { adminTheme } = useAdminTheme();
   const [activeTab, setActiveTab] = useState(() => {
     return localStorage.getItem('adminDashboardTab') || 'overview';
   });
@@ -42,6 +48,28 @@ export default function AdminDashboard({ goToPortal }) {
   const [isCollapsed, setIsCollapsed] = useState(() => {
     return localStorage.getItem('adminDashboardCollapsed') === 'true';
   });
+  const isInitialMount = useRef(true);
+  const mainContentRef = useRef(null);
+
+  useEffect(() => {
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      return;
+    }
+    if (mainContentRef.current) {
+      mainContentRef.current.focus({ preventScroll: true });
+      
+      const root = document.documentElement;
+      const prev = root.style.scrollBehavior;
+      root.style.scrollBehavior = 'auto';
+      window.scrollTo(0, 0);
+      root.scrollTop = 0;
+      document.body.scrollTop = 0;
+      requestAnimationFrame(() => {
+        root.style.scrollBehavior = prev;
+      });
+    }
+  }, [activeTab]);
 
   useEffect(() => {
     document.title = `Admin · ${SITE_NAME}`;
@@ -65,6 +93,7 @@ export default function AdminDashboard({ goToPortal }) {
     { id: 'articles', label: 'Articles', icon: '📝' },
     { id: 'blogposts', label: 'Blogposts', icon: '📰' },
     { id: 'screen_readers', label: 'Screen Readers', icon: '🔊' },
+    { id: 'games', label: 'Games', icon: '🎮' },
     { id: 'settings', label: 'Settings', icon: '⚙️' },
   ];
 
@@ -76,8 +105,8 @@ export default function AdminDashboard({ goToPortal }) {
   };
 
   return (
-    <div className={`${styles.cmsContainer} ${isCollapsed ? styles.cmsCollapsed : ''}`}>
-      <a href="#cms-main-content" className={styles.skipLink}>
+    <div data-admin-theme={adminTheme} className={`admin-theme ${styles.cmsContainer} ${isCollapsed ? styles.cmsCollapsed : ''}`}>
+      <a href="#cms-main-content" className="global-skip-link">
         Skip to main content
       </a>
 
@@ -86,7 +115,7 @@ export default function AdminDashboard({ goToPortal }) {
         <div className={styles.sidebarBrand}>
           <span className={styles.brandEmoji} aria-hidden="true">🛡️</span>
           <div className={styles.brandText}>
-            <h2 className={styles.brandTitle}>AllCanAccess</h2>
+            <span className={styles.brandTitle}>AllCanAccess</span>
             <span className={styles.brandRole}>Admin Portal</span>
           </div>
           <Tooltip content={isCollapsed ? "Expand sidebar" : "Collapse sidebar"} position="right">
@@ -96,7 +125,7 @@ export default function AdminDashboard({ goToPortal }) {
               className={styles.collapseToggle}
               aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
             >
-              {isCollapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
+              {isCollapsed ? <ChevronRight aria-hidden="true" size={16} /> : <ChevronLeft aria-hidden="true" size={16} />}
             </button>
           </Tooltip>
         </div>
@@ -124,9 +153,14 @@ export default function AdminDashboard({ goToPortal }) {
         {/* Sidebar Profile Card */}
         {user && (
           <div className={styles.profileCard}>
-            <div className={styles.profileAvatar} aria-hidden="true">
-              {user.displayName?.slice(0, 2).toUpperCase() || 'AD'}
-            </div>
+            <Avatar 
+              src={user.avatarUrl} 
+              initials={user.displayName?.slice(0, 2).toUpperCase() || 'AD'}
+              color={user.color || 'blue'}
+              size={32}
+              className={styles.profileAvatar}
+              alt={`${user.displayName}'s avatar`}
+            />
             <div className={styles.profileInfo}>
               <p className={styles.profileName}>{user.displayName}</p>
               <p className={styles.profileEmail} title={user.email}>{user.email}</p>
@@ -149,7 +183,7 @@ export default function AdminDashboard({ goToPortal }) {
       {/* Main CMS Display Frame */}
       <div className={styles.mainFrame}>
         <header className={styles.frameHeader}>
-          <span className={styles.pathIndicator}>CMS / {activeTab}</span>
+          <h1 className={styles.pathIndicator}>CMS / {activeTab}</h1>
           <button
             type="button"
             className={styles.backBtn}
@@ -161,11 +195,17 @@ export default function AdminDashboard({ goToPortal }) {
             }}
             aria-label="Return to the main community portal"
           >
-            ← Exit to site
+            <span aria-hidden="true">← </span>Exit to site
           </button>
         </header>
 
-        <main className={styles.frameContent} id="cms-main-content">
+        <main 
+          ref={mainContentRef}
+          className={styles.frameContent} 
+          id="cms-main-content"
+          tabIndex={-1}
+          style={{ outline: 'none' }}
+        >
           {activeTab === 'overview' && <OverviewView showToast={addToast} />}
           {activeTab === 'analytics' && <AnalyticsView showToast={addToast} />}
           {activeTab === 'resources' && <ResourcesView showToast={addToast} />}
@@ -173,11 +213,20 @@ export default function AdminDashboard({ goToPortal }) {
           {activeTab === 'events' && <EventsView showToast={addToast} />}
           {activeTab === 'discussions' && <DiscussionsView showToast={addToast} />}
           {activeTab === 'articles' && <ArticlesView showToast={addToast} />}
-          {activeTab === 'blogposts' && <BlogpostsView showToast={addToast} />}
-          {activeTab === 'screen_readers' && <ScreenReadersView showToast={addToast} />}
-          {activeTab === 'settings' && <SettingsView showToast={addToast} />}
+          { activeTab === 'blogposts' && <BlogpostsView showToast={addToast} /> }
+          { activeTab === 'screen_readers' && <ScreenReadersView showToast={addToast} /> }
+          { activeTab === 'games' && <GamesView showToast={addToast} /> }
+          { activeTab === 'settings' && <SettingsView showToast={addToast} /> }
         </main>
       </div>
     </div>
+  );
+}
+
+export default function AdminDashboard(props) {
+  return (
+    <AdminThemeProvider>
+      <AdminDashboardInner {...props} />
+    </AdminThemeProvider>
   );
 }

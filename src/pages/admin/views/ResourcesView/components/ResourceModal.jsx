@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { resourcesApi } from 'api/client';
-import Modal from 'components/common/Modal/Modal';
+import Modal from 'pages/admin/components/Modal/Modal';
 import styles from '../ResourcesView.module.css';
 
 const COLORS = ['blue', 'purple', 'green', 'amber', 'red', 'pink', 'gray'];
@@ -83,7 +83,7 @@ export default function ResourceModal({ isOpen, resource, existingResources = []
       width="46%"
       footer={
         <>
-          <button type="button" onClick={onClose} className={styles.cancelBtn}>
+          <button type="button" onClick={onClose} className={styles.cancelBtn} aria-label="Cancel resource edit">
             Cancel
           </button>
           <button type="submit" form="resource-form" disabled={submitting} className={styles.saveBtn}>
@@ -96,7 +96,9 @@ export default function ResourceModal({ isOpen, resource, existingResources = []
         <div className={styles.formFields}>
           
           <div className={styles.formGroup}>
-            <label htmlFor="res-title" className={styles.formLabel}>Title *</label>
+            <label htmlFor="res-title" className={styles.formLabel}>
+              Title<span className="required-asterisk" aria-hidden="true"> *</span>
+            </label>
             <input
               id="res-title"
               name="title"
@@ -109,7 +111,9 @@ export default function ResourceModal({ isOpen, resource, existingResources = []
           </div>
 
           <div className={styles.formGroup}>
-            <label htmlFor="res-url" className={styles.formLabel}>URL *</label>
+            <label htmlFor="res-url" className={styles.formLabel}>
+              URL<span className="required-asterisk" aria-hidden="true"> *</span>
+            </label>
             <input
               id="res-url"
               name="view_url"
@@ -118,6 +122,7 @@ export default function ResourceModal({ isOpen, resource, existingResources = []
               onChange={handleChange}
               className={styles.formInput}
               required
+              aria-required="true"
             />
           </div>
           
@@ -135,7 +140,9 @@ export default function ResourceModal({ isOpen, resource, existingResources = []
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
             <div className={styles.formGroup}>
-              <label htmlFor="res-icon" className={styles.formLabel}>Icon Emoji *</label>
+              <label htmlFor="res-icon" className={styles.formLabel}>
+                Icon Emoji<span className="required-asterisk" aria-hidden="true"> *</span>
+              </label>
               <input
                 id="res-icon"
                 name="icon"
@@ -144,11 +151,14 @@ export default function ResourceModal({ isOpen, resource, existingResources = []
                 onChange={handleChange}
                 className={styles.formInput}
                 required
+                aria-required="true"
               />
             </div>
             
             <div className={styles.formGroup}>
-              <label htmlFor="res-color" className={styles.formLabel}>Color *</label>
+              <label htmlFor="res-color" className={styles.formLabel}>
+                Color<span className="required-asterisk" aria-hidden="true"> *</span>
+              </label>
               <select
                 id="res-color"
                 name="color"
@@ -156,6 +166,7 @@ export default function ResourceModal({ isOpen, resource, existingResources = []
                 onChange={handleChange}
                 className={styles.formSelect}
                 required
+                aria-required="true"
               >
                 {COLORS.map(c => <option key={c} value={c}>{c}</option>)}
               </select>
@@ -163,7 +174,9 @@ export default function ResourceModal({ isOpen, resource, existingResources = []
           </div>
 
           <div className={styles.formGroup}>
-            <label htmlFor="res-category" className={styles.formLabel}>Category *</label>
+            <label htmlFor="res-category" className={styles.formLabel}>
+              Category<span className="required-asterisk" aria-hidden="true"> *</span>
+            </label>
             <input
               list="category-options"
               id="res-category"
@@ -173,6 +186,7 @@ export default function ResourceModal({ isOpen, resource, existingResources = []
               className={styles.formInput}
               autoComplete="off"
               required
+              aria-required="true"
             />
             <datalist id="category-options">
               {dynamicCategories.map(c => <option key={c} value={c} />)}

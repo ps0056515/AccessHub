@@ -1,0 +1,285 @@
+/* -- Base -- */
+
+.admin-theme {
+  /* Admin Dashboard Layout Constants */
+  --admin-sidebar-width: 260px;
+  --admin-sidebar-collapsed: 80px;
+  --admin-header-height: 64px;
+  --admin-card-padding: 24px;
+  --admin-table-density: 12px 16px;
+  --admin-dialog-width: 600px;
+  --admin-spacing-sm: 8px;
+  --admin-spacing-md: 16px;
+  --admin-spacing-lg: 24px;
+
+  /* Admin-Specific Colors & Backgrounds */
+  --admin-bg-primary: #f4f7fb;
+  --admin-bg-surface: var(--bg-card);
+  --admin-sidebar-bg: #0c1929;
+  
+  --sidebar-text: #f8fafc;
+  --sidebar-text-muted: #cbd5e1;
+  --sidebar-text-faint: #cbd5e1;
+  --sidebar-border: rgba(255, 255, 255, 0.4);
+  --sidebar-hover: rgba(255, 255, 255, 0.2);
+  --sidebar-hover-subtle: rgba(255, 255, 255, 0.1);
+  --sidebar-card-bg: rgba(255, 255, 255, 0.05);
+  --sidebar-card-border: rgba(255, 255, 255, 0.2);
+
+  /* Map missing extracted component variables to index.css globals */
+  /* Map missing extracted component variables to index.css globals */
+  --surface-primary: var(--bg-card);
+  --surface-secondary: var(--bg-card);
+  --surface-tertiary: var(--bg-secondary);
+  --surface-color-alt: var(--bg-tertiary);
+  --text-primary: var(--text);
+  
+  /* WCAG Contrast Overrides (Light) */
+  --text-secondary: #334455;
+  --text-muted: #334455;
+  --text-faint: #445566;
+  --accent-text: #003380;
+  --blue-text: #082850;
+  --amber-text: #593302;
+  --red-text: #66180d;
+  --purple-text: #2c1a66;
+  --pink-text: #82103f;
+  --green-text: #0d4022;
+
+  --border-primary: var(--border-strong);
+  --border-interactive: rgba(12, 25, 41, 0.7);
+  --border-interactive-strong: rgba(12, 25, 41, 0.85);
+  --accent-subtle: var(--accent-bg);
+  --accent-border-interactive: #074a9e;
+  --purple-border-interactive: #5a3db8;
+  --red-border-interactive: #b03020;
+  
+  --tooltip-bg: var(--brand-navy);
+  --tooltip-text: var(--text-on-dark);
+
+  /* Chart Colors (SC 1.4.11 Compliant) */
+  --chart-1: #005A9C;
+  --chart-2: #B52A00;
+  --chart-3: #007A33;
+  --chart-4: #5E35B1;
+  --chart-5: #C66A00;
+
+  scroll-behavior: smooth;
+  scroll-padding-top: var(--admin-header-height);
+  font-family: var(--sans);
+  background: var(--admin-bg-primary);
+  color: var(--text);
+  line-height: 1.5;
+  font-size: 14px;
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.admin-theme[data-admin-theme="dark"], [data-theme="dark"] .admin-theme {
+  --admin-bg-primary: #0F172A;
+  --admin-bg-surface: #1E293B;
+  --admin-sidebar-bg: #0c1929;
+
+  /* WCAG Contrast Overrides (Dark) - Upgraded to AAA Solid Colors */
+  --text-secondary: #f8fafc;
+  --text-muted: #e2e8f0;
+  --text-faint: #cbd5e1;
+  --accent-text: #bfdbfe;
+  --blue-text: #bfdbfe;
+  --amber-text: #fde68a;
+  --red-text: #fecaca;
+  --purple-text: #ddd6fe;
+  --green-text: var(--green-border-interactive);
+  --pink-text: #fce7f3;
+
+  --border-interactive: rgba(248, 250, 252, 0.7);
+  --border-interactive-strong: rgba(248, 250, 252, 0.9);
+  --accent-border-interactive: #60a5fa;
+  --purple-border-interactive: #a78bfa;
+  --red-border-interactive: #f87171;
+
+  /* Chart Colors (Dark Mode) */
+  --chart-1: #60A5FA;
+  --chart-2: #F87171;
+  --chart-3: #4ADE80;
+  --chart-4: #C084FC;
+  --chart-5: #FBBF24;
+}
+
+.admin-theme a {
+  color: inherit;
+  text-decoration: none;
+}
+/* WCAG 1.4.1 Use of Color: Underline links in body text */
+.admin-theme p a, 
+.admin-theme li a {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.admin-theme p a:hover, 
+.admin-theme li a:hover {
+  text-decoration: none;
+}
+.admin-theme button {
+  cursor: pointer;
+  font-family: var(--sans);
+}
+.admin-theme input,
+.admin-theme textarea,
+.admin-theme select {
+  font-family: var(--sans);
+}
+
+body:not(.has-flying-focus) .admin-theme *:focus-visible {
+  outline: none;
+  box-shadow:
+    0 0 0 var(--focus-ring-offset) var(--admin-bg-primary),
+    0 0 0 calc(var(--focus-ring-offset) + var(--focus-ring-width)) var(--focus-border-color),
+    0 0 8px var(--focus-ring-color);
+  border-radius: var(--radius-sm);
+  transition:
+    box-shadow 180ms ease,
+    border-color 180ms ease;
+}
+
+body.has-flying-focus .admin-theme *:focus-visible {
+  outline: none;
+}
+
+body:not(.has-flying-focus) .admin-theme input:focus-visible,
+body:not(.has-flying-focus) .admin-theme textarea:focus-visible,
+body:not(.has-flying-focus) .admin-theme select:focus-visible {
+  box-shadow:
+    0 0 0 1px var(--focus-border-color),
+    0 0 6px var(--focus-ring-color);
+  border-color: var(--focus-border-color);
+}
+
+/* -- Scrollbar -- */
+.admin-theme ::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+.admin-theme ::-webkit-scrollbar-track {
+  background: transparent;
+}
+.admin-theme ::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb);
+  border-radius: 3px;
+}
+
+/* -- Utilities -- */
+.admin-theme .required-asterisk {
+  color: var(--red-text);
+}
+.admin-theme .sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.admin-theme kbd {
+  display: inline-block;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-strong);
+  border-radius: 4px;
+  padding: 1px 6px;
+  font-size: 11px;
+  font-family: var(--mono);
+  color: var(--text);
+  line-height: 1.6;
+}
+
+/* -- Animations -- */
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.admin-theme .fade-up {
+  animation: fadeUp 0.45s ease both;
+}
+.admin-theme .fade-up-1 {
+  animation-delay: 0.05s;
+}
+.admin-theme .fade-up-2 {
+  animation-delay: 0.12s;
+}
+.admin-theme .fade-up-3 {
+  animation-delay: 0.2s;
+}
+.admin-theme .fade-up-4 {
+  animation-delay: 0.28s;
+}
+
+/* -----------------------------------------------------------
+   REDUCED MOTION
+   ----------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  .admin-theme *,
+  .admin-theme *::before,
+  .admin-theme *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .admin-theme .fade-up,
+  .admin-theme .fade-up-1,
+  .admin-theme .fade-up-2,
+  .admin-theme .fade-up-3,
+  .admin-theme .fade-up-4 {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+
+  .admin-theme *:focus-visible {
+    transition: none;
+    box-shadow:
+      0 0 0 var(--focus-ring-offset) var(--admin-bg-primary),
+      0 0 0 calc(var(--focus-ring-offset) + var(--focus-ring-width)) var(--focus-border-color);
+  }
+}
+
+/* Skip Link Global Pattern */
+.admin-theme .global-skip-link {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  transform: translateY(-200%);
+  background: var(--button-primary, var(--brand-blue));
+  color: var(--text-on-accent);
+  padding: 10px 18px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  z-index: 9999;
+  text-decoration: none;
+  transition: transform 0.2s cubic-bezier(0.2, 0, 0, 1);
+}
+
+.admin-theme .global-skip-link:focus {
+  transform: translateY(0);
+  outline: 2px solid #fff;
+  outline-offset: 4px;
+}
+
+/* Recharts Legend Override */
+.admin-theme .recharts-legend-item-text {
+  color: var(--text) !important;
+}

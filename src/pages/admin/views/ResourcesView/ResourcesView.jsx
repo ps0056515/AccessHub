@@ -3,7 +3,7 @@ import { resourcesApi } from "api/client";
 import dashboardStyles from "../../AdminDashboard.module.css";
 import styles from "./ResourcesView.module.css";
 import ResourceModal from "./components/ResourceModal";
-import Table from "components/common/Table/Table";
+import Table from "pages/admin/components/Table/Table";
 import { useConfirm } from "context/ConfirmContext";
 import { truncateText } from "utils/commonUtils";
 import { Trash } from "lucide-react";
@@ -62,6 +62,7 @@ export default function ResourcesView({ showToast }) {
       await resourcesApi.delete(id);
       showToast?.(`Resource "${title}" deleted.`, "success");
       loadResources();
+      setTimeout(() => document.getElementById("admin-search-input")?.focus(), 0);
     } catch (err) {
       showToast?.(err.message || "Failed to delete resource.", "error");
     }
@@ -82,6 +83,7 @@ export default function ResourcesView({ showToast }) {
       );
       setSelectedIds([]);
       loadResources();
+      setTimeout(() => document.getElementById("admin-search-input")?.focus(), 0);
     } catch (err) {
       showToast?.(err.message || "Failed to bulk delete resources.", "error");
     }
@@ -93,6 +95,7 @@ export default function ResourcesView({ showToast }) {
       await resourcesApi.rejectProposal(id);
       showToast?.("Proposal rejected.", "success");
       loadProposals();
+      setTimeout(() => document.getElementById("admin-search-input")?.focus(), 0);
     } catch (err) {
       showToast?.(err.message || "Failed to reject proposal.", "error");
     }
@@ -104,6 +107,7 @@ export default function ResourcesView({ showToast }) {
       await resourcesApi.deleteProposal(id);
       showToast?.("Proposal deleted.", "success");
       loadProposals();
+      setTimeout(() => document.getElementById("admin-search-input")?.focus(), 0);
     } catch (err) {
       showToast?.(err.message || "Failed to delete proposal.", "error");
     }
@@ -131,7 +135,7 @@ export default function ResourcesView({ showToast }) {
       key: "icon",
       label: "Icon",
       width: "15%",
-      render: (res) => <span className={styles.resourceIcon}>{res.icon}</span>,
+      render: (res) => <span className={styles.resourceIcon} aria-hidden="true">{res.icon}</span>,
     },
     {
       key: "title",
@@ -192,6 +196,7 @@ export default function ResourcesView({ showToast }) {
               setEditingResource(res);
               setIsModalOpen(true);
             }}
+            aria-label={`Edit ${res.title}`}
           >
             Edit
           </button>
@@ -199,6 +204,7 @@ export default function ResourcesView({ showToast }) {
             type="button"
             className={styles.deleteBtn}
             onClick={() => handleDeleteResource(res.id, res.title)}
+            aria-label={`Delete ${res.title}`}
           >
             Delete
           </button>
@@ -284,6 +290,7 @@ export default function ResourcesView({ showToast }) {
                   _proposalId: p.id,
                 });
               }}
+              aria-label={`Approve ${p.title}`}
             >
               Approve
             </button>
@@ -291,6 +298,7 @@ export default function ResourcesView({ showToast }) {
               type="button"
               className={styles.deleteBtn}
               onClick={() => handleRejectProposal(p.id)}
+              aria-label={`Reject ${p.title}`}
             >
               Reject
             </button>
@@ -303,6 +311,7 @@ export default function ResourcesView({ showToast }) {
               type="button"
               className={styles.deleteBtn}
               onClick={() => handleDeleteProposal(p.id)}
+              aria-label={`Delete ${p.title}`}
             >
               Delete
             </button>
@@ -336,7 +345,9 @@ export default function ResourcesView({ showToast }) {
           </h2>
           <div className={styles.headerActions}>
             <input
-              type="text"
+              id="admin-search-input"
+              type="search"
+              aria-label="Search resources"
               placeholder="Search resources..."
               value={resourceSearch}
               onChange={(e) => setResourceSearch(e.target.value)}
@@ -348,7 +359,7 @@ export default function ResourcesView({ showToast }) {
                 onClick={handleBulkDelete}
                 className={`${styles.deleteBtn} ${styles.bulkDeleteBtn}`}
               >
-                <Trash size={16} /> Delete ({selectedIds.length})
+                <Trash aria-hidden="true" size={16} /> Bulk Delete ({selectedIds.length})
               </button>
             )}
             {activeTab === "Active Resources" && (
@@ -360,19 +371,21 @@ export default function ResourcesView({ showToast }) {
                 }}
                 className={styles.addEventBtn}
               >
-                📚 Add Resource
+                <span aria-hidden="true">📚</span> Add Resource
               </button>
             )}
           </div>
         </div>
 
-        <nav className={styles.tabs} aria-label="Resources admin sections">
+        <nav className={styles.tabs} role="tablist" aria-label="Resources admin sections">
           {TABS.map((tab) => (
             <button
               key={tab}
+              id={`tab-${tab.replace(/\s+/g, '-').toLowerCase()}`}
               type="button"
               role="tab"
               aria-selected={activeTab === tab}
+              aria-controls={`tabpanel-${tab.replace(/\s+/g, '-').toLowerCase()}`}
               onClick={() => setActiveTab(tab)}
               className={`${styles.tab} ${activeTab === tab ? styles.tabActive : ""}`}
             >
@@ -388,8 +401,11 @@ export default function ResourcesView({ showToast }) {
         </nav>
 
         {activeTab === "Active Resources" &&
-          (resourcesLoading && resourcesList.length === 0 ? (
-            <p className={dashboardStyles.loading}>Loading resources…</p>
+          <div role="tabpanel" id="tabpanel-active-resources" aria-labelledby="tab-active-resources">
+            {resourcesLoading && resourcesList.length === 0 ? (
+            <div className={dashboardStyles.loading} role="status" aria-live="polite">
+        Loading resourcesâ€¦
+      </div>
           ) : (
             <Table
               columns={activeResourceColumns}
@@ -403,11 +419,16 @@ export default function ResourcesView({ showToast }) {
               pagination={true}
               
             />
-          ))}
+          )}
+          </div>
+        }
 
         {activeTab === "Proposed Resources" &&
-          (proposalsLoading && proposals.length === 0 ? (
-            <p className={dashboardStyles.loading}>Loading proposals…</p>
+          <div role="tabpanel" id="tabpanel-proposed-resources" aria-labelledby="tab-proposed-resources">
+            {proposalsLoading && proposals.length === 0 ? (
+            <div className={dashboardStyles.loading} role="status" aria-live="polite">
+        Loading proposalsâ€¦
+      </div>
           ) : (
             <Table
               columns={proposedResourceColumns}
@@ -417,7 +438,9 @@ export default function ResourcesView({ showToast }) {
               searchQuery={resourceSearch}
               pagination={true}
             />
-          ))}
+          )}
+          </div>
+        }
       </section>
 
       <ResourceModal
@@ -431,3 +454,4 @@ export default function ResourcesView({ showToast }) {
     </>
   );
 }
+

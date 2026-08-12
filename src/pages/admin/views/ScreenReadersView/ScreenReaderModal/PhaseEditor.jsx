@@ -30,7 +30,7 @@ export default function PhaseEditor({ phase, onChange, onDelete, onMoveUp, onMov
   return (
     <div className={styles.phaseCard}>
       <div className={styles.phaseHeader}>
-        <h4 className={styles.phaseTitle}>Phase {index + 1}: {phase.label || 'Untitled'}</h4>
+        <h4 className={styles.phaseTitle}>Phase {index + 1}: {phase.label || 'New Phase'}</h4>
         <div className={styles.phaseActions}>
           <button type="button" onClick={onMoveUp} disabled={isFirst} className={styles.iconBtn} title="Move Up">↑</button>
           <button type="button" onClick={onMoveDown} disabled={isLast} className={styles.iconBtn} title="Move Down">↓</button>
@@ -41,8 +41,9 @@ export default function PhaseEditor({ phase, onChange, onDelete, onMoveUp, onMov
       <div className={styles.phaseBody}>
         <div className={styles.rowGroup}>
           <div className={styles.formGroup} style={{ marginBottom: 0 }}>
-            <label className={styles.label}>Phase ID</label>
+            <label className={styles.label} htmlFor={`phase-id-${index}`}>Phase ID</label>
             <input 
+              id={`phase-id-${index}`}
               type="text" 
               className={styles.input} 
               value={phase.id || ''} 
@@ -52,8 +53,9 @@ export default function PhaseEditor({ phase, onChange, onDelete, onMoveUp, onMov
             />
           </div>
           <div className={styles.formGroup} style={{ marginBottom: 0 }}>
-            <label className={styles.label}>Phase Label</label>
+            <label className={styles.label} htmlFor={`phase-label-${index}`}>Phase Label</label>
             <input 
+              id={`phase-label-${index}`}
               type="text" 
               className={styles.input} 
               value={phase.label || ''} 
@@ -65,8 +67,9 @@ export default function PhaseEditor({ phase, onChange, onDelete, onMoveUp, onMov
         </div>
 
         <div className={styles.formGroup}>
-          <label className={styles.label}>Optional Tip (Displayed at the bottom of the phase)</label>
+          <label className={styles.label} htmlFor={`phase-tip-${index}`}>Optional Tip (Displayed at the bottom of the phase)</label>
           <input 
+            id={`phase-tip-${index}`}
             type="text" 
             className={styles.input} 
             value={phase.tip || ''} 

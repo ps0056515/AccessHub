@@ -5,6 +5,8 @@ import { COLOR_MAP } from "data";
 import { resourcesApi } from "api/client";
 import SuggestResourceModal from "./SuggestResourceModal";
 import Container from "components/common/Container/Container";
+import SEO from "components/common/SEO/SEO";
+import Badge from "components/common/Badge/Badge";
 import styles from "./Resources.module.css";
 
 const SAVED_KEY = "allcanaccess-saved-resources";
@@ -69,12 +71,13 @@ export default function Resources({ setActivePage }) {
     resources.forEach(r => {
       if (r.category) unique.add(r.category);
     });
-    return ["All", ...Array.from(unique)];
+    return ["All", "Saved", ...Array.from(unique)];
   }, [resources]);
 
   const filtered = useMemo(() => {
     return resources.filter((r) => {
-      if (activeCategory !== "All" && r.category !== activeCategory)
+      if (activeCategory === "Saved" && !saved.has(r.slug)) return false;
+      if (activeCategory !== "All" && activeCategory !== "Saved" && r.category !== activeCategory)
         return false;
       if (!query) return true;
       const q = query.toLowerCase();
@@ -82,26 +85,27 @@ export default function Resources({ setActivePage }) {
         r.title.toLowerCase().includes(q) || r.desc.toLowerCase().includes(q)
       );
     });
-  }, [activeCategory, query, resources]);
+  }, [activeCategory, query, resources, saved]);
 
   useEffect(() => {
     announce(`Filters applied: ${filtered.length} resources found.`);
   }, [filtered.length, activeCategory, query, announce]);
 
   const toggleSave = (slug) => {
-    setSaved((prev) => {
-      const next = new Set(prev);
-      const isCurrentlySaved = next.has(slug);
-      if (isCurrentlySaved) next.delete(slug);
-      else next.add(slug);
-      try {
-        localStorage.setItem(SAVED_KEY, JSON.stringify([...next]));
-      } catch {
-        /* private mode / quota — state still updates this session */
-      }
-      addToast(isCurrentlySaved ? "Resource removed from saved list." : "Resource saved successfully.", "success");
-      return next;
-    });
+    const isCurrentlySaved = saved.has(slug);
+    const next = new Set(saved);
+    
+    if (isCurrentlySaved) next.delete(slug);
+    else next.add(slug);
+    
+    try {
+      localStorage.setItem(SAVED_KEY, JSON.stringify([...next]));
+    } catch {
+      /* private mode / quota — state still updates this session */
+    }
+    
+    setSaved(next);
+    addToast(isCurrentlySaved ? "Resource removed from saved list." : "Resource saved successfully.", "success");
   };
 
   const closeSubmit = () => {
@@ -110,6 +114,11 @@ export default function Resources({ setActivePage }) {
 
   return (
     <Container className={styles.page}>
+      <SEO 
+        title="Resources | AllCanAccess"
+        description="Access the ultimate library of digital accessibility resources. Download free WCAG checklists, inclusive design templates, ARIA pattern guides, and step-by-step accessibility tutorials curated by top industry professionals."
+        keywords="accessibility resources, WCAG checklists, inclusive design templates, ARIA tutorials, web accessibility guides, accessibility best practices, digital accessibility learning, accessibility testing templates, ADA compliance checklist, Section 508 guides, screen reader guides, accessibility documentation, accessible HTML templates, CSS accessibility, accessible UI patterns, accessibility cheat sheets, accessible color contrast guides, a11y resources, mobile accessibility guidelines, iOS accessibility resources, Android accessibility guides, accessibility training materials, accessibility code snippets, WCAG 2.2 tutorials, accessible design systems"
+      />
       <header className={styles.pageHeader}>
         <h1 className={styles.pageTitle}>Community resources</h1>
         <p className={styles.pageSub}>
@@ -129,7 +138,7 @@ export default function Resources({ setActivePage }) {
           </h2>
           <p className={styles.certDesc}>
             IAAP credentials, WAS, and structured training tracks — pair these
-            with the checklist resources below.
+            with these checklist resources.
           </p>
         </div>
         <button
@@ -137,7 +146,7 @@ export default function Resources({ setActivePage }) {
           className={styles.certCta}
           onClick={() => setActivePage?.("tools")}
         >
-          Open tools &amp; certifications →
+          Open tools &amp; certifications <span aria-hidden="true">→</span>
         </button>
       </section>
 
@@ -159,20 +168,15 @@ export default function Resources({ setActivePage }) {
           <legend className="sr-only">Filter by category</legend>
           <div className={styles.catNav}>
             {dynamicCategories.map((c) => (
-              <label
+              <button
                 key={c}
+                type="button"
                 className={`${styles.catLabel} ${activeCategory === c ? styles.catActive : ""}`}
+                aria-pressed={activeCategory === c}
+                onClick={() => setActiveCategory(c)}
               >
-                <input
-                  type="radio"
-                  name="resource-category"
-                  className={styles.catInput}
-                  value={c}
-                  checked={activeCategory === c}
-                  onChange={() => setActiveCategory(c)}
-                />
                 <span className={styles.catText}>{c}</span>
-              </label>
+              </button>
             ))}
           </div>
         </fieldset>
@@ -186,17 +190,17 @@ export default function Resources({ setActivePage }) {
             <article
               key={r.slug}
               className={`${styles.card} fade-up`}
-              style={{ animationDelay: `${i * 0.05}s`, cursor: 'pointer' }}
-              onClick={() => window.open(r.view_url, '_blank')}
+              style={{ animationDelay: `${i * 0.05}s` }}
             >
-              <div
+              <Badge
+                as="div"
                 className={styles.cardIcon}
-                style={{ background: c.bg, color: c.text }}
+                bg={c.bg}
               >
                 <span role="img" aria-hidden="true" style={{ fontSize: 20 }}>
                   {r.icon}
                 </span>
-              </div>
+              </Badge>
               <div className={styles.cardBody}>
                 <p className={styles.cardCat}>{r.category}</p>
                 <h2 className={styles.cardTitle}>{r.title}</h2>
@@ -210,7 +214,7 @@ export default function Resources({ setActivePage }) {
                   rel="noopener noreferrer"
                   onClick={(e) => e.stopPropagation()}
                 >
-                  View →
+                  View <span className="sr-only">{r.title}</span> <span aria-hidden="true">→</span>
                 </a>
                 <button
                   type="button"
@@ -220,7 +224,6 @@ export default function Resources({ setActivePage }) {
                       ? `Remove from saved: ${r.title}`
                       : `Save for later: ${r.title}`
                   }
-                  title={isSaved ? "Remove from saved" : "Save for later"}
                   aria-pressed={isSaved}
                   onClick={(e) => {
                     e.preventDefault();
@@ -250,7 +253,7 @@ export default function Resources({ setActivePage }) {
       </div>
 
       {loading && resources.length === 0 ? (
-        <p className={styles.loading}>Loading resources...</p>
+        <p className={styles.loading} role="status">Loading resources...</p>
       ) : filtered.length === 0 ? (
         <p className={styles.empty}>
           {query.trim()
@@ -271,7 +274,7 @@ export default function Resources({ setActivePage }) {
           className={styles.bannerBtn}
           onClick={() => setSubmitOpen(true)}
         >
-          Submit a resource →
+          Submit a resource <span aria-hidden="true">→</span>
         </button>
       </div>
 
@@ -279,3 +282,4 @@ export default function Resources({ setActivePage }) {
     </Container>
   );
 }
+

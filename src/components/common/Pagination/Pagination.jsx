@@ -8,29 +8,31 @@ export default function Pagination({ currentPage, totalPages, onPageChange }) {
 
   return (
     <nav className={styles.container} aria-label="Pagination">
-      <Tooltip content="Previous page">
+      <Tooltip content={`Previous page (Page ${currentPage - 1})`}>
         <button 
+          type="button"
           className={styles.button} 
-          disabled={currentPage === 1}
-          onClick={() => onPageChange(currentPage - 1)}
-          aria-label="Previous page"
+          aria-disabled={currentPage === 1}
+          onClick={() => currentPage > 1 && onPageChange(currentPage - 1)}
+          aria-label={`Previous page, page ${currentPage - 1}`}
         >
-          <ChevronLeft size={16} />
+          <ChevronLeft aria-hidden="true" size={16} />
         </button>
       </Tooltip>
       
-      <span className={styles.info}>
+      <span className={styles.info} aria-live="polite">
         Page {currentPage} of {totalPages}
       </span>
       
-      <Tooltip content="Next page">
+      <Tooltip content={`Next page (Page ${currentPage + 1})`}>
         <button 
+          type="button"
           className={styles.button} 
-          disabled={currentPage === totalPages}
-          onClick={() => onPageChange(currentPage + 1)}
-          aria-label="Next page"
+          aria-disabled={currentPage === totalPages}
+          onClick={() => currentPage < totalPages && onPageChange(currentPage + 1)}
+          aria-label={`Next page, page ${currentPage + 1}`}
         >
-          <ChevronRight size={16} />
+          <ChevronRight aria-hidden="true" size={16} />
         </button>
       </Tooltip>
     </nav>

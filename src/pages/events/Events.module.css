@@ -14,7 +14,7 @@
 }
 .pageSub {
   font-size: 15px;
-  color: var(--text-muted);
+  color: var(--text-secondary);
   margin-bottom: 20px;
 }
 
@@ -40,13 +40,13 @@
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  background: #ffffff;
-  border: 1px solid #b8c4d4;
+  background: var(--surface-secondary);
+  border: 1px solid var(--border-strong);
   border-radius: var(--radius-full);
   padding: 6px 16px;
   font-size: 13px;
   font-weight: 500;
-  color: #0c1929;
+  color: var(--text-primary);
   transition:
     background var(--transition),
     color var(--transition),
@@ -57,22 +57,22 @@
 }
 
 .filterLabel:hover {
-  background: #e8eef7;
-  color: #0c1929;
-  border-color: #8fa0b8;
+  background: var(--surface-secondary);
+  color: var(--text-primary);
+  border-color: var(--border-primary);
 }
 
 .filterLabel:active {
-  background: #dde6f0;
-  color: #0c1929;
-  border-color: #8fa0b8;
+  background: var(--surface-tertiary);
+  color: var(--text-primary);
+  border-color: var(--border-primary);
 }
 
 .filterLabel:focus-within {
-  outline: 2px solid #074a9e;
+  outline: 2px solid var(--focus-border-color);
   outline-offset: 2px;
-  box-shadow: 0 0 0 3px rgba(7, 74, 158, 0.25);
-  color: #0c1929;
+  outline: 2px solid var(--focus-border-color); outline-offset: 2px; box-shadow: none;
+  color: var(--text-primary);
 }
 
 .filterInput {
@@ -88,26 +88,29 @@
 }
 
 .filterSelected {
-  background: #0c1929;
-  color: #ffffff;
-  border-color: #0c1929;
+  border-width: 2px;
+  border-color: var(--text-primary);
+  color: var(--text-primary);
+  background: transparent;
+  padding: 5px 15px;
+  font-weight: 600;
 }
 
 .filterLabel.filterSelected:hover {
-  background: #1a2d42;
-  color: #ffffff;
-  border-color: #1a2d42;
+  background: var(--surface-secondary);
+  color: var(--brand-navy-light);
+  border-color: var(--brand-navy-light);
 }
 
 .filterLabel.filterSelected:active {
-  background: #243347;
-  color: #ffffff;
-  border-color: #243347;
+  background: var(--surface-tertiary);
+  color: var(--brand-navy-light);
+  border-color: var(--brand-navy-light);
 }
 
 .filterLabel.filterSelected:focus-within {
-  color: #ffffff;
-  background: #0c1929;
+  color: var(--text-primary);
+  background: transparent;
 }
 
 .eventSection {
@@ -138,7 +141,7 @@
 .rsvpHint {
   font-size: 13px;
   margin-top: 12px;
-  color: var(--text-muted);
+  color: var(--text-secondary);
 }
 
 .empty {
@@ -155,7 +158,7 @@
 }
 
 .eventCard {
-  background: var(--bg-card);
+  background: var(--surface-secondary);
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
   padding: 20px 24px;
@@ -175,7 +178,7 @@
 .dateBadge {
   flex-shrink: 0;
   width: 52px;
-  background: var(--bg-secondary);
+  background: var(--surface-secondary);
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
   padding: 6px;
@@ -193,7 +196,7 @@
   display: block;
   font-family: var(--serif);
   font-size: 22px;
-  color: var(--text);
+  color: var(--text-primary);
   line-height: 1.1;
 }
 
@@ -205,7 +208,7 @@
 .eventTitle {
   font-size: 15px;
   font-weight: 500;
-  color: var(--text);
+  color: var(--text-primary);
   margin-bottom: 4px;
 }
 .eventMeta {
@@ -224,8 +227,8 @@
 .eventTag {
   font-size: 11px;
   font-weight: 500;
-  color: var(--text-muted);
-  background: var(--bg-tertiary);
+  color: var(--text-secondary);
+  background: var(--surface-tertiary);
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
   padding: 2px 8px;
@@ -233,30 +236,30 @@
 
 .rsvpBtn {
   flex-shrink: 0;
-  background: var(--bg-secondary);
-  border: 1px solid var(--border-strong);
+  background: var(--surface-secondary);
+  border: 1px solid var(--border-interactive-strong);
   border-radius: var(--radius-sm);
   padding: 8px 18px;
   font-size: 13px;
   font-weight: 500;
-  color: var(--text);
+  color: var(--text-primary);
   transition: all var(--transition);
 }
 
 .rsvpBtn:hover:not(:disabled) {
-  background: var(--accent);
-  color: #fff;
-  border-color: var(--accent);
+  background: var(--button-primary);
+  color: var(--text-on-accent);
+  border-color: var(--accent-text);
 }
 
 .rsvpBtn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
-  background: var(--bg);
+  background: var(--surface-primary);
 }
 
 .hostBanner {
-  background: linear-gradient(135deg, #1a1916 0%, #2a2720 100%);
+  background: var(--brand-navy);
   border-radius: var(--radius-lg);
   padding: 48px;
 }
@@ -265,19 +268,19 @@
   font-family: var(--serif);
   font-size: 1.8rem;
   font-weight: 400;
-  color: #faf9f7;
+  color: var(--text-on-dark);
   margin-bottom: 10px;
 }
 .hostSub {
   font-size: 15px;
-  color: rgba(250, 249, 247, 0.65);
+  color: var(--text-on-dark-muted);
   margin-bottom: 24px;
   max-width: 480px;
 }
 
 .hostBtn {
-  background: var(--accent);
-  color: #fff;
+  background: var(--button-primary);
+  color: var(--text-on-accent);
   border: none;
   border-radius: var(--radius-sm);
   padding: 12px 24px;
@@ -293,13 +296,13 @@
 .hostModalIntro {
   font-size: 14px;
   line-height: 1.6;
-  color: var(--text-muted);
+  color: var(--text-secondary);
   margin-bottom: 16px;
 }
 
 .formRequiredNote {
   font-size: 13px;
-  color: var(--text-muted);
+  color: var(--text-secondary);
   margin-bottom: 14px;
 }
 
@@ -311,12 +314,12 @@
 }
 
 .requiredMark {
-  color: var(--red);
+  color: var(--error);
   font-weight: 600;
 }
 
 .optionalMark {
-  color: var(--text-muted);
+  color: var(--text-secondary);
   font-weight: 400;
 }
 
@@ -325,7 +328,7 @@
   flex-direction: column;
   gap: 6px;
   font-size: 13px;
-  color: var(--text-muted);
+  color: var(--text-secondary);
   margin-bottom: 14px;
 }
 
@@ -333,10 +336,10 @@
 .formTextarea {
   font: inherit;
   padding: 8px 10px;
-  border: 1px solid var(--border);
+  border: 1px solid var(--text-faint);
   border-radius: var(--radius-sm);
-  background: var(--bg-card);
-  color: var(--text);
+  background: var(--surface-secondary);
+  color: var(--text-primary);
 }
 
 .formTextarea {
@@ -368,7 +371,7 @@
   padding: 8px 16px;
   cursor: pointer;
   font-size: 13px;
-  color: var(--text-muted);
+  color: var(--text-secondary);
 }
 
 .submitOk {
@@ -399,3 +402,4 @@
     padding: 28px 20px;
   }
 }
+

@@ -6,7 +6,7 @@
 
 .breadcrumb {
   font-size: 13px;
-  color: var(--text-muted);
+  color: var(--text-secondary);
   margin-bottom: 12px;
 }
 
@@ -16,7 +16,7 @@
   padding: 0;
   font: inherit;
   font-size: 13px;
-  color: var(--accent);
+  color: var(--accent-text);
   cursor: pointer;
   text-decoration: underline;
   text-underline-offset: 2px;
@@ -25,23 +25,23 @@
 .crumbBtn:hover { color: var(--accent-text); }
 
 .crumbSep { margin: 0 8px; color: var(--text-faint); }
-.crumbCurrent { color: var(--text-muted); }
+.crumbCurrent { color: var(--text-secondary); }
 
 .back {
   background: none;
   border: none;
   padding: 0 0 20px;
   font-size: 14px;
-  color: var(--accent);
+  color: var(--accent-text);
   cursor: pointer;
   font-family: inherit;
 }
 
 .back:hover { text-decoration: underline; }
 
-.notFound { margin-bottom: 16px; color: var(--text-muted); }
+.notFound { margin-bottom: 16px; color: var(--text-secondary); }
 .backLink {
-  color: var(--accent);
+  color: var(--accent-text);
   background: none;
   border: none;
   padding: 0;
@@ -53,7 +53,7 @@
 .rootPost {
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
-  background: var(--bg-card);
+  background: var(--surface-secondary);
   padding: 24px;
   margin-bottom: 32px;
 }
@@ -74,22 +74,38 @@
 
 .voteBtn {
   background: none;
-  border: 1px solid var(--border);
+  border: 1px solid var(--border-interactive);
   border-radius: 4px;
-  width: 28px;
-  height: 22px;
-  font-size: 10px;
+  width: 24px;
+  height: 24px;
+  min-width: 24px;
+  font-size: 11px;
   color: var(--text-faint);
   cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.voteBtn:focus-visible {
+  outline: 3px solid var(--focus-border-color);
+  outline-offset: 2px;
 }
 
-.votedUp { background: var(--accent-bg); border-color: var(--accent); color: var(--accent-text); }
-.votedDown { background: var(--red-bg); border-color: var(--red); color: var(--red-text); }
-.voteCount { font-size: 13px; font-weight: 500; color: var(--text-muted); }
+  .votedUp {
+    border-width: 2px;
+    border-color: var(--success);
+    color: var(--success);
+  }
+  .votedDown {
+    border-width: 2px;
+    border-color: var(--error);
+    color: var(--error);
+  }
+.voteCount { font-size: 13px; font-weight: 500; color: var(--text-secondary); }
 
 .voteError {
   font-size: 12px;
-  color: var(--red);
+  color: var(--error);
   margin-top: 6px;
   max-width: 120px;
   line-height: 1.4;
@@ -112,8 +128,8 @@
   margin-bottom: 8px;
 }
 
-.author { color: var(--text-muted); font-weight: 500; }
-.dot { color: var(--border-strong); margin: 0 4px; }
+.author { color: var(--text-secondary); font-weight: 500; }
+.dot { color: var(--text-faint); margin: 0 4px; }
 
 .title {
   font-family: var(--serif);
@@ -121,7 +137,7 @@
   font-weight: 400;
   line-height: 1.25;
   margin-bottom: 12px;
-  color: var(--text);
+  color: var(--text-primary);
 }
 
 .tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 16px; }
@@ -136,7 +152,7 @@
 .prose {
   font-size: 15px;
   line-height: 1.7;
-  color: var(--text-muted);
+  color: var(--text-secondary);
   white-space: pre-wrap;
 }
 
@@ -174,7 +190,7 @@
 .replyText {
   font-size: 14px;
   line-height: 1.65;
-  color: var(--text-muted);
+  color: var(--text-secondary);
   white-space: pre-wrap;
 }
 
@@ -195,14 +211,14 @@
   font-size: 14px;
   font-weight: 500;
   margin-bottom: 12px;
-  color: var(--text);
+  color: var(--text-primary);
 }
 
 .textarea {
   width: 100%;
   font: inherit;
   padding: 12px 14px;
-  border: 1px solid var(--border);
+  border: 1px solid var(--text-faint);
   border-radius: var(--radius-md);
   margin-bottom: 12px;
   resize: vertical;
@@ -211,7 +227,8 @@
 
 .textarea:focus {
   outline: none;
-  border-color: var(--accent);
+  border-color: var(--accent-text);
+  outline: 2px solid var(--focus-border-color); outline-offset: 2px; box-shadow: none;
 }
 
 .submit {
@@ -252,16 +269,16 @@
 
 .editBtn, .deleteBtn {
   background: none;
-  border: 1px solid var(--border);
+  border: 1px solid var(--border-interactive);
   border-radius: var(--radius-sm);
   padding: 4px 10px;
   font-size: 12px;
   cursor: pointer;
-  color: var(--text-muted);
+  color: var(--text-secondary);
 }
 
-.editBtn:hover { background: var(--bg-hover); color: var(--text); }
-.deleteBtn { border-color: var(--red-bg); color: var(--red); }
+.editBtn:hover { background: var(--bg-hover); color: var(--text-primary); }
+.deleteBtn { border-color: var(--red-bg); color: var(--error); }
 .deleteBtn:hover { background: var(--red-bg); color: var(--red-text); }
 
 .editForm {
@@ -276,13 +293,14 @@
   font: inherit;
   font-size: 16px;
   padding: 10px 12px;
-  border: 1px solid var(--border);
+  border: 1px solid var(--text-faint);
   border-radius: var(--radius-md);
 }
 
 .editInput:focus {
   outline: none;
-  border-color: var(--accent);
+  border-color: var(--accent-text);
+  outline: 2px solid var(--focus-border-color); outline-offset: 2px; box-shadow: none;
 }
 
 .editActions {
@@ -291,9 +309,9 @@
 }
 
 .cancelBtn {
-  background: var(--bg-card);
-  color: var(--text);
-  border: 1px solid var(--border);
+  background: var(--surface-secondary);
+  color: var(--text-primary);
+  border: 1px solid var(--border-interactive);
   border-radius: var(--radius-sm);
   padding: 10px 20px;
   font-size: 14px;
@@ -304,4 +322,7 @@
 .cancelBtn:hover {
   background: var(--bg-hover);
 }
+
+
+
 

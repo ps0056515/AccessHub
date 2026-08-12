@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useId } from 'react';
 import { createPortal } from 'react-dom';
 import styles from './Tooltip.module.css';
 
@@ -13,10 +13,16 @@ export default function Tooltip({
   const [isVisible, setIsVisible] = useState(false);
   const [coords, setCoords] = useState({ top: 0, left: 0 });
   const timeoutRef = useRef(null);
+  const closeTimeoutRef = useRef(null);
   const wrapperRef = useRef(null);
+  const tooltipId = useId();
 
   const handleMouseEnter = () => {
     if (disabled || !content) return;
+    
+    if (closeTimeoutRef.current) {
+      clearTimeout(closeTimeoutRef.current);
+    }
     
     if (wrapperRef.current) {
       const rect = wrapperRef.current.getBoundingClientRect();
@@ -48,16 +54,43 @@ export default function Tooltip({
     if (timeoutRef.current) {
       clearTimeout(timeoutRef.current);
     }
-    setIsVisible(false);
+    closeTimeoutRef.current = setTimeout(() => {
+      setIsVisible(false);
+    }, 200);
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === 'Escape' && isVisible) {
+      e.stopPropagation();
+      handleMouseLeave();
+    }
   };
 
   useEffect(() => {
-    return () => {
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
+    const handleGlobalKeyDown = (e) => {
+      if (e.key === 'Escape' && isVisible) {
+        e.preventDefault();
+        e.stopPropagation();
+        handleMouseLeave();
       }
     };
-  }, []);
+
+    if (isVisible) {
+      // Use capture phase to intercept the Escape key before it reaches Modals or other containers
+      document.addEventListener('keydown', handleGlobalKeyDown, true);
+    }
+
+    return () => {
+      document.removeEventListener('keydown', handleGlobalKeyDown, true);
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+      if (closeTimeoutRef.current) clearTimeout(closeTimeoutRef.current);
+    };
+  }, [isVisible]);
+
+  const child = React.isValidElement(children) ? React.Children.only(children) : null;
+  const childProps = child ? {
+    'aria-describedby': (isVisible && content && !child.props['aria-label']) ? tooltipId : undefined,
+  } : {};
 
   return (
     <div 
@@ -67,13 +100,17 @@ export default function Tooltip({
       onMouseLeave={handleMouseLeave}
       onFocus={handleMouseEnter}
       onBlur={handleMouseLeave}
+      onKeyDown={handleKeyDown}
     >
-      {children}
+      {child ? React.cloneElement(child, childProps) : children}
       {isVisible && createPortal(
         <div 
+          id={tooltipId}
           className={`${styles.tooltipBox} ${styles[position]}`} 
           role="tooltip"
           style={{ top: coords.top, left: coords.left }}
+          onMouseEnter={handleMouseEnter}
+          onMouseLeave={handleMouseLeave}
         >
           {content}
           <div className={styles.tooltipArrow} />
