@@ -1,15 +1,23 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Modal from "components/common/Modal/Modal";
 import { eventsApi } from "api/client";
+import { useAuth } from "context/AuthContext";
 import styles from "./Events.module.css";
 
 export default function HostEventModal({ isOpen, onClose }) {
+  const { user } = useAuth();
   const [hostTitle, setHostTitle] = useState("");
   const [hostFormat, setHostFormat] = useState("webinar");
   const [hostDate, setHostDate] = useState("");
   const [hostEmail, setHostEmail] = useState("");
   const [hostDetails, setHostDetails] = useState("");
   const [hostMsg, setHostMsg] = useState(null);
+
+  useEffect(() => {
+    if (isOpen && user?.email) {
+      setHostEmail(user.email);
+    }
+  }, [isOpen, user]);
 
   if (!isOpen) return null;
 
@@ -30,7 +38,7 @@ export default function HostEventModal({ isOpen, onClose }) {
         details: hostDetails.trim() || null,
       });
       setHostMsg(
-        "Thanks — your proposal has been submitted! Our team will review it and get back to you."
+        "Thanks â€” your proposal has been submitted! Our team will review it and get back to you."
       );
       setHostTitle("");
       setHostFormat("webinar");
@@ -46,19 +54,24 @@ export default function HostEventModal({ isOpen, onClose }) {
     onClose();
     setTimeout(() => {
       setHostMsg(null);
+      setHostTitle("");
+      setHostFormat("webinar");
+      setHostDate("");
+      setHostEmail(user?.email || "");
+      setHostDetails("");
     }, 200);
   };
 
   return (
     <Modal title="Host an event" onClose={handleClose}>
       <p className={styles.hostModalIntro}>
-        Tell us about your session. We’ll review community fit, timing, and
-        accessibility needs before it goes live — same flow whether you’re on a
+        Tell us about your session. Weâ€™ll review community fit, timing, and
+        accessibility needs before it goes live â€” same flow whether youâ€™re on a
         preview build or production.
       </p>
       <form
         onSubmit={handleHostSubmit}
-        noValidate
+
         aria-describedby="host-required-note"
       >
         <p id="host-required-note" className={styles.formRequiredNote}>
@@ -83,6 +96,8 @@ export default function HostEventModal({ isOpen, onClose }) {
             autoComplete="off"
             required
             aria-required="true"
+            pattern=".*\S+.*"
+            title="This field cannot be empty or just spaces"
             value={hostTitle}
             onChange={(e) => setHostTitle(e.target.value)}
           />

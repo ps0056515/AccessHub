@@ -1,7 +1,10 @@
-.container {
+﻿.container {
   max-width: 1280px;
   margin: 0 auto;
-  padding: 0 24px;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: max(24px, env(safe-area-inset-left));
+  padding-right: max(24px, env(safe-area-inset-right));
   width: 100%;
   box-sizing: border-box;
 }

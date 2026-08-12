@@ -6,7 +6,7 @@
 
 .subtitle {
   line-height: 1.7;
-  color: var(--text-muted);
+  color: var(--text-secondary);
 }
 
 .section {
@@ -34,25 +34,32 @@
   padding: 1rem;
   border: 1px solid var(--border);
   border-radius: 8px;
-  background: var(--bg-card);
+  background: var(--surface-secondary);
 }
 
 .feedLink {
   font-weight: 500;
-  color: var(--accent);
-  text-decoration: none;
+  color: var(--text-link);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.textLink {
+  color: var(--text-link);
+  text-decoration: underline;
+  text-underline-offset: 4px;
 }
 
 .feedDate {
   margin: 0.35rem 0 0;
   font-size: 0.875rem;
-  color: var(--text-muted);
+  color: var(--text-secondary);
 }
 
 .subscribeText {
   margin-top: 1.5rem;
   font-size: 0.875rem;
-  color: var(--text-muted);
+  color: var(--text-secondary);
 }
 
 .codeUrl {

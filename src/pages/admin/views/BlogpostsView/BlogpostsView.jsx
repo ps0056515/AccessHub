@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
+import { Trash } from "lucide-react";
 import ReactQuill, { Quill } from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import ImageResize from 'quill-image-resize-module-react';
 import { blogpostsApi } from "api/client";
-import Table from "components/common/Table/Table";
+import Table from "pages/admin/components/Table/Table";
 import { useConfirm } from "context/ConfirmContext";
 import styles from "./BlogpostsView.module.css";
 import { truncateText } from 'utils/commonUtils';
@@ -174,6 +175,7 @@ export default function BlogpostsView({ showToast }) {
       await blogpostsApi.delete(id);
       showToast?.('Blogpost deleted successfully!', 'success');
       await loadBlogposts();
+      setTimeout(() => document.getElementById("admin-search-input")?.focus(), 0);
     } catch (err) {
       showToast?.(err.message || 'Failed to delete blogpost.', 'error');
     }
@@ -186,6 +188,7 @@ export default function BlogpostsView({ showToast }) {
       showToast?.(`Successfully deleted ${selectedIds.length} blogposts.`, "success");
       setSelectedIds([]);
       await loadBlogposts();
+      setTimeout(() => document.getElementById("admin-search-input")?.focus(), 0);
     } catch (err) {
       showToast?.(err.message || "Failed to bulk delete blogposts.", "error");
     }
@@ -198,6 +201,7 @@ export default function BlogpostsView({ showToast }) {
       showToast?.(`Successfully ${publishState ? "published" : "unpublished"} ${selectedIds.length} blogposts.`, "success");
       setSelectedIds([]);
       await loadBlogposts();
+      setTimeout(() => document.getElementById("admin-search-input")?.focus(), 0);
     } catch (err) {
       showToast?.(err.message || `Failed to bulk ${publishState ? "publish" : "unpublish"} blogposts.`, "error");
     }
@@ -213,6 +217,11 @@ export default function BlogpostsView({ showToast }) {
       ['link', 'image', 'video'],
       ['clean']
     ],
+    keyboard: {
+      bindings: {
+        tab: false, // Prevents keyboard trap (SC 2.1.2)
+      },
+    },
     imageResize: {
       parchment: Quill.import('parchment'),
       modules: ['Resize', 'DisplaySize', 'Toolbar']
@@ -223,14 +232,7 @@ export default function BlogpostsView({ showToast }) {
     { key: 'title', label: 'Title', width: '35%', render: (row) => <span style={{ fontWeight: 500 }}>{truncateText( row.title, 50)}</span> },
     { key: 'author', label: 'Author', width: "20%" },
     { key: 'status', label: 'Status', render: (blogpost) => (
-      <span style={{ 
-        padding: '4px 8px', 
-        borderRadius: '12px', 
-        fontSize: '12px', 
-        fontWeight: '600',
-        background: blogpost.is_published ? '#dcfce7' : '#f1f5f9',
-        color: blogpost.is_published ? '#166534' : '#64748b'
-      }}>
+      <span className={`${styles.statusBadge} ${blogpost.is_published ? styles.statusPublished : styles.statusDraft}`}>
         {blogpost.is_published ? 'Published' : 'Draft'}
       </span>
     )},
@@ -242,6 +244,7 @@ export default function BlogpostsView({ showToast }) {
           type="button"
           className={blogpost.is_published ? styles.btnSecondary : styles.btnSuccess}
           onClick={() => togglePublish(blogpost)}
+          aria-label={`${blogpost.is_published ? 'Unpublish' : 'Publish'} ${blogpost.title}`}
         >
           {blogpost.is_published ? 'Unpublish' : 'Publish'}
         </button>
@@ -249,6 +252,7 @@ export default function BlogpostsView({ showToast }) {
           type="button"
           className={styles.btnSecondary}
           onClick={() => openEditor(blogpost)}
+          aria-label={`Edit ${blogpost.title}`}
         >
           Edit
         </button>
@@ -256,6 +260,7 @@ export default function BlogpostsView({ showToast }) {
           type="button"
           className={styles.btnDanger}
           onClick={() => handleDelete(blogpost.id, blogpost.title)}
+          aria-label={`Delete ${blogpost.title}`}
         >
           Delete
         </button>
@@ -271,7 +276,9 @@ export default function BlogpostsView({ showToast }) {
             <h2 className={styles.title} style={{ margin: 0 }}>Blogposts & News</h2>
             <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
               <input
-                type="text"
+                id="admin-search-input"
+                type="search"
+                aria-label="Search blogposts"
                 placeholder="Search blogposts..."
                 value={blogpostSearch}
                 onChange={(e) => setBlogpostSearch(e.target.value)}
@@ -307,12 +314,12 @@ export default function BlogpostsView({ showToast }) {
                     className={styles.btnDanger}
                     style={{ padding: '8px 12px', fontSize: '14px', borderRadius: '6px' }}
                   >
-                    🗑 Bulk Delete ({selectedIds.length})
+                    <Trash aria-hidden="true" size={16} /> Bulk Delete ({selectedIds.length})
                   </button>
                 </>
               )}
               <button type="button" onClick={() => openEditor()} className={styles.createBtn}>
-                ➕ Create New Blogpost
+                <span aria-hidden="true">➕</span> Create New Blogpost
               </button>
             </div>
           </div>
@@ -334,8 +341,11 @@ export default function BlogpostsView({ showToast }) {
           <h2 className={styles.formTitle}>{formData.id ? 'Edit Blogpost' : 'Create Blogpost'}</h2>
           
           <div className={styles.formGroup}>
-            <label className={styles.label}>Title *</label>
+            <label htmlFor="blogpost-title" className={styles.label}>
+              Title<span className="required-asterisk" aria-hidden="true"> *</span>
+            </label>
             <input
+              id="blogpost-title"
               type="text"
               value={formData.title}
               onChange={e => setFormData({ ...formData, title: e.target.value })}
@@ -346,8 +356,11 @@ export default function BlogpostsView({ showToast }) {
 
           <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
             <div className={styles.formGroup} style={{ flex: 1, minWidth: '200px' }}>
-              <label className={styles.label}>Author *</label>
+              <label htmlFor="blogpost-author" className={styles.label}>
+                Author<span className="required-asterisk" aria-hidden="true"> *</span>
+              </label>
               <input
+                id="blogpost-author"
                 type="text"
                 value={formData.author}
                 onChange={e => setFormData({ ...formData, author: e.target.value })}
@@ -356,8 +369,9 @@ export default function BlogpostsView({ showToast }) {
               />
             </div>
             <div className={styles.formGroup} style={{ flex: 1, minWidth: '200px' }}>
-              <label className={styles.label}>Publish Date</label>
+              <label htmlFor="blogpost-publish-date" className={styles.label}>Publish Date</label>
               <input
+                id="blogpost-publish-date"
                 type="datetime-local"
                 value={formData.published_date}
                 onChange={e => setFormData({ ...formData, published_date: e.target.value })}
@@ -367,8 +381,9 @@ export default function BlogpostsView({ showToast }) {
           </div>
 
           <div className={styles.formGroup}>
-            <label className={styles.label}>Cover Image (Max 2MB)</label>
+            <label htmlFor="blogpost-cover" className={styles.label}>Cover Image (Max 2MB)</label>
             <input
+              id="blogpost-cover"
               type="file"
               accept="image/*"
               onChange={handleCoverChange}
@@ -401,8 +416,10 @@ export default function BlogpostsView({ showToast }) {
           </div>
 
           <div className={styles.formGroup}>
-            <label className={styles.label}>Content *</label>
-            <div className={styles.quillWrapper}>
+            <label htmlFor="blogpost-content" className={styles.label}>
+              Content<span className="required-asterisk" aria-hidden="true"> *</span>
+            </label>
+            <div className={styles.quillWrapper} id="blogpost-content">
               <ReactQuill 
                 theme="snow" 
                 value={formData.content_html} 

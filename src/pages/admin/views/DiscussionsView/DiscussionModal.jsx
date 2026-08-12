@@ -5,8 +5,8 @@ import { useToast } from 'context/ToastContext';
 import styles from './DiscussionsView.module.css';
 import dashboardStyles from '../../AdminDashboard.module.css';
 import { useConfig } from 'context/ConfigContext';
-import MultiSelectDropdown from 'components/common/MultiSelectDropdown/MultiSelectDropdown';
-import Modal from 'components/common/Modal/Modal';
+import MultiSelectDropdown from 'pages/admin/components/MultiSelectDropdown/MultiSelectDropdown';
+import Modal from 'pages/admin/components/Modal/Modal';
 
 // Helper to format ISO strings or Date objects for datetime-local input (YYYY-MM-DDThh:mm)
 function toDatetimeLocal(isoString) {
@@ -130,7 +130,7 @@ export default function DiscussionModal({ post, onClose, onSave, isSaving }) {
 
   const footer = (
     <>
-      <button type="button" className={styles.btnSecondary} onClick={onClose}>
+      <button type="button" className={styles.btnSecondary} onClick={onClose} aria-label="Cancel discussion edit">
         Cancel
       </button>
       <button type="submit" form="discussion-form" className={styles.btnPrimary} disabled={isSaving}>
@@ -150,7 +150,7 @@ export default function DiscussionModal({ post, onClose, onSave, isSaving }) {
         
         <form id="discussion-form" onSubmit={handleSubmit} style={{ flex: 1, display: 'flex', flexDirection: 'column',  }}>
           <div className={styles.formGroup}>
-            <label htmlFor="discussion-title" className={styles.label}>Title <span aria-hidden="true">*</span></label>
+            <label htmlFor="discussion-title" className={styles.label}>Title <span className="required-asterisk" aria-hidden="true">*</span></label>
             <input
               id="discussion-title"
               type="text"
@@ -164,8 +164,9 @@ export default function DiscussionModal({ post, onClose, onSave, isSaving }) {
           </div>
 
           <div className={styles.formGroup}>
-            <label className={styles.label}>Tags</label>
+            <label id="discussion-tags-label" className={styles.label}>Tags</label>
             <MultiSelectDropdown 
+              aria-labelledby="discussion-tags-label"
               options={portalConfig?.askTopics || []}
               value={formData.tags}
               onChange={tags => setFormData({ ...formData, tags })}
@@ -215,7 +216,9 @@ export default function DiscussionModal({ post, onClose, onSave, isSaving }) {
             
             <div style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '16px', paddingRight: '8px' }}>
               {loadingComments ? (
-                <p style={{ color: 'var(--text-secondary)' }}>Loading replies...</p>
+                <div style={{ color: 'var(--text-secondary)' }} role="status" aria-live="polite">
+        Loading replies...
+      </div>
               ) : comments.length === 0 ? (
                 <p style={{ color: 'var(--text-secondary)' }}>No replies yet.</p>
               ) : (
@@ -242,7 +245,7 @@ export default function DiscussionModal({ post, onClose, onSave, isSaving }) {
                           onChange={e => setEditCommentBody(e.target.value)}
                         />
                         <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
-                          <button type="button" className={styles.btnSecondary} style={{ padding: '4px 8px', fontSize: '12px' }} onClick={() => setEditingCommentId(null)}>Cancel</button>
+                          <button type="button" className={styles.btnSecondary} style={{ padding: '4px 8px', fontSize: '12px' }} onClick={() => setEditingCommentId(null)} aria-label="Cancel comment edit">Cancel</button>
                           <button type="button" className={styles.btnPrimary} style={{ padding: '4px 8px', fontSize: '12px' }} onClick={() => handleSaveEditComment(comment.id)}>Save</button>
                         </div>
                       </div>

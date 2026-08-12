@@ -1,11 +1,12 @@
 import { useState, useEffect } from "react";
+import { Trash } from "lucide-react";
 import { toolsApi } from "api/client";
 import { COLOR_MAP } from "data";
 import ToolModal from "./components/ToolModal";
 import dashboardStyles from "../../AdminDashboard.module.css";
 import styles from "./ToolsView.module.css";
-import Table from "components/common/Table/Table";
-import Tooltip from "components/common/Tooltip/Tooltip";
+import Table from "pages/admin/components/Table/Table";
+import Tooltip from "pages/admin/components/Tooltip/Tooltip";
 import { truncateText } from "utils/commonUtils";
 import { useConfirm } from "context/ConfirmContext";
 
@@ -54,6 +55,7 @@ export default function ToolsView({ showToast }) {
       await toolsApi.delete(id);
       showToast?.(`Tool "${toolName}" deleted successfully!`, "success");
       loadTools();
+      setTimeout(() => document.getElementById("admin-search-input")?.focus(), 0);
     } catch (err) {
       showToast?.(err.message || "Failed to delete tool.", "error");
     }
@@ -66,6 +68,7 @@ export default function ToolsView({ showToast }) {
       showToast?.(`Successfully deleted ${selectedIds.length} tools.`, "success");
       setSelectedIds([]);
       loadTools();
+      setTimeout(() => document.getElementById("admin-search-input")?.focus(), 0);
     } catch (err) {
       showToast?.(err.message || "Failed to bulk delete tools.", "error");
     }
@@ -193,6 +196,7 @@ export default function ToolsView({ showToast }) {
             type="button"
             onClick={() => handleOpenEditModal(t)}
             className={styles.editBtn}
+            aria-label={`Edit ${t.name}`}
           >
             Edit
           </button>
@@ -200,6 +204,7 @@ export default function ToolsView({ showToast }) {
             type="button"
             onClick={() => handleDeleteTool(t.id, t.name)}
             className={styles.deleteBtn}
+            aria-label={`Delete ${t.name}`}
           >
             Delete
           </button>
@@ -231,7 +236,9 @@ export default function ToolsView({ showToast }) {
           </h2>
           <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
             <input
-              type="text"
+              id="admin-search-input"
+              type="search"
+              aria-label="Search tools"
               placeholder="Search tools..."
               value={toolSearch}
               onChange={(e) => setToolSearch(e.target.value)}
@@ -250,7 +257,7 @@ export default function ToolsView({ showToast }) {
                 className={styles.deleteBtn}
                 style={{ padding: '8px 12px', fontSize: '14px', borderRadius: '6px' }}
               >
-                🗑 Bulk Delete ({selectedIds.length})
+                <Trash aria-hidden="true" size={16} /> Bulk Delete ({selectedIds.length})
               </button>
             )}
             <button
@@ -258,13 +265,15 @@ export default function ToolsView({ showToast }) {
               onClick={handleOpenCreateModal}
               className={styles.addToolBtn}
             >
-              ➕ Add Recommended Tool
+              <span aria-hidden="true">➕</span> Add Recommended Tool
             </button>
           </div>
         </div>
 
         {loading && toolsList.length === 0 ? (
-          <p className={dashboardStyles.loading}>Loading tools list…</p>
+          <div className={dashboardStyles.loading} role="status" role="status" aria-live="polite">
+        Loading tools list…
+      </div>
         ) : (
           <Table
             columns={columns}
@@ -290,3 +299,4 @@ export default function ToolsView({ showToast }) {
     </>
   );
 }
+

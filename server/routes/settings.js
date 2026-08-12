@@ -246,6 +246,10 @@ router.put('/navigation', authMiddleware, adminMiddleware, async (req, res, next
   try {
     await client.query('BEGIN');
 
+    // Acquire a transaction-level advisory lock based on the menu_type string
+    // to prevent race conditions causing duplicate link insertion.
+    await client.query('SELECT pg_advisory_xact_lock(hashtext($1))', [menu_type]);
+
     // Remove existing links of this type
     await client.query('DELETE FROM navigation_links WHERE menu_type = $1', [menu_type]);
 

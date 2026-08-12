@@ -12,8 +12,11 @@ import Container from "components/common/Container/Container";
 import Pagination from "components/common/Pagination/Pagination";
 import RelativeTime from "components/common/RelativeTime/RelativeTime";
 import MultiSelectDropdown from "components/common/MultiSelectDropdown/MultiSelectDropdown";
+import SEO from "components/common/SEO/SEO";
 import { usersApi } from "api/client";
 import { CountryFlag } from "components/common/CountryFlag/CountryFlag";
+import Avatar from "components/common/Avatar/Avatar";
+import Badge from "components/common/Badge/Badge";
 import styles from "./Portal.module.css";
 
 const TOPIC_FILTERS = ["WCAG 2.2", "Screen readers", "Legal"];
@@ -88,31 +91,14 @@ function postMatchesQuery(post, rawQuery) {
   return tokens.every((word) => haystack.includes(word));
 }
 
-function Avatar({ initials, color, size = 36 }) {
-  const c = COLOR_MAP[color] || COLOR_MAP.blue;
-  return (
-    <div
-      className={styles.avatar}
-      style={{
-        width: size,
-        height: size,
-        fontSize: size * 0.36,
-        background: c.bg,
-        color: c.text,
-      }}
-      aria-hidden="true"
-    >
-      {initials}
-    </div>
-  );
-}
+
 
 function Tag({ label }) {
   const c = TAG_COLORS[label] || { bg: "#f3f2ef", text: "#4a4840" };
   return (
-    <span className={styles.tag} style={{ background: c.bg, color: c.text }}>
+    <Badge className={styles.tag} bg={c.bg}>
       {label}
-    </span>
+    </Badge>
   );
 }
 
@@ -127,6 +113,7 @@ function PostCard({
   const [voted, setVoted] = useState(post.userVote || null);
   const [voting, setVoting] = useState(false);
   const [voteError, setVoteError] = useState("");
+  const [announcement, setAnnouncement] = useState("");
 
   useEffect(() => {
     setVotes(post.votes);
@@ -157,6 +144,11 @@ function PostCard({
       setVotes(newVotes);
       setVoted(userVote);
       onVotesChange?.(post.id, newVotes, userVote);
+
+      let msg = "Vote removed.";
+      if (userVote === 'up') msg = `Upvoted. Total votes ${newVotes}.`;
+      else if (userVote === 'down') msg = `Downvoted. Total votes ${newVotes}.`;
+      setAnnouncement(msg);
     } catch (err) {
       setVotes(prevVotes);
       setVoted(prevVoted);
@@ -167,34 +159,44 @@ function PostCard({
   };
 
   return (
-    <article className={styles.postCard}>
-      <div className={styles.voteCol}>
+    <article className={styles.postCard} aria-labelledby={`post-title-${post.id}`}>
+      <div 
+        className={styles.voteCol}
+        role="group"
+        aria-labelledby={`post-title-${post.id}`}
+      >
+        <div aria-live="polite" aria-atomic="true" className="sr-only">
+          {announcement}
+        </div>
         <button
           type="button"
           className={`${styles.voteBtn} ${voted === "up" ? styles.votedUp : ""}`}
-          onClick={(e) => vote("up", e)}
-          aria-label={`Upvote: ${post.title}`}
-          aria-pressed={voted === "up"}
-          disabled={voting}
+          onClick={(e) => {
+            if (voting) { e.preventDefault(); e.stopPropagation(); return; }
+            vote("up", e);
+          }}
+          aria-label="Upvote"
+          aria-pressed={voted === "up" ? "true" : "false"}
+          aria-disabled={voting ? "true" : "false"}
         >
-          ▲
+          <span aria-hidden="true">▲</span>
         </button>
-        <span
-          className={styles.voteCount}
-          aria-live="polite"
-          aria-atomic="true"
-        >
+        <span className={styles.voteCount}>
           {votes}
+          <span className="sr-only"> votes</span>
         </span>
         <button
           type="button"
           className={`${styles.voteBtn} ${voted === "down" ? styles.votedDown : ""}`}
-          onClick={(e) => vote("down", e)}
-          aria-label={`Downvote: ${post.title}`}
-          aria-pressed={voted === "down"}
-          disabled={voting}
+          onClick={(e) => {
+            if (voting) { e.preventDefault(); e.stopPropagation(); return; }
+            vote("down", e);
+          }}
+          aria-label="Downvote"
+          aria-pressed={voted === "down" ? "true" : "false"}
+          aria-disabled={voting ? "true" : "false"}
         >
-          ▼
+          <span aria-hidden="true">▼</span>
         </button>
         {voteError ? (
           <span className="sr-only" role="alert">
@@ -202,33 +204,35 @@ function PostCard({
           </span>
         ) : null}
       </div>
-      <Avatar initials={post.initials} color={post.color} />
-      <button
-        type="button"
-        className={styles.postOpen}
-        onClick={() => onOpenThread(post)}
-        aria-label={`Open discussion: ${post.title}`}
-      >
-        <div className={styles.postBody}>
-          <div className={styles.postMeta}>
-            <span className={styles.postAuthor}>
-              {post.author}
-              <CountryFlag countryName={post.country} />
-            </span>
-            <span className={styles.postDot}>·</span>
-            <RelativeTime rawTime={post.raw_time} fallback={post.time} />
-            <span className={styles.postDot}>·</span>
-            <span>{post.replies} replies</span>
-          </div>
-          <h3 className={styles.postTitle}>{post.title}</h3>
-          <p className={styles.postExcerpt}>{post.excerpt}</p>
-          <div className={styles.postTags}>
-            {post.tags.map((t) => (
-              <Tag key={t} label={t} />
-            ))}
-          </div>
+      <Avatar src={post.avatarUrl} initials={post.initials} color={post.color} />
+      <div className={styles.postBody}>
+        <div className={styles.postMeta}>
+          <span className={styles.postAuthor}>
+            {post.author}
+            <CountryFlag countryName={post.country} />
+          </span>
+          <span className={styles.postDot} aria-hidden="true">·</span>
+          <RelativeTime rawTime={post.raw_time} fallback={post.time} />
+          <span className={styles.postDot} aria-hidden="true">·</span>
+          <span>{post.replies} replies</span>
         </div>
-      </button>
+        <h2 id={`post-title-${post.id}`} className={styles.postTitle}>
+          <button
+            type="button"
+            className={styles.postOpen}
+            onClick={() => onOpenThread(post)}
+            aria-label={`Open discussion: ${post.title}`}
+          >
+            {post.title}
+          </button>
+        </h2>
+        <p className={styles.postExcerpt}>{post.excerpt}</p>
+        <div className={styles.postTags}>
+          {post.tags.map((t) => (
+            <Tag key={t} label={t} />
+          ))}
+        </div>
+      </div>
     </article>
   );
 }
@@ -433,10 +437,10 @@ export default function Portal({
   };
 
   const tabs = [
-    { id: "hot", label: "🔥 Hot" },
-    { id: "new", label: "✨ New" },
-    { id: "top", label: "⬆ Top" },
-    { id: "unanswered", label: "💬 Unanswered" },
+    { id: "hot", label: "Hot", icon: "🔥" },
+    { id: "new", label: "New", icon: "✨" },
+    { id: "top", label: "Top", icon: "⬆" },
+    { id: "unanswered", label: "Unanswered", icon: "💬" },
   ];
 
   const baseFiltered = useMemo(() => {
@@ -516,17 +520,22 @@ export default function Portal({
 
   if (portalConfig.contentPosition === "center") {
     heroAlignStyle.margin = "0 auto";
-    overlayBackground = `radial-gradient(circle at center, rgba(255,255,255,${opacity}) 0%, rgba(255,255,255,0) 75%)`;
+    overlayBackground = `radial-gradient(circle at center, color-mix(in srgb, var(--surface-primary) ${opacity * 100}%, transparent) 0%, transparent 75%)`;
   } else if (portalConfig.contentPosition === "right") {
     heroAlignStyle.margin = "0 0 0 auto";
-    overlayBackground = `linear-gradient(to left, rgba(255,255,255,${opacity}) 0%, rgba(255,255,255,0) 100%)`;
+    overlayBackground = `linear-gradient(to left, color-mix(in srgb, var(--surface-primary) ${opacity * 100}%, transparent) 0%, transparent 100%)`;
   } else {
     heroAlignStyle.margin = "0 auto 0 0";
-    overlayBackground = `linear-gradient(to right, rgba(255,255,255,${opacity}) 0%, rgba(255,255,255,0) 100%)`;
+    overlayBackground = `linear-gradient(to right, color-mix(in srgb, var(--surface-primary) ${opacity * 100}%, transparent) 0%, transparent 100%)`;
   }
 
   return (
     <div className={styles.page}>
+      <SEO 
+        title="Community | AllCanAccess"
+        description="Join AllCanAccess, the world's leading digital accessibility community. Connect with WCAG experts, developers, and designers to learn inclusive design, share accessibility testing tools, and build ADA-compliant digital experiences for everyone."
+        keywords="digital accessibility community, web accessibility, WCAG 2.2 compliance, inclusive design, accessibility testing, ADA compliance for websites, Section 508 compliance, accessibility developers network, digital inclusion, ARIA implementation, screen reader testing, web accessibility guidelines, accessibility professionals, accessibility QA, inclusive UX design, European Accessibility Act, EAA compliance, accessibility audits, accessibility remediation, accessibility forum, accessibility advocates, assistive technology community, a11y community, accessible web development, web content accessibility guidelines"
+      />
       <section
         className={styles.hero}
         aria-labelledby="hero-heading"
@@ -632,14 +641,15 @@ export default function Portal({
       </Container>
 
       <Container className={styles.mainGrid}>
-        <main className={styles.feed}>
+        <section aria-label="Community feed" className={styles.feed}>
           <div className={styles.askBox} ref={askBoxRef}>
             <p className={styles.askLabel}>Ask the community</p>
-            <label className={styles.fieldLabel}>
-              Title <span aria-hidden="true">*</span>
+            <label htmlFor="ask-title" className={styles.fieldLabel}>
+              Title <span className="required-asterisk" aria-hidden="true">*</span>
             </label>
 
             <input
+              id="ask-title"
               type="text"
               className={styles.askTitleInput}
               placeholder="Ask the community a question..."
@@ -649,14 +659,14 @@ export default function Portal({
               ref={askTitleRef}
             />
 
-            <label className={styles.fieldLabel}>Description (Optional)</label>
+            <label htmlFor="ask-desc" className={styles.fieldLabel}>Description (Optional)</label>
 
             <textarea
+              id="ask-desc"
               className={styles.askTextarea}
               ref={askTextareaRef}
               placeholder="Provide additional details, context, or examples (optional)"
               rows={3}
-              aria-label="Question description"
               value={draftQuestion}
               onChange={(e) => setDraftQuestion(e.target.value)}
             />
@@ -684,7 +694,7 @@ export default function Portal({
                 onClick={handlePostQuestion}
                 disabled={posting}
               >
-                {posting ? "Posting…" : "Post question →"}
+                {posting ? "Posting…" : <>Post question <span aria-hidden="true">→</span></>}
               </button>
             </div>
           </div>
@@ -730,6 +740,19 @@ export default function Portal({
                   setTopicFilter(null);
                 }}
               />
+              {query && (
+                <button
+                  type="button"
+                  className={styles.searchClearBtn}
+                  onClick={() => {
+                    setQuery("");
+                    searchInputRef.current?.focus();
+                  }}
+                  aria-label="Clear search"
+                >
+                  ✕
+                </button>
+              )}
             </div>
             <div
               className={styles.filterPills}
@@ -751,18 +774,18 @@ export default function Portal({
           </div>
           <div
             className={styles.tabBar}
-            role="tablist"
+            role="group"
             aria-label="Discussion filter"
           >
             {tabs.map((t) => (
               <button
                 key={t.id}
                 type="button"
-                role="tab"
-                aria-selected={activeTab === t.id}
+                aria-pressed={activeTab === t.id}
                 className={`${styles.tabBtn} ${activeTab === t.id ? styles.tabActive : ""}`}
                 onClick={() => setActiveTab(t.id)}
               >
+                <span aria-hidden="true">{t.icon} </span>
                 {t.label}
               </button>
             ))}
@@ -771,13 +794,13 @@ export default function Portal({
           <div className={styles.postsWrapper}>
             <div
               className={styles.postsContainer}
-              role="tabpanel"
+              role="region"
               aria-label={`${activeTab} discussions`}
             >
             {postsLoading ? (
-              <p className={styles.empty}>Loading discussions…</p>
+              <p className={styles.empty} role="status">Loading discussions…</p>
             ) : postsError ? (
-              <div className={styles.empty}>
+                <div className={styles.empty} role="alert">
                 <p>{postsError}</p>
                 <button
                   type="button"
@@ -818,7 +841,7 @@ export default function Portal({
               />
             </div>
           )}
-        </main>
+        </section>
 
         <aside className={styles.sidebar} aria-label="Community sidebar">
           <section className={styles.sideSection} aria-labelledby="recent-views-heading">
@@ -829,6 +852,7 @@ export default function Portal({
                   <li key={rp.id} className={styles.recentItem}>
                     <Link to={`/thread/${rp.id}`} className={styles.recentLink}>
                       <span className={styles.recentTitle}>{rp.title}</span>
+                      <span className="sr-only">, viewed on </span>
                       <span className={styles.recentMeta}>
                         <RelativeTime rawTime={rp.viewedAt} fallback="Just now" />
                       </span>
@@ -856,7 +880,7 @@ export default function Portal({
                     className={styles.eventRowBtn}
                     onClick={() => goToEvent(e.id)}
                   >
-                    <div className={styles.eventDate}>
+                    <div className={styles.eventDate} aria-hidden="true">
                       <span className={styles.eventMonth}>
                         {fmtMonth(e.event_date)}
                       </span>
@@ -865,7 +889,9 @@ export default function Portal({
                       </span>
                     </div>
                     <div className={styles.eventRowText}>
+                      <span className="sr-only">{fmtMonth(e.event_date)} {fmtDay(e.event_date)}, </span>
                       <p className={styles.eventTitle}>{e.title}</p>
+                      <span className="sr-only">, </span>
                       <p className={styles.eventType}>{e.type}</p>
                     </div>
                   </button>
@@ -877,7 +903,7 @@ export default function Portal({
               className={styles.sideLink}
               onClick={goToAllEvents}
             >
-              View all events →
+              View all events <span aria-hidden="true">→</span>
             </button>
           </section>
 
@@ -895,9 +921,9 @@ export default function Portal({
                     type="button"
                     className={styles.memberRowBtn}
                     onClick={() => navigate(`/profile/${m.id}`)}
-                    aria-label={`View public profile: ${m.name}`}
                   >
-                    <Avatar initials={m.initials} color={m.color} size={32} />
+                    <span className="sr-only">View public profile: </span>
+                    <Avatar src={m.avatarUrl} initials={m.initials} color={m.color} size={32} />
                     <div className={styles.memberInfo}>
                       <span className={styles.memberName}>
                         {m.name}
@@ -926,7 +952,7 @@ export default function Portal({
             <h2 id="checker-heading" className={styles.sideTitle}>
               Quick WAVE scan
             </h2>
-            <p className={styles.checkerDesc}>
+            <p id="wave-desc" className={styles.checkerDesc}>
               Paste any URL for an instant accessibility scan
             </p>
             <label htmlFor="wave-url" className="sr-only">
@@ -934,6 +960,7 @@ export default function Portal({
             </label>
             <input
               id="wave-url"
+              aria-describedby="wave-desc"
               className={styles.checkerInput}
               type="url"
               placeholder="https://yoursite.com"
@@ -965,7 +992,7 @@ export default function Portal({
                   isValid = false;
                 }
                 if (!isValid) {
-                  setWaveError("Please enter a valid URL.");
+                  setWaveError("Please enter a valid URL starting with http:// or https://");
                   return;
                 }
                 setWaveError("");
@@ -975,7 +1002,7 @@ export default function Portal({
                 );
               }}
             >
-              Run scan →
+              Run scan <span aria-hidden="true">→</span>
             </button>
           </section>
 
@@ -984,3 +1011,4 @@ export default function Portal({
     </div>
   );
 }
+

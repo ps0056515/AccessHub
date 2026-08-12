@@ -1,0 +1,84 @@
+.tableWrapper {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.scrollContainer {
+  overflow-y: auto;
+  overflow-x: auto;
+  scroll-padding-top: 56px;
+  position: relative;
+  max-height: 500px;
+  border-radius: var(--radius-sm, 6px);
+  border: 1px solid var(--border-strong);
+  background: var(--surface-secondary);
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table th,
+.table td {
+  text-align: left;
+  font-size: 13px;
+  padding: 8px 12px;
+  white-space: nowrap;
+}
+
+.fixedHeader {
+  position: sticky !important;
+  top: 0;
+  z-index: 99;
+  background-color: var(--surface-secondary);
+  border-bottom: 2px solid var(--border-strong);
+}
+
+.table td,
+.table tbody th {
+  position: relative;
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+}
+
+.table tbody tr:hover td,
+.table tbody tr:hover th {
+  background-color: var(--bg-tertiary);
+}
+
+.noDataContent {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 32px;
+  color: var(--text-secondary);
+}
+
+.filterBtn {
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  text-align: inherit;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sortBtn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 11px;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px;
+}

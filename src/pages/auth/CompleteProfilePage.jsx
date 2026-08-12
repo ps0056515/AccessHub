@@ -52,7 +52,7 @@ export default function CompleteProfilePage({ goToPortal }) {
   return (
     <div className={styles.page}>
       <button type="button" className={styles.back} onClick={() => navigate('/')}>
-        ← Back to community home
+        <span aria-hidden="true">← </span>Back to community home
       </button>
 
       <div className={styles.card}>
@@ -79,14 +79,17 @@ export default function CompleteProfilePage({ goToPortal }) {
               className={`${styles.input} ${formik.touched.company && formik.errors.company ? styles.inputError : ''}`}
               type="text"
               autoComplete="organization"
+              autoFocus
               placeholder="e.g. Acme Corp"
               value={formik.values.company}
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}
               disabled={formik.isSubmitting}
+              aria-invalid={!!(formik.touched.company && formik.errors.company)}
+              aria-describedby={formik.touched.company && formik.errors.company ? "profile-company-error" : undefined}
             />
             {formik.touched.company && formik.errors.company && (
-              <div className={styles.errorText}>{formik.errors.company}</div>
+              <div id="profile-company-error" className={styles.errorText} role="alert">{formik.errors.company}</div>
             )}
           </div>
 
@@ -105,9 +108,11 @@ export default function CompleteProfilePage({ goToPortal }) {
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}
               disabled={formik.isSubmitting}
+              aria-invalid={!!(formik.touched.designation && formik.errors.designation)}
+              aria-describedby={formik.touched.designation && formik.errors.designation ? "profile-designation-error" : undefined}
             />
             {formik.touched.designation && formik.errors.designation && (
-              <div className={styles.errorText}>{formik.errors.designation}</div>
+              <div id="profile-designation-error" className={styles.errorText} role="alert">{formik.errors.designation}</div>
             )}
           </div>
 
@@ -119,6 +124,7 @@ export default function CompleteProfilePage({ goToPortal }) {
               list="profile-country-list"
               id="profile-country"
               name="country"
+              autoComplete="country-name"
               placeholder="Search or select a country"
               className={`${styles.input} ${formik.touched.country && formik.errors.country ? styles.inputError : ''}`}
               value={formik.values.country}
@@ -126,6 +132,9 @@ export default function CompleteProfilePage({ goToPortal }) {
               onBlur={formik.handleBlur}
               disabled={formik.isSubmitting}
               required
+              aria-required="true"
+              aria-invalid={!!(formik.touched.country && formik.errors.country)}
+              aria-describedby={formik.touched.country && formik.errors.country ? "profile-country-error" : undefined}
             />
             <datalist id="profile-country-list">
               {countries.map(c => (
@@ -133,7 +142,7 @@ export default function CompleteProfilePage({ goToPortal }) {
               ))}
             </datalist>
             {formik.touched.country && formik.errors.country && (
-              <div className={styles.errorText}>{formik.errors.country}</div>
+              <div id="profile-country-error" className={styles.errorText} role="alert">{formik.errors.country}</div>
             )}
           </div>
 
@@ -145,6 +154,7 @@ export default function CompleteProfilePage({ goToPortal }) {
               list="profile-city-list"
               id="profile-city"
               name="city"
+              autoComplete="address-level2"
               placeholder={cities.length === 0 && formik.values.country ? 'No cities available' : 'Search or select a city'}
               className={`${styles.input} ${formik.touched.city && formik.errors.city ? styles.inputError : ''}`}
               value={formik.values.city}
@@ -152,6 +162,9 @@ export default function CompleteProfilePage({ goToPortal }) {
               onBlur={formik.handleBlur}
               disabled={formik.isSubmitting || !formik.values.country || cities.length === 0}
               required
+              aria-required="true"
+              aria-invalid={!!(formik.touched.city && formik.errors.city)}
+              aria-describedby={formik.touched.city && formik.errors.city ? "profile-city-error" : undefined}
             />
             <datalist id="profile-city-list">
               {cities.map((c, i) => (
@@ -159,7 +172,7 @@ export default function CompleteProfilePage({ goToPortal }) {
               ))}
             </datalist>
             {formik.touched.city && formik.errors.city && (
-              <div className={styles.errorText}>{formik.errors.city}</div>
+              <div id="profile-city-error" className={styles.errorText} role="alert">{formik.errors.city}</div>
             )}
           </div>
 

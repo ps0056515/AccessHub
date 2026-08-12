@@ -2,7 +2,7 @@
   position: fixed;
   inset: 0;
   z-index: 10000;
-  background: rgba(26, 25, 22, 0.45);
+  background: var(--backdrop);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -10,8 +10,8 @@
 }
 
 .dialog {
-  background: var(--bg-card);
-  color: var(--text);
+  background: var(--surface-secondary);
+  color: var(--text-primary);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-md);
   max-width: min(540px, 100%);
@@ -43,18 +43,18 @@
   font-size: 1.75rem;
   line-height: 1;
   cursor: pointer;
-  color: var(--text-muted);
+  color: var(--text-secondary);
   padding: 0 4px;
 }
 
-.close:hover { color: var(--text); }
+.close:hover { color: var(--text-primary); }
 
 .body {
   padding: 14px 20px 20px;
   overflow-y: auto;
   font-size: 14px;
   line-height: 1.65;
-  color: var(--text-muted);
+  color: var(--text-secondary);
 }
 
 .footer {
@@ -63,4 +63,19 @@
   justify-content: flex-end;
   gap: 10px;
   flex-wrap: wrap;
+}
+
+@media (max-width: 480px) {
+  .backdrop {
+    padding: 12px;
+  }
+  .header {
+    padding: 16px 16px 0;
+  }
+  .body {
+    padding: 12px 16px 16px;
+  }
+  .footer {
+    padding: 0 16px 16px;
+  }
 }

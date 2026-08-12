@@ -44,6 +44,8 @@ export default function ShortcutsEditor({ items, onChange }) {
               value={section.section || ''} 
               onChange={e => handleChangeSection(sectionIndex, e.target.value)}
               placeholder="Section Name (e.g. Essential controls)"
+              aria-label="Section Name"
+              title="Section Name"
               style={{ fontWeight: 'bold' }}
               required
             />
@@ -62,6 +64,8 @@ export default function ShortcutsEditor({ items, onChange }) {
                     value={row.action || ''} 
                     onChange={e => handleChangeRow(sectionIndex, rowIndex, 'action', e.target.value)}
                     placeholder="Action (e.g. Stop speaking)"
+                    aria-label="Action"
+                    title="Action"
                     required
                   />
                   <input 
@@ -70,6 +74,8 @@ export default function ShortcutsEditor({ items, onChange }) {
                     value={row.cmd || ''} 
                     onChange={e => handleChangeRow(sectionIndex, rowIndex, 'cmd', e.target.value)}
                     placeholder="Command (e.g. Ctrl)"
+                    aria-label="Command"
+                    title="Command"
                     required
                   />
                 </div>
@@ -79,13 +85,13 @@ export default function ShortcutsEditor({ items, onChange }) {
               </div>
             ))}
             <button type="button" onClick={() => handleAddRow(sectionIndex)} className={styles.addItemBtn} style={{ padding: '8px' }}>
-              + Add Shortcut Row
+              <span aria-hidden="true">+</span> Add Shortcut Row
             </button>
           </div>
         </div>
       ))}
       <button type="button" onClick={handleAddSection} className={styles.addItemBtn}>
-        + Add Shortcut Section
+        <span aria-hidden="true">+</span> Add Shortcut Section
       </button>
     </div>
   );

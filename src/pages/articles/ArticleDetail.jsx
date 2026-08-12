@@ -3,6 +3,7 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import { articlesApi } from 'api/client';
 import { SITE_NAME } from 'brand';
 import Container from 'components/common/Container/Container';
+import SEO from 'components/common/SEO/SEO';
 import Interactions from 'components/Interactions';
 import styles from './Articles.module.css';
 
@@ -35,18 +36,24 @@ export default function ArticleDetail() {
     fetchArticle();
   }, [id, navigate]);
 
-  if (loading) return <Container className={styles.detailContainer}>Loading article...</Container>;
-  if (error) return <Container className={styles.detailContainer} style={{ color: 'red' }}>{error}</Container>;
+  if (loading) return <Container className={styles.detailContainer} role="status">Loading article...</Container>;
+  if (error) return <Container className={styles.detailContainer} style={{ color: 'var(--error)' }}>{error}</Container>;
   if (!article) return null;
 
   return (
     <Container className={styles.detailContainer} style={{ display: 'block' }}>
+      <SEO 
+        title={`${article.title} | ${SITE_NAME}`}
+        description={`Read "${article.title}" by ${article.author} on AllCanAccess.`}
+        ogImage={article.cover_image || '/og-image.png'}
+        ogType="article"
+      />
       <Link to="/articles" className={styles.backBtn}>
-        ← Back to Articles
+        <span aria-hidden="true">← </span>Back to Articles
       </Link>
 
       {article.cover_image && (
-        <img src={article.cover_image} alt="" className={styles.detailImage} />
+        <img src={article.cover_image} alt={article.cover_image_alt || ""} className={styles.detailImage} />
       )}
 
       <header className={styles.detailHeader}>
@@ -73,3 +80,4 @@ export default function ArticleDetail() {
     </Container>
   );
 }
+

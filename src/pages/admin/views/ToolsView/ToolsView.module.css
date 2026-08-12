@@ -2,12 +2,12 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
+  margin-bottom: 24px;
 }
 
 .addToolBtn {
-  background: var(--accent, #074a9e);
-  color: #ffffff;
+  background: var(--button-primary);
+  color: var(--text-on-accent);
   border: none;
   padding: 8px 16px;
   border-radius: 6px;
@@ -18,7 +18,7 @@
 }
 
 .addToolBtn:hover {
-  background: #063d82;
+  background: var(--button-primary-hover);
 }
 
 .sortButtons {
@@ -33,7 +33,11 @@
   cursor: pointer;
   font-size: 11px;
   color: var(--text-muted);
-  padding: 2px;
+  min-width: 24px;
+  min-height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .sortBtn:disabled {
@@ -62,7 +66,7 @@
 
 .editBtn {
   background: transparent;
-  border: 1px solid var(--border-strong, #cbd5e1);
+  border: 1px solid var(--border-interactive-strong);
   color: var(--text);
   padding: 4px 8px;
   border-radius: 4px;
@@ -71,13 +75,13 @@
 }
 
 .editBtn:hover {
-  background: var(--bg-secondary, #f8fafc);
+  background: var(--bg-secondary);
 }
 
 .deleteBtn {
   background: transparent;
-  border: 1px solid #fecaca;
-  color: #ef4444;
+  border: 1px solid var(--red-border-interactive);
+  color: var(--red-text);
   padding: 4px 8px;
   border-radius: 4px;
   font-size: 12px;
@@ -85,7 +89,7 @@
 }
 
 .deleteBtn:hover {
-  background: #fef2f2;
+  background: var(--red-bg);
 }
 
 
@@ -112,8 +116,8 @@
 .formInput, .formSelect {
   padding: 8px 12px;
   border-radius: 6px;
-  border: 1px solid var(--border, #cbd5e1);
-  background: var(--bg-card, #ffffff);
+  border: 1px solid var(--text-faint);
+  background: var(--bg-card);
   color: var(--text);
   font-size: 14px;
   width: 100%;
@@ -121,14 +125,14 @@
 }
 
 .formInput:focus, .formSelect:focus {
-  outline: 2px solid var(--accent, #074a9e);
+  outline: 2px solid var(--focus-border-color);
   outline-offset: -1px;
 }
 
 
 .cancelBtn {
   background: transparent;
-  border: 1px solid var(--border, #cbd5e1);
+  border: 1px solid var(--border-interactive);
   color: var(--text-muted);
   padding: 8px 16px;
   border-radius: 6px;
@@ -137,12 +141,12 @@
 }
 
 .cancelBtn:hover {
-  background: var(--bg-secondary, #f8fafc);
+  background: var(--bg-secondary);
 }
 
 .saveBtn {
-  background: var(--accent, #074a9e);
-  color: #ffffff;
+  background: var(--accent);
+  color: var(--text-on-accent);
   border: none;
   padding: 8px 16px;
   border-radius: 6px;
@@ -152,7 +156,7 @@
 }
 
 .saveBtn:hover {
-  background: #063d82;
+  background: var(--button-primary-hover);
 }
 
 .saveBtn:disabled {
@@ -169,4 +173,12 @@
   overflow: hidden;
   clip: rect(0, 0, 0, 0);
   border: 0;
+}
+
+@media (max-width: 768px) {
+  .toolsHeader {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
 }

@@ -3,8 +3,9 @@ import ReactQuill, { Quill } from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import ImageResize from "quill-image-resize-module-react";
 import { articlesApi } from "api/client";
-import Table from "components/common/Table/Table";
+import Table from "pages/admin/components/Table/Table";
 import { useConfirm } from "context/ConfirmContext";
+import { Trash } from "lucide-react";
 import styles from "./ArticlesView.module.css";
 import { truncateText } from "utils/commonUtils";
 
@@ -188,6 +189,7 @@ export default function ArticlesView({ showToast }) {
       await articlesApi.delete(id);
       showToast?.("Article deleted successfully!", "success");
       await loadArticles();
+      setTimeout(() => document.getElementById("admin-search-input")?.focus(), 0);
     } catch (err) {
       showToast?.(err.message || "Failed to delete article.", "error");
     }
@@ -208,6 +210,7 @@ export default function ArticlesView({ showToast }) {
       );
       setSelectedIds([]);
       await loadArticles();
+      setTimeout(() => document.getElementById("admin-search-input")?.focus(), 0);
     } catch (err) {
       showToast?.(err.message || "Failed to bulk delete articles.", "error");
     }
@@ -230,6 +233,7 @@ export default function ArticlesView({ showToast }) {
       );
       setSelectedIds([]);
       await loadArticles();
+      setTimeout(() => document.getElementById("admin-search-input")?.focus(), 0);
     } catch (err) {
       showToast?.(
         err.message ||
@@ -249,6 +253,11 @@ export default function ArticlesView({ showToast }) {
       ["link", "image", "video"],
       ["clean"],
     ],
+    keyboard: {
+      bindings: {
+        tab: false, // Prevents keyboard trap (SC 2.1.2)
+      },
+    },
     imageResize: {
       parchment: Quill.import("parchment"),
       modules: ["Resize", "DisplaySize", "Toolbar"],
@@ -270,14 +279,7 @@ export default function ArticlesView({ showToast }) {
       label: "Status",
       render: (article) => (
         <span
-          style={{
-            padding: "4px 8px",
-            borderRadius: "12px",
-            fontSize: "12px",
-            fontWeight: "600",
-            background: article.is_published ? "#dcfce7" : "#f1f5f9",
-            color: article.is_published ? "#166534" : "#64748b",
-          }}
+          className={`${styles.statusBadge} ${article.is_published ? styles.statusPublished : styles.statusDraft}`}
         >
           {article.is_published ? "Published" : "Draft"}
         </span>
@@ -315,6 +317,7 @@ export default function ArticlesView({ showToast }) {
               article.is_published ? styles.btnSecondary : styles.btnSuccess
             }
             onClick={() => togglePublish(article)}
+            aria-label={`${article.is_published ? "Unpublish" : "Publish"} ${article.title}`}
           >
             {article.is_published ? "Unpublish" : "Publish"}
           </button>
@@ -322,6 +325,7 @@ export default function ArticlesView({ showToast }) {
             type="button"
             className={styles.btnSecondary}
             onClick={() => openEditor(article)}
+            aria-label={`Edit ${article.title}`}
           >
             Edit
           </button>
@@ -329,6 +333,7 @@ export default function ArticlesView({ showToast }) {
             type="button"
             className={styles.btnDanger}
             onClick={() => handleDelete(article.id, article.title)}
+            aria-label={`Delete ${article.title}`}
           >
             Delete
           </button>
@@ -355,7 +360,9 @@ export default function ArticlesView({ showToast }) {
             </h2>
             <div style={{ display: "flex", gap: "16px", alignItems: "center" }}>
               <input
-                type="text"
+                id="admin-search-input"
+                type="search"
+                aria-label="Search articles"
                 placeholder="Search articles..."
                 value={articleSearch}
                 onChange={(e) => setArticleSearch(e.target.value)}
@@ -403,7 +410,7 @@ export default function ArticlesView({ showToast }) {
                       borderRadius: "6px",
                     }}
                   >
-                    🗑 Bulk Delete ({selectedIds.length})
+                    <Trash aria-hidden="true" size={16} /> Bulk Delete ({selectedIds.length})
                   </button>
                 </>
               )}
@@ -412,7 +419,7 @@ export default function ArticlesView({ showToast }) {
                 onClick={() => openEditor()}
                 className={styles.createBtn}
               >
-                ➕ Create New Article
+                <span aria-hidden="true">➕</span> Create New Article
               </button>
             </div>
           </div>
@@ -436,8 +443,11 @@ export default function ArticlesView({ showToast }) {
           </h2>
 
           <div className={styles.formGroup}>
-            <label className={styles.label}>Title *</label>
+            <label htmlFor="article-title" className={styles.label}>
+              Title<span className="required-asterisk" aria-hidden="true"> *</span>
+            </label>
             <input
+              id="article-title"
               type="text"
               value={formData.title}
               onChange={(e) =>
@@ -453,8 +463,11 @@ export default function ArticlesView({ showToast }) {
               className={styles.formGroup}
               style={{ flex: 1, minWidth: "200px" }}
             >
-              <label className={styles.label}>Author *</label>
+              <label htmlFor="article-author" className={styles.label}>
+                Author<span className="required-asterisk" aria-hidden="true"> *</span>
+              </label>
               <input
+                id="article-author"
                 type="text"
                 value={formData.author}
                 onChange={(e) =>
@@ -468,8 +481,9 @@ export default function ArticlesView({ showToast }) {
               className={styles.formGroup}
               style={{ flex: 1, minWidth: "200px" }}
             >
-              <label className={styles.label}>Publish Date</label>
+              <label htmlFor="article-publish-date" className={styles.label}>Publish Date</label>
               <input
+                id="article-publish-date"
                 type="datetime-local"
                 value={formData.published_date}
                 onChange={(e) =>
@@ -481,8 +495,9 @@ export default function ArticlesView({ showToast }) {
           </div>
 
           <div className={styles.formGroup}>
-            <label className={styles.label}>Cover Image (Max 2MB)</label>
+            <label htmlFor="article-cover" className={styles.label}>Cover Image (Max 2MB)</label>
             <input
+              id="article-cover"
               type="file"
               accept="image/*"
               onChange={handleCoverChange}
@@ -540,8 +555,10 @@ export default function ArticlesView({ showToast }) {
           </div>
 
           <div className={styles.formGroup}>
-            <label className={styles.label}>Content *</label>
-            <div className={styles.quillWrapper}>
+            <label htmlFor="article-content" className={styles.label}>
+              Content<span className="required-asterisk" aria-hidden="true"> *</span>
+            </label>
+            <div className={styles.quillWrapper} id="article-content">
               <ReactQuill
                 theme="snow"
                 value={formData.content_html}

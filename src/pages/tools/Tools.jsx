@@ -2,12 +2,14 @@ import { useState, useEffect, useMemo } from 'react';
 import { CERTS, COLOR_MAP } from 'data';
 import { toolsApi } from 'api/client';
 import Container from 'components/common/Container/Container';
+import SEO from 'components/common/SEO/SEO';
+import Badge from 'components/common/Badge/Badge';
 import styles from './Tools.module.css';
 
 function BadgePill({ label, color }) {
   const c = COLOR_MAP[color] || COLOR_MAP.blue;
   return (
-    <span className={styles.badge} style={{ background: c.bg, color: c.text }}>
+    <span className={styles.badge}>
       {label}
     </span>
   );
@@ -48,6 +50,11 @@ export default function Tools() {
 
   return (
     <Container className={styles.page}>
+      <SEO 
+        title="Accessibility Tools & Certifications | AllCanAccess"
+        description="Discover industry-standard accessibility testing tools and professional certifications. Compare the best automated WCAG scanners, screen readers, and explore paths for IAAP CPACC and WAS certifications to advance your accessibility career."
+        keywords="accessibility testing tools, WCAG checker, automated accessibility scanners, screen readers, NVDA, JAWS, VoiceOver testing, IAAP certifications, CPACC certification, WAS certification, web accessibility evaluation tools, WAVE tool, axe DevTools, accessibility automation, CI/CD accessibility testing, PDF accessibility tools, color contrast analyzers, inclusive design tools, accessibility browser extensions, ADA compliance software, Section 508 testing tools, digital accessibility software, manual accessibility testing, accessibility testing software, a11y tools, enterprise accessibility platforms"
+      />
       <header className={styles.pageHeader}>
         <h1 className={styles.pageTitle}>Tools &amp; certifications</h1>
         <p className={styles.pageSub}>
@@ -64,13 +71,12 @@ export default function Tools() {
           Vetted by the community — from quick browser checks to deep CI/CD integration.
         </p>
 
-        <div className={styles.filterBar} role="tablist" aria-label="Filter tools by platform compatibility">
+        <div className={styles.filterBar} role="group" aria-label="Filter tools by platform compatibility">
           {FILTERS.map(f => (
             <button
               key={f}
               type="button"
-              role="tab"
-              aria-selected={selectedFilter === f}
+              aria-pressed={selectedFilter === f}
               className={`${styles.filterBtn} ${selectedFilter === f ? styles.filterBtnActive : ''}`}
               onClick={() => setSelectedFilter(f)}
             >
@@ -95,13 +101,13 @@ export default function Tools() {
                 rel="noopener noreferrer"
                 className={`${styles.toolCard} fade-up`}
                 style={{ animationDelay: `${i * 0.04}s` }}
-                aria-label={`${t.name} — ${t.type} — ${t.price}${t.badge ? ` — ${t.badge}` : ''}${Array.isArray(t.compatibility) && t.compatibility.length > 0 ? ` — Compatible with ${t.compatibility.join(', ')}` : ''}`}
+                aria-labelledby={`tool-title-${t.id || i}`}
               >
                 <div className={styles.toolTop}>
                   <div className={styles.toolIcon}>{t.icon}</div>
                   {t.badge && <BadgePill label={t.badge} color={t.badge_color || t.badgeColor} />}
                 </div>
-                <h3 className={styles.toolName}>{t.name}</h3>
+                <h3 id={`tool-title-${t.id || i}`} className={styles.toolName}>{t.name}</h3>
                 <p className={styles.toolType}>{t.type}</p>
                 {Array.isArray(t.compatibility) && t.compatibility.length > 0 && (
                   <div className={styles.toolTags}>
@@ -132,14 +138,15 @@ export default function Tools() {
                 key={i}
                 className={`${styles.certCard} fade-up`}
                 style={{ animationDelay: `${i * 0.06}s` }}
+                aria-labelledby={`cert-title-${i}`}
               >
                 <div className={styles.certLeft}>
-                  <div className={styles.certBadge} style={{ background: col.bg }}>
+                  <div className={styles.certBadge} style={{ background: col.bg, color: col.text }}>
                     <span role="img" aria-hidden="true">{c.icon}</span>
                   </div>
                 </div>
                 <div className={styles.certBody}>
-                  <h3 className={styles.certTitle}>{c.title}</h3>
+                  <h3 id={`cert-title-${i}`} className={styles.certTitle}>{c.title}</h3>
                   <p className={styles.certDesc}>{c.body}</p>
                   <div className={styles.progressWrap}>
                     <div
@@ -159,9 +166,10 @@ export default function Tools() {
                   href={c.learnMoreUrl}
                   target="_blank"
                   rel="noopener noreferrer"
+                  aria-label={`Learn more about ${c.title} (opens in new tab)`}
                   onClick={e => e.stopPropagation()}
                 >
-                  Learn more →
+                  Learn more <span aria-hidden="true">→</span>
                 </a>
               </article>
             );
@@ -171,3 +179,4 @@ export default function Tools() {
     </Container>
   );
 }
+

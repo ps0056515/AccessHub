@@ -16,8 +16,11 @@ const blogpostsRoutes = require('./routes/blogposts');
 const screenReadersRoutes = require('./routes/screen_readers');
 const usersRoutes = require('./routes/users');
 const jobsRoutes = require('./routes/jobs');
+const gamesRoutes = require('./routes/games');
+const adminGamesRoutes = require('./routes/admin_games');
 const analyticsTrackerRoutes = require('./routes/analytics_tracker');
 const { query, closePool } = require('./db');
+const { deleteOldJobs } = require('./providers/providerManager');
 
 const PORT = Number(process.env.API_PORT || process.env.PORT) || 3015;
 const app = express();
@@ -48,6 +51,8 @@ app.use('/api/blogposts', blogpostsRoutes);
 app.use('/api/screen-readers', screenReadersRoutes);
 app.use('/api/users', usersRoutes);
 app.use('/api/jobs', jobsRoutes);
+app.use('/api/games', gamesRoutes);
+app.use('/api/admin/games', adminGamesRoutes);
 app.use('/api/uploads', express.static(path.join(__dirname, 'uploads')));
 
 app.use((err, _req, res, _next) => {
@@ -62,6 +67,12 @@ app.use((err, _req, res, _next) => {
 const server = app.listen(PORT, () => {
   console.log(`API server listening on http://localhost:${PORT}`);
   console.log('Database: PostgreSQL (DATABASE_URL)');
+  
+  // Run DB cleanup for old jobs 10 seconds after startup, then once every 24 hours
+  setTimeout(() => {
+    deleteOldJobs();
+    setInterval(deleteOldJobs, 24 * 60 * 60 * 1000);
+  }, 10000);
 });
 
 function shutdown() {

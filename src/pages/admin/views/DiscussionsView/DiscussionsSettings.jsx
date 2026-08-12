@@ -48,12 +48,13 @@ export default function DiscussionsSettings({ showToast }) {
 
   return (
     <section className={dashboardStyles.panel} aria-labelledby="discussions-cms-title">
-      <h2 id="discussions-cms-title" className={dashboardStyles.panelTitle}>Configuration</h2>
+      <h2 id="discussions-cms-title" className={dashboardStyles.panelTitle}>Discussion Configuration</h2>
       <form onSubmit={handleSave} style={{ marginTop: '24px' }}>
         
         <div className={styles.formGroup}>
-          <label className={styles.label}>Ask Community Placeholder</label>
+          <label htmlFor="settings-ask-placeholder" className={styles.label}>Ask Community Placeholder</label>
           <input
+            id="settings-ask-placeholder"
             type="text"
             className={styles.input}
             value={formData.askPlaceholder}
@@ -63,8 +64,9 @@ export default function DiscussionsSettings({ showToast }) {
         </div>
 
         <div className={styles.formGroup}>
-          <label className={styles.label}>Search Discussions Placeholder</label>
+          <label htmlFor="settings-search-placeholder" className={styles.label}>Search Discussions Placeholder</label>
           <input
+            id="settings-search-placeholder"
             type="text"
             className={styles.input}
             value={formData.searchPlaceholder}
@@ -74,8 +76,9 @@ export default function DiscussionsSettings({ showToast }) {
         </div>
 
         <div className={styles.formGroup}>
-          <label className={styles.label}>Discussion Topics</label>
+          <label htmlFor="settings-discussion-topics" className={styles.label}>Discussion Topics</label>
           <textarea
+            id="settings-discussion-topics"
             className={styles.textarea}
             value={formData.askTopics}
             onChange={e => setFormData({ ...formData, askTopics: e.target.value })}

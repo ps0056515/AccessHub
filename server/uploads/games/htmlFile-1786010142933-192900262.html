@@ -1,0 +1,845 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Accessibility Escape Room | Premium Edition</title>
+    <style>
+        :root {
+            /* Core Theme Variables */
+            --bg-base: #020617;
+            --bg-glass: rgba(15, 23, 42, 0.7);
+            --bg-glass-hover: rgba(30, 41, 59, 0.9);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --primary: #3b82f6;
+            --primary-hover: #2563eb;
+            --secondary: #8b5cf6;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --border: rgba(255, 255, 255, 0.1);
+            --focus-ring: #fbbf24;
+            --font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        [data-theme="light"] {
+            --bg-base: #f8fafc;
+            --bg-glass: rgba(255, 255, 255, 0.85);
+            --bg-glass-hover: rgba(241, 245, 249, 0.95);
+            --text-main: #0f172a;
+            --text-muted: #475569;
+            --primary: #2563eb;
+            --border: rgba(0, 0, 0, 0.1);
+            --focus-ring: #d97706;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        body {
+            font-family: var(--font-family);
+            background-color: var(--bg-base);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+            transition: var(--transition);
+            line-height: 1.6;
+        }
+
+        /* Ambient Backgrounds based on Room */
+        body[data-room="1"] { background: radial-gradient(circle at center, #020617 0%, #001e36 100%); }
+        body[data-room="2"] { background: radial-gradient(circle at center, #020617 0%, #17002e 100%); }
+        body[data-room="3"] { background: radial-gradient(circle at center, #1a0505 0%, #000000 100%); }
+        body[data-room="4"] { background: linear-gradient(135deg, #020617 0%, #0a192f 100%); }
+        body[data-room="5"] { background: repeating-linear-gradient(0deg, #020617, #020617 2px, #001100 2px, #001100 4px); }
+        body[data-room="6"] { background: #000; }
+
+        /* Focus & Accessibility */
+        *:focus-visible {
+            outline: 4px solid var(--focus-ring);
+            outline-offset: 4px;
+            border-radius: 4px;
+        }
+        .sr-only {
+            position: absolute;
+            width: 1px; height: 1px;
+            padding: 0; margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap; border-width: 0;
+        }
+
+        /* UI Components */
+        .glass-panel {
+            background: var(--bg-glass);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            padding: 2.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        header {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 1rem 2rem;
+            background: var(--bg-glass);
+            backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--border);
+            position: sticky; top: 0; z-index: 100;
+        }
+
+        .header-title { font-size: 1.5rem; font-weight: 800; color: var(--primary); letter-spacing: -0.5px; }
+        
+        .hud-stats { display: flex; gap: 2rem; align-items: center; }
+        .hud-item { display: flex; flex-direction: column; align-items: center; font-family: monospace; }
+        .hud-val { font-size: 1.5rem; font-weight: bold; color: var(--success); }
+        .hud-label { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
+
+        .controls { display: flex; gap: 0.5rem; }
+        .icon-btn {
+            background: transparent; border: 1px solid var(--border);
+            color: var(--text-main); font-size: 1.25rem;
+            width: 44px; height: 44px; border-radius: 50%;
+            cursor: pointer; transition: var(--transition);
+            display: flex; align-items: center; justify-content: center;
+        }
+        .icon-btn:hover { background: var(--bg-glass-hover); transform: scale(1.05); }
+
+        /* Main Container */
+        main {
+            flex: 1; display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            padding: 2rem; width: 100%; max-width: 1100px; margin: 0 auto;
+        }
+
+        .room-container { display: none; width: 100%; max-width: 900px; animation: scaleIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+        .room-container.active { display: block; }
+
+        h2 { font-size: 2.5rem; margin-bottom: 1rem; color: var(--primary); font-weight: 800; }
+        p { margin-bottom: 1.5rem; font-size: 1.15rem; color: var(--text-muted); }
+
+        .btn {
+            background: var(--primary); color: #fff;
+            border: none; padding: 1rem 2rem;
+            font-size: 1.1rem; font-weight: 600;
+            border-radius: 8px; cursor: pointer;
+            transition: var(--transition);
+            position: relative; overflow: hidden;
+            display: inline-flex; align-items: center; gap: 0.5rem;
+        }
+        .btn::after {
+            content: ''; position: absolute; top: 50%; left: 50%;
+            width: 5px; height: 5px; background: rgba(255,255,255,0.5);
+            opacity: 0; border-radius: 100%; transform: scale(1, 1) translate(-50%);
+            transform-origin: 50% 50%;
+        }
+        .btn:focus:not(:active)::after { animation: ripple 1s ease-out; }
+        .btn:hover { background: var(--primary-hover); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3); }
+        .btn:active { transform: translateY(0); }
+        .btn-outline { background: transparent; border: 2px solid var(--primary); color: var(--primary); }
+        .btn-outline:hover { background: var(--primary); color: #fff; }
+        
+        .btn-hint { background: var(--warning); color: #000; margin-top: 1rem; }
+        .btn-hint:hover { background: #d97706; }
+
+        /* Toasts */
+        .toast-container {
+            position: fixed; bottom: 2rem; right: 2rem;
+            display: flex; flex-direction: column; gap: 1rem; z-index: 9999;
+        }
+        .toast {
+            background: var(--bg-glass); border-left: 4px solid var(--primary);
+            color: var(--text-main); padding: 1rem 1.5rem; border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1); backdrop-filter: blur(8px);
+            animation: slideInRight 0.3s ease forwards;
+            display: flex; align-items: center; gap: 1rem; min-width: 300px;
+        }
+        .toast.error { border-left-color: var(--danger); }
+        .toast.success { border-left-color: var(--success); }
+        .toast.warning { border-left-color: var(--warning); }
+
+        /* Modals */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(4px);
+            display: none; align-items: center; justify-content: center;
+            z-index: 1000; opacity: 0; transition: opacity 0.3s ease;
+        }
+        .modal-overlay.active { display: flex; opacity: 1; }
+        .modal-content {
+            background: var(--bg-base); border: 1px solid var(--border);
+            border-radius: 16px; padding: 3rem; max-width: 700px; width: 90%;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            transform: translateY(20px) scale(0.95); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+        }
+        .modal-overlay.active .modal-content { transform: translateY(0) scale(1); }
+        .modal-close {
+            position: absolute; top: 1.5rem; right: 1.5rem;
+            background: transparent; border: none; color: var(--text-muted);
+            font-size: 1.5rem; cursor: pointer; padding: 0.5rem; border-radius: 50%;
+        }
+        .modal-close:hover { background: var(--bg-glass); color: var(--text-main); }
+
+        /* Room 1: Security Checkpoint */
+        .vault-door {
+            border: 4px solid var(--primary); border-radius: 50%; width: 120px; height: 120px;
+            margin: 0 auto 2rem; display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.3); transition: var(--transition);
+        }
+        .vault-door.open { border-color: var(--success); box-shadow: 0 0 30px rgba(16, 185, 129, 0.5); transform: rotate(90deg); }
+        .keypad-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; max-width: 400px; margin: 0 auto; }
+        .keypad-btn {
+            padding: 1.5rem; font-size: 1.5rem; font-weight: bold; font-family: monospace;
+            background: rgba(59, 130, 246, 0.1); color: var(--primary);
+            border: 2px solid var(--primary); border-radius: 8px; cursor: pointer; transition: var(--transition);
+        }
+        .keypad-btn:hover { background: rgba(59, 130, 246, 0.2); box-shadow: 0 0 15px rgba(59,130,246,0.4); }
+        .keypad-btn.active { background: var(--primary); color: #fff; }
+        .keypad-btn:disabled { opacity: 0.3; cursor: not-allowed; border-color: var(--text-muted); color: var(--text-muted); }
+
+        /* Room 2: Data Vault */
+        .labyrinth-wrapper { position: relative; height: 400px; margin-top: 2rem; perspective: 1000px; }
+        .lab-item {
+            position: absolute; background: rgba(139, 92, 246, 0.1); border: 1px solid var(--secondary);
+            padding: 1rem 2rem; border-radius: 8px; color: var(--secondary); text-decoration: none;
+            transition: var(--transition); font-family: monospace; backdrop-filter: blur(4px);
+        }
+        .lab-item:focus-visible { background: rgba(139, 92, 246, 0.3); box-shadow: 0 0 20px rgba(139, 92, 246, 0.5); z-index: 10; transform: scale(1.1); }
+
+        /* Room 3: Reactor Core */
+        .reactor-core { text-align: center; margin-bottom: 2rem; }
+        .core-pulse { width: 100px; height: 100px; background: radial-gradient(circle, var(--danger) 0%, transparent 70%); margin: 0 auto; animation: pulse 2s infinite; }
+        .wire-panel { display: flex; justify-content: center; gap: 2rem; margin: 3rem 0; padding: 2rem; background: rgba(0,0,0,0.5); border-radius: 12px; border: 1px solid var(--border); }
+        .wire {
+            width: 80px; height: 200px; border-radius: 40px; border: 4px solid rgba(255,255,255,0.1); cursor: pointer;
+            position: relative; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; box-shadow: inset 0 0 20px rgba(0,0,0,0.5); transition: var(--transition);
+        }
+        .wire:hover { transform: scale(1.05); }
+        .wire-red { background: linear-gradient(90deg, #991b1b, #ef4444, #991b1b); }
+        .wire-green { background: linear-gradient(90deg, #166534, #22c55e, #166534); }
+        .wire-blue { background: linear-gradient(90deg, #1e3a8a, #3b82f6, #1e3a8a); }
+        body[data-room="3"].color-blind-mode .wire { filter: grayscale(100%) contrast(0.8); }
+        .wire span { opacity: 0; transition: opacity 0.3s; }
+        body[data-room="3"].reveal-mode .wire span { opacity: 1; }
+
+        /* Room 4: Digital Archive */
+        .image-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 2rem; margin-top: 2rem; }
+        .image-card { background: rgba(0,0,0,0.3); padding: 1.5rem; border-radius: 12px; border: 1px solid var(--border); text-align: center; transition: var(--transition); }
+        .image-card:hover { transform: translateY(-5px); border-color: var(--primary); }
+        .image-placeholder { width: 100%; height: 150px; background: rgba(255,255,255,0.05); border: 2px dashed var(--border); border-radius: 8px; margin-bottom: 1.5rem; display: flex; align-items: center; justify-content: center; color: var(--primary); }
+        .alt-select { width: 100%; padding: 0.75rem; background: var(--bg-base); color: var(--text-main); border: 1px solid var(--border); border-radius: 6px; font-size: 1rem; cursor: pointer; }
+        .alt-select:focus { border-color: var(--primary); outline: none; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3); }
+
+        /* Room 5: Override Console */
+        .rescue-form { max-width: 500px; margin: 0 auto; text-align: left; background: rgba(0,0,0,0.4); padding: 2rem; border-radius: 12px; border: 1px solid var(--danger); transition: border-color 0.5s; }
+        .rescue-form.secured { border-color: var(--success); box-shadow: 0 0 20px rgba(16, 185, 129, 0.2); }
+        .form-group { margin-bottom: 1.5rem; }
+        .form-input { width: 100%; padding: 1rem; background: var(--bg-base); border: 2px solid var(--danger); color: var(--text-main); border-radius: 6px; font-size: 1.1rem; transition: var(--transition); }
+        .form-input:focus { outline: none; border-color: var(--warning); }
+        .form-input.fixed { border-color: var(--success); }
+        .form-label { display: none; margin-bottom: 0.5rem; font-weight: 600; color: var(--primary); }
+        .form-label.fixed { display: block; animation: fadeIn 0.3s; }
+        .form-error { color: var(--danger); font-size: 0.9rem; margin-top: 0.5rem; display: none; background: rgba(239, 68, 68, 0.1); padding: 0.5rem; border-radius: 4px; border-left: 3px solid var(--danger); }
+        .form-error.fixed { display: block; animation: fadeIn 0.3s; }
+        .dev-tools { display: flex; gap: 1rem; margin-bottom: 2rem; justify-content: center; flex-wrap: wrap; background: rgba(255,255,255,0.05); padding: 1rem; border-radius: 8px; }
+
+        /* Room 6: Dark Net */
+        .terminal-container { background: #050505; color: #0f0; font-family: 'Courier New', Courier, monospace; padding: 2rem; border-radius: 8px; text-align: left; margin: 2rem 0; box-shadow: inset 0 0 20px rgba(0, 255, 0, 0.1); border: 1px solid #0f0; overflow: hidden; position: relative; }
+        .terminal-container::after { content: " "; display: block; position: absolute; top: 0; left: 0; bottom: 0; right: 0; background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06)); z-index: 2; background-size: 100% 2px, 3px 100%; pointer-events: none; }
+        .terminal-line { margin-bottom: 0.5rem; display: flex; gap: 1rem; align-items: baseline; position: relative; z-index: 3; }
+        .sr-tag { color: #5eead4; font-weight: normal; opacity: 0.8; }
+        .terminal-btn { background: transparent; color: #0f0; border: 1px dashed #0f0; padding: 0.25rem 0.5rem; cursor: pointer; font-family: inherit; font-size: 1rem; transition: all 0.2s; }
+        .terminal-btn:hover { background: rgba(0, 255, 0, 0.1); }
+        .terminal-btn:focus-visible { outline: none; background: #0f0; color: #000; box-shadow: 0 0 10px #0f0; }
+
+        /* Final Screen Stats */
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin: 2rem 0; text-align: left; }
+        .stat-box { background: rgba(0,0,0,0.3); padding: 1.5rem; border-radius: 12px; border: 1px solid var(--border); display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .stat-box .val { font-size: 2.5rem; font-weight: 800; color: var(--primary); font-family: monospace; }
+        .stat-box .lbl { font-size: 0.9rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-top: 0.5rem; }
+        .badges-container { display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap; margin-top: 2rem; }
+        .badge { width: 80px; height: 80px; background: var(--bg-glass); border: 2px solid var(--warning); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2rem; box-shadow: 0 0 15px rgba(245, 158, 11, 0.3); position: relative; cursor: help; }
+        .badge:hover::after { content: attr(aria-label); position: absolute; bottom: -30px; background: #000; color: #fff; padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.8rem; white-space: nowrap; z-index: 10; }
+        .grade-display { font-size: 6rem; font-weight: 900; color: var(--success); text-shadow: 0 0 30px rgba(16, 185, 129, 0.5); margin: 1rem 0; line-height: 1; }
+
+        /* Animations */
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes scaleIn { from { opacity: 0; transform: scale(0.95) translateY(10px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+        @keyframes slideInRight { from { opacity: 0; transform: translateX(50px); } to { opacity: 1; transform: translateX(0); } }
+        @keyframes pulse { 0% { opacity: 0.5; transform: scale(0.9); } 50% { opacity: 1; transform: scale(1.1); } 100% { opacity: 0.5; transform: scale(0.9); } }
+        @keyframes ripple { 0% { transform: scale(0, 0); opacity: 0.5; } 100% { transform: scale(20, 20); opacity: 0; } }
+        @keyframes confettiFall { 0% { transform: translateY(-100vh) rotate(0deg); } 100% { transform: translateY(100vh) rotate(360deg); } }
+
+        @media (prefers-reduced-motion: reduce) {
+            * { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
+            .terminal-container::after { display: none; }
+        }
+        
+        .confetti { position: fixed; width: 10px; height: 10px; background: var(--primary); z-index: 999; animation: confettiFall linear forwards; }
+    </style>
+</head>
+<body data-room="0">
+
+    <div id="live-announcer" class="sr-only" aria-live="assertive" aria-atomic="true"></div>
+
+    <header>
+        <h1 class="header-title">AllCanAccess | Premium</h1>
+        <div class="hud-stats">
+            <div class="hud-item">
+                <span class="hud-val" id="hud-score">0</span>
+                <span class="hud-label">Score</span>
+            </div>
+            <div class="hud-item">
+                <span class="hud-val" id="hud-time">00:00</span>
+                <span class="hud-label">Time</span>
+            </div>
+            <div class="controls">
+                <button class="icon-btn" id="btn-help" aria-label="Help and Controls" title="Help">❓</button>
+                <button class="icon-btn" id="btn-audio" aria-label="Toggle Audio" title="Mute/Unmute Audio">🔊</button>
+                <button class="icon-btn" id="btn-theme" aria-label="Toggle Theme" title="Toggle Theme">🌓</button>
+                <button class="icon-btn" id="btn-reset" aria-label="Reset Progress" title="Reset Progress">🔄</button>
+            </div>
+        </div>
+    </header>
+
+    <div class="toast-container" id="toast-container" aria-live="polite"></div>
+
+    <main id="game-main">
+        
+        <!-- Intro Screen -->
+        <div id="screen-intro" class="room-container active glass-panel">
+            <h2 tabindex="-1" id="intro-heading">CRITICAL SYSTEM FAILURE</h2>
+            <p>The AllCanAccess Mainframe is collapsing. A "Barrier Virus" has infected the core systems, locking out users by stripping away accessibility compliance.</p>
+            <p>You are the Lead Auditor. Your mission: Purge the virus by navigating 6 corrupted sectors and restoring WCAG compliance. You will be scored on speed, accuracy, and knowledge.</p>
+            <div style="background: rgba(255,255,255,0.05); padding: 1rem; border-radius: 8px; margin-bottom: 2rem;">
+                <strong>Mission Intel:</strong> Progress is auto-saved locally. You can request hints in each sector, but it will cost you points. Audio cues are enabled by default.
+            </div>
+            <button class="btn" id="btn-start" style="width: 100%; font-size: 1.25rem;">Initiate Override Sequence</button>
+        </div>
+
+        <!-- Room 1: Security Checkpoint -->
+        <div id="room-1" class="room-container glass-panel" aria-labelledby="room1-heading">
+            <h2 tabindex="-1" id="room1-heading">Sector 1: Security Checkpoint</h2>
+            <p>The mouse drivers have been corrupted by the virus. The vault door is sealed.</p>
+            <p><strong>Objective:</strong> Use your keyboard (<kbd>Tab</kbd>, <kbd>Enter</kbd>/<kbd>Space</kbd>) to enter the security code: <strong>1 - 2 - 3</strong> in exact order.</p>
+            
+            <div class="vault-door" id="r1-door">🔒</div>
+
+            <div class="keypad-grid" role="group" aria-label="Security Keypad">
+                <button class="keypad-btn" id="kp-1" aria-label="Digit 1">1</button>
+                <button class="keypad-btn decoy" disabled aria-hidden="true" tabindex="-1">X</button>
+                <button class="keypad-btn decoy" disabled aria-hidden="true" tabindex="-1">X</button>
+                <button class="keypad-btn decoy" disabled aria-hidden="true" tabindex="-1">X</button>
+                <button class="keypad-btn" id="kp-2" aria-label="Digit 2">2</button>
+                <button class="keypad-btn decoy" disabled aria-hidden="true" tabindex="-1">X</button>
+                <button class="keypad-btn decoy" disabled aria-hidden="true" tabindex="-1">X</button>
+                <button class="keypad-btn decoy" disabled aria-hidden="true" tabindex="-1">X</button>
+                <button class="keypad-btn" id="kp-3" aria-label="Digit 3">3</button>
+            </div>
+            <button class="btn btn-hint" onclick="requestHint(1)">Request Hint (-1000 pts)</button>
+        </div>
+
+        <!-- Room 2: Data Vault -->
+        <div id="room-2" class="room-container glass-panel" aria-labelledby="room2-heading">
+            <h2 tabindex="-1" id="room2-heading">Sector 2: The Data Vault</h2>
+            <p>The visual matrix is scrambled. Holographic decoys are floating everywhere, breaking visual focus order.</p>
+            <p><strong>Objective:</strong> The underlying DOM structure is intact. Use the <kbd>Tab</kbd> key to scan the nodes sequentially and activate the "Primary Exit Node".</p>
+            
+            <div class="labyrinth-wrapper" id="r2-wrapper">
+                <a href="#" class="lab-item r2-decoy" style="top: 10px; left: 10px;">Decoy Node Alpha</a>
+                <a href="#" class="lab-item r2-decoy" style="top: 250px; left: 70%;">Decoy Node Beta</a>
+                <a href="#" class="lab-item r2-decoy" style="top: 50px; left: 40%;">Decoy Node Gamma</a>
+                <button class="btn lab-item" id="room2-exit" style="top: 150px; left: 80%; background: var(--primary); color: #fff;">Primary Exit Node</button>
+                <a href="#" class="lab-item r2-decoy" style="top: 300px; left: 20%;">Decoy Node Delta</a>
+            </div>
+            <button class="btn btn-hint" style="margin-top: 1rem;" onclick="requestHint(2)">Request Hint (-1000 pts)</button>
+        </div>
+
+        <!-- Room 3: Reactor Core -->
+        <div id="room-3" class="room-container glass-panel" aria-labelledby="room3-heading">
+            <h2 tabindex="-1" id="room3-heading">Sector 3: Reactor Core</h2>
+            <div class="reactor-core"><div class="core-pulse"></div></div>
+            <p>Core temperature critical. System protocol: <em>"Engage the green coolant line."</em> However, the virus has disabled your suit's color sensors.</p>
+            <p><strong>Objective:</strong> Do not guess. Enable the accessibility diagnostic tool to reveal secondary identifiers, then engage the correct line.</p>
+            
+            <button class="btn btn-outline" id="btn-reveal-patterns" style="margin-bottom: 1rem;">Run Diagnostic (Reveal Patterns)</button>
+            
+            <div class="wire-panel">
+                <button class="wire wire-red" aria-label="Red Line" onclick="failRoom3()"><span>❌</span></button>
+                <button class="wire wire-blue" aria-label="Blue Line" onclick="failRoom3()"><span>🌊</span></button>
+                <button class="wire wire-green" id="correct-wire" aria-label="Green Line" onclick="passRoom3()"><span>✅</span></button>
+                <button class="wire wire-yellow" aria-label="Yellow Line" onclick="failRoom3()"><span>⚡</span></button>
+            </div>
+            <button class="btn btn-hint" onclick="requestHint(3)">Request Hint (-1000 pts)</button>
+        </div>
+
+        <!-- Room 4: Digital Archive -->
+        <div id="room-4" class="room-container glass-panel" aria-labelledby="room4-heading">
+            <h2 tabindex="-1" id="room4-heading">Sector 4: The Archives</h2>
+            <p>Metadata corrupted. The screen reader AI is crashing because image alt attributes are missing or incorrect.</p>
+            <p><strong>Objective:</strong> Select the correct `alt` text strategy for each visual asset based on its context.</p>
+            
+            <div class="image-grid">
+                <div class="image-card">
+                    <div class="image-placeholder"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg></div>
+                    <p style="font-size: 0.9rem;">Icon inside a Submit button</p>
+                    <label for="alt1" class="sr-only">Alt text for search icon</label>
+                    <select id="alt1" class="alt-select">
+                        <option value="">Select strategy...</option>
+                        <option value="decorative">alt="" (Decorative)</option>
+                        <option value="functional">alt="Submit Search"</option>
+                        <option value="literal">alt="Magnifying glass"</option>
+                    </select>
+                </div>
+                <div class="image-card">
+                    <div class="image-placeholder"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20V10M18 20V4M6 20v-4"></path></svg></div>
+                    <p style="font-size: 0.9rem;">Complex data chart</p>
+                    <label for="alt2" class="sr-only">Alt text for chart</label>
+                    <select id="alt2" class="alt-select">
+                        <option value="">Select strategy...</option>
+                        <option value="decorative">alt="" (Decorative)</option>
+                        <option value="brief">alt="Bar chart showing Q3 growth of 15%"</option>
+                        <option value="literal">alt="Three vertical bars"</option>
+                    </select>
+                </div>
+                <div class="image-card">
+                    <div class="image-placeholder"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 22h20L12 2z"></path></svg></div>
+                    <p style="font-size: 0.9rem;">Abstract shape next to heading</p>
+                    <label for="alt3" class="sr-only">Alt text for decorative shape</label>
+                    <select id="alt3" class="alt-select">
+                        <option value="">Select strategy...</option>
+                        <option value="decorative">alt="" (Decorative)</option>
+                        <option value="functional">alt="Go to top"</option>
+                        <option value="literal">alt="Triangle"</option>
+                    </select>
+                </div>
+            </div>
+            <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+                <button class="btn" id="btn-submit-alt">Compile Metadata</button>
+                <button class="btn btn-hint" style="margin-top: 0;" onclick="requestHint(4)">Request Hint</button>
+            </div>
+        </div>
+
+        <!-- Room 5: Override Console -->
+        <div id="room-5" class="room-container glass-panel" aria-labelledby="room5-heading">
+            <h2 tabindex="-1" id="room5-heading">Sector 5: Override Console</h2>
+            <p>The final firewall. The form relies solely on placeholders and visual color cues for errors, making it inaccessible to the automated screen reader.</p>
+            <p><strong>Objective:</strong> Use the Dev Tools to inject proper semantic relationships, then override the system.</p>
+            
+            <div class="dev-tools">
+                <button class="btn btn-outline" id="fix-labels">Inject &lt;label&gt;</button>
+                <button class="btn btn-outline" id="fix-errors">Inject aria-describedby</button>
+                <button class="btn btn-outline" id="fix-req">Inject aria-required</button>
+            </div>
+
+            <div class="rescue-form" id="r5-form">
+                <div class="form-group">
+                    <label for="auth-code" class="form-label" id="lbl-auth">Authorization Code</label>
+                    <input type="text" id="auth-code" class="form-input" placeholder="Enter Override Code">
+                    <div class="form-error" id="err-auth">⚠ Error: Invalid authorization format.</div>
+                </div>
+                <button class="btn" id="btn-submit-form" style="width: 100%;">Execute Override</button>
+            </div>
+            <button class="btn btn-hint" onclick="requestHint(5)">Request Hint (-1000 pts)</button>
+        </div>
+
+        <!-- Room 6: Dark Net -->
+        <div id="room-6" class="room-container glass-panel" aria-labelledby="room6-heading">
+            <h2 tabindex="-1" id="room6-heading">Sector 6: The Dark Net</h2>
+            <p>Visual rendering engine offline. You are navigating raw DOM output.</p>
+            <p><strong>Objective:</strong> The virus has planted fake interactive elements using `div` and `span` tags. Find the semantically correct native button to safely disconnect.</p>
+            
+            <div class="terminal-container">
+                <div class="terminal-line"><span class="sr-tag">&lt;main role="main"&gt;</span></div>
+                
+                <div class="terminal-line" style="padding-left: 2rem;">
+                    <span class="sr-tag">&lt;div class="btn" onclick="javascript:void(0)"&gt;</span> 
+                    <button class="terminal-btn" onclick="failRoom6()">Disconnect (div)</button>
+                </div>
+                
+                <div class="terminal-line" style="padding-left: 2rem;">
+                    <span class="sr-tag">&lt;a href="#"&gt;</span> 
+                    <button class="terminal-btn" onclick="failRoom6()">Disconnect (link)</button>
+                </div>
+                
+                <div class="terminal-line" style="padding-left: 2rem;">
+                    <span class="sr-tag">&lt;button aria-label="Emergency Disconnect"&gt;</span> 
+                    <button class="terminal-btn" id="final-exit" onclick="passRoom6()">Disconnect (button)</button>
+                    <span class="sr-tag">&lt;/button&gt;</span>
+                </div>
+
+                <div class="terminal-line" style="padding-left: 2rem;">
+                    <span class="sr-tag">&lt;span tabindex="0" role="button"&gt;</span> 
+                    <button class="terminal-btn" onclick="failRoom6()">Disconnect (span)</button>
+                </div>
+                
+                <div class="terminal-line"><span class="sr-tag">&lt;/main&gt;</span></div>
+            </div>
+            <button class="btn btn-hint" onclick="requestHint(6)">Request Hint (-1000 pts)</button>
+        </div>
+
+        <!-- Final Screen -->
+        <div id="screen-final" class="room-container glass-panel" aria-labelledby="final-heading">
+            <h2 tabindex="-1" id="final-heading" style="text-align: center;">Mission Accomplished</h2>
+            <p style="text-align: center;">The Barrier Virus has been purged. System compliance restored.</p>
+            
+            <div style="text-align: center;">
+                <div class="grade-display" id="final-grade">A+</div>
+                <div class="hud-label" style="font-size: 1.2rem;">Accessibility Rating</div>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-box"><span class="val" id="stat-score">0</span><span class="lbl">Total Score</span></div>
+                <div class="stat-box"><span class="val" id="stat-time">00:00</span><span class="lbl">Time</span></div>
+                <div class="stat-box"><span class="val" id="stat-acc">100%</span><span class="lbl">Accuracy</span></div>
+                <div class="stat-box"><span class="val" id="stat-mistakes">0</span><span class="lbl">Mistakes</span></div>
+            </div>
+
+            <h3 style="text-align: center; margin-top: 2rem; color: var(--secondary);">Badges Earned</h3>
+            <div class="badges-container" id="badges-container">
+                <!-- Badges injected by JS -->
+            </div>
+
+            <div style="display: flex; justify-content: center; gap: 1rem; margin-top: 3rem;">
+                <button class="btn" onclick="resetGame(true)">Restart Mission</button>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Help Dialog -->
+    <div id="help-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="help-title">
+        <div class="modal-content">
+            <button class="modal-close" id="close-help" aria-label="Close Help">×</button>
+            <h2 id="help-title">System Manual & Controls</h2>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+                <div>
+                    <h3 style="color: var(--primary); margin-bottom: 1rem;">Keyboard Controls</h3>
+                    <ul style="list-style: none; padding: 0;">
+                        <li style="margin-bottom: 0.5rem;"><kbd>Tab</kbd> : Move to next element</li>
+                        <li style="margin-bottom: 0.5rem;"><kbd>Shift</kbd> + <kbd>Tab</kbd> : Move to previous element</li>
+                        <li style="margin-bottom: 0.5rem;"><kbd>Enter</kbd> / <kbd>Space</kbd> : Activate button/link</li>
+                        <li style="margin-bottom: 0.5rem;"><kbd>Esc</kbd> : Close dialogs</li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 style="color: var(--primary); margin-bottom: 1rem;">Game Mechanics</h3>
+                    <ul style="padding-left: 1rem;">
+                        <li style="margin-bottom: 0.5rem;"><strong>Hints:</strong> Cost 1,000 points. Use them if stuck.</li>
+                        <li style="margin-bottom: 0.5rem;"><strong>Mistakes:</strong> Cost 500 points and lower accuracy.</li>
+                        <li style="margin-bottom: 0.5rem;"><strong>Time:</strong> Faster times yield higher score bonuses.</li>
+                        <li style="margin-bottom: 0.5rem;"><strong>Save:</strong> Your progress is automatically saved locally.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Learning Summary Modal -->
+    <div id="learning-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+        <div class="modal-content">
+            <span class="wcag-tag" id="modal-tag" style="background: var(--success); padding: 0.25rem 0.75rem; border-radius: 4px; font-weight: bold; font-size: 0.9rem; margin-bottom: 1rem; display: inline-block;">WCAG</span>
+            <h2 id="modal-title" style="margin-top: 0;">Concept Learned</h2>
+            <div style="background: rgba(255,255,255,0.05); padding: 1.5rem; border-radius: 8px; margin-bottom: 1.5rem; border-left: 4px solid var(--warning);">
+                <h3 style="font-size: 1.1rem; color: var(--warning); margin-bottom: 0.5rem;">The Barrier</h3>
+                <p id="modal-problem" style="margin: 0;"></p>
+            </div>
+            <div style="background: rgba(255,255,255,0.05); padding: 1.5rem; border-radius: 8px; border-left: 4px solid var(--success);">
+                <h3 style="font-size: 1.1rem; color: var(--success); margin-bottom: 0.5rem;">The Solution</h3>
+                <p id="modal-solution" style="margin: 0;"></p>
+            </div>
+            <button class="btn" id="btn-next-room" style="width: 100%; margin-top: 2rem;">Acknowledge & Proceed</button>
+        </div>
+    </div>
+
+    <script>
+        // --- Web Audio API Synth ---
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        let audioEnabled = true;
+
+        function playTone(freq, type, duration, vol) {
+            if (!audioEnabled || audioCtx.state === 'suspended') return;
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = type; osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+            gain.gain.setValueAtTime(vol, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
+            osc.connect(gain); gain.connect(audioCtx.destination);
+            osc.start(); osc.stop(audioCtx.currentTime + duration);
+        }
+
+        const sfx = {
+            click: () => playTone(600, 'sine', 0.1, 0.1),
+            success: () => { playTone(440, 'sine', 0.1, 0.1); setTimeout(() => playTone(660, 'sine', 0.2, 0.1), 100); },
+            error: () => { playTone(150, 'sawtooth', 0.2, 0.1); setTimeout(() => playTone(100, 'sawtooth', 0.3, 0.1), 150); },
+            unlock: () => { playTone(880, 'sine', 0.1, 0.1); setTimeout(() => playTone(1100, 'sine', 0.4, 0.1), 100); }
+        };
+
+        document.getElementById('btn-audio').addEventListener('click', () => {
+            audioEnabled = !audioEnabled;
+            document.getElementById('btn-audio').textContent = audioEnabled ? '🔊' : '🔇';
+            showToast(audioEnabled ? "Audio Enabled" : "Audio Muted", "success");
+            if(audioEnabled && audioCtx.state === 'suspended') audioCtx.resume();
+        });
+
+        // --- State Management ---
+        const DEFAULT_STATE = { room: 0, score: 0, time: 0, mistakes: 0, hints: 0, r1Seq: 0, r5Lbl: false, r5Err: false, r5Req: false };
+        let state = JSON.parse(localStorage.getItem('a11yGameState')) || { ...DEFAULT_STATE };
+        let timerInterval;
+
+        function saveState() { localStorage.setItem('a11yGameState', JSON.stringify(state)); updateHUD(); }
+        
+        function resetGame(force = false) {
+            if(force || confirm("Are you sure you want to reset all progress?")) {
+                state = { ...DEFAULT_STATE }; saveState(); location.reload();
+            }
+        }
+        document.getElementById('btn-reset').addEventListener('click', () => resetGame());
+
+        // --- HUD & Toasts ---
+        const announcer = document.getElementById('live-announcer');
+        const hudScore = document.getElementById('hud-score');
+        const hudTime = document.getElementById('hud-time');
+        const toastContainer = document.getElementById('toast-container');
+
+        function formatTime(s) { const m = Math.floor(s/60).toString().padStart(2,'0'); const sec = (s%60).toString().padStart(2,'0'); return `${m}:${sec}`; }
+        function updateHUD() { hudScore.textContent = state.score.toLocaleString(); hudTime.textContent = formatTime(state.time); }
+        
+        function announce(msg) { announcer.textContent = ''; setTimeout(() => announcer.textContent = msg, 50); }
+        
+        function showToast(message, type = 'success') {
+            const t = document.createElement('div');
+            t.className = `toast ${type}`; t.setAttribute('role', type === 'error' ? 'alert' : 'status');
+            const icon = type === 'error' ? '❌' : type === 'warning' ? '⚠️' : '✅';
+            t.innerHTML = `<span>${icon}</span> <span>${message}</span>`;
+            toastContainer.appendChild(t);
+            setTimeout(() => { t.style.opacity = '0'; setTimeout(() => t.remove(), 300); }, 4000);
+            announce(message);
+        }
+
+        // --- Logic Engine ---
+        function addScore(pts) { state.score += pts; saveState(); }
+        function recordMistake() { state.mistakes++; addScore(-500); sfx.error(); showToast("Mistake recorded: -500 pts", "error"); }
+        
+        const hints = {
+            1: ["Look at the panel numbers.", "Use Tab to navigate.", "The sequence is 1, then 2, then 3."],
+            2: ["Don't trust your eyes.", "Use the keyboard to find the logical order.", "Tab until you find the 'Primary Exit Node'."],
+            3: ["Color is not enough.", "Click 'Run Diagnostic'.", "Look for the checkmark icon."],
+            4: ["Interactive icons need functional text.", "Charts need descriptions.", "Decorative shapes should be ignored by screen readers."],
+            5: ["Click the dev tools to inject code.", "Labels associate text with inputs.", "aria-describedby associates errors with inputs."],
+            6: ["A div is not a button.", "A link is for navigation, not actions.", "Find the native <button> tag."]
+        };
+        let hintCounters = {1:0, 2:0, 3:0, 4:0, 5:0, 6:0};
+
+        window.requestHint = function(roomNum) {
+            const count = hintCounters[roomNum];
+            if (count < 3) {
+                showToast(`Hint: ${hints[roomNum][count]}`, "warning");
+                hintCounters[roomNum]++; state.hints++; addScore(-1000);
+            } else {
+                showToast("No more hints available for this sector.", "error");
+            }
+        };
+
+        // --- Navigation ---
+        const rooms = ['screen-intro', 'room-1', 'room-2', 'room-3', 'room-4', 'room-5', 'room-6', 'screen-final'];
+        
+        function startTimer() {
+            if(timerInterval) clearInterval(timerInterval);
+            timerInterval = setInterval(() => { state.time++; updateHUD(); if(state.time % 5 === 0) saveState(); }, 1000);
+        }
+
+        function showRoom(index) {
+            rooms.forEach(id => document.getElementById(id).classList.remove('active'));
+            document.getElementById(rooms[index]).classList.add('active');
+            document.body.setAttribute('data-room', index);
+            state.room = index; saveState();
+            
+            const target = document.getElementById(rooms[index]);
+            const heading = target.querySelector('h2');
+            if (heading) setTimeout(() => heading.focus(), 100);
+
+            // Dynamic Difficulty Adjustments based on accuracy
+            if(index === 2 && state.mistakes === 0) {
+                // Add more decoys if they are doing perfectly
+                document.getElementById('r2-wrapper').insertAdjacentHTML('beforeend', '<a href="#" class="lab-item r2-decoy" style="top: 350px; left: 50%;">Decoy Node Epsilon</a>');
+            }
+        }
+
+        const learningContent = [
+            null,
+            { tag: "WCAG 2.1.1", title: "Keyboard Navigability", problem: "Custom elements like <div> often lack native keyboard focus and event handling.", solution: "Use native <button> and <a> elements. Ensure logical tab order." },
+            { tag: "WCAG 2.4.3", title: "Focus Order", problem: "Absolute positioning can visually scramble elements, making keyboard navigation chaotic.", solution: "Ensure the DOM structure matches the visual presentation." },
+            { tag: "WCAG 1.4.1", title: "Use of Color", problem: "Colorblind users cannot perceive instructions relying solely on hue.", solution: "Provide secondary visual cues like icons, text, or patterns." },
+            { tag: "WCAG 1.1.1", title: "Non-text Content", problem: "Missing or poor 'alt' text leaves screen reader users guessing about images.", solution: "Provide context-appropriate alt text. Use empty alt='' for decoration." },
+            { tag: "WCAG 3.3.2", title: "Labels & Instructions", problem: "Placeholders disappear. Errors described only in text aren't announced on focus.", solution: "Use explicit <label> and link errors via aria-describedby." },
+            { tag: "Semantic HTML", title: "Semantics", problem: "Faux buttons break accessibility APIs and assistive tech.", solution: "Always use the correct semantic HTML tag for the job." }
+        ];
+
+        function completeRoom(num) {
+            addScore(10000); sfx.unlock(); showToast(`Sector ${num} Purged! +10,000 pts`);
+            const data = learningContent[num];
+            document.getElementById('modal-tag').textContent = data.tag;
+            document.getElementById('modal-title').textContent = data.title;
+            document.getElementById('modal-problem').textContent = data.problem;
+            document.getElementById('modal-solution').textContent = data.solution;
+            document.getElementById('learning-modal').classList.add('active');
+            document.getElementById('modal-title').focus();
+        }
+
+        document.getElementById('btn-next-room').addEventListener('click', () => {
+            document.getElementById('learning-modal').classList.remove('active');
+            if (state.room === 6) calculateFinalScore();
+            else showRoom(state.room + 1);
+        });
+
+        // --- Room Implementations ---
+
+        // R1
+        const kp1 = document.getElementById('kp-1'), kp2 = document.getElementById('kp-2'), kp3 = document.getElementById('kp-3');
+        function handleKp(req, btn, isLast) {
+            sfx.click();
+            if (state.r1Seq === req) {
+                state.r1Seq++; btn.classList.add('active');
+                if (isLast) { document.getElementById('r1-door').classList.add('open'); setTimeout(() => completeRoom(1), 800); }
+            } else {
+                state.r1Seq = 0; kp1.classList.remove('active'); kp2.classList.remove('active'); kp3.classList.remove('active');
+                recordMistake();
+            }
+        }
+        kp1.addEventListener('click', () => handleKp(0, kp1, false));
+        kp2.addEventListener('click', () => handleKp(1, kp2, false));
+        kp3.addEventListener('click', () => handleKp(2, kp3, true));
+        document.querySelectorAll('.r2-decoy').forEach(d => d.addEventListener('click', (e) => { e.preventDefault(); recordMistake(); }));
+
+        // R2
+        document.getElementById('room2-exit').addEventListener('click', () => { sfx.click(); completeRoom(2); });
+
+        // R3
+        document.getElementById('btn-reveal-patterns').addEventListener('click', () => {
+            sfx.click(); document.body.classList.remove('color-blind-mode'); document.body.classList.add('reveal-mode');
+            showToast("Diagnostic complete. Sensors active.", "success");
+        });
+        window.failRoom3 = function() { recordMistake(); };
+        window.passRoom3 = function() { sfx.click(); completeRoom(3); };
+
+        // R4
+        document.getElementById('btn-submit-alt').addEventListener('click', () => {
+            sfx.click();
+            const a1 = document.getElementById('alt1').value, a2 = document.getElementById('alt2').value, a3 = document.getElementById('alt3').value;
+            if (a1 === 'functional' && a2 === 'brief' && a3 === 'decorative') completeRoom(4);
+            else recordMistake();
+        });
+
+        // R5
+        document.getElementById('fix-labels').addEventListener('click', (e) => { sfx.click(); state.r5Lbl = true; document.getElementById('lbl-auth').classList.add('fixed'); e.target.disabled = true; });
+        document.getElementById('fix-errors').addEventListener('click', (e) => { sfx.click(); state.r5Err = true; document.getElementById('auth-code').setAttribute('aria-describedby', 'err-auth'); document.getElementById('err-auth').classList.add('fixed'); e.target.disabled = true; });
+        document.getElementById('fix-req').addEventListener('click', (e) => { sfx.click(); state.r5Req = true; document.getElementById('auth-code').setAttribute('aria-required', 'true'); document.getElementById('auth-code').classList.add('fixed'); e.target.disabled = true; });
+        
+        document.getElementById('btn-submit-form').addEventListener('click', () => {
+            sfx.click();
+            if (state.r5Lbl && state.r5Err && state.r5Req) { document.getElementById('r5-form').classList.add('secured'); completeRoom(5); }
+            else recordMistake();
+        });
+
+        // R6
+        window.failRoom6 = function() { recordMistake(); };
+        window.passRoom6 = function() { sfx.click(); completeRoom(6); };
+
+        // --- Final Calculation ---
+        function calculateFinalScore() {
+            clearInterval(timerInterval);
+            // Par time 300s (5m). Max time bonus 10000.
+            let timeBonus = Math.max(0, 10000 - (state.time * 20));
+            let totalActions = 6; // base actions
+            let acc = Math.max(0, (1 - (state.mistakes / (totalActions + state.mistakes)))) * 100;
+            let accBonus = acc === 100 ? 5000 : 0;
+            
+            state.score += Math.floor(timeBonus) + accBonus;
+            saveState();
+
+            document.getElementById('stat-score').textContent = state.score.toLocaleString();
+            document.getElementById('stat-time').textContent = formatTime(state.time);
+            document.getElementById('stat-acc').textContent = Math.round(acc) + '%';
+            document.getElementById('stat-mistakes').textContent = state.mistakes;
+
+            let grade = 'F';
+            if (acc > 95 && state.score > 60000) grade = 'A+';
+            else if (acc > 85) grade = 'A';
+            else if (acc > 70) grade = 'B';
+            else if (acc > 50) grade = 'C';
+            document.getElementById('final-grade').textContent = grade;
+
+            // Badges
+            const bc = document.getElementById('badges-container');
+            bc.innerHTML = '';
+            if (acc === 100) bc.innerHTML += '<div class="badge" aria-label="Flawless Run">🌟</div>';
+            if (state.time < 120) bc.innerHTML += '<div class="badge" aria-label="Speed Demon">⚡</div>';
+            if (state.hints === 0) bc.innerHTML += '<div class="badge" aria-label="Lone Wolf">🐺</div>';
+            bc.innerHTML += '<div class="badge" aria-label="Accessibility Hero">🛡️</div>';
+
+            showRoom(7); // Final room
+            triggerConfetti();
+            sfx.success();
+        }
+
+        function triggerConfetti() {
+            for(let i=0; i<50; i++) {
+                const c = document.createElement('div');
+                c.className = 'confetti';
+                c.style.left = Math.random() * 100 + 'vw';
+                c.style.backgroundColor = ['#3b82f6', '#10b981', '#f59e0b', '#8b5cf6'][Math.floor(Math.random()*4)];
+                c.style.animationDuration = (Math.random() * 3 + 2) + 's';
+                c.style.animationDelay = (Math.random() * 2) + 's';
+                document.body.appendChild(c);
+            }
+        }
+
+        // --- Init ---
+        document.getElementById('btn-start').addEventListener('click', () => {
+            sfx.click();
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            startTimer(); showRoom(1);
+        });
+
+        // Help Modal
+        document.getElementById('btn-help').addEventListener('click', () => { document.getElementById('help-modal').classList.add('active'); });
+        document.getElementById('close-help').addEventListener('click', () => { document.getElementById('help-modal').classList.remove('active'); });
+        
+        // Theme
+        document.getElementById('btn-theme').addEventListener('click', () => {
+            const current = document.documentElement.getAttribute('data-theme');
+            document.documentElement.setAttribute('data-theme', current === 'light' ? 'dark' : 'light');
+        });
+
+        // Resume state if exists
+        if (state.room > 0 && state.room < 7) {
+            if(confirm("Save file found. Resume mission?")) {
+                updateHUD(); startTimer(); showRoom(state.room);
+                // Restore R1
+                if(state.r1Seq > 0) { kp1.classList.add('active'); if(state.r1Seq > 1) kp2.classList.add('active'); }
+                // Restore R5
+                if(state.r5Lbl) { document.getElementById('lbl-auth').classList.add('fixed'); document.getElementById('fix-labels').disabled = true; }
+                if(state.r5Err) { document.getElementById('err-auth').classList.add('fixed'); document.getElementById('fix-errors').disabled = true; }
+                if(state.r5Req) { document.getElementById('auth-code').classList.add('fixed'); document.getElementById('fix-req').disabled = true; }
+            } else {
+                resetGame(true);
+            }
+        }
+        
+        // Keyboard Escape
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                document.querySelectorAll('.modal-overlay').forEach(m => m.classList.remove('active'));
+            }
+        });
+    </script>
+</body>
+</html>

@@ -7,22 +7,22 @@ import {
 } from 'recharts';
 import dashboardStyles from "../../AdminDashboard.module.css";
 import styles from "./AnalyticsView.module.css";
-import AccessibleChartWrapper from "components/common/AccessibleChartWrapper/AccessibleChartWrapper";
+import AccessibleChartWrapper from "pages/admin/components/AccessibleChartWrapper/AccessibleChartWrapper";
 
-// High contrast, WCAG AA compliant color palette
-const COLORS = ['#005A9C', '#B52A00', '#007A33', '#5E35B1', '#C66A00'];
+// High contrast, WCAG AA compliant color palette (responsive to theme)
+const COLORS = ['var(--chart-1)', 'var(--chart-2)', 'var(--chart-3)', 'var(--chart-4)', 'var(--chart-5)'];
 
 const SOURCE_COLORS = {
-  Direct: '#005A9C',
-  Social: '#B52A00',
-  Search: '#007A33',
-  Referral: '#5E35B1'
+  Direct: 'var(--chart-1)',
+  Social: 'var(--chart-2)',
+  Search: 'var(--chart-3)',
+  Referral: 'var(--chart-4)'
 };
 
 const DEVICE_COLORS = {
-  Desktop: '#005A9C',
-  Mobile: '#B52A00',
-  Tablet: '#007A33'
+  Desktop: 'var(--chart-1)',
+  Mobile: 'var(--chart-2)',
+  Tablet: 'var(--chart-3)'
 };
 
 const TIMEFRAMES = [
@@ -91,7 +91,9 @@ export default function AnalyticsView({ showToast }) {
 
   /* ---------- Loading / Error / Empty guards ---------- */
   if (loading && !data) {
-    return <p className={dashboardStyles.loading}>Loading web analytics…</p>;
+    return <div className={dashboardStyles.loading} role="status" aria-live="polite">
+        Loading web analytics…
+      </div>;
   }
 
   if (error && !data) {
@@ -217,11 +219,11 @@ export default function AnalyticsView({ showToast }) {
                       <stop offset="95%" stopColor="#007A33" stopOpacity={0} />
                     </linearGradient>
                   </defs>
-                  <XAxis dataKey="displayDate" stroke="#475569" fontSize={13} />
-                  <YAxis stroke="#475569" fontSize={13} allowDecimals={false} />
+                  <XAxis dataKey="displayDate" stroke="var(--text-muted)" fontSize={13} />
+                  <YAxis stroke="var(--text-muted)" fontSize={13} allowDecimals={false} />
                   <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#cbd5e1" />
                   <RechartsTooltip contentStyle={{ borderRadius: '8px', border: '1px solid #cbd5e1' }} />
-                  <Legend verticalAlign="top" height={36} />
+                  <Legend verticalAlign="top" height={36} wrapperStyle={{ color: 'var(--text)' }} />
                   <Area type="monotone" name="Sessions" dataKey="sessions" stroke="#005A9C" fillOpacity={1} fill="url(#gradVisitors)" />
                   <Area type="monotone" name="Pageviews" dataKey="pageviews" stroke="#007A33" fillOpacity={1} fill="url(#gradPageviews)" />
                 </AreaChart>

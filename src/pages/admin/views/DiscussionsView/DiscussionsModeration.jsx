@@ -1,8 +1,9 @@
 import { useState, useEffect, useMemo } from 'react';
+import { Trash } from "lucide-react";
 import { postsApi } from 'api/client';
 import dashboardStyles from '../../AdminDashboard.module.css';
 import DiscussionModal from './DiscussionModal';
-import Table from 'components/common/Table/Table';
+import Table from 'pages/admin/components/Table/Table';
 import { useConfirm } from 'context/ConfirmContext';
 import styles from './DiscussionsView.module.css';
 import { truncateText } from 'utils/commonUtils';
@@ -47,6 +48,7 @@ export default function DiscussionsModeration({ showToast }) {
       await postsApi.deleteAdmin(id);
       setPosts(prev => prev.filter(p => p.id !== id));
       showToast?.('Discussion deleted.', 'success');
+      setTimeout(() => document.getElementById("admin-search-input")?.focus(), 0);
     } catch (err) {
       showToast?.(err.message || 'Failed to delete discussion.', 'error');
     }
@@ -59,6 +61,7 @@ export default function DiscussionsModeration({ showToast }) {
       setPosts(prev => prev.filter(p => !selectedIds.includes(p.id)));
       showToast?.(`Successfully deleted ${selectedIds.length} discussions.`, "success");
       setSelectedIds([]);
+      setTimeout(() => document.getElementById("admin-search-input")?.focus(), 0);
     } catch (err) {
       showToast?.(err.message || "Failed to bulk delete discussions.", "error");
     }
@@ -123,6 +126,7 @@ export default function DiscussionsModeration({ showToast }) {
           className={styles.btnSecondary} 
           style={{ padding: '4px 8px', fontSize: '13px' }}
           onClick={() => handleEdit(post)}
+          aria-label={`Edit ${post.title}`}
         >
           Edit
         </button>
@@ -130,6 +134,7 @@ export default function DiscussionsModeration({ showToast }) {
           className={styles.btnDanger} 
           style={{ padding: '4px 8px', fontSize: '13px' }}
           onClick={() => handleDelete(post.id)}
+          aria-label={`Delete ${post.title}`}
         >
           Delete
         </button>
@@ -143,7 +148,9 @@ export default function DiscussionsModeration({ showToast }) {
         <h2 id="discussions-mod-title" className={dashboardStyles.panelTitle} style={{ margin: 0 }}>Discussions</h2>
         <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
           <input
-            type="text"
+            id="admin-search-input"
+            type="search"
+            aria-label="Search discussions"
             placeholder="Search discussions..."
             value={discussionSearch}
             onChange={(e) => setDiscussionSearch(e.target.value)}
@@ -161,11 +168,11 @@ export default function DiscussionsModeration({ showToast }) {
               onClick={handleBulkDelete}
               style={{ padding: '8px 12px', fontSize: '14px', borderRadius: '6px' }}
             >
-              🗑 Bulk Delete ({selectedIds.length})
+              <Trash aria-hidden="true" size={16} /> Bulk Delete ({selectedIds.length})
             </button>
           )}
           <button className={styles.btnPrimary} onClick={handleCreateNew}>
-            + Create Discussion
+            <span aria-hidden="true">+</span> Create Discussion
           </button>
         </div>
       </div>

@@ -23,7 +23,7 @@ export default function SignInPage({ goToPortal }) {
   const [showPassword, setShowPassword] = useState(false);
 
   const formik = useFormik({
-    initialValues: signInInitialValues,
+    initialValues: { ...signInInitialValues, email: location.state?.email || signInInitialValues.email },
     validationSchema: signInValidationSchema,
     onSubmit: async (values, { setSubmitting }) => {
       try {
@@ -96,15 +96,19 @@ export default function SignInPage({ goToPortal }) {
               name="email"
               className={`${styles.input} ${formik.touched.email && formik.errors.email ? styles.inputError : ''}`}
               type="email"
-              autoComplete="email"
+              autoComplete="username"
+              autoFocus
               value={formik.values.email}
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}
               disabled={formik.isSubmitting || submittingGoogle}
               required
+              aria-required="true"
+              aria-invalid={!!(formik.touched.email && formik.errors.email)}
+              aria-describedby={formik.touched.email && formik.errors.email ? "signin-email-error" : undefined}
             />
             {formik.touched.email && formik.errors.email && (
-              <div className={styles.errorText}>{formik.errors.email}</div>
+              <div id="signin-email-error" className={styles.errorText} role="alert">{formik.errors.email}</div>
             )}
           </div>
 
@@ -113,7 +117,7 @@ export default function SignInPage({ goToPortal }) {
               <label className={styles.label} htmlFor="signin-password">
                 Password<span className="required-asterisk" aria-hidden="true"> *</span>
               </label>
-              <Link className={styles.linkInline} to="/forgot-password">
+              <Link className={styles.linkInline} to="/forgot-password" state={{ ...location.state, email: formik.values.email }}>
                 Forgot password?
               </Link>
             </div>
@@ -130,6 +134,9 @@ export default function SignInPage({ goToPortal }) {
                 onBlur={formik.handleBlur}
                 disabled={formik.isSubmitting || submittingGoogle}
                 required
+                aria-required="true"
+                aria-invalid={!!(formik.touched.password && formik.errors.password)}
+                aria-describedby={formik.touched.password && formik.errors.password ? "signin-password-error" : undefined}
               />
               <button
                 type="button"
@@ -137,22 +144,22 @@ export default function SignInPage({ goToPortal }) {
                 onClick={() => setShowPassword(!showPassword)}
                 aria-label={showPassword ? 'Hide password' : 'Show password'}
               >
-                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                {showPassword ? <EyeOff aria-hidden="true" size={18} /> : <Eye aria-hidden="true" size={18} />}
               </button>
             </div>
             {formik.touched.password && formik.errors.password && (
-              <div className={styles.errorText}>{formik.errors.password}</div>
+              <div id="signin-password-error" className={styles.errorText} role="alert">{formik.errors.password}</div>
             )}
           </div>
 
-          <button type="submit" className={styles.submit} disabled={formik.isSubmitting || submittingGoogle || !formik.isValid || !formik.dirty}>
+          <button type="submit" className={styles.submit} disabled={formik.isSubmitting || submittingGoogle}>
             {formik.isSubmitting ? 'Signing in…' : 'Sign in'}
           </button>
         </form>
 
         <p className={styles.footer}>
           Don&apos;t have an account?{' '}
-          <Link className={styles.link} to="/sign-up" state={location.state}>
+          <Link className={styles.link} to="/sign-up" state={{ ...location.state, email: formik.values.email }}>
             Join community
           </Link>
         </p>

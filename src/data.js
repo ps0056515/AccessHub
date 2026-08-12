@@ -507,10 +507,10 @@ export const TAG_COLORS = {
 };
 
 export const COLOR_MAP = {
-  blue: { bg: '#e8f0fb', text: '#0d3060' },
-  green: { bg: '#e6f4ee', text: '#0d4a32' },
-  amber: { bg: '#fef3e2', text: '#6b3f05' },
-  purple: { bg: '#f0edfd', text: '#3a2580' },
-  red: { bg: '#fdecea', text: '#7a1f12' },
-  pink: { bg: '#fde8f0', text: '#7a2050' },
+  blue: { bg: 'var(--blue-bg)', text: 'var(--blue-text)' },
+  green: { bg: 'var(--green-bg)', text: 'var(--green-text)' },
+  amber: { bg: 'var(--amber-bg)', text: 'var(--amber-text)' },
+  purple: { bg: 'var(--purple-bg)', text: 'var(--purple-text)' },
+  red: { bg: 'var(--red-bg)', text: 'var(--red-text)' },
+  pink: { bg: 'var(--pink-bg)', text: 'var(--pink-text)' },
 };

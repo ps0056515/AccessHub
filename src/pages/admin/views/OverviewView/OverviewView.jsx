@@ -4,8 +4,8 @@ import { useAuth } from "context/AuthContext";
 import { Download } from "lucide-react";
 import dashboardStyles from "../../AdminDashboard.module.css";
 import styles from "./OverviewView.module.css";
-import Table from "components/common/Table/Table";
-import Tooltip from "components/common/Tooltip/Tooltip";
+import Table from "pages/admin/components/Table/Table";
+import Tooltip from "pages/admin/components/Tooltip/Tooltip";
 import { useConfirm } from "context/ConfirmContext";
 import { exportToExcel } from "utils/commonUtils";
 
@@ -130,10 +130,17 @@ export default function OverviewView({ showToast }) {
     };
   }, [showToast]);
 
-  if (loading)
+  if (loading) {
     return (
-      <p className={dashboardStyles.loading}>Loading dashboard overview…</p>
+      <div 
+        className={dashboardStyles.loading} 
+        role="status" 
+        aria-live="polite"
+      >
+        Loading dashboard overview…
+      </div>
     );
+  }
   if (error) {
     return (
       <div className={styles.errorContainer}>
@@ -209,6 +216,7 @@ export default function OverviewView({ showToast }) {
             className={`${styles.actionBtn} ${u.isAdmin ? styles.actionBtnDanger : ""}`}
             onClick={() => toggleRole(u)}
             disabled={u.id === currentUser?.id}
+            aria-label={`${u.isAdmin ? "Revoke Admin" : "Make Admin"} for ${u.displayName}`}
           >
             {u.isAdmin ? "Revoke Admin" : "Make Admin"}
           </button>
@@ -216,6 +224,7 @@ export default function OverviewView({ showToast }) {
             className={`${styles.actionBtn} ${u.isBlocked ? "" : styles.actionBtnDanger}`}
             onClick={() => toggleBlock(u)}
             disabled={u.id === currentUser?.id}
+            aria-label={`${u.isBlocked ? "Unblock" : "Block"} ${u.displayName}`}
           >
             {u.isBlocked ? "Unblock" : "Block"}
           </button>
@@ -223,7 +232,7 @@ export default function OverviewView({ showToast }) {
             className={`${styles.actionBtn} ${styles.actionBtnDanger}`}
             onClick={() => deleteUser(u)}
             disabled={u.id === currentUser?.id}
-            title="Delete user"
+            aria-label={`Delete ${u.displayName}`}
           >
             Delete
           </button>
@@ -274,13 +283,14 @@ export default function OverviewView({ showToast }) {
                   onClick={() => exportToExcel(stats.byCountry, "members_by_country")} 
                   className={styles.actionBtn}
                   style={{ padding: '8px', borderRadius: '6px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-                  aria-label="Export to Excel"
+                  aria-label="Export members by country to Excel"
                 >
-                  <Download size={16} />
+                  <Download aria-hidden="true" size={16} />
                 </button>
               </Tooltip>
               <input 
-                type="text" 
+                type="search" 
+                aria-label="Search members by country"
                 placeholder="Search..." 
                 value={countrySearch}
                 onChange={(e) => setCountrySearch(e.target.value)}
@@ -296,6 +306,7 @@ export default function OverviewView({ showToast }) {
             </div>
           </div>
           <Table
+            ariaLabel="Top Countries Data"
             columns={countryColumns}
             data={stats.byCountry}
             emptyMessage="No data available."
@@ -321,13 +332,14 @@ export default function OverviewView({ showToast }) {
                   }} 
                   className={styles.actionBtn}
                   style={{ padding: '8px', borderRadius: '6px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-                  aria-label="Export to Excel"
+                  aria-label="Export members by city to Excel"
                 >
-                  <Download size={16} />
+                  <Download aria-hidden="true" size={16} />
                 </button>
               </Tooltip>
               <input 
-                type="text" 
+                type="search" 
+                aria-label="Search members by city"
                 placeholder="Search..." 
                 value={citySearch}
                 onChange={(e) => setCitySearch(e.target.value)}
@@ -343,6 +355,7 @@ export default function OverviewView({ showToast }) {
             </div>
           </div>
           <Table
+            ariaLabel="Top Cities Data"
             columns={cityColumns}
             data={stats.byCity.map((r) => ({
               id: `${r.city}-${r.country}`,
@@ -381,13 +394,14 @@ export default function OverviewView({ showToast }) {
                 }} 
                 className={styles.actionBtn}
                 style={{ padding: '8px', borderRadius: '6px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-                aria-label="Export to Excel"
+                aria-label="Export all members to Excel"
               >
-                <Download size={16} />
+                <Download aria-hidden="true" size={16} />
               </button>
             </Tooltip>
             <input 
-              type="text" 
+              type="search" 
+              aria-label="Search all members"
               placeholder="Search members..." 
               value={memberSearch}
               onChange={(e) => setMemberSearch(e.target.value)}
@@ -402,6 +416,7 @@ export default function OverviewView({ showToast }) {
           </div>
         </div>
         <Table
+          ariaLabel="Recent Members Data"
           columns={userColumns}
           data={users}
           emptyMessage="No members found."
@@ -414,3 +429,4 @@ export default function OverviewView({ showToast }) {
     </>
   );
 }
+
