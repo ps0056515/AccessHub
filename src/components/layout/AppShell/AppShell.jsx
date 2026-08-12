@@ -23,6 +23,8 @@ import SignUpPage from "pages/auth/SignUpPage";
 import ForgotPasswordPage from "pages/auth/ForgotPasswordPage";
 import ResetPasswordPage from "pages/auth/ResetPasswordPage";
 import CompleteProfilePage from "pages/auth/CompleteProfilePage";
+import GamesHub from "pages/games/GamesHub";
+import GamePlayer from "pages/games/GamePlayer";
 // Footer pages
 import Privacy from "pages/footer-pages/Privacy/Privacy";
 import Terms from "pages/footer-pages/Terms/Terms";
@@ -59,6 +61,7 @@ const SECTION_PATHS = {
   events: "/events",
   guide: "/screen-readers",
   articles: "/articles",
+  games: "/games",
 };
 
 const PAGE_TITLES = {
@@ -68,6 +71,7 @@ const PAGE_TITLES = {
   events: `Events · ${SITE_NAME}`,
   guide: `Screen Readers · ${SITE_NAME}`,
   articles: `Articles · ${SITE_NAME}`,
+  games: `Games Arcade · ${SITE_NAME}`,
 };
 
 /** `html { scroll-behavior: smooth }` can animate `scrollTo`; route changes must jump instantly. */
@@ -129,8 +133,9 @@ export default function AppShell() {
 
   const isThreadRoute = location.pathname.startsWith("/thread/");
   const isProfileRoute = location.pathname.startsWith("/profile/");
+  const isGameRoute = location.pathname.startsWith("/games/");
 
-  const SECTION_IDS = ["portal", "resources", "tools", "events", "guide", "articles"];
+  const SECTION_IDS = ["portal", "resources", "tools", "events", "guide", "articles", "games"];
 
   const sectionFromPath = SECTION_IDS.find(
     (id) => id !== "portal" && location.pathname === SECTION_PATHS[id],
@@ -321,6 +326,8 @@ export default function AppShell() {
           <Route path="/privacy" element={<Privacy />} />
           <Route path="/terms" element={<Terms />} />
           <Route path="/accessibility" element={<AccessibilityStatement />} />
+          <Route path="/games" element={<GamesHub />} />
+          <Route path="/games/:slug" element={<GamePlayer />} />
           <Route path="/sitemap" element={<Sitemap />} />
           <Route path="/news" element={<News />} />
           <Route path="/contact" element={<Contact />} />

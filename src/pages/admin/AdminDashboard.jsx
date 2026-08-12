@@ -21,6 +21,7 @@ import BlogpostsView from './views/BlogpostsView/BlogpostsView';
 import ScreenReadersView from './views/ScreenReadersView/ScreenReadersView';
 import SettingsView from './views/SettingsView/SettingsView';
 import AnalyticsView from './views/AnalyticsView/AnalyticsView';
+import GamesView from './views/GamesView/GamesView';
 
 const VIEWS = {
   overview: OverviewView,
@@ -33,6 +34,7 @@ const VIEWS = {
   screen_readers: ScreenReadersView,
   settings: SettingsView,
   analytics: AnalyticsView,
+  games: GamesView,
 };
 
 function AdminDashboardInner({ goToPortal }) {
@@ -91,6 +93,7 @@ function AdminDashboardInner({ goToPortal }) {
     { id: 'articles', label: 'Articles', icon: '📝' },
     { id: 'blogposts', label: 'Blogposts', icon: '📰' },
     { id: 'screen_readers', label: 'Screen Readers', icon: '🔊' },
+    { id: 'games', label: 'Games', icon: '🎮' },
     { id: 'settings', label: 'Settings', icon: '⚙️' },
   ];
 
@@ -210,9 +213,10 @@ function AdminDashboardInner({ goToPortal }) {
           {activeTab === 'events' && <EventsView showToast={addToast} />}
           {activeTab === 'discussions' && <DiscussionsView showToast={addToast} />}
           {activeTab === 'articles' && <ArticlesView showToast={addToast} />}
-          {activeTab === 'blogposts' && <BlogpostsView showToast={addToast} />}
-          {activeTab === 'screen_readers' && <ScreenReadersView showToast={addToast} />}
-          {activeTab === 'settings' && <SettingsView showToast={addToast} />}
+          { activeTab === 'blogposts' && <BlogpostsView showToast={addToast} /> }
+          { activeTab === 'screen_readers' && <ScreenReadersView showToast={addToast} /> }
+          { activeTab === 'games' && <GamesView showToast={addToast} /> }
+          { activeTab === 'settings' && <SettingsView showToast={addToast} /> }
         </main>
       </div>
     </div>

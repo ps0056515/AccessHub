@@ -22,11 +22,30 @@ export default function FlyingFocus() {
       }
     };
 
-    const handleFocus = (e) => {
+      const handleFocus = (e) => {
       const target = e.target;
       if (!target || target === document || target === window) return;
       
-      const isKeyboard = Date.now() - keyDownTimeRef.current < 500;
+      // The PERFECT WORKAROUND:
+      // If the user tabs into the game iframe, hide the flying focus immediately.
+      // This allows the flying focus to work on the navbar/footer, but disables it for the game.
+      if (target.tagName && target.tagName.toLowerCase() === 'iframe') {
+        setIsVisible(false);
+        return;
+      }
+      
+      // When tabbing out of an iframe, the parent document doesn't get the keydown event.
+      // So we use the native :focus-visible pseudo-class to detect keyboard focus.
+      let isKeyboard = false;
+      try {
+        isKeyboard = target.matches(':focus-visible');
+      } catch (e) {
+        // Fallback for very old browsers
+      }
+      
+      if (!isKeyboard) {
+        isKeyboard = Date.now() - keyDownTimeRef.current < 500;
+      }
       
       if (!isKeyboard) {
         setIsVisible(false);
