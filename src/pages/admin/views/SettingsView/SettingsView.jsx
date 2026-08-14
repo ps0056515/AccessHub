@@ -8,13 +8,14 @@ import styles from './SettingsView.module.css';
 
 export default function SettingsView({ showToast }) {
   const confirm = useConfirm();
-  const { siteName, navbarLogoUrl, footerLogoUrl, navigation, footerColumns, portalConfig, refreshConfig } = useConfig();
+  const { siteName, enableThemeToggle, navbarLogoUrl, darkNavbarLogoUrl, footerLogoUrl, darkFooterLogoUrl, navigation, footerColumns, portalConfig, refreshConfig } = useConfig();
 
   // Tab state: 'branding', 'navbar', 'footer', 'landing'
   const [activeSubTab, setActiveSubTab] = useState('branding');
 
   // Branding states
   const [siteNameInput, setSiteNameInput] = useState(siteName);
+  const [enableThemeToggleInput, setEnableThemeToggleInput] = useState(enableThemeToggle);
   const [brandingLoading, setBrandingLoading] = useState(false);
   const [logoLoading, setLogoLoading] = useState(null); // 'navbar' or 'footer'
 
@@ -45,7 +46,8 @@ export default function SettingsView({ showToast }) {
 
   useEffect(() => {
     setSiteNameInput(siteName);
-  }, [siteName]);
+    setEnableThemeToggleInput(enableThemeToggle);
+  }, [siteName, enableThemeToggle]);
 
   useEffect(() => {
     if (portalConfig) {
@@ -88,7 +90,7 @@ export default function SettingsView({ showToast }) {
     e.preventDefault();
     setBrandingLoading(true);
     try {
-      await settingsApi.update({ site_name: siteNameInput.trim() });
+      await settingsApi.update({ site_name: siteNameInput.trim(), enable_theme_toggle: enableThemeToggleInput });
       await refreshConfig();
       showToast?.('Site branding updated successfully!', 'success');
     } catch (err) {
@@ -103,9 +105,9 @@ export default function SettingsView({ showToast }) {
     const file = e.target.files[0];
     if (!file) return;
 
-    // Validation: Logo size MUST be smaller than 2MB
-    if (file.size > 2 * 1024 * 1024) {
-      showToast?.(`Logo file size must be smaller than 2MB. Your file is ${(file.size / (1024 * 1024)).toFixed(2)}MB.`, 'error');
+    // Validation: Logo size MUST be smaller than 5MB
+    if (file.size > 5 * 1024 * 1024) {
+      showToast?.(`Logo file size must be smaller than 5MB. Your file is ${(file.size / (1024 * 1024)).toFixed(2)}MB.`, 'error');
       return;
     }
     setLogoLoading(key);
@@ -120,8 +122,15 @@ export default function SettingsView({ showToast }) {
           key: key
         });
         await refreshConfig();
-        const labelName = key === 'navbar_logo_url' ? 'Navbar logo' : key === 'footer_logo_url' ? 'Footer logo' : 'Hero background';
-        showToast?.(`${labelName} uploaded successfully!`, 'success');
+        const labelNames = {
+          navbar_logo_url: 'Navbar logo',
+          dark_navbar_logo_url: 'Dark Navbar logo',
+          footer_logo_url: 'Footer logo',
+          dark_footer_logo_url: 'Dark Footer logo',
+          portal_hero_bg_url: 'Hero background',
+          dark_portal_hero_bg_url: 'Dark Hero background'
+        };
+        showToast?.(`${labelNames[key]} uploaded successfully!`, 'success');
       } catch (err) {
         showToast?.(err.message || 'Failed to upload logo.', 'error');
       } finally {
@@ -389,31 +398,34 @@ export default function SettingsView({ showToast }) {
       {/* Tab 1: Branding & Logos */}
       {activeSubTab === 'branding' && (
         <div id="tabpanel-branding" role="tabpanel" aria-labelledby="tab-branding" className={styles.tabContent}>
-          {/* <section className={dashboardStyles.panel}>
-            <h2 className={dashboardStyles.panelTitle}>Site Brand</h2>
+          <section className={dashboardStyles.panel}>
+            <h2 className={dashboardStyles.panelTitle}>Site Preferences</h2>
             <form onSubmit={handleSaveBranding}>
-              <div className={styles.formGroup}>
-                <label htmlFor="site-name-input" className={styles.formLabel}>Site Name</label>
+              <div className={styles.formGroup} style={{ flexDirection: 'row', alignItems: 'center', gap: '12px' }}>
                 <input
-                  id="site-name-input"
-                  type="text"
-                  value={siteNameInput}
-                  onChange={(e) => setSiteNameInput(e.target.value)}
-                  className={styles.textInput}
+                  id="enable-theme-toggle"
+                  type="checkbox"
+                  checked={enableThemeToggleInput}
+                  onChange={(e) => setEnableThemeToggleInput(e.target.checked)}
+                  style={{ width: '20px', height: '20px' }}
                 />
+                <label htmlFor="enable-theme-toggle" className={styles.formLabel} style={{ marginBottom: 0 }}>Enable Dark/Light Mode Toggle</label>
               </div>
+              <p className={styles.lead} style={{ marginTop: '8px', marginBottom: '16px', fontSize: '14px' }}>
+                If disabled, the theme toggle icon in the navigation bar will be hidden, and the site will be permanently forced into Light Mode.
+              </p>
               <button
                 type="submit"
                 disabled={brandingLoading}
                 className={`${dashboardStyles.backBtn} ${styles.saveBtn}`}
               >
-                {brandingLoading ? 'Saving...' : 'Save Site Name'}
+                {brandingLoading ? 'Saving...' : 'Save Preferences'}
               </button>
             </form>
-          </section> */}
+          </section>
 
           <section className={dashboardStyles.panel}>
-            <h2 className={dashboardStyles.panelTitle}>Website Logos (Max 2MB file size)</h2>
+            <h2 className={dashboardStyles.panelTitle}>Website Logos (Max 5MB file size)</h2>
             
             <div className={styles.logosGrid}>
               {/* Navbar Logo */}
@@ -424,10 +436,25 @@ export default function SettingsView({ showToast }) {
                 </div>
                 <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
                   <label className={styles.uploadLabelBtn}>
-                    {logoLoading === 'navbar_logo_url' ? 'Uploading...' : 'Choose Navbar Logo'}
+                    {logoLoading === 'navbar_logo_url' ? 'Uploading...' : 'Choose Light Logo'}
                     <input type="file" accept="image/*" onChange={(e) => handleLogoUpload(e, 'navbar_logo_url')} className={styles.fileInputOverlay} />
                   </label>
                   <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>(JPG, PNG, SVG, WEBP)</span>
+                </div>
+                
+                <h4 style={{ fontSize: '14px', marginTop: '20px', marginBottom: '8px' }}>Dark Mode Variant (Optional)</h4>
+                <div className={styles.logoPreviewBox} style={{ background: '#1e293b' }}>
+                  {darkNavbarLogoUrl ? (
+                    <img src={darkNavbarLogoUrl} alt="Dark Navbar Logo Preview" className={styles.logoPreviewImg} />
+                  ) : (
+                    <span style={{ color: '#94a3b8' }}>No dark mode variant</span>
+                  )}
+                </div>
+                <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+                  <label className={styles.uploadLabelBtn}>
+                    {logoLoading === 'dark_navbar_logo_url' ? 'Uploading...' : 'Choose Dark Logo'}
+                    <input type="file" accept="image/*" onChange={(e) => handleLogoUpload(e, 'dark_navbar_logo_url')} className={styles.fileInputOverlay} />
+                  </label>
                 </div>
               </div>
 
@@ -439,10 +466,25 @@ export default function SettingsView({ showToast }) {
                 </div>
                 <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
                   <label className={styles.uploadLabelBtn}>
-                    {logoLoading === 'footer_logo_url' ? 'Uploading...' : 'Choose Footer Logo'}
+                    {logoLoading === 'footer_logo_url' ? 'Uploading...' : 'Choose Light Logo'}
                     <input type="file" accept="image/*" onChange={(e) => handleLogoUpload(e, 'footer_logo_url')} className={styles.fileInputOverlay} />
                   </label>
                   <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>(JPG, PNG, SVG, WEBP)</span>
+                </div>
+
+                <h4 style={{ fontSize: '14px', marginTop: '20px', marginBottom: '8px' }}>Dark Mode Variant (Optional)</h4>
+                <div className={styles.logoPreviewBox} style={{ background: '#1e293b' }}>
+                  {darkFooterLogoUrl ? (
+                    <img src={darkFooterLogoUrl} alt="Dark Footer Logo Preview" className={styles.logoPreviewImg} />
+                  ) : (
+                    <span style={{ color: '#94a3b8' }}>No dark mode variant</span>
+                  )}
+                </div>
+                <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+                  <label className={styles.uploadLabelBtn}>
+                    {logoLoading === 'dark_footer_logo_url' ? 'Uploading...' : 'Choose Dark Logo'}
+                    <input type="file" accept="image/*" onChange={(e) => handleLogoUpload(e, 'dark_footer_logo_url')} className={styles.fileInputOverlay} />
+                  </label>
                 </div>
               </div>
             </div>
@@ -510,8 +552,9 @@ export default function SettingsView({ showToast }) {
           </section>
 
           <section className={dashboardStyles.panel}>
-            <h2 className={dashboardStyles.panelTitle}>Hero Background Image (Max 2MB file size)</h2>
+            <h2 className={dashboardStyles.panelTitle}>Hero Background Image (Max 5MB file size)</h2>
             <div className={styles.logoCard}>
+              <h3 className={styles.logoCardTitle} style={{ fontSize: '16px' }}>Light Mode Background</h3>
               <div className={styles.logoPreviewBox} style={{ height: '160px', background: '#e0e0e0', overflow: 'hidden', position: 'relative' }}>
                 {localPortalConfig.bgUrl ? (
                   <>
@@ -522,7 +565,38 @@ export default function SettingsView({ showToast }) {
                   <span style={{ color: '#666' }}>No custom background (using default theme color)</span>
                 )}
               </div>
-              <div className={styles.formGroup} style={{ marginTop: '16px', marginBottom: '16px' }}>
+              <div style={{ display: 'flex', gap: '12px', alignItems: 'center', marginTop: '12px' }}>
+                  <label className={styles.uploadLabelBtn}>
+                  {logoLoading === 'portal_hero_bg_url' ? 'Uploading...' : 'Upload Light Background'}
+                  <input type="file" accept="image/*" onChange={(e) => handleLogoUpload(e, 'portal_hero_bg_url')} className={styles.fileInputOverlay} />
+                </label>
+                <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>(JPG, PNG, SVG, WEBP)</span>
+                {localPortalConfig.bgUrl && (
+                  <button type="button" onClick={handleDeleteHeroBg} disabled={portalSaving} className={styles.deleteBgBtn}>
+                    <Trash size={16} /> Remove
+                  </button>
+                )}
+              </div>
+
+              <h3 className={styles.logoCardTitle} style={{ fontSize: '16px', marginTop: '24px' }}>Dark Mode Background (Optional)</h3>
+              <div className={styles.logoPreviewBox} style={{ height: '160px', background: '#1e293b', overflow: 'hidden', position: 'relative' }}>
+                {localPortalConfig.darkBgUrl ? (
+                  <>
+                    <img src={localPortalConfig.darkBgUrl} alt="Dark Hero Background Preview" className={styles.logoPreviewImg} style={{ objectFit: 'cover', width: '100%', height: '100%' }} />
+                    <div style={{ position: 'absolute', inset: 0, background: `rgba(0,0,0,${localPortalConfig.bgOpacity ?? 0.5})` }} />
+                  </>
+                ) : (
+                  <span style={{ color: '#94a3b8' }}>No dark mode variant</span>
+                )}
+              </div>
+              <div style={{ display: 'flex', gap: '12px', alignItems: 'center', marginTop: '12px' }}>
+                  <label className={styles.uploadLabelBtn}>
+                  {logoLoading === 'dark_portal_hero_bg_url' ? 'Uploading...' : 'Upload Dark Background'}
+                  <input type="file" accept="image/*" onChange={(e) => handleLogoUpload(e, 'dark_portal_hero_bg_url')} className={styles.fileInputOverlay} />
+                </label>
+              </div>
+
+              <div className={styles.formGroup} style={{ marginTop: '24px', marginBottom: '16px' }}>
                 <label htmlFor="bg-opacity" className={styles.formLabel}>Background Overlay Opacity</label>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                   <input
@@ -538,18 +612,7 @@ export default function SettingsView({ showToast }) {
                   <span>{localPortalConfig.bgOpacity ?? 0.5}</span>
                 </div>
               </div>
-              <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-                  <label className={styles.uploadLabelBtn}>
-                  {logoLoading === 'portal_hero_bg_url' ? 'Uploading...' : 'Upload New Hero Background'}
-                  <input type="file" accept="image/*" onChange={(e) => handleLogoUpload(e, 'portal_hero_bg_url')} className={styles.fileInputOverlay} />
-                </label>
-                <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>(JPG, PNG, SVG, WEBP)</span>
-                {localPortalConfig.bgUrl && (
-                  <button type="button" onClick={handleDeleteHeroBg} disabled={portalSaving} className={styles.deleteBgBtn}>
-                    <Trash size={16} /> Remove Custom Background
-                  </button>
-                )}
-              </div>
+
               <button
                 type="button"
                 disabled={portalSaving}

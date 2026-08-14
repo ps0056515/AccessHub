@@ -8,6 +8,7 @@ import { useAuth } from "context/AuthContext";
 import { useConfig } from "context/ConfigContext";
 import { useToast } from "context/ToastContext";
 import { useAriaLive } from "context/AriaLiveContext";
+import { useTheme } from "context/ThemeContext";
 import Container from "components/common/Container/Container";
 import Pagination from "components/common/Pagination/Pagination";
 import RelativeTime from "components/common/RelativeTime/RelativeTime";
@@ -249,6 +250,7 @@ export default function Portal({
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
   const { portalConfig } = useConfig();
+  const { theme } = useTheme();
   const { addToast } = useToast();
   const { announce } = useAriaLive();
   const [activeTab, setActiveTab] = useState("hot");
@@ -540,7 +542,13 @@ export default function Portal({
         className={styles.hero}
         aria-labelledby="hero-heading"
         style={
-          portalConfig.bgUrl
+          theme === 'dark' && portalConfig.darkBgUrl
+            ? {
+                backgroundImage: `url(${portalConfig.darkBgUrl})`,
+                backgroundSize: "cover",
+                backgroundPosition: "center",
+              }
+            : portalConfig.bgUrl
             ? {
                 backgroundImage: `url(${portalConfig.bgUrl})`,
                 backgroundSize: "cover",
@@ -549,7 +557,7 @@ export default function Portal({
             : undefined
         }
       >
-        {portalConfig.bgUrl && (
+        {((theme === 'dark' && portalConfig.darkBgUrl) || portalConfig.bgUrl) && (
           <div
             style={{
               position: "absolute",
@@ -618,7 +626,7 @@ export default function Portal({
             </button>
           </div>
         </Container>
-        {!portalConfig.bgUrl && (
+        {!((theme === 'dark' && portalConfig.darkBgUrl) || portalConfig.bgUrl) && (
           <div className={styles.heroDecor} aria-hidden="true">
             <div className={styles.decorCircle1} />
             <div className={styles.decorCircle2} />

@@ -54,9 +54,13 @@ router.get('/', async (req, res, next) => {
 
     res.json({
       site_name: settings.site_name !== undefined ? settings.site_name : 'AllCanAccess',
+      enable_theme_toggle: settings.enable_theme_toggle !== undefined ? settings.enable_theme_toggle === 'true' : true,
       navbar_logo_url: settings.navbar_logo_url || '/allcanaccess.png',
+      dark_navbar_logo_url: settings.dark_navbar_logo_url || '',
       footer_logo_url: settings.footer_logo_url || '/allcanaccess_footer.png',
+      dark_footer_logo_url: settings.dark_footer_logo_url || '',
       portal_hero_bg_url: settings.portal_hero_bg_url || '',
+      dark_portal_hero_bg_url: settings.dark_portal_hero_bg_url || '',
       portal_hero_bg_opacity: settings.portal_hero_bg_opacity !== undefined ? parseFloat(settings.portal_hero_bg_opacity) : 0.5,
       portal_hero_content_position: settings.portal_hero_content_position || 'left',
       portal_hero_badge: settings.portal_hero_badge !== undefined ? settings.portal_hero_badge : null,
@@ -79,12 +83,14 @@ router.get('/', async (req, res, next) => {
 router.put('/', authMiddleware, adminMiddleware, async (req, res, next) => {
   const { 
     site_name, 
+    enable_theme_toggle,
     portal_hero_badge, 
     portal_hero_heading, 
     portal_hero_subheading, 
     portal_hero_tags, 
     portal_stats, 
     portal_hero_bg_url,
+    dark_portal_hero_bg_url,
     portal_hero_bg_opacity,
     portal_hero_content_position,
     portal_ask_placeholder,
@@ -99,7 +105,7 @@ router.put('/', authMiddleware, adminMiddleware, async (req, res, next) => {
       if (v === undefined) return;
 
       // If we are clearing a URL field (e.g., removing an image), delete the old physical file
-      if (v === '' && (k.endsWith('_logo_url') || k === 'portal_hero_bg_url')) {
+      if (v === '' && (k.endsWith('_logo_url') || k.endsWith('_bg_url'))) {
         const oldSettings = await query('SELECT value FROM system_settings WHERE key = $1', [k]);
         if (oldSettings.rows.length > 0) {
           const oldUrl = oldSettings.rows[0].value;
@@ -123,10 +129,12 @@ router.put('/', authMiddleware, adminMiddleware, async (req, res, next) => {
     };
 
     if (site_name !== undefined) await upsert('site_name', site_name.trim());
+    if (enable_theme_toggle !== undefined) await upsert('enable_theme_toggle', enable_theme_toggle ? 'true' : 'false');
     await upsert('portal_hero_badge', portal_hero_badge);
     await upsert('portal_hero_heading', portal_hero_heading);
     await upsert('portal_hero_subheading', portal_hero_subheading);
     await upsert('portal_hero_bg_url', portal_hero_bg_url);
+    await upsert('dark_portal_hero_bg_url', dark_portal_hero_bg_url);
     await upsert('portal_hero_bg_opacity', portal_hero_bg_opacity);
     await upsert('portal_hero_content_position', portal_hero_content_position);
     await upsert('portal_ask_placeholder', portal_ask_placeholder);
@@ -155,7 +163,8 @@ router.post('/upload-logo', authMiddleware, adminMiddleware, async (req, res, ne
     res.status(400).json({ error: 'Data, filename, and setting key are required.' });
     return;
   }
-  if (key !== 'navbar_logo_url' && key !== 'footer_logo_url' && key !== 'portal_hero_bg_url') {
+  if (key !== 'navbar_logo_url' && key !== 'footer_logo_url' && key !== 'portal_hero_bg_url' &&
+      key !== 'dark_navbar_logo_url' && key !== 'dark_footer_logo_url' && key !== 'dark_portal_hero_bg_url') {
     res.status(400).json({ error: 'Invalid file key.' });
     return;
   }
@@ -171,9 +180,9 @@ router.post('/upload-logo', authMiddleware, adminMiddleware, async (req, res, ne
   const buffer = Buffer.from(base64Data, 'base64');
   const size = buffer.length;
 
-  // Validation: Logo size MUST be smaller than 2MB
-  if (size > 2 * 1024 * 1024) {
-    res.status(400).json({ error: 'Logo file size must be smaller than 2MB.' });
+  // Validation: Logo size MUST be smaller than 5MB
+  if (size > 5 * 1024 * 1024) {
+    res.status(400).json({ error: 'Logo file size must be smaller than 5MB.' });
     return;
   }
 

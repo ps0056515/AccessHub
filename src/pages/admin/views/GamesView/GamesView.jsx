@@ -21,6 +21,7 @@ export default function GamesView({ showToast }) {
     title: "",
     description: "",
     is_active: true,
+    deleteThumbnail: false,
   });
   
   const [htmlFile, setHtmlFile] = useState(null);
@@ -50,6 +51,7 @@ export default function GamesView({ showToast }) {
         title: game.title,
         description: game.description || "",
         is_active: game.is_active,
+        deleteThumbnail: false,
       });
       setExistingThumbnail(game.thumbnail);
     } else {
@@ -58,6 +60,7 @@ export default function GamesView({ showToast }) {
         title: "",
         description: "",
         is_active: true,
+        deleteThumbnail: false,
       });
       setExistingThumbnail(null);
     }
@@ -68,7 +71,7 @@ export default function GamesView({ showToast }) {
 
   const closeEditor = () => {
     setIsEditing(false);
-    setFormData({ id: null, title: "", description: "", is_active: true });
+    setFormData({ id: null, title: "", description: "", is_active: true, deleteThumbnail: false });
     setHtmlFile(null);
     setThumbnailFile(null);
     setExistingThumbnail(null);
@@ -91,6 +94,7 @@ export default function GamesView({ showToast }) {
       formPayload.append("title", formData.title);
       formPayload.append("description", formData.description);
       formPayload.append("is_active", formData.is_active);
+      formPayload.append("deleteThumbnail", formData.deleteThumbnail);
       
       if (htmlFile) formPayload.append("htmlFile", htmlFile);
       if (thumbnailFile) formPayload.append("thumbnail", thumbnailFile);
@@ -143,7 +147,7 @@ export default function GamesView({ showToast }) {
       render: (row) => (
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
           {row.thumbnail ? (
-            <img src={row.thumbnail} alt="" style={{ width: 40, height: 40, borderRadius: 6, objectFit: 'cover' }} />
+            <img src={row.thumbnail} alt="" style={{ width: 40, height: 40, borderRadius: 6, objectFit: 'contain', backgroundColor: 'var(--bg-secondary)' }} />
           ) : (
             <div style={{ width: 40, height: 40, borderRadius: 6, backgroundColor: 'var(--bg-tertiary)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>🎮</div>
           )}
@@ -309,16 +313,32 @@ export default function GamesView({ showToast }) {
               id="game-thumb"
               type="file"
               accept="image/*"
-              onChange={(e) => setThumbnailFile(e.target.files[0])}
+              onChange={(e) => {
+                setThumbnailFile(e.target.files[0]);
+                setFormData({ ...formData, deleteThumbnail: false });
+              }}
               className={styles.input}
               style={{ padding: "8px" }}
             />
-            {(thumbnailFile || existingThumbnail) && (
-              <img
-                src={thumbnailFile ? URL.createObjectURL(thumbnailFile) : existingThumbnail}
-                alt="Thumbnail preview"
-                className={styles.thumbPreview}
-              />
+            {!formData.deleteThumbnail && (thumbnailFile || existingThumbnail) && (
+              <div style={{ display: 'flex', alignItems: 'flex-end', gap: '16px' }}>
+                <img
+                  src={thumbnailFile ? URL.createObjectURL(thumbnailFile) : existingThumbnail}
+                  alt="Thumbnail preview"
+                  className={styles.thumbPreview}
+                />
+                <button
+                  type="button"
+                  onClick={() => {
+                    setThumbnailFile(null);
+                    setFormData({ ...formData, deleteThumbnail: true });
+                    document.getElementById('game-thumb').value = '';
+                  }}
+                  className={styles.btnDanger}
+                >
+                  Delete Image
+                </button>
+              </div>
             )}
           </div>
 

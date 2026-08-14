@@ -203,6 +203,9 @@
 .thumbPreview {
   width: 150px;
   height: auto;
+  max-height: 120px;
+  object-fit: contain;
+  background-color: var(--bg-secondary);
   border-radius: 8px;
   margin-top: 8px;
   border: 1px solid var(--border);
