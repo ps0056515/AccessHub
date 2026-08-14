@@ -451,7 +451,7 @@ router.post('/forgot-password', async (req, res, next) => {
     const { rows } = await query(`${USER_SELECT} WHERE LOWER(email) = $1`, [normalizedEmail]);
     const user = rows[0];
 
-    if (user?.password_hash) {
+    if (user) {
       const token = generateResetToken();
       const tokenHash = hashResetToken(token);
       const expiresAt = resetExpiresAt();
