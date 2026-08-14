@@ -104,7 +104,7 @@ router.post('/', upload.fields([{ name: 'htmlFile', maxCount: 1 }, { name: 'thum
 router.put('/:id', upload.fields([{ name: 'thumbnail', maxCount: 1 }]), async (req, res, next) => {
   try {
     const id = Number(req.params.id);
-    const { title, description, is_active } = req.body;
+    const { title, description, is_active, deleteThumbnail } = req.body;
 
     if (!Number.isFinite(id)) {
       return res.status(400).json({ error: 'Invalid game ID' });
@@ -116,7 +116,13 @@ router.put('/:id', upload.fields([{ name: 'thumbnail', maxCount: 1 }]), async (r
     }
 
     let thumbnailPath = existing[0].thumbnail;
-    if (req.files && req.files['thumbnail'] && req.files['thumbnail'][0]) {
+    if (deleteThumbnail === 'true') {
+      if (thumbnailPath) {
+        const thumbFilePath = path.join(__dirname, '..', thumbnailPath.replace('/api/', ''));
+        if (fs.existsSync(thumbFilePath)) fs.unlinkSync(thumbFilePath);
+      }
+      thumbnailPath = null;
+    } else if (req.files && req.files['thumbnail'] && req.files['thumbnail'][0]) {
       // Optional: Delete old thumbnail if needed
       thumbnailPath = '/api/uploads/games/thumbnails/' + req.files['thumbnail'][0].filename;
     }

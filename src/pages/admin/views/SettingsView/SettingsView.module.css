@@ -18,6 +18,11 @@
   transition: background 0.2s, color 0.2s;
 }
 
+.tabBtn:hover:not(.tabBtnActive) {
+  background: var(--bg-secondary);
+  color: var(--text);
+}
+
 .tabBtnActive {
   background: var(--accent);
   color: #ffffff;
@@ -59,8 +64,9 @@
   border: none;
 }
 
-.saveBtn:hover {
+.saveBtn:hover:not(:disabled) {
   background: #063d82;
+  color: #ffffff;
 }
 
 .logosGrid {
@@ -187,6 +193,7 @@
 
 .addLinkBtn:hover {
   background: var(--bg-secondary);
+  color: var(--text);
 }
 
 .linksList {
@@ -220,6 +227,12 @@
   border-radius: 4px;
   font-size: 12px;
   cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+.editBtn:hover {
+  background: var(--bg-secondary);
+  color: var(--text);
 }
 
 .sortBtn {
@@ -233,6 +246,11 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: color 0.2s;
+}
+
+.sortBtn:hover:not(:disabled) {
+  color: var(--text);
 }
 
 .sortBtn:disabled {
@@ -278,6 +296,10 @@
   color: var(--text-muted);
 }
 
+.checkboxLabel:hover {
+  color: var(--text);
+}
+
 .deleteLinkBtn {
   background: transparent;
   border: none;
@@ -285,6 +307,11 @@
   cursor: pointer;
   font-size: 16px;
   padding: 4px;
+  transition: color 0.2s;
+}
+
+.deleteLinkBtn:hover {
+  color: #b91c1c;
 }
 
 .emptyState {
@@ -352,8 +379,9 @@
   cursor: pointer;
 }
 
-.createBtn:hover {
+.createBtn:hover:not(:disabled) {
   background: #063d82;
+  color: #ffffff;
 }
 
 .createBtn:disabled {

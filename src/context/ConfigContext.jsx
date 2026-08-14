@@ -6,7 +6,10 @@ const ConfigContext = createContext(null);
 export function ConfigProvider({ children }) {
   const [siteName, setSiteName] = useState('');
   const [navbarLogoUrl, setNavbarLogoUrl] = useState('/allcanaccess.png');
+  const [darkNavbarLogoUrl, setDarkNavbarLogoUrl] = useState('');
   const [footerLogoUrl, setFooterLogoUrl] = useState('/allcanaccess_footer.png');
+  const [darkFooterLogoUrl, setDarkFooterLogoUrl] = useState('');
+  const [enableThemeToggle, setEnableThemeToggle] = useState(true);
 const [navigation, setNavigation] = useState({
   navbar: [],
   footer_community: [],
@@ -20,6 +23,7 @@ const [navigation, setNavigation] = useState({
   // Portal Hero config
   const [portalConfig, setPortalConfig] = useState({
     bgUrl: '',
+    darkBgUrl: '',
     bgOpacity: 0.5,
     contentPosition: 'center',
     badge: 'Live community · weekly office hours',
@@ -62,12 +66,16 @@ const [navigation, setNavigation] = useState({
       if (data) {
         if (data.site_name) setSiteName(data.site_name);
         if (data.navbar_logo_url) setNavbarLogoUrl(data.navbar_logo_url);
+        if (data.dark_navbar_logo_url !== undefined) setDarkNavbarLogoUrl(data.dark_navbar_logo_url);
         if (data.footer_logo_url) setFooterLogoUrl(data.footer_logo_url);
+        if (data.dark_footer_logo_url !== undefined) setDarkFooterLogoUrl(data.dark_footer_logo_url);
+        if (data.enable_theme_toggle !== undefined) setEnableThemeToggle(data.enable_theme_toggle);
         if (data.navigation) setNavigation(data.navigation);
         if (data.footer_columns) setFooterColumns(data.footer_columns);
         
         setPortalConfig(prev => ({
           bgUrl: data.portal_hero_bg_url ?? prev.bgUrl,
+          darkBgUrl: data.dark_portal_hero_bg_url ?? prev.darkBgUrl,
           bgOpacity: data.portal_hero_bg_opacity ?? prev.bgOpacity,
           contentPosition: data.portal_hero_content_position || prev.contentPosition,
           badge: data.portal_hero_badge ?? prev.badge,
@@ -93,8 +101,11 @@ const [navigation, setNavigation] = useState({
 
   const value = {
     siteName,
+    enableThemeToggle,
     navbarLogoUrl,
+    darkNavbarLogoUrl,
     footerLogoUrl,
+    darkFooterLogoUrl,
     navigation,
     footerColumns,
     portalConfig,
