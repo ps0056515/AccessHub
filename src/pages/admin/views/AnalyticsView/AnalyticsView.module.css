@@ -3,6 +3,39 @@
    Premium, enterprise-grade styling using global CSS variables.
    ============================================================ */
 
+/* --- View Toggle Tabs --- */
+.viewTabs {
+  display: flex;
+  gap: 4px;
+  border-bottom: 2px solid var(--border);
+  margin-bottom: 8px;
+}
+
+.viewTab {
+  background: none;
+  border: none;
+  border-bottom: 3px solid transparent;
+  margin-bottom: -2px;
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  cursor: pointer;
+  border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+  transition: color 0.15s, border-color 0.15s, background 0.15s;
+}
+
+.viewTab:hover {
+  color: var(--text-primary);
+  background: var(--surface-secondary);
+}
+
+.viewTabActive {
+  color: var(--text-primary) !important;
+  border-bottom-color: var(--button-primary) !important;
+  font-weight: 700;
+}
+
 /* --- Error / Retry --- */
 .errorContainer {
   padding: 48px;

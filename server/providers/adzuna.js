@@ -5,12 +5,11 @@
  */
 
 const axios = require('axios');
-const { normalizeJob, isRelevantJob } = require('./baseProvider');
+const { normalizeJob, isRelevantJob, detectCountryCode } = require('./baseProvider');
 
 const PROVIDER_NAME = 'adzuna';
 const BASE_URL = 'https://api.adzuna.com/v1/api/jobs';
 const TIMEOUT_MS = 10000;
-const DEFAULT_COUNTRY = 'us';
 const RESULTS_PER_PAGE = 20;
 
 /**
@@ -31,7 +30,7 @@ async function searchJobs({ query, location, remoteOnly, page = 1 }) {
     throw new Error('Adzuna: ADZUNA_APP_ID or ADZUNA_APP_KEY not configured');
   }
 
-  const country = DEFAULT_COUNTRY;
+  const country = detectCountryCode(location);
   const url = `${BASE_URL}/${country}/search/${page}`;
 
   const params = {
@@ -39,7 +38,7 @@ async function searchJobs({ query, location, remoteOnly, page = 1 }) {
     app_key: process.env.ADZUNA_APP_KEY,
     results_per_page: RESULTS_PER_PAGE,
     what: query,
-    max_days_old: 7
+    max_days_old: 30
   };
 
   if (location) {

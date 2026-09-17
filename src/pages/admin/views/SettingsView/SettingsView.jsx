@@ -447,7 +447,7 @@ export default function SettingsView({ showToast }) {
                   {darkNavbarLogoUrl ? (
                     <img src={darkNavbarLogoUrl} alt="Dark Navbar Logo Preview" className={styles.logoPreviewImg} />
                   ) : (
-                    <span style={{ color: '#94a3b8' }}>No dark mode variant</span>
+                    <span style={{ color: '#cbd5e1' }}>No dark mode variant</span>
                   )}
                 </div>
                 <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
@@ -477,7 +477,7 @@ export default function SettingsView({ showToast }) {
                   {darkFooterLogoUrl ? (
                     <img src={darkFooterLogoUrl} alt="Dark Footer Logo Preview" className={styles.logoPreviewImg} />
                   ) : (
-                    <span style={{ color: '#94a3b8' }}>No dark mode variant</span>
+                    <span style={{ color: '#cbd5e1' }}>No dark mode variant</span>
                   )}
                 </div>
                 <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
@@ -562,7 +562,7 @@ export default function SettingsView({ showToast }) {
                     <div style={{ position: 'absolute', inset: 0, background: `rgba(255,255,255,${localPortalConfig.bgOpacity ?? 0.5})` }} />
                   </>
                 ) : (
-                  <span style={{ color: '#666' }}>No custom background (using default theme color)</span>
+                  <span style={{ color: '#444444' }}>No custom background (using default theme color)</span>
                 )}
               </div>
               <div style={{ display: 'flex', gap: '12px', alignItems: 'center', marginTop: '12px' }}>
@@ -586,7 +586,7 @@ export default function SettingsView({ showToast }) {
                     <div style={{ position: 'absolute', inset: 0, background: `rgba(0,0,0,${localPortalConfig.bgOpacity ?? 0.5})` }} />
                   </>
                 ) : (
-                  <span style={{ color: '#94a3b8' }}>No dark mode variant</span>
+                  <span style={{ color: '#cbd5e1' }}>No dark mode variant</span>
                 )}
               </div>
               <div style={{ display: 'flex', gap: '12px', alignItems: 'center', marginTop: '12px' }}>

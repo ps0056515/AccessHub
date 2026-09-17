@@ -128,6 +128,10 @@ export const authApi = {
 export const adminApi = {
   stats: () => api("/api/admin/stats"),
   analytics: (timeframe) => api(`/api/admin/analytics?timeframe=${timeframe}`),
+  analyticsSessions: (timeframe, page = 1) =>
+    api(`/api/admin/analytics/sessions?timeframe=${timeframe}&page=${page}`),
+  analyticsSessionPages: (sessionId) =>
+    api(`/api/admin/analytics/sessions/${sessionId}/pages`),
   users: () => api("/api/admin/users"),
   toggleAdminRole: (id, is_admin) =>
     api(`/api/admin/users/${id}/role`, {

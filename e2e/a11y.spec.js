@@ -1,6 +1,6 @@
 const { test, expect } = require('@playwright/test');
 const { AxeBuilder } = require('@axe-core/playwright');
-
+  
 /** Collapse axe output for readable test failures */
 function summarize(violations) {
   return violations.map(v => ({

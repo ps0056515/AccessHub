@@ -208,6 +208,87 @@ router.get('/analytics', async (req, res, next) => {
   }
 });
 
+// GET /api/admin/analytics/sessions — paginated session list with user info
+router.get('/analytics/sessions', async (req, res, next) => {
+  try {
+    const page = Math.max(1, parseInt(req.query.page, 10) || 1);
+    const limit = 25;
+    const offset = (page - 1) * limit;
+    const { timeframe } = req.query;
+
+    let dateFilter = "NOW() - INTERVAL '30 days'";
+    if (timeframe === '7d') dateFilter = "NOW() - INTERVAL '7 days'";
+    else if (timeframe === 'ytd') dateFilter = "DATE_TRUNC('year', NOW())";
+    else if (timeframe === 'all') dateFilter = "'1970-01-01'";
+
+    const totalResult = await query(
+      `SELECT COUNT(*)::int AS n FROM analytics_sessions WHERE started_at >= ${dateFilter}`
+    );
+    const total = totalResult.rows[0].n;
+
+    const { rows } = await query(`
+      SELECT
+        s.id,
+        s.visitor_id,
+        s.user_id,
+        u.display_name   AS user_name,
+        u.email          AS user_email,
+        u.is_admin       AS user_is_admin,
+        s.country,
+        s.city,
+        s.device_type,
+        s.browser,
+        s.os,
+        s.referrer_domain,
+        s.referrer_category,
+        s.utm_source,
+        s.utm_medium,
+        s.utm_campaign,
+        s.page_count,
+        s.is_bounce,
+        s.started_at,
+        s.ended_at,
+        ROUND(EXTRACT(EPOCH FROM (s.ended_at - s.started_at)))::int AS duration_seconds
+      FROM analytics_sessions s
+      LEFT JOIN users u ON u.id = s.user_id
+      WHERE s.started_at >= ${dateFilter}
+      ORDER BY s.started_at DESC
+      LIMIT $1 OFFSET $2
+    `, [limit, offset]);
+
+    res.json({
+      sessions: rows,
+      total,
+      page,
+      totalPages: Math.ceil(total / limit),
+      limit
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// GET /api/admin/analytics/sessions/:id/pages — all page views for a session
+router.get('/analytics/sessions/:id/pages', async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const { rows } = await query(`
+      SELECT
+        pv.id,
+        pv.path,
+        pv.created_at
+      FROM analytics_page_views pv
+      WHERE pv.session_id = $1
+      ORDER BY pv.created_at ASC
+    `, [id]);
+
+    res.json({ pages: rows });
+  } catch (err) {
+    next(err);
+  }
+});
+
+
 router.get('/users', async (_req, res, next) => {
   try {
     const { rows } = await query(`${USER_SELECT} ORDER BY created_at DESC`);

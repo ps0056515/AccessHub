@@ -117,7 +117,7 @@ function toResponseShape(job) {
 // ─── Main Search Route ────────────────────────────────────────────────────────
 router.get('/', async (req, res) => {
   const searchTerms = req.query.query || 'accessibility';
-  const location = req.query.location || '';
+  const location = req.query.location || 'India';
   const page = parseInt(req.query.page, 10) || 1;
   const remoteOnly = req.query.remote_jobs_only === 'true';
 

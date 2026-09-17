@@ -4,7 +4,7 @@
  */
 
 const axios = require('axios');
-const { normalizeJob, isRelevantJob } = require('./baseProvider');
+const { normalizeJob, isRelevantJob, detectCountryCode } = require('./baseProvider');
 
 const PROVIDER_NAME = 'jsearch';
 const BASE_URL = 'https://jsearch.p.rapidapi.com/search-v2';
@@ -14,73 +14,6 @@ const TIMEOUT_MS = 15000;
 const ROTATE_ON_STATUS = [401, 403, 404, 429];
 // Statuses that are transient — retry with same key (not applicable here since we rotate)
 const TRANSIENT_STATUS = [500, 502, 503, 504];
-
-// Map common location names / country names to JSearch country codes
-const COUNTRY_MAP = {
-  // Americas
-  'us': 'us', 'usa': 'us', 'united states': 'us', 'america': 'us',
-  'canada': 'ca', 'ca': 'ca',
-  'brazil': 'br', 'brasil': 'br', 'br': 'br',
-  'mexico': 'mx', 'mx': 'mx',
-  'argentina': 'ar', 'ar': 'ar',
-
-  // Europe
-  'uk': 'gb', 'gb': 'gb', 'united kingdom': 'gb', 'england': 'gb', 'britain': 'gb',
-  'germany': 'de', 'de': 'de', 'deutschland': 'de',
-  'france': 'fr', 'fr': 'fr',
-  'spain': 'es', 'es': 'es',
-  'italy': 'it', 'it': 'it',
-  'netherlands': 'nl', 'nl': 'nl', 'holland': 'nl',
-  'sweden': 'se', 'se': 'se',
-  'norway': 'no', 'no': 'no',
-  'denmark': 'dk', 'dk': 'dk',
-  'finland': 'fi', 'fi': 'fi',
-  'switzerland': 'ch', 'ch': 'ch',
-  'austria': 'at', 'at': 'at',
-  'belgium': 'be', 'be': 'be',
-  'portugal': 'pt', 'pt': 'pt',
-  'poland': 'pl', 'pl': 'pl',
-  'ireland': 'ie', 'ie': 'ie',
-
-  // Asia
-  'india': 'in', 'in': 'in',
-  'singapore': 'sg', 'sg': 'sg',
-  'australia': 'au', 'au': 'au',
-  'new zealand': 'nz', 'nz': 'nz',
-  'japan': 'jp', 'jp': 'jp',
-  'south korea': 'kr', 'korea': 'kr', 'kr': 'kr',
-  'china': 'cn', 'cn': 'cn',
-  'hong kong': 'hk', 'hk': 'hk',
-  'uae': 'ae', 'dubai': 'ae', 'united arab emirates': 'ae', 'ae': 'ae',
-  'israel': 'il', 'il': 'il',
-  'malaysia': 'my', 'my': 'my',
-  'philippines': 'ph', 'ph': 'ph',
-
-  // Africa
-  'south africa': 'za', 'za': 'za',
-  'nigeria': 'ng', 'ng': 'ng',
-  'kenya': 'ke', 'ke': 'ke',
-};
-
-/**
- * Detect country code from a free-text location string.
- * Returns 'us' as default if no match found.
- */
-function detectCountryCode(location) {
-  if (!location) return 'us';
-  const lower = location.toLowerCase().trim();
-
-  // Check if the location directly matches a country name/code
-  if (COUNTRY_MAP[lower]) return COUNTRY_MAP[lower];
-
-  // Check if any country name appears anywhere in the location string
-  for (const [key, code] of Object.entries(COUNTRY_MAP)) {
-    if (lower.includes(key)) return code;
-  }
-
-  // Default to US — JSearch requires a country param
-  return 'us';
-}
 
 /**
  * Fetch jobs from JSearch API.
@@ -106,7 +39,7 @@ async function searchJobs({ query, location, remoteOnly, page = 1 }) {
     query: jsearchQuery,
     page: String(page),
     num_pages: '1',
-    date_posted: 'week',
+    date_posted: 'month',
     country: countryCode
   };
 

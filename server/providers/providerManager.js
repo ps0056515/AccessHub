@@ -189,8 +189,8 @@ async function getJobsFromDB({ query, location, remoteOnly, limit = 20 }) {
       conditions.push(`is_remote = TRUE`);
     }
 
-    // Only return jobs from the last 7 days
-    conditions.push(`(posted_date IS NULL OR posted_date >= NOW() - INTERVAL '7 days')`);
+    // Only return jobs from the last 30 days
+    conditions.push(`(posted_date IS NULL OR posted_date >= NOW() - INTERVAL '30 days')`);
 
     const sql = `
       SELECT * FROM accessibility_jobs
@@ -234,7 +234,7 @@ async function getDBJobCount() {
 async function getRecentDBJobCount() {
   try {
     const result = await dbQuery(
-      `SELECT COUNT(*) FROM accessibility_jobs WHERE active = TRUE AND (posted_date >= NOW() - INTERVAL '7 days' OR posted_date IS NULL)`
+      `SELECT COUNT(*) FROM accessibility_jobs WHERE active = TRUE AND (posted_date >= NOW() - INTERVAL '30 days' OR posted_date IS NULL)`
     );
     return parseInt(result.rows[0].count, 10);
   } catch {

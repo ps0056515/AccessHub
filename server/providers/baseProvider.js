@@ -8,8 +8,77 @@
 const ACCESSIBILITY_KEYWORDS = [
   'accessibil', 'wcag', 'a11y', 'ada ', 'section 508', '508 compliance',
   'screen reader', 'assistive technology', 'inclusive design',
-  'vpat', 'jaws', 'nvda', 'voiceover'
+  'vpat', 'jaws', 'nvda', 'voiceover', 'digital accessibility',
+  'web accessibility', 'accessibility tester', 'accessibility consultant',
+  'accessibility engineer', 'accessibility specialist', 'w3c', 'aria',
+  'inclusive digital', 'keyboard navigation', 'pdf remediation'
 ];
+
+// Map common location names / country names to country codes
+const COUNTRY_MAP = {
+  // Americas
+  'us': 'us', 'usa': 'us', 'united states': 'us', 'america': 'us',
+  'canada': 'ca', 'ca': 'ca',
+  'brazil': 'br', 'brasil': 'br', 'br': 'br',
+  'mexico': 'mx', 'mx': 'mx',
+  'argentina': 'ar', 'ar': 'ar',
+
+  // Europe
+  'uk': 'gb', 'gb': 'gb', 'united kingdom': 'gb', 'england': 'gb', 'britain': 'gb',
+  'germany': 'de', 'de': 'de', 'deutschland': 'de',
+  'france': 'fr', 'fr': 'fr',
+  'spain': 'es', 'es': 'es',
+  'italy': 'it', 'it': 'it',
+  'netherlands': 'nl', 'nl': 'nl', 'holland': 'nl',
+  'sweden': 'se', 'se': 'se',
+  'norway': 'no', 'no': 'no',
+  'denmark': 'dk', 'dk': 'dk',
+  'finland': 'fi', 'fi': 'fi',
+  'switzerland': 'ch', 'ch': 'ch',
+  'austria': 'at', 'at': 'at',
+  'belgium': 'be', 'be': 'be',
+  'portugal': 'pt', 'pt': 'pt',
+  'poland': 'pl', 'pl': 'pl',
+  'ireland': 'ie', 'ie': 'ie',
+
+  // Asia
+  'india': 'in', 'in': 'in',
+  'singapore': 'sg', 'sg': 'sg',
+  'australia': 'au', 'au': 'au',
+  'new zealand': 'nz', 'nz': 'nz',
+  'japan': 'jp', 'jp': 'jp',
+  'south korea': 'kr', 'korea': 'kr', 'kr': 'kr',
+  'china': 'cn', 'cn': 'cn',
+  'hong kong': 'hk', 'hk': 'hk',
+  'uae': 'ae', 'dubai': 'ae', 'united arab emirates': 'ae', 'ae': 'ae',
+  'israel': 'il', 'il': 'il',
+  'malaysia': 'my', 'my': 'my',
+  'philippines': 'ph', 'ph': 'ph',
+
+  // Africa
+  'south africa': 'za', 'za': 'za',
+  'nigeria': 'ng', 'ng': 'ng',
+  'kenya': 'ke', 'ke': 'ke',
+};
+
+/**
+ * Detect country code from a free-text location string.
+ * Returns 'us' as default if no match found.
+ */
+function detectCountryCode(location) {
+  if (!location) return 'us';
+  const lower = location.toLowerCase().trim();
+
+  // Check if the location directly matches a country name/code
+  if (COUNTRY_MAP[lower]) return COUNTRY_MAP[lower];
+
+  // Check if any country name appears anywhere in the location string
+  for (const [key, code] of Object.entries(COUNTRY_MAP)) {
+    if (lower.includes(key)) return code;
+  }
+
+  return 'us';
+}
 
 const TAG_RULES = [
   { keywords: ['wcag', 'web content accessibility', 'web accessibility'], tag: 'WCAG' },
@@ -98,6 +167,7 @@ module.exports = {
   inferTags,
   isRelevantJob,
   truncateDescription,
+  detectCountryCode,
   ACCESSIBILITY_KEYWORDS,
   TAG_RULES
 };

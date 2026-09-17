@@ -8,6 +8,7 @@ import {
 import dashboardStyles from "../../AdminDashboard.module.css";
 import styles from "./AnalyticsView.module.css";
 import AccessibleChartWrapper from "pages/admin/components/AccessibleChartWrapper/AccessibleChartWrapper";
+import SessionsExplorer from "./SessionsExplorer";
 
 // High contrast, WCAG AA compliant color palette (responsive to theme)
 const COLORS = ['var(--chart-1)', 'var(--chart-2)', 'var(--chart-3)', 'var(--chart-4)', 'var(--chart-5)'];
@@ -63,6 +64,7 @@ export default function AnalyticsView({ showToast }) {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
   const [timeframe, setTimeframe] = useState('30d');
+  const [activeView, setActiveView] = useState('overview'); // 'overview' | 'sessions'
 
   useEffect(() => {
     let cancelled = false;
@@ -150,6 +152,38 @@ export default function AnalyticsView({ showToast }) {
         </div>
       </header>
 
+      {/* ==================== VIEW TABS ==================== */}
+      <div className={styles.viewTabs} role="tablist" aria-label="Analytics views">
+        <button
+          type="button"
+          role="tab"
+          aria-selected={activeView === 'overview'}
+          className={`${styles.viewTab} ${activeView === 'overview' ? styles.viewTabActive : ''}`}
+          onClick={() => setActiveView('overview')}
+        >
+          📊 Overview
+        </button>
+        <button
+          type="button"
+          role="tab"
+          aria-selected={activeView === 'sessions'}
+          className={`${styles.viewTab} ${activeView === 'sessions' ? styles.viewTabActive : ''}`}
+          onClick={() => setActiveView('sessions')}
+        >
+          👥 Session Explorer
+        </button>
+      </div>
+
+      {/* ==================== SESSION EXPLORER VIEW ==================== */}
+      {activeView === 'sessions' && (
+        <div role="tabpanel" aria-label="Session Explorer">
+          <SessionsExplorer showToast={showToast} />
+        </div>
+      )}
+
+      {/* ==================== OVERVIEW VIEW ==================== */}
+      {activeView === 'overview' && (
+      <>
       {/* ==================== TIME FILTERS ==================== */}
       <section className={styles.filterControls} aria-label="Filter timeframe">
         {TIMEFRAMES.map((tf) => (
@@ -455,6 +489,8 @@ export default function AnalyticsView({ showToast }) {
           </div>
         </section>
       </div>
+      </>
+      )}
     </>
   );
 }
