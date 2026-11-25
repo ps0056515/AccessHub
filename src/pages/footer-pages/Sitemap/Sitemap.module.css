@@ -34,7 +34,7 @@
 
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr));
   gap: 32px;
 }
 
@@ -44,6 +44,9 @@
   border-radius: 12px;
   padding: 28px;
   transition: box-shadow 0.2s ease, transform 0.2s ease;
+  overflow-wrap: break-word;
+  word-break: break-word;
+  min-width: 0;
 }
 
 .section:hover {
@@ -58,6 +61,8 @@
   margin: 0 0 20px;
   padding-bottom: 12px;
   border-bottom: 2px solid var(--border-secondary);
+  overflow-wrap: break-word;
+  word-break: break-word;
 }
 
 .linkList {
@@ -82,6 +87,8 @@
   padding: 6px 12px;
   margin-left: -12px;
   border-radius: 6px;
+  overflow-wrap: break-word;
+  word-break: break-word;
 }
 
 .linkItem a:hover {
@@ -94,4 +101,48 @@
   color: var(--text-primary);
   background: var(--surface-tertiary);
 }
+
+/* ==================== RESPONSIVE / 400% REFLOW ==================== */
+@media (max-width: 640px) {
+  .container {
+    padding: 36px 16px 64px;
+  }
+
+  .header {
+    margin-bottom: 32px;
+  }
+
+  .title {
+    font-size: clamp(26px, 8vw, 36px);
+    margin-bottom: 12px;
+  }
+
+  .subtitle {
+    font-size: 15px;
+    line-height: 1.55;
+  }
+
+  .grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .section {
+    padding: 20px 16px;
+  }
+
+  .sectionTitle {
+    font-size: 18px;
+    margin-bottom: 14px;
+    padding-bottom: 10px;
+  }
+
+  .linkItem a {
+    font-size: 14px;
+    margin-left: 0;
+    padding: 6px 8px;
+    max-width: 100%;
+  }
+}
+
 

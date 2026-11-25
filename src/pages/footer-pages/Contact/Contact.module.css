@@ -1,4 +1,4 @@
-﻿.container {
+.container {
   min-height: 100vh;
   background: var(--surface-primary);
 }
@@ -51,10 +51,11 @@
 
 .grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
   gap: 16px;
   margin-bottom: 48px;
 }
+
 
 .card {
   background: var(--surface-secondary);
@@ -136,3 +137,38 @@
 .highlight {
   color: var(--text-primary);
 }
+
+/* ==================== RESPONSIVE / 400% REFLOW ==================== */
+@media (max-width: 640px) {
+  .content {
+    padding: 32px 16px 60px;
+  }
+
+  .header {
+    margin-bottom: 32px;
+  }
+
+  .title {
+    font-size: clamp(24px, 7vw, 32px);
+  }
+
+  .subtitle {
+    font-size: 15px;
+    line-height: 1.6;
+  }
+
+  .grid {
+    grid-template-columns: 1fr;
+    gap: 14px;
+    margin-bottom: 32px;
+  }
+
+  .card {
+    padding: 20px 16px;
+  }
+
+  .notice {
+    padding: 16px;
+  }
+}
+
