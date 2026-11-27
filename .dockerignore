@@ -7,3 +7,12 @@ docker-compose.yml
 .env
 .env.*
 npm-debug.log
+MIGRATION_GUIDE.md
+CHAT_HISTORY_SUMMARY.md
+*.zip
+*.bak
+update_nav.js
+scratch
+e2e
+playwright-report
+test-results

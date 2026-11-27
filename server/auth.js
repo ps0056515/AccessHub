@@ -27,11 +27,14 @@ function verifyPassword(password, hash) {
 }
 
 function signToken(user) {
-  return jwt.sign({ sub: user.id, email: user.email }, JWT_SECRET, { expiresIn: TOKEN_TTL });
+  return jwt.sign({ sub: user.id, email: user.email }, JWT_SECRET, {
+    algorithm: 'HS256',
+    expiresIn: TOKEN_TTL,
+  });
 }
 
 function verifyToken(token) {
-  return jwt.verify(token, JWT_SECRET);
+  return jwt.verify(token, JWT_SECRET, { algorithms: ['HS256'] });
 }
 
 

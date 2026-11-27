@@ -59,6 +59,7 @@
     "verify": "npm run build",
     "verify:e2e": "npm run build && playwright test",
     "serve:prod": "serve -s build -l 4173",
+    "security:check": "node scripts/check-secrets.js",
     "eject": "react-scripts eject"
   },
   "browserslist": {

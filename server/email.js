@@ -1,4 +1,5 @@
 const nodemailer = require('nodemailer');
+const { isTrustedResetOrigin } = require('./security');
 
 let transporter;
 
@@ -78,7 +79,7 @@ function escapeAttr(value) {
 }
 
 function buildResetUrl(token, origin, email) {
-  const base = origin || getAppOrigin();
+  const base = isTrustedResetOrigin(origin) ? origin : getAppOrigin();
   const url = new URL(`${base.replace(/\/$/, '')}/reset-password`);
   url.searchParams.set('token', token);
   if (email) {

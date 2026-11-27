@@ -170,12 +170,21 @@ router.post('/upload-logo', authMiddleware, adminMiddleware, async (req, res, ne
   }
 
   // Expecting format: "data:image/png;base64,iVBORw0KGgo..."
-  const match = data.match(/^data:([^;]+);base64,(.+)$/);
+  const match = data.match(/^data:image\/(png|jpe?g|webp|gif|svg\+xml);base64,(.+)$/i);
   if (!match) {
-    res.status(400).json({ error: 'Invalid base64 image data.' });
+    res.status(400).json({ error: 'Invalid image format. Use PNG, JPEG, WebP, GIF, or SVG.' });
     return;
   }
 
+  const MIME_EXT_MAP = {
+    png: '.png',
+    jpg: '.jpg',
+    jpeg: '.jpg',
+    webp: '.webp',
+    gif: '.gif',
+    'svg+xml': '.svg',
+  };
+  const ext = MIME_EXT_MAP[match[1].toLowerCase()] || '.png';
   const base64Data = match[2];
   const buffer = Buffer.from(base64Data, 'base64');
   const size = buffer.length;
@@ -192,7 +201,6 @@ router.post('/upload-logo', authMiddleware, adminMiddleware, async (req, res, ne
       fs.mkdirSync(uploadsDir, { recursive: true });
     }
 
-    const ext = path.extname(filename) || '.png';
     const cleanFilename = `${key}_${Date.now()}${ext}`;
     const filePath = path.join(uploadsDir, cleanFilename);
 

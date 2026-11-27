@@ -10,6 +10,7 @@ const {
 const { verifyGoogleToken } = require('../google');
 const { generateResetToken, hashResetToken, resetExpiresAt } = require('../passwordReset');
 const { sendPasswordResetEmail, sendOtpEmail, buildResetUrl } = require('../email');
+const { authAttemptLimiter, authEmailLimiter, normalizeOrigin } = require('../security');
 const crypto = require('crypto');
 const fs = require('fs');
 const path = require('path');
@@ -50,7 +51,7 @@ function validateSignUp({ email, password, displayName, country, city }) {
   return null;
 }
 
-router.post('/signup', async (req, res, next) => {
+router.post('/signup', authEmailLimiter, async (req, res, next) => {
   const { email, password, displayName, country, city, company, designation } = req.body || {};
   const validationError = validateSignUp({ email, password, displayName, country, city });
   if (validationError) {
@@ -114,7 +115,7 @@ router.post('/signup', async (req, res, next) => {
   }
 });
 
-router.post('/signin', async (req, res, next) => {
+router.post('/signin', authAttemptLimiter, async (req, res, next) => {
   const { email, password } = req.body || {};
   if (!email?.trim() || !password) {
     res.status(400).json({ error: 'Email and password are required.' });
@@ -162,7 +163,7 @@ router.post('/signin', async (req, res, next) => {
   }
 });
 
-router.post('/google', async (req, res, next) => {
+router.post('/google', authAttemptLimiter, async (req, res, next) => {
   const { credential, country, city, company, designation } = req.body || {};
   if (!credential) {
     res.status(400).json({ error: 'Google credential is required.' });
@@ -438,7 +439,7 @@ router.get('/me', authMiddleware, async (req, res, next) => {
   }
 });
 
-router.post('/forgot-password', async (req, res, next) => {
+router.post('/forgot-password', authEmailLimiter, async (req, res, next) => {
   const { email } = req.body || {};
   if (!email?.trim() || !EMAIL_RE.test(email.trim())) {
     res.status(400).json({ error: 'Enter a valid email address.' });
@@ -463,7 +464,7 @@ router.post('/forgot-password', async (req, res, next) => {
         [tokenHash, expiresAt.toISOString(), user.id],
       );
 
-      const reqOrigin = req.headers.origin || (req.headers.referer ? new URL(req.headers.referer).origin : null);
+      const reqOrigin = normalizeOrigin(req.headers.origin) || normalizeOrigin(req.headers.referer);
       const resetUrl = buildResetUrl(token, reqOrigin, user.email);
       try {
         await sendPasswordResetEmail({
@@ -499,7 +500,7 @@ router.post('/forgot-password', async (req, res, next) => {
   }
 });
 
-router.post('/reset-password', async (req, res, next) => {
+router.post('/reset-password', authAttemptLimiter, async (req, res, next) => {
   const { token, password } = req.body || {};
   if (!token?.trim()) {
     res.status(400).json({ error: 'Reset link is invalid or expired.' });
@@ -543,7 +544,7 @@ router.post('/reset-password', async (req, res, next) => {
   }
 });
 
-router.post('/verify-otp', async (req, res, next) => {
+router.post('/verify-otp', authAttemptLimiter, async (req, res, next) => {
   const { email, otp } = req.body || {};
   if (!email || !otp) {
     return res.status(400).json({ error: 'Email and OTP are required.' });
@@ -579,7 +580,7 @@ router.post('/verify-otp', async (req, res, next) => {
   }
 });
 
-router.post('/resend-otp', async (req, res, next) => {
+router.post('/resend-otp', authEmailLimiter, async (req, res, next) => {
   const { email } = req.body || {};
   if (!email) {
     return res.status(400).json({ error: 'Email is required.' });

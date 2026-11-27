@@ -3,6 +3,12 @@ require('dotenv').config();
 const path = require('path');
 const express = require('express');
 const cors = require('cors');
+const helmet = require('helmet');
+const {
+  corsOriginHandler,
+  apiLimiter,
+  checkJwtSecretSecurity,
+} = require('./security');
 const authRoutes = require('./routes/auth');
 const adminRoutes = require('./routes/admin');
 const postsRoutes = require('./routes/posts');
@@ -25,8 +31,23 @@ const { deleteOldJobs } = require('./providers/providerManager');
 const PORT = Number(process.env.API_PORT || process.env.PORT) || 3015;
 const app = express();
 
-app.use(cors({ origin: true, credentials: true }));
+checkJwtSecretSecurity();
+
+// Trust first reverse proxy hop (Nginx/Docker) for accurate rate-limit client IP detection
+app.set('trust proxy', 1);
+
+// Set security headers (allow same-origin game iframes and cross-origin static asset loads in dev)
+app.use(
+  helmet({
+    contentSecurityPolicy: false,
+    crossOriginResourcePolicy: { policy: 'cross-origin' },
+    frameguard: { action: 'sameorigin' },
+  }),
+);
+
+app.use(cors({ origin: corsOriginHandler, credentials: true }));
 app.use(express.json({ limit: '10mb' }));
+app.use('/api/', apiLimiter);
 
 app.get('/api/health', async (_req, res) => {
   try {
